@@ -1,4 +1,4 @@
-import { red } from "@mui/material/colors";
+import { green, red } from "@mui/material/colors";
 import { createTheme } from "@mui/material/styles";
 import defaultTheme from "@mui/material/styles/defaultTheme";
 import { LinkBehavior } from "./components/LinkBehavior";
@@ -78,6 +78,16 @@ const theme = createTheme({
       },
     },
     MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            // "& .Mui-selected": {
+            // "&.Mui-selected": {
+            color: green,
+            // "&.Mui-focusVisible": { background: "orange" },
+          },
+        },
+      },
       defaultProps: {
         LinkComponent: LinkBehavior,
       },

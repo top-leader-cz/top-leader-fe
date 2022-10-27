@@ -18,6 +18,7 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
+import { useMatch } from "react-router-dom";
 import { routes } from "../Routes";
 
 const LogoImg = () => {
@@ -39,9 +40,11 @@ const LogoImg = () => {
 };
 
 const ListItemLink = ({ to, text, icon }) => {
+  const match = useMatch(to ?? "");
+
   return (
     <ListItem disablePadding>
-      <ListItemButton href={to}>
+      <ListItemButton selected={Boolean(match)} href={to}>
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
         <ListItemText primary={text} />
       </ListItemButton>
@@ -54,8 +57,6 @@ export const MainMenu = () => {
     <Paper
       square
       sx={{
-        width: 256,
-        minWidth: 256,
         height: "100vh",
         display: "flex",
         flexFlow: "column nowrap",
@@ -80,10 +81,6 @@ export const MainMenu = () => {
           <ListItemLink text="Get feedback" icon={<ForumOutlined />} />
         </List>
       </Box>
-      {/* <Box>
-        <ListItemLink text={routes.muiDefaultApp} to={routes.muiDefaultApp} />
-        <ListItemLink text={routes.craDefaultApp} to={routes.craDefaultApp} />
-      </Box> */}
       <Box sx={{ mb: 2 }}>
         <ListItemLink text="Settings" icon={<SettingsOutlined />} />
         <ListItemLink text="Help" icon={<HelpOutlined />} />
@@ -94,10 +91,10 @@ export const MainMenu = () => {
           to={routes.signIn}
         />
       </Box>
-      {/* <Avatar variant="rounded" sx={{ bgcolor: "primary.main" }} /> */}
     </Paper>
   );
 };
+// <Avatar variant="rounded" sx={{ bgcolor: "primary.main" }} />
 
 // const Menu = () => {
 
