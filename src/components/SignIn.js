@@ -10,6 +10,8 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
+import { Divider } from "@mui/material";
+import { routes } from "../Routes";
 
 function Copyright(props) {
   return (
@@ -45,10 +47,11 @@ export default function SignInSide() {
         <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
           <Box
             sx={{
-              my: 8,
               // mt: "200px",
-              mx: 4,
-              // width: 0.33,
+              my: 8,
+              // mx: 4,
+              mx: "25%",
+              // width: "33%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -66,13 +69,13 @@ export default function SignInSide() {
             >
               {/* <LockOutlinedIcon /> */}
             </Avatar>
-            <Typography component="h1" variant="h5" mt={3}>
+            <Typography variant="h1" mt={3}>
               Welcome to TopLeader
             </Typography>
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
               Please enter your details
             </Typography> */}
-            <Typography variant="body1" mt={1} mb={5}>
+            <Typography variant="body1" mt={1} mb={4}>
               Please enter your details
             </Typography>
 
@@ -87,7 +90,7 @@ export default function SignInSide() {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                label="Email"
                 name="email"
                 autoComplete="email"
                 autoFocus
@@ -125,9 +128,41 @@ export default function SignInSide() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 3, mb: 3 }}
+                href={routes.dashboard}
               >
                 Log In
+              </Button>
+              <Divider />
+              <Button
+                type="button"
+                fullWidth
+                variant="outlined"
+                sx={{ mt: 3 }}
+                startIcon={
+                  <Avatar
+                    sx={{ width: 20, height: 20 }}
+                    variant="square"
+                    src={"google-small.png"}
+                  />
+                }
+              >
+                Sign in with Google
+              </Button>
+              <Button
+                type="button"
+                fullWidth
+                variant="outlined"
+                sx={{ mt: 3, mb: 3 }}
+                startIcon={
+                  <Avatar
+                    sx={{ width: 20, height: 20 }}
+                    variant="square"
+                    src={"microsoft-small.png"}
+                  />
+                }
+              >
+                Sign in with Microsoft
               </Button>
               {/* <Grid container>
                 <Grid item xs>
