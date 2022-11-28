@@ -44,6 +44,7 @@ export const Layout = ({ children }) => {
       sx={{
         display: "flex",
         bgcolor: "#EAECF0",
+        // minHeight: "100%",
       }}
     >
       <SideMenu width={256} anchor="left">

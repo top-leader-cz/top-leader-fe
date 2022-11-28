@@ -2,7 +2,8 @@ import { Masonry } from "@mui/lab";
 import { alpha, Card, CardContent, TextField } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import * as React from "react";
+import React, { useEffect } from "react";
+import { useAuth } from "../features/auth";
 import { Header } from "./Header";
 import { Icon } from "./Icon";
 import { Layout } from "./Layout";
@@ -67,6 +68,12 @@ const DashboardCard = ({
 };
 
 function Dashboard() {
+  const { authFetch } = useAuth();
+
+  useEffect(() => {
+    const res = authFetch({ url: "/api/rest/users" });
+  }, []);
+
   return (
     <Layout>
       <Header />

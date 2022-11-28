@@ -12,32 +12,38 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { Divider } from "@mui/material";
 import { routes } from "../Routes";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../features/auth/AuthProvider";
 
 export default function SignInSide() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const auth = useAuth();
+  console.log("Login ");
+
+  // const from = location.state?.from?.pathname || routes.dashboard;
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
+    console.log("Login submit");
+
+    const formData = new FormData(event.currentTarget);
+
+    const user = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+
+    console.log("Login submit", { user });
+
+    auth.signin(user, () => {
+      // Send them back to the page they tried to visit when they were
+      // redirected to the login page. Use { replace: true } so we don't create
+      // another entry in the history stack for the login page.  This means that
+      // when they get to the protected page and click the back button, they
+      // won't end up back on the login page, which is also really nice for the
+      // user experience.
+      // navigate(from, { replace: true });
     });
   };
 
@@ -129,7 +135,7 @@ export default function SignInSide() {
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 3 }}
-                href={routes.dashboard}
+                // href={routes.dashboard}
               >
                 Log In
               </Button>

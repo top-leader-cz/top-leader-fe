@@ -1,11 +1,11 @@
 import {
   DescriptionOutlined,
   ForumOutlined,
+  HelpOutlined,
   HomeOutlined,
+  LogoutOutlined,
   PersonOutlined,
   SettingsOutlined,
-  HelpOutlined,
-  LogoutOutlined,
 } from "@mui/icons-material";
 import {
   Divider,
@@ -19,7 +19,8 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { useMatch } from "react-router-dom";
-import { routes } from "../Routes";
+import { useAuth } from "../features/auth/AuthProvider";
+import { routes } from "../features/navigation";
 
 const LogoImg = () => {
   return (
@@ -27,14 +28,13 @@ const LogoImg = () => {
       component="img"
       src="/topleader-big.png"
       sx={{
-        // height: 233,
         width: "100%",
         px: 2,
         my: 2,
         // maxHeight: { xs: 233, md: 167 },
         // maxWidth: { xs: 350, md: 250 },
       }}
-      //   alt="The house from the offer."
+      alt="Topleader"
     />
   );
 };
@@ -44,7 +44,7 @@ const ListItemLink = ({ to, text, icon }) => {
 
   return (
     <ListItem disablePadding>
-      <ListItemButton selected={Boolean(match)} href={to}>
+      <ListItemButton selected={Boolean(to && match)} href={to}>
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
         <ListItemText primary={text} />
       </ListItemButton>
@@ -53,6 +53,8 @@ const ListItemLink = ({ to, text, icon }) => {
 };
 
 export const MainMenu = () => {
+  const auth = useAuth();
+
   return (
     <Paper
       square
@@ -88,7 +90,11 @@ export const MainMenu = () => {
         <ListItemLink
           text="Logout"
           icon={<LogoutOutlined />}
-          to={routes.signIn}
+          onClick={() => {
+            auth.signout();
+            // auth.signout(() => navigate("/"));
+          }}
+          // to={routes.signIn}
         />
       </Box>
     </Paper>
