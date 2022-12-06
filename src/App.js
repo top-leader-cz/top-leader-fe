@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./features/auth";
 import { router } from "./Routes";
 import theme from "./theme";
+import "./index.css";
 
 export default function App() {
   return (

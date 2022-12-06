@@ -8,6 +8,7 @@ import {
   redirect,
   useNavigation,
 } from "react-router-dom";
+import Assessment from "./components/Assessment";
 import Dashboard from "./components/Dashboard";
 import MuiSignIn from "./components/SignIn";
 import CraDefaultApp from "./examples/cra-app/App";
@@ -55,6 +56,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <Dashboard />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.assessment,
+        element: (
+          <RequireAuth>
+            <Assessment />
           </RequireAuth>
         ),
       },

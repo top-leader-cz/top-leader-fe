@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
     }) => {
       if (!user) throw new Error("Not signed in");
 
-      return fetch(url, {
+      const promise = fetch(url, {
         method,
         // credentials: "include",
         headers: [
@@ -80,10 +80,11 @@ export function AuthProvider({ children }) {
         ],
         /** A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request's mode. */
         // mode: "no-cors", // "cors" | "navigate" | "no-cors" | "same-origin";
-        referrer: "",
+        // referrer: "",
         ...(data ? { body: JSON.stringify(data) } : {}),
       });
       // }).then((res) => res[type]());
+      return promise;
     },
     [user]
   );

@@ -38,7 +38,38 @@ const SideMenu = ({ children, width, anchor }) => {
   );
 };
 
-export const Layout = ({ children }) => {
+const JourneyRightMenu = () => {
+  return (
+    <Paper
+      square
+      sx={{
+        px: 3,
+        py: 4,
+        height: "100vh",
+        display: "flex",
+        flexFlow: "column nowrap",
+        alignItems: "center",
+        // alignItems: "stretch",
+        // justifyContent: "space-between",
+      }}
+    >
+      <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
+      <Avatar variant="circular" sx={{ my: 5 }}>
+        <Icon />
+      </Avatar>
+      <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
+      <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
+      <Button fullWidth variant="contained">
+        Start Session
+      </Button>
+    </Paper>
+  );
+};
+
+export const Layout = ({
+  children,
+  rightMenuContent = <JourneyRightMenu />,
+}) => {
   return (
     <Box
       sx={{
@@ -65,29 +96,7 @@ export const Layout = ({ children }) => {
       </Box>
 
       <SideMenu width={392} anchor="right">
-        <Paper
-          square
-          sx={{
-            px: 3,
-            py: 4,
-            height: "100vh",
-            display: "flex",
-            flexFlow: "column nowrap",
-            alignItems: "center",
-            // alignItems: "stretch",
-            // justifyContent: "space-between",
-          }}
-        >
-          <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
-          <Avatar variant="circular" sx={{ my: 5 }}>
-            <Icon />
-          </Avatar>
-          <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
-          <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
-          <Button fullWidth variant="contained">
-            Start Session
-          </Button>
-        </Paper>
+        {rightMenuContent}
       </SideMenu>
     </Box>
   );
