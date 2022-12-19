@@ -1,11 +1,17 @@
 // import * as Icons from "@mui/icons-material";
-import { FitnessCenterOutlined, Forum, JoinRight } from "@mui/icons-material";
+import {
+  FitnessCenterOutlined,
+  Forum,
+  JoinRight,
+  Handshake,
+} from "@mui/icons-material";
 import * as React from "react";
 
 const Icons = {
   FitnessCenterOutlined,
   Forum,
   JoinRight,
+  Handshake,
 };
 
 export const Icon = ({ name = "FitnessCenterOutlined", ...props }) => {

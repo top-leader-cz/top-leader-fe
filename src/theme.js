@@ -11,9 +11,20 @@ const theme = createTheme({
     secondary: {
       main: "#907ACF",
     },
+    warning: {
+      contrastText: "#EAAA08", // yellow/500
+      main: "#FEF7C3", // yellow/100
+    },
     error: {
       main: "#F04438",
       // main: red.A400,
+    },
+    accent: {
+      main: "#EAAA08",
+      // light: "#757ce8",
+      // main: "#3f50b5",
+      // dark: "#002884",
+      // contrastText: "#fff",
     },
     // gray: { // TODO
     //   900

@@ -11,11 +11,13 @@ import {
 import CircularProgress, {
   circularProgressClasses,
 } from "@mui/material/CircularProgress";
-import { useAuth } from "../features/auth";
-import { Layout } from "./Layout";
-import { H1, H2, P } from "./Typography";
+import { useAuth } from "../../features/auth";
+import { Layout } from "../Layout";
+import { H1, H2, P } from "../Typography";
 import { ArrowBack, ArrowForward, ArrowRight } from "@mui/icons-material";
-import { routes } from "../features/navigation";
+import { routes } from "../../features/navigation";
+import { QUESTIONS } from "./questions";
+import { useNavigate } from "react-router-dom";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -63,7 +65,7 @@ const Score = ({ value, onChange, sx = {} }) => {
       {...sx}
     >
       <P>Not me at all</P>
-      <Box mx={2}>
+      <Box sx={{ mx: 2, display: "flex", flexFlow: "row nowrap" }}>
         {Array(10)
           .fill()
           .map((_, i) => (
@@ -87,6 +89,7 @@ const PROGRESS_PROPS = {
 };
 
 function CircularProgressWithLabel({ value, sx = {} }) {
+  console.log({ value });
   return (
     <Box sx={{ position: "relative", display: "inline-flex", ...sx }}>
       <CircularProgress
@@ -149,7 +152,12 @@ const Count = ({ label, value, sx = {} }) => {
   );
 };
 
-const AssessmentRightMenu = ({ currentIndex, totalCount, responsesCount }) => {
+const AssessmentRightMenu = ({
+  currentIndex,
+  totalCount,
+  responsesCount,
+  onSave,
+}) => {
   return (
     <Paper
       square
@@ -165,8 +173,8 @@ const AssessmentRightMenu = ({ currentIndex, totalCount, responsesCount }) => {
       <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
         <H2>Find my strengths assessment</H2>
         <CircularProgressWithLabel
+          value={(100 * responsesCount) / totalCount}
           sx={{ alignSelf: "center", my: 7.5 }}
-          value={25}
         />
         <Box
           sx={{
@@ -183,52 +191,12 @@ const AssessmentRightMenu = ({ currentIndex, totalCount, responsesCount }) => {
           />
         </Box>
       </Box>
-      <Button fullWidth variant="contained">
+      <Button fullWidth variant="contained" onClick={onSave}>
         Save assessment
       </Button>
     </Paper>
   );
 };
-
-const version = 0;
-const QUESTIONS = [
-  {
-    id: 1,
-    version,
-    data: {
-      talent: "empathizer",
-      text: "I easily help others to find the right words to express their feelings.",
-      img: { src: "/Empathizer_02.svg" },
-    },
-  },
-  {
-    id: 2,
-    version,
-    data: {
-      talent: "initiator",
-      text: `"Don't stop me now!" Do you find yourself often in a situation where you just need to take action?`,
-      img: { src: "/Initiator_01.svg" },
-    },
-  },
-  {
-    id: 3,
-    version,
-    data: {
-      talent: "initiator",
-      text: `"Hey everyone, let's start!" Does it sound like you?`,
-      img: { src: "/Initiator_02.svg" },
-    },
-  },
-  {
-    id: 4,
-    version,
-    data: {
-      talent: "initiator",
-      text: `"I can't stand it when there's no action! I hate wasting time." Is that you?`,
-      img: { src: "/Initiator_03.svg" },
-    },
-  },
-];
 
 const useAssessment = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -264,6 +232,7 @@ const useAssessment = () => {
 function Assessment() {
   const { authFetch } = useAuth();
   const { pagination, question, score, responsesCount } = useAssessment();
+  const navigate = useNavigate();
 
   console.log("[Assessment.rndr]", { pagination, question, score });
   return (
@@ -273,6 +242,7 @@ function Assessment() {
           currentIndex={pagination.currentIndex}
           totalCount={pagination.totalCount}
           responsesCount={responsesCount}
+          onSave={() => navigate(routes.strengths)}
         />
       }
     >
