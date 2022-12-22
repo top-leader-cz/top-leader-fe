@@ -25,47 +25,6 @@ const PRIMARY_BG_LIGHT = (theme) =>
 const GRAY_BG_LIGHT = (theme) =>
   console.log({ theme }) || alpha(theme.palette.action.selected, 0.05);
 
-const todoTalent = {
-  positives: ["TODO", "positives"],
-  tips: ["TODO: some tips"],
-};
-
-const _TALENTS_ = {
-  responsible: {
-    name: "Responsible",
-    emoji: "🤝",
-    positives: [
-      "you don’t like easy tasks",
-      "you love it when you face challenges and when you can think a few steps ahead",
-      "you have an ability to see situations from a higher perspective which helps you to find the best way through",
-      "where others see only problems you have the ability to see patterns",
-    ],
-    tips: [
-      "Having the skill to see big picture can sometimes lead to the fact that you missed very important details. It helps to stop within the process, regularly, to look back to be sure nothing was missed.",
-    ],
-  },
-  communicator: {
-    name: "Communicator",
-    emoji: "🗣",
-    ...todoTalent,
-  },
-  strategist: {
-    name: "Strategist",
-    emoji: "📈",
-    ...todoTalent,
-  },
-  analyser: {
-    name: "Analyser",
-    emoji: "📊",
-    ...todoTalent,
-  },
-  ideamaker: {
-    name: "Ideamaker",
-    emoji: "💡",
-    ...todoTalent,
-  },
-};
-
 const AssessmentRightMenu = ({
   history,
   selectedTimestamp,

@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import { alpha, createTheme } from "@mui/material/styles";
 import defaultTheme from "@mui/material/styles/defaultTheme";
 import { LinkBehavior } from "./components/LinkBehavior";
 
@@ -94,6 +94,35 @@ const theme = createTheme({
       defaultProps: {
         LinkComponent: LinkBehavior,
       },
+    },
+    MuiChip: {
+      styleOverrides: {
+        icon: {
+          color: "inherit",
+        },
+      },
+      variants: [
+        {
+          props: { variant: "selected" },
+          style: {
+            color: "#4720B7",
+            backgroundColor: "#F9F8FF",
+            border: "1px solid #4720B7",
+            padding: "16px",
+            borderRadius: "10px",
+          },
+        },
+        {
+          props: { variant: "unselected" },
+          style: {
+            color: "#101828",
+            backgroundColor: "#FFFFFF",
+            border: "none",
+            padding: "16px",
+            borderRadius: "10px",
+          },
+        },
+      ],
     },
   },
 });

@@ -12,6 +12,7 @@ import Assessment from "./components/Assessment";
 import Dashboard from "./components/Dashboard";
 import MuiSignIn from "./components/SignIn";
 import Strengths from "./components/Strengths";
+import SetValues from "./components/Values/SetValues";
 import CraDefaultApp from "./examples/cra-app/App";
 import MuiDefaultApp from "./examples/mui/ExampleApp";
 import { AuthRedirect, ForbidAuth, RequireAuth } from "./features/auth";
@@ -73,6 +74,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <Strengths />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.setValues,
+        element: (
+          <RequireAuth>
+            <SetValues />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.myValues,
+        element: (
+          <RequireAuth>
+            <SetValues />
           </RequireAuth>
         ),
       },

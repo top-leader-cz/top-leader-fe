@@ -134,7 +134,7 @@ const DashboardCard = ({
 
 const DashboardCardAssessment = () => {
   const { last } = useAssessmentHistory();
-  const maybeItems = useMemo(
+  const items = useMemo(
     () =>
       last?.orderedTalents.slice(0, 5).map((key) => ({
         label: [TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
@@ -146,51 +146,34 @@ const DashboardCardAssessment = () => {
 
   return (
     <DashboardCard
-      title={last ? "My strengths" : "Find my strengths"}
-      href={last ? routes.strengths : routes.assessment}
-      items={maybeItems}
+      title={items ? "My strengths" : "Find my strengths"}
+      href={items ? routes.strengths : routes.assessment}
+      items={items}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#0BA5EC" }}
     />
   );
 };
 
-// const DashboardCardAssessment = ({ minHeight = 200 }) => {
-//   const assessmentHistory = useAssessmentHistory();
+const DashboardCardValues = () => {
+  const items = useMemo(
+    () => undefined,
+    // last?.orderedTalents.slice(0, 5).map((key) => ({
+    //   label: [TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
+    //     .filter(Boolean)
+    //     .join(" "),
+    // })),
+    []
+  );
 
-//   if (assessmentHistory.last)
-//     return (
-//       <Card sx={{ minHeight }}>
-//         <CardActionArea sx={{ height: "100%" }} href={routes.strengths}>
-//           <CardContent>
-//             <H2 sx={{ mb: 2 }}>My strengths</H2>
-//             {assessmentHistory.last?.orderedTalents.slice(0, 5).map((key) => (
-//               <Chip
-//                 sx={{ borderRadius: 1, justifyContent: "flex-start", m: 1 }}
-//                 label={[TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
-//                   .filter(Boolean)
-//                   .join(" ")}
-//               />
-//             ))}
-//           </CardContent>
-//         </CardActionArea>
-//       </Card>
-//     );
-
-//   return (
-//     <Card sx={{ minHeight }}>
-//       <CardActionArea sx={{ height: "100%" }} href={routes.assessment}>
-//         <CardContent sx={{ position: "relative", height: "100%" }}>
-//           <H2 sx={{ mb: 2 }}>Find my strengths</H2>
-//           <DashboardIcon
-//             iconName={"FitnessCenterOutlined"}
-//             color={"#0BA5EC"}
-//             sx={{ position: "absolute", bottom: 24, right: 24 }}
-//           />
-//         </CardContent>
-//       </CardActionArea>
-//     </Card>
-//   );
-// };
+  return (
+    <DashboardCard
+      title={items ? "My values" : "Set my values"}
+      href={items ? routes.myValues : routes.setValues}
+      items={items}
+      fallbackIcon={{ name: "JoinRight", color: "#2E90FA" }}
+    />
+  );
+};
 
 function Dashboard() {
   const { authFetch } = useAuth();
@@ -210,11 +193,7 @@ function Dashboard() {
         </P>
         <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
           <DashboardCardAssessment />
-          <DashboardCardButton
-            title="Set my values"
-            iconName={"JoinRight"}
-            iconColor={"#2E90FA"}
-          />
+          <DashboardCardValues />
           <DashboardCardNotes />
           <DashboardCardButton
             title="Get feedback"
