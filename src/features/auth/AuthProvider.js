@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { createContext, useCallback, useContext, useState } from "react";
+import { useLocalStorage } from "./useLocalStorage";
 
 // Initialize Firebase
 var firebaseConfig = {
@@ -18,20 +19,17 @@ const firebaseAuth = getAuth(app);
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useLocalStorage("user", null);
 
   const signin = ({ email, password }, callback = () => {}) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password)
       .then((userCredential) => {
-        console.log("[Auth] signedIn", { userCredential }); // userCredential.user
+        console.log("[Auth] signedIn", { userCredential });
         return {
           jwt: userCredential.user.accessToken,
           email: userCredential.user.email,
+          displayName: userCredential.user.email, // TODO: Michal
         };
-        return userCredential.user.getIdToken().then((jwt) => ({
-          jwt,
-          email: userCredential.user.email,
-        }));
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -50,9 +48,9 @@ export function AuthProvider({ children }) {
   };
 
   const signout = (callback = () => {}) => {
+    setUser(null);
     return firebaseAuth.signOut().then((r) => {
       console.log("[Auth] signOut", { r });
-      setUser(null);
     });
     // return fakeAuthProvider.signout(() => {
     //   setUser(null);

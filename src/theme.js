@@ -17,18 +17,11 @@ const theme = createTheme({
     },
     error: {
       main: "#F04438",
-      // main: red.A400,
-    },
-    accent: {
-      main: "#EAAA08",
       // light: "#757ce8",
       // main: "#3f50b5",
       // dark: "#002884",
       // contrastText: "#fff",
     },
-    // gray: { // TODO
-    //   900
-    // }
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',

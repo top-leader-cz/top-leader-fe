@@ -10,68 +10,30 @@ import {
   Paper,
   Stack,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth";
+import { useLocalStorage } from "../../features/auth/useLocalStorage";
 import { routes } from "../../features/navigation";
 import { Icon } from "../Icon";
 import { Layout } from "../Layout";
 import { H1, H2, P } from "../Typography";
+import { TALENTS } from "./talents";
 
-const PRIMARY_BG_LIGHT = (theme) => alpha(theme.palette.primary.main, 0.05);
+const PRIMARY_BG_LIGHT = (theme) =>
+  console.log({ theme }) || alpha(theme.palette.primary.main, 0.05);
 const GRAY_BG_LIGHT = (theme) =>
   console.log({ theme }) || alpha(theme.palette.action.selected, 0.05);
-//   console.log({ theme }) || alpha(theme.palette.common.black, 0.05);
-
-const AssessmentRightMenu = ({ history, onRetake }) => {
-  return (
-    <Paper
-      square
-      sx={{
-        px: 3,
-        py: 4,
-        height: "100vh",
-        display: "flex",
-        flexFlow: "column nowrap",
-        justifyContent: "space-between",
-      }}
-    >
-      <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
-        <H2>Find my strengths assessment</H2>
-        <P mt={5}>History</P>
-        {history.map(({ date, status }) => (
-          <Button
-            sx={{
-              mt: 3,
-              p: 2,
-              flexFlow: "column nowrap",
-              alignItems: "flex-start",
-              bgcolor: PRIMARY_BG_LIGHT,
-            }}
-          >
-            {date}
-            <br />
-            <P>{status}</P>
-          </Button>
-        ))}
-      </Box>
-      <Button fullWidth variant="contained" onClick={onRetake}>
-        Retake assessment
-      </Button>
-    </Paper>
-  );
-};
 
 const todoTalent = {
   positives: ["TODO", "positives"],
   tips: ["TODO: some tips"],
 };
 
-const TALENTS = {
+const _TALENTS_ = {
   responsible: {
     name: "Responsible",
     emoji: "🤝",
-    // iconName: "Handshake",
     positives: [
       "you don’t like easy tasks",
       "you love it when you face challenges and when you can think a few steps ahead",
@@ -104,60 +66,57 @@ const TALENTS = {
   },
 };
 
-const StrengthCard2 = ({ heading, description, talents }) => {
+const AssessmentRightMenu = ({
+  history,
+  selectedTimestamp,
+  onSelect,
+  onRemove,
+  onRetake,
+}) => {
   return (
-    <Card>
-      <CardContent sx={{ display: "flex" }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {talents.map((talent) => (
-            <Button>{talent.name}</Button>
-          ))}
-        </Box>
-        <Divider orientation="vertical" flexItem />
-        <Box>
-          <H1>{heading}</H1>
-          <P>{description}</P>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-const StrengthCard3 = ({ heading, description, talents }) => {
-  return (
-    <Card>
-      <CardContent sx={{ display: "flex" }}>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {talents.map((talent) => (
-            <Button>{talent.name}</Button>
-          ))}
-        </Box>
-        <Divider orientation="vertical" flexItem />
-        <CardContent sx={{ py: 0 }}>
-          <H1 gutterBottom>{heading}</H1>
-          <P>{description}</P>
-        </CardContent>
-      </CardContent>
-    </Card>
-  );
-};
-
-const StrengthCard4 = ({ heading, description, talents }) => {
-  return (
-    <Card sx={{ display: "flex" }}>
-      <CardContent>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          {talents.map((talent) => (
-            <Button>{talent.name}</Button>
-          ))}
-        </Box>
-      </CardContent>
-      <Divider sx={{ my: 2 }} orientation="vertical" flexItem />
-      <CardContent>
-        <H1 gutterBottom>{heading}</H1>
-        <P>{description}</P>
-      </CardContent>
-    </Card>
+    <Paper
+      square
+      sx={{
+        px: 3,
+        py: 4,
+        height: "100vh",
+        display: "flex",
+        flexFlow: "column nowrap",
+        justifyContent: "space-between",
+      }}
+    >
+      <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
+        <H2>Find my strengths assessment</H2>
+        <P mt={5}>History</P>
+        {history.map((entry) => (
+          <Button
+            onClick={(e) =>
+              console.log({ e }) || (onRemove && e.metaKey && e.shiftKey)
+                ? onRemove(entry)
+                : onSelect(entry)
+            }
+            sx={{
+              mt: 3,
+              p: 2,
+              flexFlow: "column nowrap",
+              alignItems: "flex-start",
+              bgcolor: PRIMARY_BG_LIGHT,
+            }}
+            color={
+              entry.timestamp === selectedTimestamp ? "primary" : "secondary"
+            }
+            // variant={"contained"}
+          >
+            {entry.date}
+            <br />
+            <P>{entry.status}</P>
+          </Button>
+        ))}
+      </Box>
+      <Button fullWidth variant="contained" onClick={onRetake}>
+        Retake assessment
+      </Button>
+    </Paper>
   );
 };
 
@@ -186,7 +145,7 @@ const CardBox = ({ children, sx = {} }) => {
   );
 };
 
-const TalentInfo = ({ positives, tips }) => {
+const TalentInfo = ({ positives = [], tips = "" }) => {
   return (
     <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
       <CardBox>
@@ -206,62 +165,98 @@ const TalentInfo = ({ positives, tips }) => {
 };
 
 const StrengthCard = ({ heading, description, talents, sx = { mb: 3 } }) => {
-  const [selected, setSelected] = useState();
+  const [selectedKey, setSelectedKey] = useState();
+  const selectedTalent = selectedKey ? TALENTS[selectedKey] : undefined;
+  useEffect(() => {
+    if (selectedKey && !talents.includes(selectedKey))
+      setSelectedKey(undefined);
+  }, [selectedKey, talents]);
 
   return (
     <Card sx={{ display: "flex", ...sx }} elevation={0}>
       <CardContent>
         <Stack direction="column" spacing={1}>
-          {talents.map((talent) => (
+          {talents.map((key) => (
             <Chip
-              color={talent === selected ? "primary" : "default"}
+              color={key === selectedKey ? "primary" : "default"}
               sx={{ borderRadius: 1, justifyContent: "flex-start" }}
-              label={[talent.emoji, talent.name].filter(Boolean).join(" ")}
+              label={[TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
+                .filter(Boolean)
+                .join(" ")}
               onClick={(e) =>
-                setSelected((selected) =>
-                  selected === talent ? undefined : talent
+                setSelectedKey((selected) =>
+                  selected === key ? undefined : key
                 )
               }
-              {...(talent.iconName
-                ? { icon: <Icon name={talent.iconName} /> }
-                : {})}
-
+              //   icon={<Icon name={talent.iconName} />}
               //   variant="outlined"
             />
           ))}
         </Stack>
       </CardContent>
       <Divider sx={{ my: 2 }} orientation="vertical" flexItem />
-      {!selected ? (
+      {!selectedKey ? (
         <StrengthSummary heading={heading} description={description} />
       ) : (
-        <TalentInfo positives={selected.positives} tips={selected.tips} />
+        <TalentInfo
+          positives={selectedTalent?.positives}
+          tips={selectedTalent?.tips}
+        />
       )}
     </Card>
   );
 };
 
-const useStrengths = () => {
-  const history = [
-    { date: "21/05/2022", status: "Assessment completed" },
-    { date: "15/09/2021", status: "Assessment completed" },
-  ];
+export const useAssessmentHistory = () => {
+  const [assessmentHistory, setAssessmentHistory] = useLocalStorage(
+    "assessment_history",
+    []
+  );
+  const last = assessmentHistory[assessmentHistory.length - 1];
+  const [selectedTimestamp, setSelectedTimestamp] = useState(last?.timestamp);
+  const selected = assessmentHistory.find(
+    ({ timestamp }) => selectedTimestamp && timestamp === selectedTimestamp
+  );
 
-  return { history };
+  return {
+    last,
+    all: assessmentHistory,
+    selected,
+    setSelected: useCallback(
+      (entry) => setSelectedTimestamp(entry?.timestamp),
+      []
+    ),
+    push: useCallback(
+      (entry) => setAssessmentHistory((history) => [...history, entry]),
+      [setAssessmentHistory]
+    ),
+    remove: useCallback(
+      (entry) =>
+        setAssessmentHistory((entries) =>
+          entries.filter(({ timestamp }) => timestamp !== entry.timestamp)
+        ),
+      [setAssessmentHistory]
+    ),
+  };
 };
 
 function Strengths() {
   const { authFetch } = useAuth();
-  const { history } = useStrengths();
+  const assessmentHistory = useAssessmentHistory();
   const navigate = useNavigate();
 
-  console.log("[Strengths.rndr]", { history });
+  console.log("[Strengths.rndr]", {
+    assessmentHistory,
+  });
 
   return (
     <Layout
       rightMenuContent={
         <AssessmentRightMenu
-          history={history}
+          history={assessmentHistory.all}
+          selectedTimestamp={assessmentHistory.selected?.timestamp}
+          onSelect={assessmentHistory.setSelected}
+          onRemove={assessmentHistory.remove}
           onRetake={() => navigate(routes.assessment)}
         />
       }
@@ -289,7 +284,7 @@ function Strengths() {
         <StrengthCard
           heading={
             <>
-              1-5{" "}
+              1-5&nbsp;
               <Chip
                 sx={{ borderRadius: 0.5 }}
                 label="Top"
@@ -300,36 +295,22 @@ function Strengths() {
             </>
           }
           description="Did you know that you have much more potential for growth when you invest energy in developing your strengths? Many research have shown how a strengths-based approach improves your confidence, direction, and kindness toward others."
-          talents={[
-            TALENTS.responsible,
-            TALENTS.communicator,
-            TALENTS.strategist,
-            TALENTS.analyser,
-            TALENTS.ideamaker,
-          ]}
+          talents={assessmentHistory.selected?.orderedTalents.slice(0, 5)}
         />
-        <StrengthCard
-          heading={"6-10"}
-          description="Whilst the list of your Top 5 strengths shows you the areas where you have the greatest potential to use your natural talents, here you can see the next five stenghts that you should be also aware of. They might be a big help in your professional and private life journey."
-          talents={[
-            TALENTS.responsible,
-            TALENTS.communicator,
-            TALENTS.strategist,
-            TALENTS.analyser,
-            TALENTS.ideamaker,
-          ]}
-        />
-        <StrengthCard
-          heading={"11-20"}
-          description="In any role, it’s good to know your areas of lesser talent. In many cases, simply being aware of your areas of lesser talent can help you avoid major barriers. Either try to establish systems to manage them or try to partner with someone who has more talent in the areas in which you are lacking. "
-          talents={[
-            TALENTS.responsible,
-            TALENTS.communicator,
-            TALENTS.strategist,
-            TALENTS.analyser,
-            TALENTS.ideamaker,
-          ]}
-        />
+        {assessmentHistory.selected?.orderedTalents.length > 5 && (
+          <StrengthCard
+            heading={"6-10"}
+            description="Whilst the list of your Top 5 strengths shows you the areas where you have the greatest potential to use your natural talents, here you can see the next five stenghts that you should be also aware of. They might be a big help in your professional and private life journey."
+            talents={assessmentHistory.selected?.orderedTalents.slice(5, 10)}
+          />
+        )}
+        {assessmentHistory.selected?.orderedTalents.length > 10 && (
+          <StrengthCard
+            heading={"11-20"}
+            description="In any role, it’s good to know your areas of lesser talent. In many cases, simply being aware of your areas of lesser talent can help you avoid major barriers. Either try to establish systems to manage them or try to partner with someone who has more talent in the areas in which you are lacking. "
+            talents={assessmentHistory.selected?.orderedTalents.slice(10)}
+          />
+        )}
       </Box>
     </Layout>
   );

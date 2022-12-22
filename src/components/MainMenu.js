@@ -39,12 +39,16 @@ const LogoImg = () => {
   );
 };
 
-const ListItemLink = ({ to, text, icon }) => {
+const ListItemLink = ({ to, text, icon, onClick }) => {
   const match = useMatch(to ?? "");
 
   return (
     <ListItem disablePadding>
-      <ListItemButton selected={Boolean(to && match)} href={to}>
+      <ListItemButton
+        selected={Boolean(to && match)}
+        href={to}
+        onClick={onClick}
+      >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
         <ListItemText primary={text} />
       </ListItemButton>

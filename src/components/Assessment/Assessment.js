@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -18,6 +18,8 @@ import { ArrowBack, ArrowForward, ArrowRight } from "@mui/icons-material";
 import { routes } from "../../features/navigation";
 import { QUESTIONS } from "./questions";
 import { useNavigate } from "react-router-dom";
+import { useLocalStorage } from "../../features/auth/useLocalStorage";
+import { useAssessmentHistory } from "../Strengths/Strengths";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -154,6 +156,7 @@ const Count = ({ label, value, sx = {} }) => {
 
 const AssessmentRightMenu = ({
   currentIndex,
+  saveDisabled,
   totalCount,
   responsesCount,
   onSave,
@@ -191,27 +194,72 @@ const AssessmentRightMenu = ({
           />
         </Box>
       </Box>
-      <Button fullWidth variant="contained" onClick={onSave}>
+      <Button
+        fullWidth
+        variant="contained"
+        onClick={onSave}
+        disabled={saveDisabled}
+      >
         Save assessment
       </Button>
     </Paper>
   );
 };
 
+const createAssessmentEntry = ({ questions, scores }) => {
+  const scoreSumByTalent = questions.reduce(
+    (acc, q) => ({
+      ...acc,
+      [q.data.talent]: (acc[q.data.talent] ?? 0) + scores[q.id] ?? 0,
+    }),
+    {}
+  );
+  const orderedTalents = Object.entries(scoreSumByTalent)
+    .sort(([, aScore], [, bScore]) => bScore - aScore)
+    .map(([talent]) => talent);
+  const status =
+    Object.entries(scores).filter(([id, score]) => typeof score === "number")
+      .length === questions.length
+      ? "Assessment completed"
+      : "Incomplete";
+
+  console.log({ orderedTalents, scoreSumByTalent, questions, scores, status });
+
+  return {
+    date: new Date().toISOString(),
+    timestamp: new Date().getTime(),
+    status,
+    orderedTalents,
+    scoreSumByTalent,
+    questions,
+    scores,
+  };
+};
+
 const useAssessment = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [scores, setScores] = useState({});
+  const [scores, setScores] = useLocalStorage("assessment", {});
+  const assessmentHistory = useAssessmentHistory();
+  const navigate = useNavigate();
 
   const question = QUESTIONS[currentIndex];
+  const saveAssessment = useCallback(() => {
+    assessmentHistory.push(
+      createAssessmentEntry({ questions: QUESTIONS, scores })
+    );
+    setScores({});
+    navigate(routes.strengths);
+  }, [assessmentHistory, navigate, scores, setScores]);
 
   console.log("[useAssessment]", { currentIndex, scores, question });
 
   return {
+    saveAssessment,
     pagination: {
       currentIndex,
       totalCount: QUESTIONS.length,
-      back: () => setCurrentIndex((i) => i - 1),
-      next: () => setCurrentIndex((i) => i + 1),
+      back: () => setCurrentIndex((i) => Math.max(0, i - 1)),
+      next: () => setCurrentIndex((i) => Math.min(QUESTIONS.length - 1, i + 1)),
       onChange: ({ value }) => {
         setCurrentIndex(value);
       },
@@ -231,18 +279,45 @@ const useAssessment = () => {
 
 function Assessment() {
   const { authFetch } = useAuth();
-  const { pagination, question, score, responsesCount } = useAssessment();
-  const navigate = useNavigate();
+  const { pagination, question, score, responsesCount, saveAssessment } =
+    useAssessment();
+  const handleNext =
+    typeof score.value !== "number"
+      ? () => {}
+      : pagination.currentIndex < pagination.totalCount - 1
+      ? pagination.next
+      : saveAssessment;
+
+  const handleNextRef = useRef(handleNext);
+  handleNextRef.current = handleNext;
+  const handleBackRef = useRef(pagination.back);
+  handleBackRef.current = pagination.back;
+  const onScoreChangeRef = useRef(score.onChange);
+  onScoreChangeRef.current = score.onChange;
+  useEffect(() => {
+    const fn = (e) => {
+      if (e.key === "Enter" || e.key === "ArrowRight") handleNextRef.current();
+      if (e.key === "Escape" || e.key === "ArrowLeft") handleBackRef.current();
+      if (e.key?.match(/^\d$/)) {
+        let value = Number(e.key);
+        if (value === 0) value = 10;
+        onScoreChangeRef.current({ value });
+      }
+    };
+    document.addEventListener("keydown", fn);
+    return () => document.removeEventListener("keydown", fn);
+  }, []);
 
   console.log("[Assessment.rndr]", { pagination, question, score });
   return (
     <Layout
       rightMenuContent={
         <AssessmentRightMenu
+          saveDisabled={responsesCount !== pagination.totalCount}
           currentIndex={pagination.currentIndex}
           totalCount={pagination.totalCount}
           responsesCount={responsesCount}
-          onSave={() => navigate(routes.strengths)}
+          onSave={saveAssessment}
         />
       }
     >
@@ -295,13 +370,16 @@ function Assessment() {
           Back
         </Button>
         <Button
+          type="submit"
           sx={{ mx: 4 }}
           variant="contained"
-          disabled={pagination.currentIndex >= pagination.totalCount - 1}
-          onClick={pagination.next}
+          disabled={typeof score.value !== "number"}
+          onClick={handleNext}
           endIcon={<ArrowForward />}
         >
-          Next
+          {pagination.currentIndex >= pagination.totalCount - 1
+            ? "Save"
+            : "Next"}
         </Button>
       </Box>
     </Layout>
