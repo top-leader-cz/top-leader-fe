@@ -1,67 +1,114 @@
-import { ArrowBack, ArrowForward, Check } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  Chip,
-  Divider,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { ArrowBack, Check, Close } from "@mui/icons-material";
+import { Box, Button, Chip, Divider, Paper } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../features/auth";
-import { useLocalStorage } from "../../features/auth/useLocalStorage";
 import { routes } from "../../features/navigation";
 import { Layout } from "../Layout";
-import { useAssessmentHistory } from "../Strengths/Strengths";
+import { useHistoryEntries } from "../Strengths/Strengths";
 import { H1, H2, P } from "../Typography";
+import { InfoBox } from "./MyValues";
+import { VALUES } from "./values";
 
-const RightMenu = ({ saveDisabled, onSave }) => {
+export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
   return (
     <Paper
       square
       sx={{
         px: 3,
-        py: 4,
+        // py: 4,
         height: "100vh",
         display: "flex",
         flexFlow: "column nowrap",
         justifyContent: "space-between",
       }}
     >
-      <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
-        <H2>My values</H2>
-      </Box>
-      <Button
-        fullWidth
-        variant="contained"
-        onClick={onSave}
-        disabled={saveDisabled}
+      <H2 sx={{ my: 4 }}>{heading}</H2>
+      <Box
+        sx={{
+          overflow: "scroll",
+          flex: 1,
+          display: "flex",
+          flexFlow: "column nowrap",
+        }}
       >
-        Save my values
-      </Button>
+        {children}
+      </Box>
+      <Button fullWidth variant="contained" sx={{ my: 4 }} {...buttonProps} />
     </Paper>
   );
 };
 
+const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
+  return (
+    <ScrollableRightMenu
+      heading={"My values"}
+      buttonProps={{
+        disabled: saveDisabled,
+        onClick: onSave,
+        children: "Save my values",
+      }}
+    >
+      {selectedKeys
+        .slice()
+        .sort((a, b) => a.localeCompare(b))
+        .map((key) => VALUES[key] || { name: key })
+        .map(({ name, description }) => (
+          <InfoBox
+            color="primary"
+            heading={name}
+            sx={{ p: 2, mb: 3, borderRadius: "6px" }}
+          >
+            <P>{description}</P>
+          </InfoBox>
+        ))}
+    </ScrollableRightMenu>
+  );
+};
+
+const createValuesEntry = ({ selectedKeys }) => {
+  return {
+    date: new Date().toISOString(),
+    timestamp: new Date().getTime(),
+    selectedKeys,
+  };
+};
+
 const useMyValues = () => {
+  const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
+  const [selectedKeys, setSelectedKeys] = useState(
+    valuesHistory.last?.selectedKeys ?? []
+  );
   const navigate = useNavigate();
 
   const save = useCallback(() => {
-    navigate(routes.myValues);
-  }, [navigate]);
+    valuesHistory.push(createValuesEntry({ selectedKeys }));
+    navigate(routes.dashboard);
+    // navigate(routes.myValues);
+  }, [navigate, selectedKeys, valuesHistory]);
 
   console.log("[useMyValues]", {});
 
   return {
     save,
-    items: [
-      { label: "Accountability", key: "accountability" },
-      // { label: "Accuracy", key: "accuracy" },
-    ],
-    selectedKeys: [],
+    items: Object.entries(VALUES).map(([key, value]) => ({
+      data: value,
+      key,
+      label: value.name,
+    })),
+    // [
+    //   { label: "Accountability", key: "accountability" },
+    //   { label: "Accuracy", key: "accuracy" },
+    // ],
+    selectedKeys,
+    toggleItem: useCallback(
+      ({ key }) =>
+        setSelectedKeys((keys) =>
+          keys.includes(key) ? keys.filter((k) => k !== key) : [...keys, key]
+        ),
+      []
+    ),
   };
 };
 
@@ -94,20 +141,24 @@ const SelectableChip2 = styled(Chip, {
 const SelectableChip = ({ selected, ...props }) => {
   const selectedProps = selected
     ? { variant: "selected", icon: <Check /> }
-    : { variant: "unselected" };
+    : { variant: "unselected", icon: <Close /> };
 
   return <Chip {...props} {...selectedProps} />;
 };
 
 function SetValues() {
   const { authFetch } = useAuth();
-  const { items, selectedKeys, save } = useMyValues();
+  const { items, selectedKeys, toggleItem, save } = useMyValues();
 
   console.log("[SetValues.rndr]", { items, selectedKeys });
   return (
     <Layout
       rightMenuContent={
-        <RightMenu saveDisabled={!selectedKeys.length} onSave={save} />
+        <RightMenu
+          selectedKeys={selectedKeys}
+          saveDisabled={!selectedKeys.length}
+          onSave={save}
+        />
       }
     >
       <Box mt={4} mb={3} alignItems="flex-start">
@@ -120,7 +171,7 @@ function SetValues() {
       <H1 mt={12.5} gutterBottom align="center">
         Select the values that you believe in the most
       </H1>
-      <P>
+      <P textAlign="center">
         Your values are a central part of who you are. When the things that you
         do and the way you respond match your values, you’ll feel confident that
         you are doing and saying the right thing.
@@ -144,35 +195,12 @@ function SetValues() {
           gap: 3,
         }}
       >
-        {items.map(({ label, key }) => (
-          <>
-            <Chip
-              label={label}
-              selected={true}
-              color="primary"
-              variant="outlined"
-            />
-            <Chip
-              label={label}
-              selected={false}
-              color="primary"
-              variant="filled"
-            />
-            <Chip
-              label={label}
-              selected={true}
-              color="default"
-              variant="outlined"
-            />
-            <Chip
-              label={label}
-              selected={false}
-              color="default"
-              variant="filled"
-            />
-            <SelectableChip label={label} selected={true} />
-            <SelectableChip label={label} selected={false} />
-          </>
+        {items.map((item) => (
+          <SelectableChip
+            label={item.label}
+            selected={selectedKeys.includes(item.key)}
+            onClick={(e) => toggleItem(item)}
+          />
         ))}
       </Box>
     </Layout>

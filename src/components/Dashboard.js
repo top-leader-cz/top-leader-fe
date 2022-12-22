@@ -17,9 +17,10 @@ import { routes } from "../features/navigation";
 import { Header } from "./Header";
 import { Icon } from "./Icon";
 import { Layout } from "./Layout";
-import { useAssessmentHistory } from "./Strengths/Strengths";
+import { useAssessmentHistory, useHistoryEntries } from "./Strengths/Strengths";
 import { TALENTS } from "./Strengths/talents";
 import { H2, P } from "./Typography";
+import { VALUES } from "./Values/values";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -155,14 +156,15 @@ const DashboardCardAssessment = () => {
 };
 
 const DashboardCardValues = () => {
+  const { last } = useHistoryEntries({ storageKey: "values_history" }); // TODO: keys vs wrapper hooks
   const items = useMemo(
-    () => undefined,
-    // last?.orderedTalents.slice(0, 5).map((key) => ({
-    //   label: [TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
-    //     .filter(Boolean)
-    //     .join(" "),
-    // })),
-    []
+    () =>
+      last?.selectedKeys.slice(0).map((key) => ({
+        label: [VALUES[key]?.emoji ?? "⚓️", VALUES[key]?.name || key]
+          .filter(Boolean)
+          .join(" "),
+      })),
+    [last?.selectedKeys]
   );
 
   return (

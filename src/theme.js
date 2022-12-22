@@ -117,7 +117,7 @@ const theme = createTheme({
           style: {
             color: "#101828",
             backgroundColor: "#FFFFFF",
-            border: "none",
+            border: "1px solid transparent",
             padding: "16px",
             borderRadius: "10px",
           },

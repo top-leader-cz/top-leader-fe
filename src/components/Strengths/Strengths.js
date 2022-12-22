@@ -18,11 +18,12 @@ import { routes } from "../../features/navigation";
 import { Icon } from "../Icon";
 import { Layout } from "../Layout";
 import { H1, H2, P } from "../Typography";
+import { ChipsCard, InfoBox } from "../Values/MyValues";
 import { TALENTS } from "./talents";
 
-const PRIMARY_BG_LIGHT = (theme) =>
+export const PRIMARY_BG_LIGHT = (theme) =>
   console.log({ theme }) || alpha(theme.palette.primary.main, 0.05);
-const GRAY_BG_LIGHT = (theme) =>
+export const GRAY_BG_LIGHT = (theme) =>
   console.log({ theme }) || alpha(theme.palette.action.selected, 0.05);
 
 const AssessmentRightMenu = ({
@@ -88,41 +89,32 @@ const StrengthSummary = ({ heading, description }) => {
   );
 };
 
-const CardBox = ({ children, sx = {} }) => {
-  return (
-    <Box
-      sx={{
-        flex: "1 1 50%",
-        p: 3,
-        borderRadius: 0.5,
-        bgcolor: PRIMARY_BG_LIGHT,
-        ...sx,
-      }}
-    >
-      {children}
-    </Box>
-  );
-};
-
 const TalentInfo = ({ positives = [], tips = "" }) => {
   return (
     <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
-      <CardBox>
-        <H2 color="primary.main">What’s great about your talent</H2>
+      <InfoBox
+        color="primary"
+        heading={"What’s great about your talent"}
+        sx={{ flex: "1 1 50%" }}
+      >
         <ul>
           {positives.map((text) => (
             <li>{text}</li>
           ))}
         </ul>
-      </CardBox>
-      <CardBox sx={{ bgcolor: GRAY_BG_LIGHT }}>
-        <H2 sx={{ mb: 1.5 }}>💡 Tips for action</H2>
+      </InfoBox>
+      <InfoBox
+        color="default"
+        heading={"💡 Tips for action"}
+        sx={{ flex: "1 1 50%" }}
+      >
+        {/* <H2 sx={{ mb: 1.5 }}>TODO: mb</H2> */}
         <P>{tips}</P>
-      </CardBox>
+      </InfoBox>
     </CardContent>
   );
 };
-
+// TODO: ChipsCard
 const StrengthCard = ({ heading, description, talents, sx = { mb: 3 } }) => {
   const [selectedKey, setSelectedKey] = useState();
   const selectedTalent = selectedKey ? TALENTS[selectedKey] : undefined;
@@ -166,37 +158,45 @@ const StrengthCard = ({ heading, description, talents, sx = { mb: 3 } }) => {
   );
 };
 
-export const useAssessmentHistory = () => {
-  const [assessmentHistory, setAssessmentHistory] = useLocalStorage(
-    "assessment_history",
-    []
-  );
-  const last = assessmentHistory[assessmentHistory.length - 1];
-  const [selectedTimestamp, setSelectedTimestamp] = useState(last?.timestamp);
-  const selected = assessmentHistory.find(
-    ({ timestamp }) => selectedTimestamp && timestamp === selectedTimestamp
+export const useHistoryEntries = ({ storageKey, idKey = "timestamp" }) => {
+  const [history, setHistory] = useLocalStorage(storageKey, []);
+  const last = history[history.length - 1];
+  const [selectedId, setSelectedId] = useState(last?.[idKey]);
+  const selected = history.find(
+    (entry) => selectedId && entry[idKey] === selectedId
   );
 
   return {
     last,
-    all: assessmentHistory,
+    all: history,
     selected,
-    setSelected: useCallback(
-      (entry) => setSelectedTimestamp(entry?.timestamp),
-      []
-    ),
+    setSelected: useCallback((entry) => setSelectedId(entry?.[idKey]), []),
     push: useCallback(
-      (entry) => setAssessmentHistory((history) => [...history, entry]),
-      [setAssessmentHistory]
+      (entry) => setHistory((history) => [...history, entry]),
+      [setHistory]
+    ),
+    update: useCallback(
+      (newEntry) => {
+        setHistory((entries) =>
+          entries.map((entry) =>
+            entry[idKey] === newEntry[idKey] ? { ...entry, ...newEntry } : entry
+          )
+        );
+      },
+      [idKey, setHistory]
     ),
     remove: useCallback(
-      (entry) =>
-        setAssessmentHistory((entries) =>
-          entries.filter(({ timestamp }) => timestamp !== entry.timestamp)
+      (rmEntry) =>
+        setHistory((entries) =>
+          entries.filter((entry) => entry[idKey] !== rmEntry[idKey])
         ),
-      [setAssessmentHistory]
+      [idKey, setHistory]
     ),
   };
+};
+
+export const useAssessmentHistory = () => {
+  return useHistoryEntries({ storageKey: "assessment_history" });
 };
 
 function Strengths() {
@@ -240,7 +240,54 @@ function Strengths() {
           Harum ipsa tenetur porro error quaerat. Est porro facilis tenetur
           repellendus id fugiat et doloribus.
         </P>
-        <StrengthCard
+        <ChipsCard
+          keys={assessmentHistory.selected?.orderedTalents.slice(0, 5)}
+          dict={TALENTS}
+          renderSummary={() => (
+            <CardContent>
+              <H1 gutterBottom>
+                1-5&nbsp;
+                <Chip
+                  sx={{ borderRadius: 0.5 }}
+                  label="Top"
+                  icon={<Star />}
+                  size="small"
+                  color="warning"
+                />
+              </H1>
+              <P>
+                "Did you know that you have much more potential for growth when
+                you invest energy in developing your strengths? Many research
+                have shown how a strengths-based approach improves your
+                confidence, direction, and kindness toward others."
+              </P>
+            </CardContent>
+          )}
+          renderSelected={(selected) => (
+            <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
+              <InfoBox
+                color="primary"
+                heading={"What’s great about your talent"}
+                sx={{ flex: "1 1 50%" }}
+              >
+                <ul>
+                  {selected.positives.map((text) => (
+                    <li>{text}</li>
+                  ))}
+                </ul>
+              </InfoBox>
+              <InfoBox
+                color="default"
+                heading={"💡 Tips for action"}
+                sx={{ flex: "1 1 50%" }}
+              >
+                {/* <H2 sx={{ mb: 1.5 }}>TODO: mb</H2> */}
+                <P>{selected.tips}</P>
+              </InfoBox>
+            </CardContent>
+          )}
+        />
+        {/* <StrengthCard
           heading={
             <>
               1-5&nbsp;
@@ -255,7 +302,7 @@ function Strengths() {
           }
           description="Did you know that you have much more potential for growth when you invest energy in developing your strengths? Many research have shown how a strengths-based approach improves your confidence, direction, and kindness toward others."
           talents={assessmentHistory.selected?.orderedTalents.slice(0, 5)}
-        />
+        /> */}
         {assessmentHistory.selected?.orderedTalents.length > 5 && (
           <StrengthCard
             heading={"6-10"}

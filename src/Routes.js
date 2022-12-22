@@ -12,6 +12,7 @@ import Assessment from "./components/Assessment";
 import Dashboard from "./components/Dashboard";
 import MuiSignIn from "./components/SignIn";
 import Strengths from "./components/Strengths";
+import MyValues from "./components/Values/MyValues";
 import SetValues from "./components/Values/SetValues";
 import CraDefaultApp from "./examples/cra-app/App";
 import MuiDefaultApp from "./examples/mui/ExampleApp";
@@ -89,7 +90,7 @@ export const router = createBrowserRouter([
         path: routes.myValues,
         element: (
           <RequireAuth>
-            <SetValues />
+            <MyValues />
           </RequireAuth>
         ),
       },
