@@ -22,9 +22,14 @@ import { H1, H2, P } from "../Typography";
 import { ScrollableRightMenu } from "./SetValues";
 import { VALUES } from "./values";
 
-const HistoryRightMenu = ({ history, onRemove, buttonProps }) => {
+export const HistoryRightMenu = ({
+  heading,
+  history,
+  onRemove,
+  buttonProps,
+}) => {
   return (
-    <ScrollableRightMenu heading={"My values"} buttonProps={buttonProps}>
+    <ScrollableRightMenu heading={heading} buttonProps={buttonProps}>
       <P mt={1}>History</P>
       {history.all.map((entry) => (
         <Button
@@ -52,7 +57,6 @@ const HistoryRightMenu = ({ history, onRemove, buttonProps }) => {
   );
 };
 
-// const StrengthCard = ({ heading, description, talents, sx = { mb: 3 } }) => {
 export const ChipsCard = ({
   keys = [],
   dict = {},
@@ -169,6 +173,7 @@ function MyValues() {
     <Layout
       rightMenuContent={
         <HistoryRightMenu
+          heading={"My values"}
           history={history}
           onRemove={history.remove}
           buttonProps={{

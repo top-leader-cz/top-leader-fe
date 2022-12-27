@@ -5,6 +5,8 @@ export const routes = {
   strengths: "/strengths",
   setValues: "/set-values",
   myValues: "/my-values",
+  sessions: "/sessions",
+  newSession: "/new-session",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
 };

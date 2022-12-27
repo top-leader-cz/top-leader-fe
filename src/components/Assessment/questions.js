@@ -8,7 +8,7 @@ export const QUESTIONS = [
       themes_subject: "Influencer/Impact",
       talent: "initiator",
       text: `"Don't stop me now!" Do you find yourself often in a situation where you just need to take action?`,
-      img: { src: "/Activator_01.svg" },
+      img: { src: "/Initiator_01.svg" },
     },
   },
   {
@@ -18,7 +18,7 @@ export const QUESTIONS = [
       themes_subject: "Influencer/Impact",
       talent: "initiator",
       text: `"Hey everyone, let's start!" Does it sound like you?`,
-      img: { src: "/Activator_02.svg" },
+      img: { src: "/Initiator_02.svg" },
     },
   },
   {
@@ -28,7 +28,7 @@ export const QUESTIONS = [
       themes_subject: "Influencer/Impact",
       talent: "initiator",
       text: `"I can't stand it when there's no action! I hate wasting time." Is that you?`,
-      img: { src: "/Activator_03.svg" },
+      img: { src: "/Initiator_03.svg" },
     },
   },
   {
@@ -38,7 +38,7 @@ export const QUESTIONS = [
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
       text: `"I can adapt easily to different changes." Is that you?`,
-      img: { src: "/Adaptability_01.svg" },
+      img: { src: "/Flexible_01.svg" },
     },
   },
   {
@@ -48,7 +48,7 @@ export const QUESTIONS = [
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
       text: `"No matter what the situation is, I just fit in and adapt."`,
-      img: { src: "/Adaptability_02.svg" },
+      img: { src: "/Flexible_02.svg" },
     },
   },
   {
@@ -58,7 +58,7 @@ export const QUESTIONS = [
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
       text: `"No big deal. Frequent changes are not a problem for me." Do you agree?`,
-      img: { src: "/Adaptability_03.svg" },
+      img: { src: "/Flexible_03.svg" },
     },
   },
   {

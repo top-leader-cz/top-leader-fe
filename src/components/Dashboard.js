@@ -122,7 +122,12 @@ const DashboardCard = ({
           ) : (
             items.map((item) => (
               <Chip
-                sx={{ borderRadius: 1, justifyContent: "flex-start", m: 1 }}
+                sx={{
+                  borderRadius: 1,
+                  justifyContent: "flex-start",
+                  m: 1,
+                  pointerEvents: "none",
+                }}
                 {...item}
               />
             ))

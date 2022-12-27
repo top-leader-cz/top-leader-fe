@@ -15,6 +15,7 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
+import { routes } from "../features/navigation";
 import { Icon } from "./Icon";
 import { MainMenu } from "./MainMenu";
 import { H2, P } from "./Typography";
@@ -59,7 +60,7 @@ const JourneyRightMenu = () => {
       </Avatar>
       <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
       <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
-      <Button fullWidth variant="contained">
+      <Button fullWidth variant="contained" href={routes.newSession}>
         Start Session
       </Button>
     </Paper>

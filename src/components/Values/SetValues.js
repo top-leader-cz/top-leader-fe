@@ -75,11 +75,27 @@ const createValuesEntry = ({ selectedKeys }) => {
   };
 };
 
+export const useSelection = ({ keyName = "key", initialValue = [] }) => {
+  const [selectedKeys, setSelectedKeys] = useState(initialValue);
+
+  const toggleItem = useCallback(
+    (item) =>
+      setSelectedKeys((keys) =>
+        keys.includes(item[keyName])
+          ? keys.filter((k) => k !== item[keyName])
+          : [...keys, item[keyName]]
+      ),
+    [keyName]
+  );
+
+  return { selectedKeys, toggleItem };
+};
+
 const useMyValues = () => {
   const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
-  const [selectedKeys, setSelectedKeys] = useState(
-    valuesHistory.last?.selectedKeys ?? []
-  );
+  const { selectedKeys, toggleItem } = useSelection({
+    initialValue: valuesHistory.last?.selectedKeys ?? [],
+  });
   const navigate = useNavigate();
 
   const save = useCallback(() => {
@@ -102,13 +118,7 @@ const useMyValues = () => {
     //   { label: "Accuracy", key: "accuracy" },
     // ],
     selectedKeys,
-    toggleItem: useCallback(
-      ({ key }) =>
-        setSelectedKeys((keys) =>
-          keys.includes(key) ? keys.filter((k) => k !== key) : [...keys, key]
-        ),
-      []
-    ),
+    toggleItem,
   };
 };
 
@@ -138,12 +148,21 @@ const SelectableChip2 = styled(Chip, {
     }
 );
 
-const SelectableChip = ({ selected, ...props }) => {
+export const SelectableChip = ({ selected, ...props }) => {
   const selectedProps = selected
     ? { variant: "selected", icon: <Check /> }
     : { variant: "unselected", icon: <Close /> };
 
   return <Chip {...props} {...selectedProps} />;
+};
+
+SelectableChip.wrapperSx = {
+  display: "flex",
+  flexFlow: "row wrap",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: 3,
+  pb: 3,
 };
 
 function SetValues() {
@@ -162,7 +181,11 @@ function SetValues() {
       }
     >
       <Box mt={4} mb={3} alignItems="flex-start">
-        <Button href={routes.dashboard} startIcon={<ArrowBack />}>
+        <Button
+          color="inherit"
+          href={routes.dashboard}
+          startIcon={<ArrowBack />}
+        >
           <H2>Back to the dashboard</H2>
         </Button>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
@@ -186,15 +209,7 @@ function SetValues() {
           my={7.5}
         />
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexFlow: "row wrap",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 3,
-        }}
-      >
+      <Box sx={SelectableChip.wrapperSx}>
         {items.map((item) => (
           <SelectableChip
             label={item.label}

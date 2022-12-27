@@ -1,25 +1,15 @@
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Divider,
-  Pagination,
-  Paper,
-  Typography,
-} from "@mui/material";
-import CircularProgress, {
-  circularProgressClasses,
-} from "@mui/material/CircularProgress";
-import { useAuth } from "../../features/auth";
-import { Layout } from "../Layout";
-import { H1, H2, P } from "../Typography";
-import { ArrowBack, ArrowForward, ArrowRight } from "@mui/icons-material";
-import { routes } from "../../features/navigation";
-import { QUESTIONS } from "./questions";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../features/auth";
 import { useLocalStorage } from "../../features/auth/useLocalStorage";
+import { routes } from "../../features/navigation";
+import { Layout } from "../Layout";
 import { useAssessmentHistory } from "../Strengths/Strengths";
+import { H1, H2, P } from "../Typography";
+import { QUESTIONS } from "./questions";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -41,18 +31,6 @@ const AssessmentProgress = ({ currentIndex, totalCount, sx = {} }) => {
         <ProgressItem value={currentQuestion} active />
         {currentQuestion !== totalCount && <ProgressItem value={totalCount} />}
       </P>
-      {/* <Pagination
-          count={10}
-          page={pagination.currentIndex}
-            disabled
-            onChange={handleChange}
-            renderItem={(item) => (
-              <PaginationItem
-                slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
-                {...item}
-              />
-            )}
-        /> */}
     </Box>
   );
 };

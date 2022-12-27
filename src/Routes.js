@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import Assessment from "./components/Assessment";
 import Dashboard from "./components/Dashboard";
+import { NewSession, Sessions } from "./components/Sessions";
 import MuiSignIn from "./components/SignIn";
 import Strengths from "./components/Strengths";
 import MyValues from "./components/Values/MyValues";
@@ -91,6 +92,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <MyValues />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.sessions,
+        element: (
+          <RequireAuth>
+            <Sessions />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.newSession,
+        element: (
+          <RequireAuth>
+            <NewSession />
           </RequireAuth>
         ),
       },
