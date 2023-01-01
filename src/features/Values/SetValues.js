@@ -1,44 +1,16 @@
-import { ArrowBack, Check, Close } from "@mui/icons-material";
-import { Box, Button, Chip, Divider, Paper } from "@mui/material";
-import { styled } from "@mui/system";
-import React, { useCallback, useState } from "react";
+import { ArrowBack } from "@mui/icons-material";
+import { Box, Button, Divider } from "@mui/material";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth";
-import { routes } from "../../features/navigation";
-import { Layout } from "../Layout";
-import { useHistoryEntries } from "../Strengths/Strengths";
-import { H1, H2, P } from "../Typography";
-import { InfoBox } from "./MyValues";
+import { InfoBox } from "../../components/InfoBox";
+import { Layout } from "../../components/Layout";
+import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
+import { SelectableChip } from "../../components/SelectableChip";
+import { H1, H2, P } from "../../components/Typography";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import { useSelection } from "../../hooks/useSelection";
+import { routes } from "../../routes";
 import { VALUES } from "./values";
-
-export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
-  return (
-    <Paper
-      square
-      sx={{
-        px: 3,
-        // py: 4,
-        height: "100vh",
-        display: "flex",
-        flexFlow: "column nowrap",
-        justifyContent: "space-between",
-      }}
-    >
-      <H2 sx={{ my: 4 }}>{heading}</H2>
-      <Box
-        sx={{
-          overflow: "scroll",
-          flex: 1,
-          display: "flex",
-          flexFlow: "column nowrap",
-        }}
-      >
-        {children}
-      </Box>
-      <Button fullWidth variant="contained" sx={{ my: 4 }} {...buttonProps} />
-    </Paper>
-  );
-};
 
 const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
   return (
@@ -75,22 +47,6 @@ const createValuesEntry = ({ selectedKeys }) => {
   };
 };
 
-export const useSelection = ({ keyName = "key", initialValue = [] }) => {
-  const [selectedKeys, setSelectedKeys] = useState(initialValue);
-
-  const toggleItem = useCallback(
-    (item) =>
-      setSelectedKeys((keys) =>
-        keys.includes(item[keyName])
-          ? keys.filter((k) => k !== item[keyName])
-          : [...keys, item[keyName]]
-      ),
-    [keyName]
-  );
-
-  return { selectedKeys, toggleItem };
-};
-
 const useMyValues = () => {
   const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
   const { selectedKeys, toggleItem } = useSelection({
@@ -122,51 +78,7 @@ const useMyValues = () => {
   };
 };
 
-// https://mui.com/material-ui/react-chip/
-// https://mui.com/material-ui/api/chip/
-
-// https://mui.com/system/styled/#custom-components
-// https://mui.com/material-ui/customization/how-to-customize/#2-reusable-component
-// https://mui.com/system/styled/#styled-component-options-styles-component
-// https://mui.com/material-ui/customization/theme-components/#creating-new-component-variants
-
-const SelectableChip2 = styled(Chip, {
-  shouldForwardProp: (prop) => prop !== "bgcolor" && prop !== "selected",
-  name: "SelectableChip",
-  slot: "Root",
-  // We are specifying here how the styleOverrides are being applied based on props
-  overridesResolver: (props, styles) =>
-    console.log("overridesResolver", { props, styles }) || [
-      styles.root,
-      props.color === "primary" && styles.primary,
-      props.color === "secondary" && styles.secondary,
-    ],
-})(
-  ({ theme, ...props }) =>
-    console.log("styled", { theme, props }) || {
-      backgroundColor: "pink",
-    }
-);
-
-export const SelectableChip = ({ selected, ...props }) => {
-  const selectedProps = selected
-    ? { variant: "selected", icon: <Check /> }
-    : { variant: "unselected", icon: <Close /> };
-
-  return <Chip {...props} {...selectedProps} />;
-};
-
-SelectableChip.wrapperSx = {
-  display: "flex",
-  flexFlow: "row wrap",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: 3,
-  pb: 3,
-};
-
-function SetValues() {
-  const { authFetch } = useAuth();
+export function SetValuesPage() {
   const { items, selectedKeys, toggleItem, save } = useMyValues();
 
   console.log("[SetValues.rndr]", { items, selectedKeys });
@@ -221,5 +133,3 @@ function SetValues() {
     </Layout>
   );
 }
-
-export default SetValues;

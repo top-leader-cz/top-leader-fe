@@ -1,5 +1,5 @@
 import { Avatar, Box, Divider } from "@mui/material";
-import { useAuth } from "../features/auth";
+import { useAuth } from "../features/Auth";
 import { H1 } from "./Typography";
 
 export const Header = ({}) => {

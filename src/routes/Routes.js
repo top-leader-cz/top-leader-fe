@@ -8,18 +8,27 @@ import {
   redirect,
   useNavigation,
 } from "react-router-dom";
-import Assessment from "./components/Assessment";
-import Dashboard from "./components/Dashboard";
-import { NewSession, Sessions } from "./components/Sessions";
-import MuiSignIn from "./components/SignIn";
-import Strengths from "./components/Strengths";
-import MyValues from "./components/Values/MyValues";
-import SetValues from "./components/Values/SetValues";
-import CraDefaultApp from "./examples/cra-app/App";
-import MuiDefaultApp from "./examples/mui/ExampleApp";
-import { AuthRedirect, ForbidAuth, RequireAuth } from "./features/auth";
-import { routes } from "./features/navigation";
-import ErrorPage from "./routes/ErrorPage";
+import { AuthProvider, AuthRedirect } from "../features/Auth/Redirects";
+import CraDefaultApp from "../examples/cra-app/App";
+import MuiDefaultApp from "../examples/mui/ExampleApp";
+import { AssessmentPage } from "../features/Assessment";
+// import {
+// AuthRedirect,
+// ForbidAuth,
+// RequireAuth,
+// SignInPage,
+// } from "../features/Auth";
+import { DashboardPage } from "../features/Dashboard";
+import { NewSessionPage, SessionsPage } from "../features/Sessions";
+import { StrengthsPage } from "../features/Strengths";
+import { MyValuesPage, SetValuesPage } from "../features/Values";
+import { routes } from "./constants";
+import ErrorPage from "./ErrorPage";
+
+// const AuthRedirect = "div";
+const RequireAuth = "div";
+const ForbidAuth = "div";
+const SignInPage = "div";
 
 const GlobalSpinner = () => {
   return (
@@ -51,7 +60,7 @@ export const router = createBrowserRouter([
         path: routes.signIn,
         element: (
           <ForbidAuth>
-            <MuiSignIn />
+            <SignInPage />
           </ForbidAuth>
         ),
       },
@@ -59,7 +68,7 @@ export const router = createBrowserRouter([
         path: routes.dashboard,
         element: (
           <RequireAuth>
-            <Dashboard />
+            <DashboardPage />
           </RequireAuth>
         ),
       },
@@ -67,7 +76,7 @@ export const router = createBrowserRouter([
         path: routes.assessment,
         element: (
           <RequireAuth>
-            <Assessment />
+            <AssessmentPage />
           </RequireAuth>
         ),
       },
@@ -75,7 +84,7 @@ export const router = createBrowserRouter([
         path: routes.strengths,
         element: (
           <RequireAuth>
-            <Strengths />
+            <StrengthsPage />
           </RequireAuth>
         ),
       },
@@ -83,7 +92,7 @@ export const router = createBrowserRouter([
         path: routes.setValues,
         element: (
           <RequireAuth>
-            <SetValues />
+            <SetValuesPage />
           </RequireAuth>
         ),
       },
@@ -91,7 +100,7 @@ export const router = createBrowserRouter([
         path: routes.myValues,
         element: (
           <RequireAuth>
-            <MyValues />
+            <MyValuesPage />
           </RequireAuth>
         ),
       },
@@ -99,7 +108,7 @@ export const router = createBrowserRouter([
         path: routes.sessions,
         element: (
           <RequireAuth>
-            <Sessions />
+            <SessionsPage />
           </RequireAuth>
         ),
       },
@@ -107,7 +116,7 @@ export const router = createBrowserRouter([
         path: routes.newSession,
         element: (
           <RequireAuth>
-            <NewSession />
+            <NewSessionPage />
           </RequireAuth>
         ),
       },

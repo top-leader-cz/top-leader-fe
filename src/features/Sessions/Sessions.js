@@ -1,14 +1,10 @@
-import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, Divider } from "@mui/material";
-import { useCallback, useState } from "react";
+import { Box, Card, CardContent, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth";
-import { useLocalStorage } from "../../features/auth/useLocalStorage";
-import { routes } from "../../features/navigation";
-import { Layout } from "../Layout";
-import { GRAY_BG_LIGHT, PRIMARY_BG_LIGHT } from "../Strengths/Strengths";
-import { H1, H2, P } from "../Typography";
-import { HistoryRightMenu, useHistoryEntries } from "../Values/MyValues";
+import { HistoryRightMenu } from "../../components/HistoryRightMenu";
+import { Layout } from "../../components/Layout";
+import { H1, P } from "../../components/Typography";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import { routes } from "../../routes";
 
 export const SessionCard = ({
   session: { date, type, area, goal, motivation, steps } = {},
@@ -29,7 +25,6 @@ export const SessionCard = ({
 };
 
 function Sessions() {
-  const { authFetch } = useAuth();
   const history = useHistoryEntries({ storageKey: "sessions_history" });
   const navigate = useNavigate();
 

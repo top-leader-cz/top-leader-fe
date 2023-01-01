@@ -3,13 +3,12 @@ import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth";
-import { useLocalStorage } from "../../features/auth/useLocalStorage";
-import { routes } from "../../features/navigation";
-import { Layout } from "../Layout";
-import { useAssessmentHistory } from "../Strengths/Strengths";
-import { H1, H2, P } from "../Typography";
+import { Layout } from "../../components/Layout";
+import { H1, H2, P } from "../../components/Typography";
 import { QUESTIONS } from "./questions";
+import { routes } from "../../routes";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -214,6 +213,10 @@ const createAssessmentEntry = ({ questions, scores }) => {
   };
 };
 
+export const useAssessmentHistory = () => {
+  return useHistoryEntries({ storageKey: "assessment_history" });
+};
+
 const useAssessment = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useLocalStorage("assessment", {});
@@ -256,7 +259,6 @@ const useAssessment = () => {
 };
 
 function Assessment() {
-  const { authFetch } = useAuth();
   const { pagination, question, score, responsesCount, saveAssessment } =
     useAssessment();
   const handleNext =

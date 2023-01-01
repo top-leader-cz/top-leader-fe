@@ -1,9 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { routes } from "../navigation";
-import { useAuth } from "./AuthProvider";
+import { routes } from "../../routes";
+import { useAuth } from "./useAuth";
 
 export const AuthRedirect = () => {
   let auth = useAuth();
+  console.log("[AuthRedirect]", { auth });
 
   if (!auth.user) {
     return <Navigate to={routes.signIn} replace />;

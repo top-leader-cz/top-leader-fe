@@ -11,16 +11,16 @@ import {
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import React, { useEffect, useMemo } from "react";
-import { useAuth } from "../features/auth";
-import { useLocalStorage } from "../features/auth/useLocalStorage";
-import { routes } from "../features/navigation";
-import { Header } from "./Header";
-import { Icon } from "./Icon";
-import { Layout } from "./Layout";
-import { useAssessmentHistory, useHistoryEntries } from "./Strengths/Strengths";
-import { TALENTS } from "./Strengths/talents";
-import { H2, P } from "./Typography";
-import { VALUES } from "./Values/values";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { Header } from "../../components/Header";
+import { Icon } from "../../components/Icon";
+import { Layout } from "../../components/Layout";
+import { H2, P } from "../../components/Typography";
+import { routes } from "../../routes";
+import { useAssessmentHistory } from "../Assessment";
+import { TALENTS } from "../Strengths";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import { VALUES } from "../Values";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -128,6 +128,7 @@ const DashboardCard = ({
                   m: 1,
                   pointerEvents: "none",
                 }}
+                key={item.label}
                 {...item}
               />
             ))
@@ -182,12 +183,12 @@ const DashboardCardValues = () => {
   );
 };
 
-function Dashboard() {
-  const { authFetch } = useAuth();
+export function DashboardPage() {
+  // const { authFetch } = useAuth();
 
-  useEffect(() => {
-    const res = authFetch({ url: "/api/rest/users" });
-  }, []);
+  // useEffect(() => {
+  //   const res = authFetch({ url: "/api/rest/users" });
+  // }, []);
 
   return (
     <Layout>
@@ -223,5 +224,3 @@ function Dashboard() {
     </Layout>
   );
 }
-
-export default Dashboard;

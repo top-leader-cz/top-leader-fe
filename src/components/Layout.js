@@ -15,7 +15,7 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
-import { routes } from "../features/navigation";
+import { routes } from "../routes";
 import { Icon } from "./Icon";
 import { MainMenu } from "./MainMenu";
 import { H2, P } from "./Typography";
@@ -76,7 +76,8 @@ export const Layout = ({
       sx={{
         display: "flex",
         bgcolor: "#EAECF0",
-        // minHeight: "100%",
+        // TODO: check sessions
+        minHeight: "100%",
       }}
     >
       <SideMenu width={256} anchor="left">

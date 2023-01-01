@@ -1,27 +1,14 @@
 import { ArrowBack, Star } from "@mui/icons-material";
-import {
-  alpha,
-  Box,
-  Button,
-  CardContent,
-  Chip,
-  Divider,
-  Paper,
-} from "@mui/material";
-import React, { useCallback, useState } from "react";
+import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../features/auth";
-import { useLocalStorage } from "../../features/auth/useLocalStorage";
-import { routes } from "../../features/navigation";
-import { Layout } from "../Layout";
-import { H1, H2, P } from "../Typography";
-import { ChipsCard, InfoBox } from "../Values/MyValues";
+import { ChipsCard } from "../../components/ChipsCard";
+import { InfoBox, PRIMARY_BG_LIGHT } from "../../components/InfoBox";
+import { Layout } from "../../components/Layout";
+import { H1, H2, P } from "../../components/Typography";
+import { routes } from "../../routes";
+import { useAssessmentHistory } from "../Assessment";
 import { TALENTS } from "./talents";
-
-export const PRIMARY_BG_LIGHT = (theme) =>
-  console.log({ theme }) || alpha(theme.palette.primary.main, 0.05);
-export const GRAY_BG_LIGHT = (theme) =>
-  console.log({ theme }) || alpha(theme.palette.action.selected, 0.05);
 
 const AssessmentRightMenu = ({
   history,
@@ -77,47 +64,6 @@ const AssessmentRightMenu = ({
   );
 };
 
-export const useHistoryEntries = ({ storageKey, idKey = "timestamp" }) => {
-  const [history, setHistory] = useLocalStorage(storageKey, []);
-  const last = history[history.length - 1];
-  const [selectedId, setSelectedId] = useState(last?.[idKey]);
-  const selected = history.find(
-    (entry) => selectedId && entry[idKey] === selectedId
-  );
-
-  return {
-    last,
-    all: history,
-    selected,
-    setSelected: useCallback((entry) => setSelectedId(entry?.[idKey]), []),
-    push: useCallback(
-      (entry) => setHistory((history) => [...history, entry]),
-      [setHistory]
-    ),
-    update: useCallback(
-      (newEntry) => {
-        setHistory((entries) =>
-          entries.map((entry) =>
-            entry[idKey] === newEntry[idKey] ? { ...entry, ...newEntry } : entry
-          )
-        );
-      },
-      [idKey, setHistory]
-    ),
-    remove: useCallback(
-      (rmEntry) =>
-        setHistory((entries) =>
-          entries.filter((entry) => entry[idKey] !== rmEntry[idKey])
-        ),
-      [idKey, setHistory]
-    ),
-  };
-};
-
-export const useAssessmentHistory = () => {
-  return useHistoryEntries({ storageKey: "assessment_history" });
-};
-
 const SelectedStregth = ({ positives = [], tips = "" }) => {
   return (
     <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
@@ -143,8 +89,7 @@ const SelectedStregth = ({ positives = [], tips = "" }) => {
   );
 };
 
-function Strengths() {
-  const { authFetch } = useAuth();
+export function StrengthsPage() {
   const assessmentHistory = useAssessmentHistory();
   const navigate = useNavigate();
 
@@ -268,5 +213,3 @@ function Strengths() {
     </Layout>
   );
 }
-
-export default Strengths;

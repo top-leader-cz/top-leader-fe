@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { createContext, useCallback, useContext, useState } from "react";
-import { useLocalStorage } from "./useLocalStorage";
+import { createContext, useCallback } from "react";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 // Initialize Firebase
 var firebaseConfig = {
@@ -16,7 +16,7 @@ var firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(app);
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage("user", null);
@@ -90,8 +90,4 @@ export function AuthProvider({ children }) {
   const value = { user, signin, signout, authFetch };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }
