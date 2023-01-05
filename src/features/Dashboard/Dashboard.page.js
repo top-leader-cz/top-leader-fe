@@ -5,21 +5,20 @@ import {
   CardActionArea,
   CardContent,
   Chip,
-  Stack,
   TextField,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useEffect, useMemo } from "react";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import React, { useMemo } from "react";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { H2, P } from "../../components/Typography";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
 import { useAssessmentHistory } from "../Assessment";
 import { TALENTS } from "../Strengths";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { VALUES } from "../Values";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {

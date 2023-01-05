@@ -1,6 +1,10 @@
 import { useCallback, useState } from "react";
 
-export function useSelection({ keyName = "key", initialValue = [] }) {
+export function useSelection({
+  keyName = "key",
+  initialValue = [],
+  limit = Infinity,
+}) {
   const [selectedKeys, setSelectedKeys] = useState(initialValue);
 
   const toggleItem = useCallback(
@@ -8,9 +12,9 @@ export function useSelection({ keyName = "key", initialValue = [] }) {
       setSelectedKeys((keys) =>
         keys.includes(item[keyName])
           ? keys.filter((k) => k !== item[keyName])
-          : [...keys, item[keyName]]
+          : [...keys, item[keyName]].slice(0, limit)
       ),
-    [keyName]
+    [keyName, limit]
   );
 
   return { selectedKeys, toggleItem };

@@ -1,103 +1,323 @@
-import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import {
+  Add,
+  ArrowBack,
+  ArrowForward,
+  Delete,
+  EmojiEvents,
+  PlusOne,
+} from "@mui/icons-material";
+import {
+  Avatar,
   Box,
   Button,
   Card,
   CardContent,
   Divider,
-  Step,
-  StepConnector,
-  stepConnectorClasses,
-  StepLabel,
-  Stepper,
-  styled,
+  IconButton,
+  Stack,
   TextField,
-  Typography,
 } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { SelectableChip } from "../../components/SelectableChip";
 import { H1, H2, P } from "../../components/Typography";
-import { useSelection } from "../../hooks/useSelection";
 import { routes } from "../../routes";
+import { SessionStepCard } from "./SessionStepCard";
+import { VerticalStepper } from "./VerticalStepper";
+import { Controls, ControlsContainer } from "./Controls";
+import { useHistoryEntries } from "../../hooks/useHistoryEntries";
+import {
+  DesktopDatePicker,
+  TimePicker as MuiTimePicker,
+} from "@mui/x-date-pickers";
+import { addDays, parse } from "date-fns";
 
-const Controls = ({ handleNext, handleBack }) => {
+const AreaStep = ({ handleNext, data, setData, ...props }) => {
+  const { areas } = useNewSession();
+
+  const isCustomArea = !areas.some((area) => area.key === data.area);
+  const [selected, setSelected] = useState(
+    isCustomArea ? undefined : data.area
+  );
+  const [customArea, setCustomArea] = useState(isCustomArea ? data.area : "");
+  console.log({ selected, customArea });
+
+  const newArea = customArea || selected;
+  const next = () => {
+    handleNext({ area: newArea });
+  };
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        width: "100%",
-        alignItems: "baseline",
-        justifyContent: "flex-end",
-        gap: 5,
-      }}
-    >
-      <Button variant="outlined" endIcon={<ArrowBack />} onClick={handleBack}>
-        Back
-      </Button>
-
-      <Button
-        variant="contained"
-        endIcon={<ArrowForward />}
-        onClick={handleNext}
+    <SessionStepCard {...props}>
+      <Box sx={{ my: 12.5, ...SelectableChip.wrapperSx }}>
+        {areas.map((item) => (
+          <SelectableChip
+            key={item.key}
+            label={item.label}
+            selected={selected === item.key}
+            onClick={() => {
+              setSelected(item.key);
+              setCustomArea("");
+            }}
+          />
+        ))}
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          width: "100%",
+          alignItems: "baseline",
+          gap: 5,
+        }}
       >
-        Next
+        <TextField
+          margin="normal"
+          // required
+          // fullWidth
+          id="customArea"
+          // label="Area"
+          placeholder="Type your own area for growth"
+          name="customArea"
+          autoFocus
+          size="small"
+          hiddenLabel
+          value={customArea}
+          onChange={(e) => {
+            setSelected();
+            setCustomArea(e.target.value);
+          }}
+          sx={{ flex: "1 1 auto" }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          endIcon={<ArrowForward />}
+          onClick={next}
+          disabled={!newArea}
+        >
+          Next
+        </Button>
+      </Box>
+    </SessionStepCard>
+  );
+};
+
+const TextAreaStep = ({
+  textAreaName,
+  handleNext,
+  handleBack,
+  data,
+  setData,
+  ...props
+}) => {
+  const { register, handleSubmit, watch, formState } = useForm({
+    defaultValues: data,
+  });
+  const componentData = {
+    [textAreaName]: watch(textAreaName),
+  };
+  console.log({ componentData, data });
+
+  return (
+    <SessionStepCard {...props}>
+      <Box
+        component="form"
+        noValidate
+        // onSubmit={handleSubmit(submit)}
+        sx={{ mt: 1 }}
+      >
+        <TextField
+          placeholder={"Type your own " + textAreaName}
+          autoFocus
+          size="small"
+          hiddenLabel
+          multiline
+          rows={4}
+          {...register(textAreaName, { required: true })}
+          sx={{ my: 4 }}
+          fullWidth
+        />
+        <Controls
+          handleNext={handleNext}
+          nextProps={{ disabled: !formState.isValid }}
+          handleBack={handleBack}
+          data={componentData}
+          sx={{ mt: 3 }}
+        />
+      </Box>
+    </SessionStepCard>
+  );
+};
+
+const MotivationStep = (props) => (
+  <TextAreaStep textAreaName={"motivation"} {...props} />
+);
+
+const GoalStep = (props) => <TextAreaStep textAreaName={"goal"} {...props} />;
+
+const DatePicker = ({ control, name, rules, ...props }) => {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      rules={rules}
+      render={({ field }) => (
+        <DesktopDatePicker
+          renderInput={(params) => <TextField {...props} {...params} />}
+          {...field}
+        />
+      )}
+    />
+  );
+};
+
+const TimePicker = ({ control, name, rules, ...props }) => {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      rules={rules}
+      render={({ field }) => (
+        <MuiTimePicker
+          renderInput={(params) => <TextField {...props} {...params} />}
+          {...field}
+        />
+      )}
+    />
+  );
+};
+
+const Input = ({ name, control, rules, ...props }) => {
+  return (
+    <Controller
+      control={control}
+      name={name}
+      rules={rules}
+      render={({ field }) => <TextField {...props} {...field} />}
+    />
+  );
+};
+
+const ActionSteps = ({ name, rules, control }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name,
+    rules,
+  });
+
+  return (
+    // <Box component={"ol"}>
+    <Box sx={{ my: 5 }}>
+      {fields.map((field, i) => (
+        <Box
+          key={field.id}
+          // component={"li"}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Box sx={{ width: 16, mx: 1 }}>{i + 1}.</Box>
+          <Input
+            control={control}
+            name={`${name}.${i}.label`}
+            placeholder={"Label"}
+            rules={{ required: true }}
+            size="small"
+            autoFocus
+            sx={{ mx: 1, minWidth: { lg: 320 } }}
+          />
+          <P sx={{ ml: 4, mr: 2 }}>Due date</P>
+          <DatePicker
+            control={control}
+            name={`${name}.${i}.date`}
+            size="small"
+            inputFormat="MM/dd/yyyy"
+          />
+          {i > 0 && (
+            <IconButton
+              onClick={() => remove(i)}
+              sx={{
+                mx: 2,
+              }}
+            >
+              <Delete />
+            </IconButton>
+          )}
+        </Box>
+      ))}
+      <Button
+        onClick={() =>
+          append({
+            label: "",
+            date: null,
+          })
+        }
+        startIcon={<Add />}
+      >
+        Add action
       </Button>
     </Box>
   );
 };
 
-const AreaStep = (props) => {
-  const { areas } = useNewSession();
-  const { selectedKeys, toggleItem } = useSelection({ initialValue: [] });
+const ActionStepsStep = ({
+  handleNext,
+  handleBack,
+  data,
+  setData,
+  onFinish,
+  ...props
+}) => {
+  const { control, watch, formState } = useForm({
+    defaultValues: {
+      steps: data.steps?.length ? data.steps : [{ label: "", date: null }],
+    },
+  });
+  const nextData = {
+    ...data,
+    steps: watch("steps"),
+  };
+
+  console.log("[ActionStepsStep.rndr]", {
+    nextData,
+    errors: {
+      "formState.errors": formState.errors,
+      "formState.errors?.steps": formState.errors?.steps,
+      "formState.errors?.fieldArray": formState.errors?.fieldArray,
+      "formState.errors?.fieldArray?.root": formState.errors?.fieldArray?.root,
+      "formState.errors?.steps?.root": formState.errors?.steps?.root,
+    },
+    "nextData.steps?.length": nextData.steps?.length,
+    "formState.isValid": formState.isValid,
+  });
+  // TODO: not working useFieldArray rules validation? must be required?
+  const disabled = !nextData.steps?.length || !formState.isValid;
 
   return (
-    <SessionStepCard
-      {...props}
-      renderControls={() => (
-        <Box
-          sx={{
-            display: "flex",
-            width: "100%",
-            alignItems: "baseline",
-            gap: 5,
-          }}
-        >
-          <TextField
-            margin="normal"
-            // required
-            // fullWidth
-            id="customArea"
-            // label="Area"
-            placeholder="Type your own area for growth"
-            name="customArea"
-            autoFocus
-            size="small"
-            hiddenLabel
-            sx={{ flex: "1 1 auto" }}
-          />
-          <Button
-            variant="contained"
-            endIcon={<ArrowForward />}
-            onClick={props.handleNext}
-          >
-            Next
-          </Button>
-        </Box>
-      )}
-    >
-      <Box sx={{ my: 12.5, ...SelectableChip.wrapperSx }}>
-        {areas.map((item) => (
-          <SelectableChip
-            key={item.label}
-            label={item.label}
-            selected={selectedKeys.includes(item.key)}
-            onClick={(e) => toggleItem(item)}
-          />
-        ))}
+    <SessionStepCard {...props}>
+      <Box
+        component="form"
+        noValidate
+        // onSubmit={handleSubmit(submit)}
+        sx={{ mt: 1 }}
+      >
+        <ActionSteps
+          name="steps"
+          control={control}
+          rules={{ required: true, minLength: 1 }}
+        />
+        <Controls
+          handleNext={onFinish}
+          nextProps={{ disabled, children: "Done", endIcon: undefined }}
+          handleBack={handleBack}
+          data={nextData}
+          sx={{ mt: 3 }}
+        />
       </Box>
     </SessionStepCard>
   );
@@ -105,15 +325,16 @@ const AreaStep = (props) => {
 
 const STEPS = [
   {
+    StepComponent: AreaStep,
     label: "Choose area",
     caption: "Area for development",
     // caption: "InsertChart",
     iconName: "InsertChart",
     heading: "Set area for your development",
     perex: "",
-    StepComponent: AreaStep,
   },
   {
+    StepComponent: GoalStep,
     label: "Set long-term goal",
     caption: "Goals give you focus",
     // caption: "Adjust",
@@ -124,6 +345,7 @@ const STEPS = [
     focusedList: ["Focus on building relationship", "TODO", "TODO", "TODO"],
   },
   {
+    StepComponent: MotivationStep,
     label: "Motivation",
     caption: "See yourself to excel",
     // caption: "RocketLaunch",
@@ -137,6 +359,7 @@ const STEPS = [
     ],
   },
   {
+    StepComponent: ActionStepsStep,
     label: "Set action steps",
     caption: "Be specific",
     // caption: "Explore",
@@ -147,50 +370,6 @@ const STEPS = [
   },
 ];
 
-const StepIconRoot = styled("div")(({ theme, ownerState }) => ({
-  backgroundColor:
-    theme.palette.mode === "dark" ? theme.palette.grey[700] : "#EAECF0",
-  color: "#667085",
-  zIndex: 1,
-  width: 48,
-  height: 48,
-  display: "flex",
-  borderRadius: "50%",
-  justifyContent: "center",
-  alignItems: "center",
-  ...(ownerState.active && {
-    color: theme.palette.common.white,
-    backgroundColor: theme.palette.primary.main,
-  }),
-  ...(ownerState.completed &&
-    {
-      // color: theme.palette.common.white,
-      // backgroundColor: theme.palette.secondary.light,
-    }),
-}));
-
-function StepIcon({ active, completed, className, icon, iconName }) {
-  return (
-    <StepIconRoot ownerState={{ completed, active }} className={className}>
-      <Icon name={iconName} fallback={icon} fontSize="small" />
-    </StepIconRoot>
-  );
-}
-
-const Connector = styled(StepConnector)(({ theme }) => ({
-  marginLeft: "24px",
-  //   [`&.${stepConnectorClasses.active}`]: {
-  //     [`& .${stepConnectorClasses.line}`]: {},
-  //   },
-  //   [`&.${stepConnectorClasses.completed}`]: {
-  //     [`& .${stepConnectorClasses.line}`]: {},
-  //   },
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor: "#EAECF0",
-    minHeight: 40,
-  },
-}));
-
 export const RightMenu = ({
   heading,
   activeStepIndex = 0,
@@ -199,98 +378,12 @@ export const RightMenu = ({
 }) => {
   return (
     <ScrollableRightMenu heading={heading} buttonProps={buttonProps}>
-      {/* {steps.map((step) => (
-        <Box>
-          <pre>{JSON.stringify(step, null, 2)}</pre>
-        </Box>
-      ))} */}
-      <Stepper
-        activeStep={activeStepIndex}
-        connector={<Connector />}
-        orientation="vertical"
-      >
-        {steps.map((step, index) => (
-          <Step key={step.label}>
-            <StepLabel
-              //   icon={<Avatar><Icon name={step.iconName} fontSize="small" /></Avatar>}
-              StepIconComponent={StepIcon}
-              StepIconProps={{ iconName: step.iconName }}
-              optional={
-                <Typography variant="caption">{step.caption}</Typography>
-              }
-              sx={{ padding: 0 }}
-            >
-              {step.label}
-            </StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+      <VerticalStepper activeStepIndex={activeStepIndex} steps={steps} />
     </ScrollableRightMenu>
   );
 };
 
-const FocusedListRoot = styled(Box)(({ theme }) => ({
-  transition: theme.transitions.create(),
-}));
-
-const FocusedList = ({
-  items,
-  initialCount = 1,
-  showMoreLabel = "Show another",
-}) => {
-  const [visibleCount, setVisibleCount] = useState(initialCount);
-
-  return (
-    <FocusedListRoot>
-      <ul>
-        {Array(visibleCount)
-          .fill(null)
-          .map((_, i) => {
-            const item = items[i];
-            return <li key={item}>{item}</li>;
-          })}
-      </ul>
-      {visibleCount < items.length ? (
-        <Button variant="text" onClick={() => setVisibleCount((c) => c + 1)}>
-          {showMoreLabel}
-        </Button>
-      ) : null}
-    </FocusedListRoot>
-  );
-};
-
-const SessionStepCard = ({
-  step: { perex, heading, focusedList } = {},
-  stepper,
-  handleNext,
-  handleBack,
-  children,
-  renderControls = ({ handleNext, handleBack }) => (
-    <Controls handleNext={handleNext} handleBack={handleBack} />
-  ),
-  sx = { mb: 3 },
-}) => {
-  return (
-    <Card sx={{ ...sx }} elevation={0}>
-      <CardContent sx={{ flexDirection: "column" }}>
-        <Box>
-          {stepper && (
-            <P sx={{ mb: 1 }}>
-              Step {stepper.currentIndex + 1}/{stepper.totalCount}
-            </P>
-          )}
-          <H1 gutterBottom>{heading}</H1>
-          {perex && <P>{perex}</P>}
-        </Box>
-        {focusedList && <FocusedList items={focusedList} />}
-        <Box>{children}</Box>
-        {renderControls({ handleNext, handleBack })}
-      </CardContent>
-    </Card>
-  );
-};
-
-const AREAS = {
+export const AREAS = {
   1: { label: "Become an active listener" },
   2: { label: "Become more efficient" },
   3: { label: "Show appreciation, recognition and empathy for your team" },
@@ -305,7 +398,6 @@ const AREAS = {
 const useNewSession = () => {
   return {
     areas: Object.entries(AREAS).map(([key, value]) => ({
-      data: value,
       key,
       label: value.label,
     })),
@@ -318,18 +410,19 @@ const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   const activeStep = steps[activeStepIndex];
 
   const handleNext = useCallback((data) => {
-    setData((prev) => ({ ...prev, data }));
-    setActiveStepIndex((i) => (i + 1) % STEPS.length);
+    setData((prev) => ({ ...prev, ...data }));
+    setActiveStepIndex((i) => i + 1);
   }, []);
 
-  const handleBack = useCallback(() => {
+  const handleBack = useCallback((data) => {
+    setData((prev) => ({ ...prev, ...data }));
     setActiveStepIndex((i) => Math.max(0, i - 1));
   }, []);
 
   return {
     steps,
     activeStep,
-    activeStepIndex,
+    activeStepIndex: Math.min(activeStepIndex, STEPS.length - 1),
     isFirst: activeStepIndex === 0,
     isLast: activeStepIndex === steps.length - 1,
     handleNext,
@@ -339,17 +432,99 @@ const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   };
 };
 
-function NewSession() {
-  //   const history = useHistoryEntries({ storageKey: "sessions_history" });
+const createSessionEntry = ({ area, goal, motivation, steps }) => {
+  return {
+    timestamp: new Date().getTime(),
+    date: new Date().toISOString(),
+    type: "Private session",
+    area,
+    goal,
+    motivation,
+    steps,
+  };
+};
+
+const Finished = () => {
+  const { control } = useForm({
+    defaultValues: {
+      date: addDays(new Date(), 7),
+      time: parse("14:00", "HH:mm", new Date()),
+    },
+  });
+  return (
+    <Card sx={{}} elevation={0}>
+      <CardContent
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
+          <Avatar
+            variant="circular"
+            sx={{ width: 100, height: 100, bgcolor: "#F9FAFB" }}
+          >
+            <Avatar
+              variant="circular"
+              sx={{ width: 60, height: 60, bgcolor: "#EAECF0" }}
+            >
+              <EmojiEvents sx={{ fontSize: 30, color: "#667085" }} />
+            </Avatar>
+          </Avatar>
+        </Box>
+        <H1 sx={{ mt: 2 }} gutterBottom>
+          Congratulations, you’ve completed your session!
+        </H1>
+        <P>Would you like to book the next one?</P>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 3,
+            my: 7.5,
+          }}
+        >
+          <DatePicker {...{ control, name: "date", size: "small" }} />
+          <P>at</P>
+          <TimePicker {...{ control, name: "time", size: "small" }} />
+        </Box>
+        <ControlsContainer sx={{ mt: 10 }}>
+          <Button href={routes.sessions} variant="outlined">
+            Skip for now
+          </Button>
+          <Button href={routes.sessions} variant="contained">
+            Schedule the session
+          </Button>
+        </ControlsContainer>
+      </CardContent>
+    </Card>
+  );
+};
+
+export function NewSessionPage() {
+  const history = useHistoryEntries({ storageKey: "sessions_history" });
   const navigate = useNavigate();
+  const [finished, setFinished] = useState(false);
   const {
-    activeStep: { StepComponent = SessionStepCard, ...activeStep },
+    activeStep: { StepComponent = SessionStepCard, ...activeStep } = {},
     activeStepIndex,
     handleNext,
     handleBack,
+    data,
+    setData,
   } = useSteps({
     steps: STEPS,
+    initialIndex: 0,
   });
+  const onFinish = (data) => {
+    const entry = createSessionEntry(data);
+    history.push(entry);
+    setFinished(true);
+  };
+  console.log("[NewSessionPage.rndr]", { data });
 
   return (
     <Layout
@@ -382,14 +557,19 @@ function NewSession() {
         </Box>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
       </Box>
-      <StepComponent
-        step={activeStep}
-        stepper={{ currentIndex: activeStepIndex, totalCount: STEPS.length }}
-        handleNext={handleNext}
-        handleBack={handleBack}
-      />
+      {finished ? (
+        <Finished />
+      ) : (
+        <StepComponent
+          step={activeStep}
+          stepper={{ currentIndex: activeStepIndex, totalCount: STEPS.length }}
+          data={data}
+          setData={setData}
+          handleNext={handleNext}
+          handleBack={handleBack}
+          onFinish={onFinish}
+        />
+      )}
     </Layout>
   );
 }
-
-export default NewSession;

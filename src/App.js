@@ -10,14 +10,18 @@ import { AuthProvider } from "./features/Auth/AuthProvider";
 import { router } from "./routes";
 import theme from "./theme";
 import "./index.css";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <AuthProvider>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }
