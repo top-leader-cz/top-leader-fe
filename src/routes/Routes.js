@@ -24,6 +24,7 @@ import { StrengthsPage } from "../features/Strengths";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
+import { EditSessionPage } from "../features/Sessions/EditSession.page";
 
 // const AuthRedirect = "div";
 const RequireAuth = "div";
@@ -117,6 +118,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <NewSessionPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.editSession,
+        element: (
+          <RequireAuth>
+            <EditSessionPage />
           </RequireAuth>
         ),
       },

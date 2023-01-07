@@ -7,6 +7,7 @@ export const routes = {
   myValues: "/my-values",
   sessions: "/sessions",
   newSession: "/new-session",
+  editSession: "/session/:id",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
 };

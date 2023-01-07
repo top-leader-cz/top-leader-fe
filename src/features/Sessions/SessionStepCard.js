@@ -1,6 +1,6 @@
 import { Box, Card, CardContent } from "@mui/material";
 import { H1, P } from "../../components/Typography";
-import { Controls } from "./Controls";
+import { Controls } from "./steps/Controls";
 import { FocusedList } from "./FocusedList";
 
 export const SessionStepCard = ({

@@ -1,57 +1,58 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  Stack,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box, Card, CardActionArea, CardContent, Divider } from "@mui/material";
+import { generatePath, useNavigate } from "react-router-dom";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
 import { Layout } from "../../components/Layout";
+import { Todos } from "../../components/Todos";
 import { H1, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { AREAS } from "./NewSession";
+import { AREAS } from "./steps/AreaStep";
 
 const ActionStepsTodo = ({ steps = [], label }) => {
+  // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
   return (
     <>
       <P sx={{ mt: 3, mb: 2 }}>
         <b>{label}</b>
       </P>
-      <Stack>
-        {steps.map((step) => (
-          <FormControlLabel
-            control={<Checkbox defaultChecked={!!Math.round(Math.random())} />}
-            label={step.label}
-          />
-        ))}
-      </Stack>
+      <Todos items={steps} keyProp="label" />
     </>
   );
 };
 
 // TODO: grid
 export const SessionCard = ({
-  session: { date, type, area, goal, motivation, steps } = {},
+  session: {
+    timestamp,
+    id = timestamp,
+    date,
+    type,
+    area,
+    goal,
+    motivation,
+    steps,
+  } = {},
   sx = { mb: 3 },
 }) => {
   return (
     <Card sx={{ ...sx }} elevation={0}>
-      <CardContent sx={{ display: "flex", flexDirection: "row" }}>
-        <Box>
-          <P>{date} -&nbsp;</P>
-        </Box>
-        <Box>
-          <P>{type}</P>
-          <P sx={{ my: 3 }}>
-            <b>{AREAS[area]?.label || area}</b>
-          </P>
-          <ActionStepsTodo steps={steps} label="Goals" />
-        </Box>
-      </CardContent>
+      <CardActionArea
+        sx={{ height: "100%" }}
+        href={generatePath(routes.editSession, { id })}
+      >
+        <CardContent sx={{ display: "flex", flexDirection: "row" }}>
+          <Box>
+            <P>{date} -&nbsp;</P>
+          </Box>
+          <Box>
+            <P>{type}</P>
+            <P sx={{ my: 3 }}>
+              <b>{AREAS[area]?.label || area}</b>
+            </P>
+            <ActionStepsTodo steps={steps} label="Goals" />
+          </Box>
+        </CardContent>
+      </CardActionArea>
     </Card>
   );
 };

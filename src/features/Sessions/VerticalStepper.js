@@ -34,7 +34,7 @@ const StepIconRoot = styled("div")(({ theme, ownerState }) => ({
 function StepIcon({ active, completed, className, icon, iconName }) {
   return (
     <StepIconRoot ownerState={{ completed, active }} className={className}>
-      <Icon name={iconName} fallback={icon} fontSize="small" />
+      <Icon name={iconName} fallback={icon} />
     </StepIconRoot>
   );
 }

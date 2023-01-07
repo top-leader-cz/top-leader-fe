@@ -14,6 +14,8 @@ import {
   Adjust,
   RocketLaunch,
   Explore,
+  Lightbulb,
+  ArrowForward,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -27,6 +29,8 @@ const Icons = {
   Adjust,
   RocketLaunch,
   Explore,
+  Lightbulb,
+  ArrowForward,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({
