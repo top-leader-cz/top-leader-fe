@@ -63,13 +63,19 @@ const STEPS = [
 
 export const StepperRightMenu = ({
   heading,
-  activeStepIndex = 0,
-  steps,
   buttonProps,
+
+  activeStepIndex = 0,
+  onStepClick,
+  steps,
 }) => {
   return (
     <ScrollableRightMenu heading={heading} buttonProps={buttonProps}>
-      <VerticalStepper activeStepIndex={activeStepIndex} steps={steps} />
+      <VerticalStepper
+        activeStepIndex={activeStepIndex}
+        onStepClick={onStepClick}
+        steps={steps}
+      />
     </ScrollableRightMenu>
   );
 };
@@ -80,7 +86,9 @@ export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   const activeStep = steps[activeStepIndex];
 
   const handleNext = useCallback((data) => {
-    setData((prev) => ({ ...prev, ...data }));
+    setData(
+      (prev) => console.log("handleNext", data, prev) || { ...prev, ...data }
+    );
     setActiveStepIndex((i) => i + 1);
   }, []);
 
@@ -93,6 +101,7 @@ export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
     steps,
     activeStep,
     activeStepIndex: Math.min(activeStepIndex, STEPS.length - 1),
+    setActiveStepIndex,
     isFirst: activeStepIndex === 0,
     isLast: activeStepIndex === steps.length - 1,
     handleNext,
@@ -121,6 +130,7 @@ export function NewSessionPage() {
   const {
     activeStep: { StepComponent = SessionStepCard, ...activeStep } = {},
     activeStepIndex,
+    setActiveStepIndex,
     handleNext,
     handleBack,
     data,
@@ -142,6 +152,7 @@ export function NewSessionPage() {
         <StepperRightMenu
           heading={"My session 22/06/2022"}
           activeStepIndex={activeStepIndex}
+          onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={STEPS}
           buttonProps={{
             children: "End session",

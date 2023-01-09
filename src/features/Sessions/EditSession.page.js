@@ -2,16 +2,20 @@ import { ArrowBack } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ActionSteps, Input } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Todos } from "../../components/Todos";
-import { H1, H2 } from "../../components/Typography";
+import { H1, H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
+import { FocusedList } from "./FocusedList";
 import { StepperRightMenu, useSteps } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
+import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
+import { FormStepCard } from "./steps/FormStepCard";
 
 const IconTile = ({ iconName, caption, text, ...props }) => {
   return (
@@ -82,17 +86,94 @@ const exampleTodos = [
   { id: 3, label: "Qui voluptates sint facilis impedit et ea quia deleniti." },
 ];
 
-const ReflectStep = ({ handleNext, handleBack, data, setData, ...props }) => {
+const reflectionKeyName = "reflection";
+const ReflectStep = ({ ...props }) => {
   return (
-    <SessionStepCard {...props}>
+    <FormStepCard {...props}>
       <Todos items={exampleTodos} keyProp="id" />
-      <Controls handleNext={handleNext} handleBack={handleBack} />
-    </SessionStepCard>
+      <P>
+        Dolores perspiciatis ea et ut est magnam eaque sed provident. Adipisci
+        unde iure ipsum ullam est molestiae. Ut deleniti et provident et placeat
+        eos qui. Cumque ex ut. Iure harum labore. Soluta qui consequuntur rem.
+      </P>
+      <P>
+        Animi eos autem libero hic at sint molestiae accusamus. Et sed aliquid
+        possimus minima expedita quia dicta ea. Et autem voluptatem ullam
+        voluptates ipsa fuga ut aut dolorem. Consequuntur tempora rerum
+        molestiae dignissimos molestiae distinctio reiciendis.
+      </P>
+      <FocusedList
+        items={[
+          "What have you learned when aiming to that action step?",
+          "What were you happy with?",
+        ]}
+      />
+      <Input
+        name={reflectionKeyName}
+        rules={{ required: true }}
+        placeholder={"Type your own " + reflectionKeyName}
+        autoFocus
+        size="small"
+        hiddenLabel
+        multiline
+        rows={4}
+        sx={{ my: 4 }}
+        fullWidth
+      />
+    </FormStepCard>
   );
 };
 
-const SetGoalStep = ({ ...props }) => {
-  return <SessionStepCard {...props} />;
+const setActionStepsKeyName = "steps";
+const SetActionStepsStep = ({ onFinish, data, ...props }) => {
+  return (
+    <FormStepCard
+      {...props}
+      data={data}
+      renderControls={({
+        handleNext,
+        handleBack,
+        formState,
+        data,
+        componentData,
+      }) => (
+        <Controls
+          data={{ ...data, ...componentData }}
+          handleNext={onFinish}
+          handleBack={handleBack}
+          nextProps={{
+            disabled: !formState.isValid,
+            children: "Done",
+            endIcon: undefined,
+          }}
+        />
+      )}
+    >
+      <Todos items={exampleTodos} keyProp="id" />
+      <P>
+        Dolores perspiciatis ea et ut est magnam eaque sed provident. Adipisci
+        unde iure ipsum ullam est molestiae. Ut deleniti et provident et placeat
+        eos qui. Cumque ex ut. Iure harum labore. Soluta qui consequuntur rem.
+      </P>
+      <P>
+        Animi eos autem libero hic at sint molestiae accusamus. Et sed aliquid
+        possimus minima expedita quia dicta ea. Et autem voluptatem ullam
+        voluptates ipsa fuga ut aut dolorem. Consequuntur tempora rerum
+        molestiae dignissimos molestiae distinctio reiciendis.
+      </P>
+      <FocusedList
+        items={[
+          "What have you learned when aiming to that action step?",
+          "What were you happy with?",
+        ]}
+      />
+      <ActionSteps
+        name={setActionStepsKeyName}
+        rules={{ required: true, minLength: 1 }}
+        sx={{ my: 5 }}
+      />
+    </FormStepCard>
+  );
 };
 
 const STEPS = [
@@ -107,6 +188,7 @@ const STEPS = [
   },
   {
     StepComponent: ReflectStep,
+    fields: [{ name: reflectionKeyName }],
     label: "Reflect",
     caption: "",
     iconName: "Lightbulb",
@@ -114,8 +196,9 @@ const STEPS = [
     perex: "Here are the actions you set last time",
   },
   {
-    StepComponent: SetGoalStep,
-    label: "Set goal",
+    StepComponent: SetActionStepsStep,
+    fields: [{ name: setActionStepsKeyName }],
+    label: "Set action steps",
     caption: "",
     iconName: "Explore",
     heading: "Set your action steps",
@@ -123,27 +206,35 @@ const STEPS = [
   },
 ];
 
-const createSessionEntry = ({ area, goal, motivation, steps }) => {
+const createSessionEntry = (timestamp, { reflection, steps }) => {
   return {
-    timestamp: new Date().getTime(),
-    date: new Date().toISOString(),
-    type: "Private session",
-    area,
-    goal,
-    motivation,
-    steps,
+    timestamp,
+    steps: steps,
+    secondSession: {
+      timestamp: new Date().getTime(),
+      date: new Date().toISOString(),
+      reflection,
+      // steps,
+    },
   };
 };
 
 export function EditSessionPage() {
   const { id } = useParams();
-  const history = useHistoryEntries({ storageKey: "sessions_history" });
-  //   const entry = history.get({id})
+  const timestamp = Number(id);
+  const history = useHistoryEntries({
+    storageKey: "sessions_history",
+    initialSelectedId: timestamp,
+    idKey: "timestamp",
+  });
+  const entry = history.selected; // get({ id }); // TODO
+
   const navigate = useNavigate();
   const [finished, setFinished] = useState(false);
   const {
     activeStep: { StepComponent = SessionStepCard, ...activeStep } = {},
     activeStepIndex,
+    setActiveStepIndex,
     handleNext,
     handleBack,
     data,
@@ -151,13 +242,19 @@ export function EditSessionPage() {
   } = useSteps({
     steps: STEPS,
     initialIndex: 0,
+    initialData: {
+      ...entry,
+      steps: entry?.steps?.length ? entry.steps : DEFAULT_VALUE_ROW,
+    },
   });
-  const onFinish = (data) => {
-    const entry = createSessionEntry(data);
+  const handleFinish = (data) => {
+    console.log("%chandleFinish", "color:pink;", data);
+    const entry = createSessionEntry(timestamp, data);
+
     history.update(entry);
     setFinished(true);
   };
-  console.log("[EditSessionPage.rndr]", { id, data });
+  console.log("[EditSessionPage.rndr]", { id, data, entry, history });
 
   return (
     <Layout
@@ -165,6 +262,7 @@ export function EditSessionPage() {
         <StepperRightMenu
           heading={"My session 22/06/2022"}
           activeStepIndex={activeStepIndex}
+          onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={STEPS}
           buttonProps={{
             children: "End session",
@@ -200,7 +298,7 @@ export function EditSessionPage() {
           setData={setData}
           handleNext={handleNext}
           handleBack={handleBack}
-          onFinish={onFinish}
+          onFinish={handleFinish}
         />
       )}
     </Layout>

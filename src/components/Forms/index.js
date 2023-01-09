@@ -1,10 +1,15 @@
-import { DesktopDatePicker, TimePicker as MuiTimePicker } from "@mui/lab";
 import { TextField } from "@mui/material";
+import {
+  DesktopDatePicker,
+  TimePicker as MuiTimePicker,
+} from "@mui/x-date-pickers";
 import { Controller, useFormContext } from "react-hook-form";
+
+export * from "./ActionSteps";
 
 export const DatePicker = ({ control, name, rules, ...props }) => {
   const methods = useFormContext();
-  console.log({ control, methods });
+
   return (
     <Controller
       control={control || methods?.control}
@@ -21,9 +26,11 @@ export const DatePicker = ({ control, name, rules, ...props }) => {
 };
 
 export const TimePicker = ({ control, name, rules, ...props }) => {
+  const methods = useFormContext();
+
   return (
     <Controller
-      control={control}
+      control={control || methods?.control}
       name={name}
       rules={rules}
       render={({ field }) => (
@@ -37,12 +44,22 @@ export const TimePicker = ({ control, name, rules, ...props }) => {
 };
 
 export const Input = ({ name, control, rules, ...props }) => {
+  const methods = useFormContext();
+
   return (
     <Controller
-      control={control}
+      control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field }) => <TextField {...props} {...field} />}
+      render={({ field, fieldState }) =>
+        console.log("INPUT", {
+          name,
+          rules,
+          field,
+          fieldState,
+          error: fieldState.error,
+        }) || <TextField error={!!fieldState.error} {...props} {...field} />
+      }
     />
   );
 };

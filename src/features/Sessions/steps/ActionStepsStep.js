@@ -1,75 +1,10 @@
-import { Add, Delete } from "@mui/icons-material";
-import { DatePicker } from "@mui/lab";
-import { Box, Button, IconButton } from "@mui/material";
-import { useFieldArray, useForm } from "react-hook-form";
-import { Input } from "../../../components/Forms";
-import { P } from "../../../components/Typography";
+import { Box } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { ActionSteps } from "../../../components/Forms";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 
-export const ActionSteps = ({ name, rules, control, sx = {} }) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name,
-    rules,
-  });
-
-  return (
-    // <Box component={"ol"}>
-    <Box sx={{ ...sx }}>
-      {fields.map((field, i) => (
-        <Box
-          key={field.id}
-          // component={"li"}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 2,
-          }}
-        >
-          <Box sx={{ width: 16, mx: 1 }}>{i + 1}.</Box>
-          <Input
-            control={control}
-            name={`${name}.${i}.label`}
-            placeholder={"Label"}
-            rules={{ required: true }}
-            size="small"
-            autoFocus
-            sx={{ mx: 1, minWidth: { lg: 320 } }}
-          />
-          <P sx={{ ml: 4, mr: 2 }}>Due date</P>
-          <DatePicker
-            control={control}
-            name={`${name}.${i}.date`}
-            size="small"
-            inputFormat="MM/dd/yyyy"
-          />
-          {i > 0 && (
-            <IconButton
-              onClick={() => remove(i)}
-              sx={{
-                mx: 2,
-              }}
-            >
-              <Delete />
-            </IconButton>
-          )}
-        </Box>
-      ))}
-      <Button
-        onClick={() =>
-          append({
-            label: "",
-            date: null,
-          })
-        }
-        startIcon={<Add />}
-      >
-        Add action
-      </Button>
-    </Box>
-  );
-};
+export const DEFAULT_VALUE_ROW = [{ label: "", date: null }];
 
 export const ActionStepsStep = ({
   handleNext,
@@ -80,8 +15,9 @@ export const ActionStepsStep = ({
   ...props
 }) => {
   const { control, watch, formState } = useForm({
+    mode: "onBlur",
     defaultValues: {
-      steps: data.steps?.length ? data.steps : [{ label: "", date: null }],
+      steps: data.steps?.length ? data.steps : DEFAULT_VALUE_ROW,
     },
   });
   const nextData = {
@@ -89,6 +25,7 @@ export const ActionStepsStep = ({
     steps: watch("steps"),
   };
 
+  // TODO: fieldArray errors?
   console.log("[ActionStepsStep.rndr]", {
     nextData,
     errors: {

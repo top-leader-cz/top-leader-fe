@@ -53,7 +53,7 @@ const Connector = styled(StepConnector)(({ theme }) => ({
   },
 }));
 
-export const VerticalStepper = ({ activeStepIndex, steps }) => {
+export const VerticalStepper = ({ activeStepIndex, onStepClick, steps }) => {
   return (
     <Stepper
       activeStep={activeStepIndex}
@@ -68,6 +68,7 @@ export const VerticalStepper = ({ activeStepIndex, steps }) => {
             StepIconProps={{ iconName: iconName }}
             optional={<Typography variant="caption">{caption}</Typography>}
             sx={{ padding: 0 }}
+            onClick={onStepClick ? () => onStepClick({ index }) : undefined}
           >
             {label}
           </StepLabel>

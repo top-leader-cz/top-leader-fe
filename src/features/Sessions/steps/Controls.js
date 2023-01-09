@@ -17,6 +17,10 @@ export const ControlsContainer = ({ sx, ...props }) => {
   );
 };
 
+export const Controls2 = ({ ...props }) => {
+  return <ControlsContainer></ControlsContainer>;
+};
+
 export const Controls = ({
   handleNext,
   nextProps,
@@ -24,6 +28,7 @@ export const Controls = ({
   data,
   sx = {},
 }) => {
+  console.log("[Controls.rndr]", data);
   return (
     <ControlsContainer>
       <Button

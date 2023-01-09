@@ -1,52 +1,31 @@
 import { Box, TextField } from "@mui/material";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { Input } from "../../../components/Forms";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
+import { FormStepCard } from "./FormStepCard";
 
-export const FormStepCard = ({
-  handleNext,
-  handleBack,
-  data,
-  setData,
-  fields = [],
-  step,
-  stepper,
-  sx,
-  renderControls = ({ formState, ...props }) => (
-    <Controls nextProps={{ disabled: !formState.isValid }} {...props} />
-  ),
-}) => {
-  const methods = useForm({
-    defaultValues: data, // TODO: pick(keys, data)
-  });
-  const componentData = Object.fromEntries(
-    fields.map(({ name }) => [name, methods.watch(name)])
-  );
-
-  console.log("FormStepCard.rndr", { componentData, data });
-
+// methods.formState.isValid not set properly
+const TextAreaStepTODO = ({ textAreaName, ...props }) => {
   return (
-    <FormProvider {...methods}>
-      <SessionStepCard {...{ step, stepper, sx }}>
-        <Box
-          component="form"
-          noValidate
-          sx={{ mt: 1 }}
-          // onSubmit={handleSubmit(submit)}
-        >
-          {renderControls({
-            handleNext,
-            handleBack,
-            formState: { isValid: methods.formState.isValid },
-            data: componentData,
-            sx: { mt: 3 },
-          })}
-        </Box>
-      </SessionStepCard>
-    </FormProvider>
+    <FormStepCard {...props}>
+      <Input
+        name={textAreaName}
+        rules={{ required: true }}
+        placeholder={"Type your own " + textAreaName}
+        autoFocus
+        size="small"
+        hiddenLabel
+        multiline
+        rows={4}
+        sx={{ my: 4 }}
+        fullWidth
+      />
+    </FormStepCard>
   );
 };
 
+// TODO: -> FormStepCard
 export const TextAreaStep = ({
   textAreaName,
   handleNext,
@@ -61,7 +40,10 @@ export const TextAreaStep = ({
   const componentData = {
     [textAreaName]: watch(textAreaName),
   };
-  console.log({ componentData, data });
+  console.log("[TextAreaStep.rndr]", formState.isValid, {
+    componentData,
+    data,
+  });
 
   return (
     <SessionStepCard {...props}>
