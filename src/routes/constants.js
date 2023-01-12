@@ -8,6 +8,7 @@ export const routes = {
   sessions: "/sessions",
   newSession: "/new-session",
   editSession: "/session/:id",
+  coaches: "/coaches",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
 };

@@ -48,7 +48,8 @@ const JourneyRightMenu = () => {
         py: 4,
         height: "100vh",
         display: "flex",
-        flexFlow: "column nowrap",
+        flexDirection: "column",
+        flexWrap: "nowrap",
         alignItems: "center",
         // alignItems: "stretch",
         // justifyContent: "space-between",
@@ -91,6 +92,7 @@ export const Layout = ({
           // mx: 4,
           width: "100%",
           flexGrow: 1,
+          position: "relative",
           //   bgcolor: "background.default",
         }}
       >

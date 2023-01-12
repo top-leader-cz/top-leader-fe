@@ -16,6 +16,12 @@ import {
   Explore,
   Lightbulb,
   ArrowForward,
+  CreditCard,
+  Lock,
+  Star,
+  Search,
+  Mail,
+  Close,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -31,6 +37,12 @@ const Icons = {
   Explore,
   Lightbulb,
   ArrowForward,
+  CreditCard,
+  Lock,
+  Star,
+  Search,
+  Mail,
+  Close,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

@@ -65,7 +65,8 @@ export const MainMenu = () => {
       sx={{
         height: "100vh",
         display: "flex",
-        flexFlow: "column nowrap",
+        flexDirection: "column",
+        flexWrap: "nowrap",
         justifyContent: "space-between",
         p: 2,
       }}
@@ -83,7 +84,11 @@ export const MainMenu = () => {
             icon={<DescriptionOutlined />}
             to={routes.sessions}
           />
-          <ListItemLink text="Coaches" icon={<PersonOutlined />} />
+          <ListItemLink
+            text="Coaches"
+            icon={<PersonOutlined />}
+            to={routes.coaches}
+          />
           <ListItemLink text="Get feedback" icon={<ForumOutlined />} />
         </List>
       </Box>

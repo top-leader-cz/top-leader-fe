@@ -10,7 +10,8 @@ export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
         // py: 4,
         height: "100vh",
         display: "flex",
-        flexFlow: "column nowrap",
+        flexDirection: "column",
+        flexWrap: "nowrap",
         justifyContent: "space-between",
       }}
     >
@@ -20,12 +21,15 @@ export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
           overflow: "scroll",
           flex: 1,
           display: "flex",
-          flexFlow: "column nowrap",
+          flexDirection: "column",
+          flexWrap: "nowrap",
         }}
       >
         {children}
       </Box>
-      <Button fullWidth variant="contained" sx={{ my: 4 }} {...buttonProps} />
+      {buttonProps && (
+        <Button fullWidth variant="contained" sx={{ my: 4 }} {...buttonProps} />
+      )}
     </Paper>
   );
 };
