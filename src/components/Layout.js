@@ -99,9 +99,11 @@ export const Layout = ({
         {children}
       </Box>
 
-      <SideMenu width={392} anchor="right">
-        {rightMenuContent}
-      </SideMenu>
+      {rightMenuContent && (
+        <SideMenu width={392} anchor="right">
+          {rightMenuContent}
+        </SideMenu>
+      )}
     </Box>
   );
 };

@@ -22,6 +22,7 @@ import {
   Search,
   Mail,
   Close,
+  CloudUploadOutlined,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -43,6 +44,7 @@ const Icons = {
   Search,
   Mail,
   Close,
+  CloudUploadOutlined,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

@@ -20,3 +20,19 @@ export const Header = ({}) => {
     </Box>
   );
 };
+
+export const TextHeader = ({ text, noDivider }) => {
+  return (
+    <Box mt={4} mb={3}>
+      <Box
+        display="flex"
+        flexWrap="nowrap"
+        alignItems="center"
+        flexDirection="row"
+      >
+        <H1>{text}</H1>
+      </Box>
+      {!noDivider && <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />}
+    </Box>
+  );
+};

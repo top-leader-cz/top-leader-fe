@@ -39,6 +39,19 @@ export const LANGUAGE_OPTIONS = [
   { label: "English", value: "en" },
   { label: "Czech", value: "cz" },
 ];
+export const renderLanguageOption = (props, option) => (
+  <Box component="li" sx={{ "& > img": { mr: 2, flexShrink: 0 } }} {...props}>
+    <img
+      loading="lazy"
+      width="20"
+      src={getFlagSrc(option)}
+      srcSet={getFlagSrc(option, true)}
+      alt=""
+    />
+    {option.label} ({option.value})
+  </Box>
+);
+
 export const FIELD_OPTIONS = [
   { label: "Business", value: "business" },
   { label: "Life", value: "life" },
@@ -100,22 +113,7 @@ const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
               name="language"
               label="Language"
               options={LANGUAGE_OPTIONS}
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  <img
-                    loading="lazy"
-                    width="20"
-                    src={getFlagSrc(option)}
-                    srcSet={getFlagSrc(option, true)}
-                    alt=""
-                  />
-                  {option.label} ({option.value})
-                </Box>
-              )}
+              renderOption={renderLanguageOption}
             />
             <AutocompleteSelect
               name="field"
@@ -280,7 +278,7 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
   );
 };
 
-const getLabel = (options) => (searchValue) =>
+export const getLabel = (options) => (searchValue) =>
   options.find(({ value }) => value === searchValue)?.label || searchValue;
 
 const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {

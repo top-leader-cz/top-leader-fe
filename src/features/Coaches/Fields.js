@@ -1,60 +1,21 @@
-import { ArrowBack, Close, Diversity1, Mail } from "@mui/icons-material";
 import {
   Autocomplete,
-  Avatar,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  Divider,
   FormControl,
   IconButton,
   InputAdornment,
-  InputBase,
   InputLabel,
-  Modal,
   OutlinedInput,
-  Paper,
   Slider,
   TextField,
-  Tooltip,
-  Typography,
 } from "@mui/material";
 import { alpha, styled } from "@mui/system";
-import {
-  addDays,
-  endOfDay,
-  format,
-  getHours,
-  isWithinInterval,
-  parseISO,
-  setHours,
-  setMinutes,
-  setSeconds,
-  startOfDay,
-} from "date-fns/fp";
-import { curryN, filter, identity, map, pipe } from "ramda";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-} from "react-hook-form";
-import { Input } from "../../components/Forms";
+import { Controller } from "react-hook-form";
 import { Icon } from "../../components/Icon";
-import { InfoBox } from "../../components/InfoBox";
-import { Layout } from "../../components/Layout";
-import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
-import { H1, H2, P } from "../../components/Typography";
-import { routes } from "../../routes";
-import { ControlsContainer } from "../Sessions/steps/Controls";
 
-const getOption = (options, value) => options.find((o) => o.value === value);
+export const getOption = (options, value) =>
+  options.find((o) => o.value === value);
 
-const color = (color, msg) => ["%c" + msg, `color:${color};`];
+export const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
 function valuetext(value) {
   return `${value} years`;
@@ -190,10 +151,15 @@ export const SliderField = ({
 
 export const AutocompleteSelect = ({
   name,
+  id = name,
   rules,
   label,
   options,
   renderOption,
+  InputProps,
+  disableIsOptionEqualToValue,
+  placeholder,
+  sx = {},
 }) => {
   return (
     <Controller
@@ -204,9 +170,15 @@ export const AutocompleteSelect = ({
           name={name}
           autoHighlight
           fullWidth
+          id={id}
           {...field}
+          sx={sx}
           options={options}
-          isOptionEqualToValue={(option, value) => option.value === value}
+          isOptionEqualToValue={
+            disableIsOptionEqualToValue
+              ? undefined
+              : (option, value) => option.value === value
+          }
           // getOptionSelected
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
@@ -234,12 +206,15 @@ export const AutocompleteSelect = ({
               <TextField
                 {...params}
                 label={label}
+                placeholder={placeholder}
                 inputProps={{
+                  // ...InputProps,
                   ...params.inputProps,
                   //   autoComplete: "new-password", // disable autocomplete and autofill
                 }}
+                // InputProps={{ ...InputProps }}
                 InputLabelProps={{
-                  shrink: true,
+                  shrink: !!label,
                 }}
                 sx={
                   {

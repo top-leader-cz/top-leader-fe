@@ -93,7 +93,11 @@ export const MainMenu = () => {
         </List>
       </Box>
       <Box sx={{ mb: 2 }}>
-        <ListItemLink text="Settings" icon={<SettingsOutlined />} />
+        <ListItemLink
+          text="Settings"
+          icon={<SettingsOutlined />}
+          to={routes.settings}
+        />
         <ListItemLink text="Help" icon={<HelpOutlined />} />
         <Divider sx={{ my: 2 }} />
         <ListItemLink
