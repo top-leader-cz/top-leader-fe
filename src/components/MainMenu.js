@@ -19,7 +19,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { useMatch } from "react-router-dom";
-import { useAuth } from "../features/Auth";
+import { useAuth } from "../features/Authorization";
 import { routes } from "../routes";
 
 const LogoImg = () => {

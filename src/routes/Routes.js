@@ -8,7 +8,10 @@ import {
   redirect,
   useNavigation,
 } from "react-router-dom";
-import { AuthProvider, AuthRedirect } from "../features/Auth/Redirects";
+import {
+  AuthProvider,
+  AuthRedirect,
+} from "../features/Authorization/Redirects";
 import CraDefaultApp from "../examples/cra-app/App";
 import MuiDefaultApp from "../examples/mui/ExampleApp";
 import { AssessmentPage } from "../features/Assessment";
