@@ -8,33 +8,24 @@ import {
   redirect,
   useNavigation,
 } from "react-router-dom";
-import {
-  AuthProvider,
-  AuthRedirect,
-} from "../features/Authorization/Redirects";
 import CraDefaultApp from "../examples/cra-app/App";
 import MuiDefaultApp from "../examples/mui/ExampleApp";
 import { AssessmentPage } from "../features/Assessment";
-// import {
-// AuthRedirect,
-// ForbidAuth,
-// RequireAuth,
-// SignInPage,
-// } from "../features/Auth";
+import {
+  AuthRedirect,
+  ForbidAuth,
+  RequireAuth,
+  SignInPage,
+} from "../features/Authorization";
+import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
 import { NewSessionPage, SessionsPage } from "../features/Sessions";
+import { EditSessionPage } from "../features/Sessions/EditSession.page";
+import { SettingsPage } from "../features/Settings/Settings.page";
 import { StrengthsPage } from "../features/Strengths";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
-import { EditSessionPage } from "../features/Sessions/EditSession.page";
-import { CoachesPage } from "../features/Coaches/Coaches.page";
-import { SettingsPage } from "../features/Settings/Settings.page";
-
-// const AuthRedirect = "div";
-const RequireAuth = "div";
-const ForbidAuth = "div";
-const SignInPage = "div";
 
 const GlobalSpinner = () => {
   return (
@@ -214,6 +205,7 @@ export const router1 = createBrowserRouter([
         path: "contacts/:contactId/destroy",
         action: async function action({ params }) {
           throw new Error("oh dang!");
+          // eslint-disable-next-line
           await delay(params.contactId);
           return redirect("/");
         },
