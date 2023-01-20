@@ -1,11 +1,11 @@
 import {
   DescriptionOutlined,
   ForumOutlined,
+  HelpOutlined,
   HomeOutlined,
+  LogoutOutlined,
   PersonOutlined,
   SettingsOutlined,
-  HelpOutlined,
-  LogoutOutlined,
 } from "@mui/icons-material";
 import {
   Divider,
@@ -19,7 +19,8 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
 import { useMatch } from "react-router-dom";
-import { routes } from "../Routes";
+import { useAuth } from "../features/Authorization";
+import { routes } from "../routes";
 
 const LogoImg = () => {
   return (
@@ -27,24 +28,27 @@ const LogoImg = () => {
       component="img"
       src="/topleader-big.png"
       sx={{
-        // height: 233,
         width: "100%",
         px: 2,
         my: 2,
         // maxHeight: { xs: 233, md: 167 },
         // maxWidth: { xs: 350, md: 250 },
       }}
-      //   alt="The house from the offer."
+      alt="Topleader"
     />
   );
 };
 
-const ListItemLink = ({ to, text, icon }) => {
+const ListItemLink = ({ to, text, icon, onClick }) => {
   const match = useMatch(to ?? "");
 
   return (
     <ListItem disablePadding>
-      <ListItemButton selected={Boolean(match)} href={to}>
+      <ListItemButton
+        selected={Boolean(to && match)}
+        href={to}
+        onClick={onClick}
+      >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
         <ListItemText primary={text} />
       </ListItemButton>
@@ -53,13 +57,16 @@ const ListItemLink = ({ to, text, icon }) => {
 };
 
 export const MainMenu = () => {
+  const auth = useAuth();
+
   return (
     <Paper
       square
       sx={{
         height: "100vh",
         display: "flex",
-        flexFlow: "column nowrap",
+        flexDirection: "column",
+        flexWrap: "nowrap",
         justifyContent: "space-between",
         p: 2,
       }}
@@ -77,18 +84,30 @@ export const MainMenu = () => {
             icon={<DescriptionOutlined />}
             to={routes.sessions}
           />
-          <ListItemLink text="Coaches" icon={<PersonOutlined />} />
+          <ListItemLink
+            text="Coaches"
+            icon={<PersonOutlined />}
+            to={routes.coaches}
+          />
           <ListItemLink text="Get feedback" icon={<ForumOutlined />} />
         </List>
       </Box>
       <Box sx={{ mb: 2 }}>
-        <ListItemLink text="Settings" icon={<SettingsOutlined />} />
+        <ListItemLink
+          text="Settings"
+          icon={<SettingsOutlined />}
+          to={routes.settings}
+        />
         <ListItemLink text="Help" icon={<HelpOutlined />} />
         <Divider sx={{ my: 2 }} />
         <ListItemLink
           text="Logout"
           icon={<LogoutOutlined />}
-          to={routes.signIn}
+          onClick={() => {
+            auth.signout();
+            // auth.signout(() => navigate("/"));
+          }}
+          // to={routes.signIn}
         />
       </Box>
     </Paper>

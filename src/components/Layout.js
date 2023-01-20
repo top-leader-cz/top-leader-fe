@@ -15,6 +15,7 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
+import { routes } from "../routes";
 import { Icon } from "./Icon";
 import { MainMenu } from "./MainMenu";
 import { H2, P } from "./Typography";
@@ -38,12 +39,46 @@ const SideMenu = ({ children, width, anchor }) => {
   );
 };
 
-export const Layout = ({ children }) => {
+const JourneyRightMenu = () => {
+  return (
+    <Paper
+      square
+      sx={{
+        px: 3,
+        py: 4,
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        flexWrap: "nowrap",
+        alignItems: "center",
+        // alignItems: "stretch",
+        // justifyContent: "space-between",
+      }}
+    >
+      <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
+      <Avatar variant="circular" sx={{ my: 5 }}>
+        <Icon />
+      </Avatar>
+      <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
+      <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
+      <Button fullWidth variant="contained" href={routes.newSession}>
+        Start Session
+      </Button>
+    </Paper>
+  );
+};
+
+export const Layout = ({
+  children,
+  rightMenuContent = <JourneyRightMenu />,
+}) => {
   return (
     <Box
       sx={{
         display: "flex",
         bgcolor: "#EAECF0",
+        // TODO: check sessions
+        minHeight: "100%",
       }}
     >
       <SideMenu width={256} anchor="left">
@@ -57,37 +92,18 @@ export const Layout = ({ children }) => {
           // mx: 4,
           width: "100%",
           flexGrow: 1,
+          position: "relative",
           //   bgcolor: "background.default",
         }}
       >
         {children}
       </Box>
 
-      <SideMenu width={392} anchor="right">
-        <Paper
-          square
-          sx={{
-            px: 3,
-            py: 4,
-            height: "100vh",
-            display: "flex",
-            flexFlow: "column nowrap",
-            alignItems: "center",
-            // alignItems: "stretch",
-            // justifyContent: "space-between",
-          }}
-        >
-          <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
-          <Avatar variant="circular" sx={{ my: 5 }}>
-            <Icon />
-          </Avatar>
-          <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
-          <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
-          <Button fullWidth variant="contained">
-            Start Session
-          </Button>
-        </Paper>
-      </SideMenu>
+      {rightMenuContent && (
+        <SideMenu width={392} anchor="right">
+          {rightMenuContent}
+        </SideMenu>
+      )}
     </Box>
   );
 };

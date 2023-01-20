@@ -1,4 +1,4 @@
-import { createTheme } from "@mui/material/styles";
+import { alpha, createTheme } from "@mui/material/styles";
 import defaultTheme from "@mui/material/styles/defaultTheme";
 import { LinkBehavior } from "./components/LinkBehavior";
 
@@ -11,13 +11,17 @@ const theme = createTheme({
     secondary: {
       main: "#907ACF",
     },
+    warning: {
+      contrastText: "#EAAA08", // yellow/500
+      main: "#FEF7C3", // yellow/100
+    },
     error: {
       main: "#F04438",
-      // main: red.A400,
+      // light: "#757ce8",
+      // main: "#3f50b5",
+      // dark: "#002884",
+      // contrastText: "#fff",
     },
-    // gray: { // TODO
-    //   900
-    // }
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -91,8 +95,41 @@ const theme = createTheme({
         LinkComponent: LinkBehavior,
       },
     },
+    MuiChip: {
+      styleOverrides: {
+        icon: {
+          color: "inherit",
+        },
+      },
+      variants: [
+        {
+          props: { variant: "selected" },
+          style: {
+            color: "#4720B7",
+            backgroundColor: "#F9F8FF",
+            border: "1px solid #4720B7",
+            padding: "16px",
+            borderRadius: "10px",
+          },
+        },
+        {
+          props: { variant: "unselected" },
+          style: {
+            color: "#101828",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid transparent",
+            padding: "16px",
+            borderRadius: "10px",
+          },
+        },
+      ],
+    },
   },
 });
+
+// export const COLOR = {
+//   primary: {},
+// };
 
 // console.log({ theme, defaultTheme });
 
