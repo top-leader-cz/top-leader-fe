@@ -39,7 +39,7 @@ export const LANGUAGE_OPTIONS = [
   { label: "English", value: "en" },
   { label: "Czech", value: "cz" },
 ];
-export const renderLanguageOption = (props, option) => (
+export const renderLanguageOption = (props, option, { selected } = {}) => (
   <Box component="li" sx={{ "& > img": { mr: 2, flexShrink: 0 } }} {...props}>
     <img
       loading="lazy"
@@ -178,7 +178,51 @@ const DAY_FORMAT = "E d";
 
 const VISIBLE_DAYS_COUNT = 7;
 
-const CREATE_OFFSET =
+export const TimeSlot = ({ hour, isFree, sx }) => {
+  return (
+    <Box
+      key={hour}
+      borderRadius="6px"
+      p={1}
+      bgcolor={isFree ? "#F9F8FF" : "transparent"}
+      color={isFree ? "primary.main" : "inherit"}
+      fontWeight={isFree ? 500 : 400}
+      sx={sx}
+    >
+      {isFree ? `${hour}:00` : "-"}
+    </Box>
+  );
+};
+
+export const CalendarDaySlots = ({
+  date,
+  slotsCount,
+  startHour,
+  freeHours = [],
+  sx = { flexDirection: "column" },
+  dateSx,
+  slotSx,
+}) => {
+  const daySlots = Array(slotsCount)
+    .fill(null)
+    .map((_, index) => ({
+      index,
+      hour: index + startHour,
+      isFree: freeHours.includes(index + startHour),
+    }));
+  return (
+    <Box display="flex" alignItems="stretch" textAlign="center" gap={1} sx={sx}>
+      <Box p={1} sx={dateSx}>
+        {format(DAY_FORMAT, date)}
+      </Box>
+      {daySlots.map(({ hour, isFree }) => (
+        <TimeSlot key={hour} hour={hour} isFree={isFree} sx={slotSx} />
+      ))}
+    </Box>
+  );
+};
+
+export const CREATE_OFFSET =
   (date, map = identity) =>
   (daysOffset, hour) =>
     pipe(
@@ -189,39 +233,6 @@ const CREATE_OFFSET =
       setSeconds(0),
       map
     )(date);
-
-const DaySlots = ({ date, slotsCount, startHour, freeHours = [] }) => {
-  const daySlots = Array(slotsCount)
-    .fill(null)
-    .map((_, index) => ({
-      index,
-      hour: index + startHour,
-      isFree: freeHours.includes(index + startHour),
-    }));
-  return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="stretch"
-      textAlign="center"
-      gap={1}
-    >
-      <Box p={1}>{format(DAY_FORMAT, date)}</Box>
-      {daySlots.map(({ hour, isFree }) => (
-        <Box
-          key={hour}
-          borderRadius="6px"
-          p={1}
-          bgcolor={isFree ? "#F9F8FF" : "transparent"}
-          color={isFree ? "primary.main" : "inherit"}
-          fontWeight={isFree ? 500 : 400}
-        >
-          {isFree ? `${hour}:00` : "-"}
-        </Box>
-      ))}
-    </Box>
-  );
-};
 
 const isWithinDay = (dayDate) =>
   isWithinInterval({ start: startOfDay(dayDate), end: endOfDay(dayDate) });
@@ -255,7 +266,7 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
         {Array(VISIBLE_DAYS_COUNT)
           .fill(null)
           .map((_, i) => (
-            <DaySlots
+            <CalendarDaySlots
               key={i}
               startHour={9}
               slotsCount={8}

@@ -15,6 +15,10 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
+import { useReducer } from "react";
+import { useContext } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { routes } from "../routes";
 import { Icon } from "./Icon";
 import { MainMenu } from "./MainMenu";
@@ -39,39 +43,66 @@ const SideMenu = ({ children, width, anchor }) => {
   );
 };
 
-const JourneyRightMenu = () => {
+export const RightMenuContext = React.createContext();
+
+const update =
+  ({ id, element }) =>
+  (prev) => {
+    const index = prev.findIndex((item) => item.id === id);
+    if (index < 0 && element) return [...prev, { id, element }];
+    if (!element) return prev.filter((item) => item.id !== id);
+    return [...prev].splice(index, 0, { id, element });
+  };
+
+export const RightMenuProvider = ({ children }) => {
+  const [stack, setStack] = useState([]);
+  const context = React.useMemo(
+    () => ({
+      updateStack: ({ id, element }) => setStack(update({ id, element })),
+      stack,
+    }),
+    [stack]
+  );
+  console.log("[RightMenuProvider]", stack);
+
   return (
-    <Paper
-      square
-      sx={{
-        px: 3,
-        py: 4,
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        flexWrap: "nowrap",
-        alignItems: "center",
-        // alignItems: "stretch",
-        // justifyContent: "space-between",
-      }}
-    >
-      <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
-      <Avatar variant="circular" sx={{ my: 5 }}>
-        <Icon />
-      </Avatar>
-      <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
-      <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
-      <Button fullWidth variant="contained" href={routes.newSession}>
-        Start Session
-      </Button>
-    </Paper>
+    <RightMenuContext.Provider value={context}>
+      {children}
+    </RightMenuContext.Provider>
+  );
+};
+
+let counter = 0;
+
+export const useRightMenu = (element) => {
+  const [id] = useState(() => counter++);
+  const { updateStack } = useContext(RightMenuContext);
+
+  const updateStackRef = React.useRef(updateStack);
+  updateStackRef.current = updateStack;
+
+  useEffect(() => {
+    updateStackRef.current({ id, element });
+  }, [element, id]);
+
+  useEffect(
+    () => () => {
+      updateStackRef.current({ id, element: null });
+    },
+    [id]
   );
 };
 
 export const Layout = ({
   children,
-  rightMenuContent = <JourneyRightMenu />,
+  rightMenuContent: rightMenuContentProp,
 }) => {
+  const { stack } = useContext(RightMenuContext);
+  const rightMenuContent = React.useMemo(
+    () => rightMenuContentProp || stack[stack.length - 1]?.element,
+    [rightMenuContentProp, stack]
+  );
+
   return (
     <Box
       sx={{

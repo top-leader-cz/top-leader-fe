@@ -9,6 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import { alpha, styled } from "@mui/system";
+import { useCallback, useMemo } from "react";
 import { Controller } from "react-hook-form";
 import { Icon } from "../../components/Icon";
 
@@ -106,8 +107,7 @@ const SliderFieldInner = ({ id, label, min, max, onChange, value }) => {
         {label}
       </InputLabel>
       <StyledSlider
-        // aria-label="Temperature"
-        // defaultValue={30}
+        aria-label={`${label}`}
         // valueLabelDisplay="auto"
         valueLabelDisplay="on"
         // components={{
@@ -125,7 +125,6 @@ const SliderFieldInner = ({ id, label, min, max, onChange, value }) => {
         onChange={handleChange}
         getAriaValueText={valuetext}
         // getAriaValueText={valuetext}
-        // marks
       />
     </FormControl>
   );
@@ -137,7 +136,6 @@ export const SliderField = ({
   label,
   range: [min = 1, max = 10] = [],
 }) => {
-  // return null;
   return (
     <Controller
       name={name}
@@ -159,8 +157,18 @@ export const AutocompleteSelect = ({
   InputProps,
   disableIsOptionEqualToValue,
   placeholder,
+  multiple,
+  disableCloseOnSelect,
+  autoComplete,
   sx = {},
 }) => {
+  const from = useMemo(
+    () =>
+      multiple
+        ? (data) => data?.map((item) => item?.value ?? item) ?? []
+        : (data) => data?.value ?? null,
+    [multiple]
+  );
   return (
     <Controller
       name={name}
@@ -173,6 +181,8 @@ export const AutocompleteSelect = ({
           id={id}
           {...field}
           sx={sx}
+          multiple={multiple}
+          disableCloseOnSelect={disableCloseOnSelect}
           options={options}
           isOptionEqualToValue={
             disableIsOptionEqualToValue
@@ -196,35 +206,39 @@ export const AutocompleteSelect = ({
               action,
               other,
             });
-            field.onChange(data?.value ?? null); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
+            const value = from(data);
+            field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
           }}
-          renderInput={(params) =>
-            console.log("[AutocompleteSelect.renderInput]", {
-              field,
-              params,
-            }) || (
-              <TextField
-                {...params}
-                label={label}
-                placeholder={placeholder}
-                inputProps={{
-                  // ...InputProps,
-                  ...params.inputProps,
-                  //   autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-                // InputProps={{ ...InputProps }}
-                InputLabelProps={{
-                  shrink: !!label,
-                }}
-                sx={
-                  {
-                    // mt: 1,
-                    // "label + .MuiOutlinedInput-root": { marginTop: 3 },
-                  }
+          renderInput={(params) => (
+            // console.log("[AutocompleteSelect.renderInput]", {
+            //   field,
+            //   params,
+            // }) ||
+            <TextField
+              {...params}
+              label={label}
+              placeholder={placeholder}
+              inputProps={{
+                // TODO: language autocomplete
+                autocomplete: autoComplete,
+                autoComplete: autoComplete,
+                "auto-complete": autoComplete,
+                // ...InputProps,
+                ...params.inputProps,
+                //   autoComplete: "new-password", // disable autocomplete and autofill
+              }}
+              // InputProps={{ ...InputProps }}
+              InputLabelProps={{
+                shrink: !!label,
+              }}
+              sx={
+                {
+                  // mt: 1,
+                  // "label + .MuiOutlinedInput-root": { marginTop: 3 },
                 }
-              />
-            )
-          }
+              }
+            />
+          )}
           // inputValue={`${field.value}`}
           // onInputChange={(event, newInputValue) => {
           //   console.log("[AutocompleteSelect.onInputChange]", {
