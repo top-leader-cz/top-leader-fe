@@ -1,30 +1,8 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  OutlinedInput,
-  styled,
-  Tab,
-  Tabs,
-} from "@mui/material";
-import { format } from "date-fns-tz";
-import { useMemo, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Box, styled, Tab, Tabs } from "@mui/material";
+import { useState } from "react";
 import { TextHeader } from "../../components/Header";
-import { Icon } from "../../components/Icon";
-import { Layout, useRightMenu } from "../../components/Layout";
-import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
-import { H2, P } from "../../components/Typography";
-import {
-  FIELD_OPTIONS,
-  getLabel,
-  LANGUAGE_OPTIONS,
-  renderLanguageOption,
-} from "../Coaches/Coaches.page";
-import { AutocompleteSelect } from "../Coaches/Fields";
+import { Layout } from "../../components/Layout";
 import { AvailabilitySettings } from "./AvailabilitySettings";
-import { FormRow } from "./FormRow";
 import { GeneralSettings } from "./GeneralSettings";
 import { ProfileSettings } from "./ProfileSettings";
 
@@ -36,7 +14,7 @@ function TabPanel({ children, value, tabName }) {
       hidden={value !== tabName}
       id={`simple-tabpanel-${tabName}`}
       aria-labelledby={`simple-tab-${tabName}`}
-      sx={{ mt: 3 }}
+      sx={{ mt: 3, pb: 4 }}
     >
       {value === tabName && children}
     </Box>

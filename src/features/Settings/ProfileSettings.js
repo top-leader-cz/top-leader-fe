@@ -1,18 +1,21 @@
-import { Box, Chip, OutlinedInput, styled } from "@mui/material";
+import { Box, Chip } from "@mui/material";
 import { format } from "date-fns-tz";
 import { useMemo } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useRightMenu } from "../../components/Layout";
-import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
-import { H2, P } from "../../components/Typography";
+import { FormProvider, useForm } from "react-hook-form";
 import {
   FIELD_OPTIONS,
   getLabel,
   LANGUAGE_OPTIONS,
   renderLanguageOption,
-} from "../Coaches/Coaches.page";
-import { AutocompleteSelect } from "../Coaches/Fields";
-import { BareInputField, FileUpload } from "./Fields";
+} from "../../components/Forms";
+import {
+  AutocompleteSelect,
+  BareInputField,
+  FileUpload,
+} from "../../components/Forms/Fields";
+import { useRightMenu } from "../../components/Layout";
+import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
+import { H2, P } from "../../components/Typography";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 
@@ -59,11 +62,16 @@ const COACH = {
   [FIELDS.experience]: "3", // TODO: field
 };
 
-export const ProfileSettings = ({}) => {
+export const ProfileSettings = () => {
   const form = useForm({
     // mode: "onSubmit",
     defaultValues: { ...COACH },
   });
+
+  const onSubmit = (data, e) =>
+    console.log("[ProfileSettings.onSubmit]", data, e);
+  const onError = (errors, e) =>
+    console.log("[ProfileSettings.onError]", errors, e);
 
   useRightMenu(
     useMemo(
@@ -72,7 +80,11 @@ export const ProfileSettings = ({}) => {
           heading={"Your coach profile preview"}
           buttonProps={{
             children: "Save",
-            onClick: () => console.log("Save click"),
+            type: "submit",
+            onClick: (e) => {
+              console.log("Save click");
+              form.handleSubmit(onSubmit, onError)(e);
+            },
           }}
         >
           <Box width="100%" align="left" mt={3}>
@@ -105,7 +117,7 @@ export const ProfileSettings = ({}) => {
           </Box>
         </ScrollableRightMenu>
       ),
-      []
+      [form]
     )
   );
 

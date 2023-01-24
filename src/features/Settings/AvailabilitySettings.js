@@ -1,23 +1,15 @@
-import { Button, Checkbox, Divider, Switch, TextField } from "@mui/material";
+import { Checkbox, Divider, Switch, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { TimePicker } from "@mui/x-date-pickers";
-import { pipe } from "ramda";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { B } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
-import {
-  CalendarDaySlots,
-  CREATE_OFFSET,
-  LANGUAGE_OPTIONS,
-  renderLanguageOption,
-} from "../Coaches/Coaches.page";
-import { AutocompleteSelect } from "../Coaches/Fields";
-import { ControlsContainer } from "../Sessions/steps/Controls";
-import { B } from "./Fields";
+import { CalendarDaySlots, CREATE_OFFSET } from "../Coaches/Coaches.page";
 import { FieldLayout, FormRow } from "./FormRow";
-import { BareInputField, WHITE_BG } from "./Settings.page";
+import { WHITE_BG } from "./Settings.page";
 
 const DAYS = {
   MON: "Monday",
@@ -29,7 +21,7 @@ const DAYS = {
   SUN: "Sunday",
 };
 
-const TimeField = ({}) => {
+const TimeField = () => {
   return (
     <TimePicker
       label=""
@@ -80,7 +72,7 @@ export const FIELDS_AVAILABILITY = {
   [dayName(DAYS.MON)]: [],
 };
 
-export const AvailabilitySettings = ({}) => {
+export const AvailabilitySettings = () => {
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯

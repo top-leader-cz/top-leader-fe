@@ -1,13 +1,12 @@
 import { Button } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { H2, P } from "../../components/Typography";
+import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
-  LANGUAGE_OPTIONS,
-  renderLanguageOption,
-} from "../Coaches/Coaches.page";
-import { AutocompleteSelect } from "../Coaches/Fields";
+  AutocompleteSelect,
+  BareInputField,
+} from "../../components/Forms/Fields";
+import { H2, P } from "../../components/Typography";
 import { ControlsContainer } from "../Sessions/steps/Controls";
-import { BareInputField } from "./Fields";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 
@@ -18,7 +17,7 @@ const FIELDS_GENERAL = {
   newPasswordConfirm: "newPasswordConfirm",
 };
 
-export const GeneralSettings = ({}) => {
+export const GeneralSettings = () => {
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
