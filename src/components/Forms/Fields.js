@@ -6,17 +6,98 @@ import {
   InputLabel,
   OutlinedInput,
   Slider,
+  Switch,
   TextField,
 } from "@mui/material";
 import { alpha, Box, styled } from "@mui/system";
 import {
   DesktopDatePicker,
+  LocalizationProvider,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Icon } from "../Icon";
 import { P } from "../Typography";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { DateRangePicker } from "@mui/lab";
+// import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+
+// export const DateRangePicker = ({ name, ...props }) => {
+//   const [value, setValue] = useState([null, null]);
+//   console.log("%c[DateRangePicker.rndr]", "color:coral;", { name });
+
+//   return (
+//     <DesktopDatePicker
+
+//       renderInput={({ value, onChange }) => (
+//         <>
+//           <TextField {...{ value: value?.[0] }} />
+//           <Box sx={{ mx: 2 }}> to </Box>
+//           <TextField {...{ value: value?.[1] }} />
+//         </>
+//       )}
+//     />
+//   );
+// };
+
+export const DateRangePicker = React.forwardRef(({ field, ...props }, ref) => {
+  console.log("%c[DateRangePicker.rndr]", "color:coral;", field.name, {
+    field,
+  });
+
+  const onChange = (idx) => (date) => {
+    const newValue = [...field.value];
+    newValue[idx] = date;
+    return field.onChange(newValue);
+  };
+
+  return (
+    <DesktopDatePicker
+      ref={ref}
+      renderInput={(params) => (
+        <TextField size="small" {...props} {...params} />
+      )}
+      name={field.name}
+      onChange={onChange(0)}
+      onBlur={field.onBlur}
+      value={field.value[0]}
+    />
+  );
+});
+
+export const DateRangePickerField = ({ name, rules, ...props }) => {
+  const methods = useFormContext();
+
+  return (
+    // <LocalizationProvider
+    //   dateAdapter={AdapterDateFns}
+    //   localeText={{ start: "Check-in", end: "Check-out" }}
+    // >
+    <Controller
+      // control={methods?.control}
+      name={name}
+      rules={rules}
+      render={({ field }) => <DateRangePicker {...props} field={field} />}
+    />
+    // </LocalizationProvider>
+  );
+};
+
+export const SwitchField = ({ name, rules, ...props }) => {
+  return (
+    <Controller
+      // control={control || methods?.control}
+      name={name}
+      rules={rules}
+      render={({ field }) =>
+        console.log("[SwitchField.rndr]", name, { props, field }) || (
+          <Switch {...{ ...props, ...field, checked: field.value, name }} />
+        )
+      }
+    />
+  );
+};
 
 export const DatePicker = ({ control, name, rules, ...props }) => {
   const methods = useFormContext();

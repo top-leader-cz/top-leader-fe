@@ -2,8 +2,13 @@ import { Checkbox, Divider, Switch, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { TimePicker } from "@mui/x-date-pickers";
 import { useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { B } from "../../components/Forms";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import {
+  B,
+  DateRangePicker,
+  DateRangePickerField,
+  SwitchField,
+} from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
@@ -44,9 +49,6 @@ const TimeRange = () => {
   );
 };
 
-const enabledName = (name) => `enabled_${name}`;
-const dayName = (name) => `day_${name}`;
-
 const DaySlots = ({ name }) => {
   return (
     <FieldLayout
@@ -66,8 +68,31 @@ const DaySlots = ({ name }) => {
   );
 };
 
+export const Recurrence = () => {
+  const recurring = useFormContext().watch("recurring");
+
+  console.log("[Recurrence.rndr]", { recurring });
+  return (
+    <FormRow label="Recurring" name={FIELDS_AVAILABILITY.recurring}>
+      <Box>
+        <SwitchField name={FIELDS_AVAILABILITY.recurring} />
+        {!recurring && (
+          <DateRangePickerField
+            name={FIELDS_AVAILABILITY.recurrenceRange}
+            sx={{ ml: 8, ...WHITE_BG }}
+          />
+        )}
+      </Box>
+    </FormRow>
+  );
+};
+
+const enabledName = (name) => `enabled_${name}`;
+const dayName = (name) => `day_${name}`;
+
 export const FIELDS_AVAILABILITY = {
   recurring: "recurring",
+  recurrenceRange: "recurrenceRange",
   [enabledName(DAYS.MON)]: true,
   [dayName(DAYS.MON)]: [],
 };
@@ -76,7 +101,13 @@ export const AvailabilitySettings = () => {
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: {},
+    defaultValues: {
+      [FIELDS_AVAILABILITY.recurring]: true,
+      recurrenceRange: [
+        new Date(),
+        new Date(Date.now() + 3 * 7 * 24 * 3600 * 1000),
+      ],
+    },
   });
 
   const onSubmit = (data, e) =>
@@ -125,9 +156,7 @@ export const AvailabilitySettings = () => {
         <H2 gutterBottom>Availability</H2>
         <P sx={{ mb: -1 }}>Set your availability here</P>
 
-        <FormRow label="Recurring" name={FIELDS_AVAILABILITY.recurring}>
-          <Switch />
-        </FormRow>
+        <Recurrence />
         <DaySlots name={DAYS.MON} />
         <DaySlots name={DAYS.TUE} />
         <DaySlots name={DAYS.WED} />
