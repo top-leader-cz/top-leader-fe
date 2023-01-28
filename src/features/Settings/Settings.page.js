@@ -66,7 +66,8 @@ const TABS = {
 };
 
 export function SettingsPage() {
-  const [tab, setTab] = useState(TABS.PROFILE);
+  const [tab, setTab] = useState(TABS.AVAILABILITY);
+  // const [tab, setTab] = useState(TABS.PROFILE); // TODO
 
   const handleChange = (event, newValue) => {
     setTab(newValue);

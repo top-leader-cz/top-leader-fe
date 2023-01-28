@@ -2,6 +2,7 @@ import {
   Autocomplete,
   Avatar,
   Button,
+  Checkbox,
   FormControl,
   InputLabel,
   OutlinedInput,
@@ -12,14 +13,13 @@ import {
 import { alpha, Box, styled } from "@mui/system";
 import {
   DesktopDatePicker,
-  LocalizationProvider,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Icon } from "../Icon";
 import { P } from "../Typography";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 
@@ -41,34 +41,105 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 //   );
 // };
 
-export const DateRangePicker = React.forwardRef(({ field, ...props }, ref) => {
-  console.log("%c[DateRangePicker.rndr]", "color:coral;", field.name, {
+const DateRangePicker = React.forwardRef(({ field, sx, ...props }, ref) => {
+  console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
     field,
+    props,
   });
 
+  const [startValue, endValue] = field.value ?? [];
   const onChange = (idx) => (date) => {
-    const newValue = [...field.value];
+    const newValue = [startValue, endValue];
     newValue[idx] = date;
     return field.onChange(newValue);
   };
 
   return (
-    <DesktopDatePicker
-      ref={ref}
-      renderInput={(params) => (
-        <TextField size="small" {...props} {...params} />
-      )}
-      name={field.name}
-      onChange={onChange(0)}
-      onBlur={field.onBlur}
-      value={field.value[0]}
-    />
+    <Box display="flex" sx={sx}>
+      <DesktopDatePicker
+        ref={ref}
+        renderInput={(params) => (
+          <TextField size="small" sx={{ width: 180 }} {...props} {...params} />
+        )}
+        name={field.name}
+        onChange={onChange(0)}
+        onBlur={field.onBlur}
+        value={startValue}
+      />
+      <Box alignSelf="center" sx={{ mx: 1 }}>
+        -
+      </Box>
+      <DesktopDatePicker
+        renderInput={(params) => (
+          <TextField size="small" sx={{ width: 180 }} {...props} {...params} />
+        )}
+        // name={field.name}
+        onChange={onChange(1)}
+        onBlur={field.onBlur}
+        value={endValue}
+      />
+    </Box>
   );
 });
 
-export const DateRangePickerField = ({ name, rules, ...props }) => {
-  const methods = useFormContext();
+const RangePicker = React.forwardRef(
+  ({ Component, inputProps, field, sx, ...props }, ref) => {
+    console.log("%c[RangePicker.rndr]", "color:coral;", field.name, {
+      field,
+      props,
+    });
 
+    const onChange = (idx) => (date) => {
+      const newValue = [...(field?.value ?? [])];
+      newValue[idx] = date;
+      return field.onChange(newValue);
+    };
+
+    return (
+      <Box display="flex" sx={sx}>
+        <Component
+          ref={ref}
+          renderInput={(params) => (
+            <TextField size="small" {...props} {...params} {...inputProps} />
+          )}
+          name={field.name}
+          onChange={onChange(0)}
+          onBlur={field.onBlur}
+          value={field.value?.[0]}
+        />
+        <Box alignSelf="center" sx={{ mx: 1 }}>
+          -
+        </Box>
+        <Component
+          renderInput={(params) => (
+            <TextField size="small" {...props} {...params} {...inputProps} />
+          )}
+          // name={field.name}
+          onChange={onChange(1)}
+          onBlur={field.onBlur}
+          value={field.value?.[1]}
+        />
+      </Box>
+    );
+  }
+);
+
+export const RangePickerField = ({ Component, name, rules, ...props }) => {
+  if (!Component)
+    throw new Error("Missing Component for RangePickerField name=" + name);
+
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field }) => (
+        <RangePicker {...props} {...{ Component, field }} />
+      )}
+    />
+  );
+};
+
+export const DateRangePickerField = ({ name, rules, ...props }) => {
   return (
     // <LocalizationProvider
     //   dateAdapter={AdapterDateFns}
@@ -92,7 +163,21 @@ export const SwitchField = ({ name, rules, ...props }) => {
       rules={rules}
       render={({ field }) =>
         console.log("[SwitchField.rndr]", name, { props, field }) || (
-          <Switch {...{ ...props, ...field, checked: field.value, name }} />
+          <Switch {...{ ...props, ...field, checked: !!field.value, name }} />
+        )
+      }
+    />
+  );
+};
+
+export const CheckboxField = ({ name, rules, ...props }) => {
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field }) =>
+        console.log("[CheckboxField.rndr]", name, { props, field }) || (
+          <Checkbox {...{ ...props, ...field, checked: !!field.value, name }} />
         )
       }
     />

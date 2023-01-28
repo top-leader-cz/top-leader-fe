@@ -1,12 +1,12 @@
-import { Checkbox, Divider, Switch, TextField } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, Divider } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers";
 import { useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
   B,
-  DateRangePicker,
+  CheckboxField,
   DateRangePickerField,
+  RangePickerField,
   SwitchField,
 } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
@@ -16,53 +16,43 @@ import { CalendarDaySlots, CREATE_OFFSET } from "../Coaches/Coaches.page";
 import { FieldLayout, FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 
+const DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+
 const DAYS = {
-  MON: "Monday",
-  TUE: "Tuesday",
-  WED: "Wednesday",
-  THU: "Thursday",
-  FRI: "Friday",
-  SAT: "Saturday",
-  SUN: "Sunday",
+  mon: "Monday",
+  tue: "Tuesday",
+  wed: "Wednesday",
+  thu: "Thursday",
+  fri: "Friday",
+  sat: "Saturday",
+  sun: "Sunday",
 };
 
-const TimeField = () => {
-  return (
-    <TimePicker
-      label=""
-      //   value={value}
-      //   onChange={(newValue) => {
-      //     setValue(newValue);
-      //   }}
-      renderInput={(params) => (
-        <TextField size="small" sx={WHITE_BG} {...params} />
-      )}
-    />
-  );
-};
+const DaySlots = ({ dayName }) => {
+  const enabled = useFormContext().watch(enabledName(dayName));
+  console.log(dayName, enabled);
 
-const TimeRange = () => {
-  return (
-    <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
-      <TimeField /> - <TimeField />
-    </Box>
-  );
-};
-
-const DaySlots = ({ name }) => {
   return (
     <FieldLayout
       label={
         <>
-          <Checkbox /> {[name]}
+          <CheckboxField name={enabledName(dayName)} /> {DAYS[dayName]}
         </>
       }
       LabelComponent={P}
       dividerTop
       sx={{}}
     >
-      <Box display="flex" flexDirection="column">
-        <TimeRange />
+      <Box display="flex">
+        {enabled ? (
+          <RangePickerField
+            Component={TimePicker}
+            name={dayRangesName(dayName)}
+            inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
+          />
+        ) : (
+          "Unavailable"
+        )}
       </Box>
     </FieldLayout>
   );
@@ -72,9 +62,10 @@ export const Recurrence = () => {
   const recurring = useFormContext().watch("recurring");
 
   console.log("[Recurrence.rndr]", { recurring });
+
   return (
     <FormRow label="Recurring" name={FIELDS_AVAILABILITY.recurring}>
-      <Box>
+      <Box display="flex">
         <SwitchField name={FIELDS_AVAILABILITY.recurring} />
         {!recurring && (
           <DateRangePickerField
@@ -88,14 +79,14 @@ export const Recurrence = () => {
 };
 
 const enabledName = (name) => `enabled_${name}`;
-const dayName = (name) => `day_${name}`;
+const dayRangesName = (name) => `day_${name}`;
 
 export const FIELDS_AVAILABILITY = {
   recurring: "recurring",
   recurrenceRange: "recurrenceRange",
-  [enabledName(DAYS.MON)]: true,
-  [dayName(DAYS.MON)]: [],
 };
+
+const MOCK_RANGE = [new Date(2022, 0, 0, 9, 0), new Date(2022, 0, 0, 17, 0)];
 
 export const AvailabilitySettings = () => {
   const form = useForm({
@@ -107,6 +98,20 @@ export const AvailabilitySettings = () => {
         new Date(),
         new Date(Date.now() + 3 * 7 * 24 * 3600 * 1000),
       ],
+      [enabledName("mon")]: true,
+      [enabledName("tue")]: true,
+      [enabledName("wed")]: true,
+      [enabledName("thu")]: true,
+      [enabledName("fri")]: true,
+      [enabledName("sat")]: false,
+      [enabledName("sun")]: false,
+      [dayRangesName("mon")]: MOCK_RANGE,
+      [dayRangesName("tue")]: MOCK_RANGE,
+      [dayRangesName("wed")]: MOCK_RANGE,
+      [dayRangesName("thu")]: MOCK_RANGE,
+      [dayRangesName("fri")]: MOCK_RANGE,
+      [dayRangesName("sat")]: MOCK_RANGE,
+      [dayRangesName("sun")]: MOCK_RANGE,
     },
   });
 
@@ -157,13 +162,9 @@ export const AvailabilitySettings = () => {
         <P sx={{ mb: -1 }}>Set your availability here</P>
 
         <Recurrence />
-        <DaySlots name={DAYS.MON} />
-        <DaySlots name={DAYS.TUE} />
-        <DaySlots name={DAYS.WED} />
-        <DaySlots name={DAYS.THU} />
-        <DaySlots name={DAYS.FRI} />
-        <DaySlots name={DAYS.SAT} />
-        <DaySlots name={DAYS.SUN} />
+        {DAY_NAMES.map((dayName) => (
+          <DaySlots dayName={dayName} />
+        ))}
       </FormProvider>
     </form>
   );
