@@ -10,6 +10,7 @@ export const routes = {
   editSession: "/session/:id",
   coaches: "/coaches",
   settings: "/settings",
+  getFeedback: "/get-feedback",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
 };

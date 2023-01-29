@@ -6,7 +6,7 @@ import { AvailabilitySettings } from "./AvailabilitySettings";
 import { GeneralSettings } from "./GeneralSettings";
 import { ProfileSettings } from "./ProfileSettings";
 
-function TabPanel({ children, value, tabName }) {
+export function TabPanel({ children, value, tabName }) {
   console.log("TabPanel", { value, tabName });
   return (
     <Box
@@ -30,7 +30,7 @@ function a11yProps(index) {
 
 // const StyledTab = Tab;
 
-const StyledTabs = styled(Tabs)(({ theme }) => ({
+export const StyledTabs = styled(Tabs)(({ theme }) => ({
   // padding: "0 8px",
   minWidth: 8,
   minHeight: "16px",
@@ -42,7 +42,7 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
   },
 }));
 
-const StyledTab = styled(Tab)(({ theme }) => ({
+export const StyledTab = styled(Tab)(({ theme }) => ({
   textTransform: "none",
   fontWeight: 400,
   paddingTop: 0,
@@ -66,8 +66,8 @@ const TABS = {
 };
 
 export function SettingsPage() {
-  const [tab, setTab] = useState(TABS.AVAILABILITY);
-  // const [tab, setTab] = useState(TABS.PROFILE); // TODO
+  // const [tab, setTab] = useState(TABS.AVAILABILITY);
+  const [tab, setTab] = useState(TABS.PROFILE);
 
   const handleChange = (event, newValue) => {
     setTab(newValue);

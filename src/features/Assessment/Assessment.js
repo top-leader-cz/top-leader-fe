@@ -9,6 +9,8 @@ import { QUESTIONS } from "./questions";
 import { routes } from "../../routes";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { ProgressStats } from "../../components/ProgressStats";
+import { Score } from "../../components/Score";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -30,34 +32,6 @@ const AssessmentProgress = ({ currentIndex, totalCount, sx = {} }) => {
         <ProgressItem value={currentQuestion} active />
         {currentQuestion !== totalCount && <ProgressItem value={totalCount} />}
       </P>
-    </Box>
-  );
-};
-
-const Score = ({ value, onChange, sx = {} }) => {
-  return (
-    <Box
-      display={"flex"}
-      flexDirection={"row"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      {...sx}
-    >
-      <P>Not me at all</P>
-      <Box sx={{ mx: 2, display: "flex", flexFlow: "row nowrap" }}>
-        {Array(10)
-          .fill()
-          .map((_, i) => (
-            <Button
-              variant={value === i + 1 ? "contained" : "outlined"}
-              sx={{ minWidth: 32, mx: 1 }}
-              onClick={() => onChange({ value: i + 1 })}
-            >
-              {i + 1}
-            </Button>
-          ))}
-      </Box>
-      <P>Totally me</P>
     </Box>
   );
 };
@@ -120,17 +94,6 @@ function CircularProgressWithLabel({ value, sx = {} }) {
   );
 }
 
-const Count = ({ label, value, sx = {} }) => {
-  return (
-    <Box sx={{ display: "flex", flexFlow: "column nowrap", ...sx }}>
-      <Typography variant="body" mb={2}>
-        {label}
-      </Typography>
-      <Typography variant="h1">{value}</Typography>
-    </Box>
-  );
-};
-
 const AssessmentRightMenu = ({
   currentIndex,
   saveDisabled,
@@ -156,20 +119,12 @@ const AssessmentRightMenu = ({
           value={(100 * responsesCount) / totalCount}
           sx={{ alignSelf: "center", my: 7.5 }}
         />
-        <Box
-          sx={{
-            display: "flex",
-            flexFlow: "row nowrap",
-            justifyContent: "space-between",
-          }}
-        >
-          <Count sx={{ flexGrow: 1 }} label="Questions" value={totalCount} />
-          <Count
-            sx={{ flexGrow: 1 }}
-            label="Responses"
-            value={responsesCount}
-          />
-        </Box>
+        <ProgressStats
+          items={[
+            { label: "Questions", value: totalCount },
+            { label: "Responses", value: responsesCount },
+          ]}
+        />
       </Box>
       <Button
         fullWidth

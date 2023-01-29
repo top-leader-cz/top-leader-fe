@@ -47,41 +47,6 @@ const sx = {
   height: "100%",
 };
 
-const DashboardCardButton = ({
-  title,
-  iconName,
-  iconColor,
-  to = routes.dashboard,
-  minHeight = 200,
-}) => {
-  const withTo = (children) =>
-    to ? (
-      <CardContent sx={sx}>
-        <CardActionArea href={to}>{children}</CardActionArea>
-      </CardContent>
-    ) : (
-      <CardContent sx={sx}>{children}</CardContent>
-    );
-  return (
-    <Card sx={{ minHeight }}>
-      {withTo(
-        <>
-          <H2 sx={{ mb: 2 }}>{title}</H2>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              // height: "100%",
-            }}
-          >
-            <DashboardIcon iconName={iconName} color={iconColor} />
-          </Box>
-        </>
-      )}
-    </Card>
-  );
-};
-
 const DashboardCardNotes = ({ title = "My Notes" }) => {
   const [note, setNote] = useLocalStorage("dashboard_note", "");
 
@@ -183,6 +148,28 @@ const DashboardCardValues = () => {
   );
 };
 
+const DashboardCardFeedback = () => {
+  return (
+    <DashboardCard
+      title={"Get feedback"}
+      href={routes.getFeedback}
+      items={undefined}
+      fallbackIcon={{ name: "Forum", color: "#6172F3" }}
+    />
+  );
+};
+
+const DashboardCardSession = () => {
+  return (
+    <DashboardCard
+      title={"Set area for my development"}
+      href={routes.newSession}
+      items={undefined}
+      fallbackIcon={{ name: "FitnessCenterOutlined", color: "#66C61C" }}
+    />
+  );
+};
+
 export function DashboardPage() {
   // const { authFetch } = useAuth();
 
@@ -199,26 +186,18 @@ export function DashboardPage() {
           Before you set where you are heading it's good to know from where you
           start.
         </P>
-        <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
+        <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
           <DashboardCardAssessment />
           <DashboardCardValues />
           <DashboardCardNotes />
-          <DashboardCardButton
-            title="Get feedback"
-            iconName="Forum"
-            iconColor="#6172F3"
-          />
+          <DashboardCardFeedback />
         </Masonry>
       </Box>
       <Box>
         <H2>Who to become</H2>
         <P>Become a better leader and here is how you get there.</P>
         <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
-          <DashboardCardButton
-            title="Set area for my development"
-            iconName="FitnessCenterOutlined"
-            iconColor={"#66C61C"}
-          />
+          <DashboardCardSession />
         </Masonry>
       </Box>
     </Layout>
