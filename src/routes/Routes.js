@@ -19,6 +19,7 @@ import {
 } from "../features/Authorization";
 import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
+import { GetFeedbackPage } from "../features/Feedback/GetFeedback.page";
 import { NewSessionPage, SessionsPage } from "../features/Sessions";
 import { EditSessionPage } from "../features/Sessions/EditSession.page";
 import { SettingsPage } from "../features/Settings/Settings.page";
@@ -138,6 +139,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <SettingsPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.getFeedback,
+        element: (
+          <RequireAuth>
+            <GetFeedbackPage />
           </RequireAuth>
         ),
       },

@@ -89,7 +89,11 @@ export const MainMenu = () => {
             icon={<PersonOutlined />}
             to={routes.coaches}
           />
-          <ListItemLink text="Get feedback" icon={<ForumOutlined />} />
+          <ListItemLink
+            text="Get feedback"
+            icon={<ForumOutlined />}
+            to={routes.getFeedback}
+          />
         </List>
       </Box>
       <Box sx={{ mb: 2 }}>

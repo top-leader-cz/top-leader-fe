@@ -2,6 +2,7 @@ import { Add, Delete } from "@mui/icons-material";
 import { Box, Button, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { DatePicker, Input } from ".";
+import { Icon } from "../Icon";
 import { P } from "../Typography";
 
 export const ActionSteps = ({ name, rules, control, sx = {} }) => {
@@ -49,7 +50,7 @@ export const ActionSteps = ({ name, rules, control, sx = {} }) => {
                 mx: 2,
               }}
             >
-              <Delete />
+              <Icon name="Delete" />
             </IconButton>
           )}
         </Box>
@@ -61,7 +62,7 @@ export const ActionSteps = ({ name, rules, control, sx = {} }) => {
             date: null,
           })
         }
-        startIcon={<Add />}
+        startIcon={<Icon name="Add" />}
       >
         Add action
       </Button>

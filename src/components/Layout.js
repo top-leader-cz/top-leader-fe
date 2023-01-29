@@ -49,9 +49,20 @@ const update =
   ({ id, element }) =>
   (prev) => {
     const index = prev.findIndex((item) => item.id === id);
-    if (index < 0 && element) return [...prev, { id, element }];
-    if (!element) return prev.filter((item) => item.id !== id);
-    return [...prev].splice(index, 0, { id, element });
+    let newStack;
+    if (!element) {
+      // console.log("%cUPDATE STACK", "color:pink;", "REMOVE");
+      newStack = prev.filter((item) => item.id !== id);
+    } else if (index < 0 && element) {
+      // console.log("%cUPDATE STACK", "color:pink;", "ADD");
+      newStack = [...prev, { id, element }];
+    } else {
+      // console.log("%cUPDATE STACK", "color:pink;", "UPDATE");
+      newStack = [...prev];
+      newStack[index] = { id, element };
+      // newStack = [...prev].splice(index, 0, { id, element });
+    }
+    return newStack;
   };
 
 export const RightMenuProvider = ({ children }) => {
@@ -82,11 +93,13 @@ export const useRightMenu = (element) => {
   updateStackRef.current = updateStack;
 
   useEffect(() => {
+    console.log("%c[useRightMenu.eff]", "color:coral;", { id, element });
     updateStackRef.current({ id, element });
   }, [element, id]);
 
   useEffect(
     () => () => {
+      console.log("%c[useRightMenu.eff cleanup]", "color:coral;", { id });
       updateStackRef.current({ id, element: null });
     },
     [id]
@@ -96,12 +109,14 @@ export const useRightMenu = (element) => {
 export const Layout = ({
   children,
   rightMenuContent: rightMenuContentProp,
+  contentWrapperSx,
 }) => {
   const { stack } = useContext(RightMenuContext);
   const rightMenuContent = React.useMemo(
     () => rightMenuContentProp || stack[stack.length - 1]?.element,
     [rightMenuContentProp, stack]
   );
+  console.log("[Layout.rndr]", { stack, rightMenuContent });
 
   return (
     <Box
@@ -125,6 +140,7 @@ export const Layout = ({
           flexGrow: 1,
           position: "relative",
           //   bgcolor: "background.default",
+          ...contentWrapperSx,
         }}
       >
         {children}

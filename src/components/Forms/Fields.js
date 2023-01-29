@@ -42,10 +42,10 @@ import { P } from "../Typography";
 // };
 
 const DateRangePicker = React.forwardRef(({ field, sx, ...props }, ref) => {
-  console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
-    field,
-    props,
-  });
+  // console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
+  //   field,
+  //   props,
+  // });
 
   const [startValue, endValue] = field.value ?? [];
   const onChange = (idx) => (date) => {
@@ -84,10 +84,10 @@ const DateRangePicker = React.forwardRef(({ field, sx, ...props }, ref) => {
 
 const RangePicker = React.forwardRef(
   ({ Component, inputProps, field, sx, ...props }, ref) => {
-    console.log("%c[RangePicker.rndr]", "color:coral;", field.name, {
-      field,
-      props,
-    });
+    // console.log("%c[RangePicker.rndr]", "color:coral;", field.name, {
+    //   field,
+    //   props,
+    // });
 
     const onChange = (idx) => (date) => {
       const newValue = [...(field?.value ?? [])];
@@ -228,22 +228,14 @@ export const Input = ({ name, control, rules, ...props }) => {
       control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field, fieldState }) =>
-        console.log("INPUT", {
-          name,
-          rules,
-          field,
-          fieldState,
-          error: fieldState.error,
-        }) || (
-          <TextField
-            error={!!fieldState.error}
-            // helperText={fieldState.error}
-            {...props}
-            {...field}
-          />
-        )
-      }
+      render={({ field, fieldState }) => (
+        <TextField
+          error={!!fieldState.error}
+          // helperText={fieldState.error}
+          {...props}
+          {...field}
+        />
+      )}
     />
   );
 };

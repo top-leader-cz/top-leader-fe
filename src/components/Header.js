@@ -21,9 +21,9 @@ export const Header = ({}) => {
   );
 };
 
-export const TextHeader = ({ text, noDivider }) => {
+export const TextHeader = ({ text, noDivider, sx }) => {
   return (
-    <Box mt={4} mb={3}>
+    <Box mt={4} mb={3} sx={sx}>
       <Box
         display="flex"
         flexWrap="nowrap"
