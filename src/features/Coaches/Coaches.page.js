@@ -1,4 +1,3 @@
-import { Close } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -7,8 +6,6 @@ import {
   CardMedia,
   Chip,
   Divider,
-  InputAdornment,
-  TextField,
 } from "@mui/material";
 import {
   addDays,
@@ -22,151 +19,19 @@ import {
   startOfDay,
 } from "date-fns/fp";
 import { filter, identity, map, pipe } from "ramda";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { Icon } from "../../components/Icon";
+import { useState } from "react";
+import {
+  FIELD_OPTIONS,
+  getLabel,
+  LANGUAGE_OPTIONS,
+} from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H1, P } from "../../components/Typography";
 import { ControlsContainer } from "../Sessions/steps/Controls";
+import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
-import { AutocompleteSelect, SliderField } from "./Fields";
-
-const color = (color, msg) => ["%c" + msg, `color:${color};`];
-
-export const LANGUAGE_OPTIONS = [
-  { label: "English", value: "en" },
-  { label: "Czech", value: "cz" },
-];
-export const renderLanguageOption = (props, option) => (
-  <Box component="li" sx={{ "& > img": { mr: 2, flexShrink: 0 } }} {...props}>
-    <img
-      loading="lazy"
-      width="20"
-      src={getFlagSrc(option)}
-      srcSet={getFlagSrc(option, true)}
-      alt=""
-    />
-    {option.label} ({option.value})
-  </Box>
-);
-
-export const FIELD_OPTIONS = [
-  { label: "Business", value: "business" },
-  { label: "Life", value: "life" },
-  { label: "Football", value: "football" },
-];
-
-const getFlagSrc = (option, isBigger) => {
-  let code = option.value.toLowerCase();
-  if (code === "en") code = "gb";
-
-  if (isBigger) return `https://flagcdn.com/40x30/${code}.png 2x`;
-  else return `https://flagcdn.com/20x15/${code}.png`;
-};
-
-const INITIAL_FILTER = {
-  language: "en",
-  field: null,
-  experience: [1, 3],
-  search: "",
-};
-
-const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
-  const methods = useForm({
-    // mode: "all",
-    defaultValues: filter,
-  });
-  const onClearFilters = () => {
-    methods.setValue("language", null);
-    methods.setValue("field", null);
-    methods.setValue("experience", null);
-  };
-
-  const language = methods.watch("language");
-  const field = methods.watch("field");
-  const experience = methods.watch("experience");
-
-  const values = useMemo(
-    () => ({ language, field, experience }),
-    [field, language, experience]
-  );
-
-  console.log(...color("pink", "[CoachesFilter]"), {
-    filter,
-    values,
-  });
-
-  const setFilterRef = useRef(setFilter);
-  setFilterRef.current = setFilter;
-  useEffect(() => {
-    setFilterRef.current((filter) => ({ ...filter, ...values }));
-  }, [values]);
-
-  return (
-    <FormProvider {...methods}>
-      <Card sx={{ ...sx }}>
-        <CardContent sx={{ "&:last-child": { pb: 2 } }}>
-          <Box display="flex" flexDirection="row" gap={3}>
-            <AutocompleteSelect
-              name="language"
-              label="Language"
-              options={LANGUAGE_OPTIONS}
-              renderOption={renderLanguageOption}
-            />
-            <AutocompleteSelect
-              name="field"
-              label="Field"
-              options={FIELD_OPTIONS}
-            />
-            <SliderField name="experience" label="Experience" range={[1, 10]} />
-
-            {/* <OutlinedField label="Test" /> */}
-          </Box>
-          <Divider sx={{ mt: 3, mb: 2 }} />
-          <ControlsContainer>
-            <Button
-              onClick={onClearFilters}
-              variant="text"
-              startIcon={<Close />}
-              sx={{ p: 1 }}
-            >
-              Remove all filters
-            </Button>
-          </ControlsContainer>
-        </CardContent>
-      </Card>
-      <Box display="flex" flexDirection="row">
-        <TextField
-          disabled
-          sx={{ width: 360, "> .MuiInputBase-root": { bgcolor: "white" } }}
-          label=""
-          placeholder={"Search"}
-          size="small"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Button
-                  sx={{
-                    mr: -2,
-                    px: 1,
-                    minWidth: "auto",
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                  }}
-                  variant="contained"
-                >
-                  <Icon name="Search" />
-                </Button>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
-    </FormProvider>
-  );
-};
 
 const createSlot = ({ start, duration = 60 }) => ({
   start,
@@ -178,7 +43,51 @@ const DAY_FORMAT = "E d";
 
 const VISIBLE_DAYS_COUNT = 7;
 
-const CREATE_OFFSET =
+export const TimeSlot = ({ hour, isFree, sx }) => {
+  return (
+    <Box
+      key={hour}
+      borderRadius="6px"
+      p={1}
+      bgcolor={isFree ? "#F9F8FF" : "transparent"}
+      color={isFree ? "primary.main" : "inherit"}
+      fontWeight={isFree ? 500 : 400}
+      sx={sx}
+    >
+      {isFree ? `${hour}:00` : "-"}
+    </Box>
+  );
+};
+
+export const CalendarDaySlots = ({
+  date,
+  slotsCount,
+  startHour,
+  freeHours = [],
+  sx = { flexDirection: "column" },
+  dateSx,
+  slotSx,
+}) => {
+  const daySlots = Array(slotsCount)
+    .fill(null)
+    .map((_, index) => ({
+      index,
+      hour: index + startHour,
+      isFree: freeHours.includes(index + startHour),
+    }));
+  return (
+    <Box display="flex" alignItems="stretch" textAlign="center" gap={1} sx={sx}>
+      <Box p={1} sx={dateSx}>
+        {format(DAY_FORMAT, date)}
+      </Box>
+      {daySlots.map(({ hour, isFree }) => (
+        <TimeSlot key={hour} hour={hour} isFree={isFree} sx={slotSx} />
+      ))}
+    </Box>
+  );
+};
+
+export const CREATE_OFFSET =
   (date, map = identity) =>
   (daysOffset, hour) =>
     pipe(
@@ -189,39 +98,6 @@ const CREATE_OFFSET =
       setSeconds(0),
       map
     )(date);
-
-const DaySlots = ({ date, slotsCount, startHour, freeHours = [] }) => {
-  const daySlots = Array(slotsCount)
-    .fill(null)
-    .map((_, index) => ({
-      index,
-      hour: index + startHour,
-      isFree: freeHours.includes(index + startHour),
-    }));
-  return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="stretch"
-      textAlign="center"
-      gap={1}
-    >
-      <Box p={1}>{format(DAY_FORMAT, date)}</Box>
-      {daySlots.map(({ hour, isFree }) => (
-        <Box
-          key={hour}
-          borderRadius="6px"
-          p={1}
-          bgcolor={isFree ? "#F9F8FF" : "transparent"}
-          color={isFree ? "primary.main" : "inherit"}
-          fontWeight={isFree ? 500 : 400}
-        >
-          {isFree ? `${hour}:00` : "-"}
-        </Box>
-      ))}
-    </Box>
-  );
-};
 
 const isWithinDay = (dayDate) =>
   isWithinInterval({ start: startOfDay(dayDate), end: endOfDay(dayDate) });
@@ -255,7 +131,7 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
         {Array(VISIBLE_DAYS_COUNT)
           .fill(null)
           .map((_, i) => (
-            <DaySlots
+            <CalendarDaySlots
               key={i}
               startHour={9}
               slotsCount={8}
@@ -278,10 +154,8 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
   );
 };
 
-export const getLabel = (options) => (searchValue) =>
-  options.find(({ value }) => value === searchValue)?.label || searchValue;
-
 const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
+  // eslint-disable-next-line no-unused-vars
   const { id, name, role, experience, languages, description, fields, imgSrc } =
     coach;
   const TODAY = new Date();

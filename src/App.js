@@ -12,14 +12,17 @@ import theme from "./theme";
 import "./index.css";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { RightMenuProvider } from "./components/Layout";
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <AuthProvider>
-          <CssBaseline />
-          <RouterProvider router={router} />
+          <RightMenuProvider>
+            <CssBaseline />
+            <RouterProvider router={router} />
+          </RightMenuProvider>
         </AuthProvider>
       </LocalizationProvider>
     </ThemeProvider>

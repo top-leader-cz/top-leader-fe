@@ -20,6 +20,7 @@ import { routes } from "../../routes";
 import { useAssessmentHistory } from "../Assessment";
 import { TALENTS } from "../Strengths";
 import { VALUES } from "../Values";
+import { JourneyRightMenu } from "./JourneyRightMenu";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -190,7 +191,7 @@ export function DashboardPage() {
   // }, []);
 
   return (
-    <Layout>
+    <Layout rightMenuContent={<JourneyRightMenu />}>
       <Header />
       <Box>
         <H2>Who I am</H2>
