@@ -10,6 +10,7 @@ import {
   SwitchField,
 } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { CalendarDaySlots, CREATE_OFFSET } from "../Coaches/Coaches.page";
@@ -29,6 +30,7 @@ const DAYS = {
 };
 
 const DaySlots = ({ dayName }) => {
+  const msg = useMsg();
   const enabled = useFormContext().watch(enabledName(dayName));
   console.log(dayName, enabled);
 
@@ -51,7 +53,7 @@ const DaySlots = ({ dayName }) => {
             inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
           />
         ) : (
-          "Unavailable"
+          msg("settings.availability.unavailable")
         )}
       </Box>
     </FieldLayout>
@@ -59,12 +61,16 @@ const DaySlots = ({ dayName }) => {
 };
 
 export const Recurrence = () => {
+  const msg = useMsg();
   const recurring = useFormContext().watch("recurring");
 
   console.log("[Recurrence.rndr]", { recurring });
 
   return (
-    <FormRow label="Recurring" name={FIELDS_AVAILABILITY.recurring}>
+    <FormRow
+      label={msg("settings.availability.recurring")}
+      name={FIELDS_AVAILABILITY.recurring}
+    >
       <Box display="flex">
         <SwitchField name={FIELDS_AVAILABILITY.recurring} />
         {!recurring && (
@@ -89,6 +95,7 @@ export const FIELDS_AVAILABILITY = {
 const MOCK_RANGE = [new Date(2022, 0, 0, 9, 0), new Date(2022, 0, 0, 17, 0)];
 
 export const AvailabilitySettings = () => {
+  const msg = useMsg();
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
@@ -124,9 +131,9 @@ export const AvailabilitySettings = () => {
     useMemo(
       () => (
         <ScrollableRightMenu
-          heading={"Preview"}
+          heading={msg("settings.availability.aside.title")}
           buttonProps={{
-            children: "Save",
+            children: msg("settings.availability.aside.save"),
             onClick: () => console.log("Save click"),
           }}
         >
@@ -158,8 +165,12 @@ export const AvailabilitySettings = () => {
   return (
     <form onSubmit={form.handleSubmit(onSubmit, onError)}>
       <FormProvider {...form}>
-        <H2 gutterBottom>Availability</H2>
-        <P sx={{ mb: -1 }}>Set your availability here</P>
+        <H2 gutterBottom>
+          <Msg id="settings.availability.heading" />
+        </H2>
+        <P sx={{ mb: -1 }}>
+          <Msg id="settings.availability.perex" />
+        </P>
 
         <Recurrence />
         {DAY_NAMES.map((dayName) => (

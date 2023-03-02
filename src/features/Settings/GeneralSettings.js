@@ -1,10 +1,14 @@
 import { Button } from "@mui/material";
+import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { TranslationContext } from "../../App";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
   AutocompleteSelect,
   BareInputField,
 } from "../../components/Forms/Fields";
+import { Msg } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FormRow } from "./FormRow";
@@ -18,10 +22,14 @@ const FIELDS_GENERAL = {
 };
 
 export const GeneralSettings = () => {
+  const msg = useMsg();
+  const { language, setLanguage } = useContext(TranslationContext);
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: { language: "en" },
+    defaultValues: {
+      language,
+    },
   });
 
   const onSubmit = (data, e) =>
@@ -32,10 +40,18 @@ export const GeneralSettings = () => {
   return (
     <form onSubmit={form.handleSubmit(onSubmit, onError)}>
       <FormProvider {...form}>
-        <H2 gutterBottom>General</H2>
-        <P sx={{ mb: -1 }}>Pavel</P>
+        <H2 gutterBottom>
+          <Msg id="settings.general.heading" />
+        </H2>
+        <P sx={{ mb: -1 }}>
+          <Msg id="settings.general.perex" />
+        </P>
 
-        <FormRow label="Language" name={FIELDS_GENERAL.language} dividerBottom>
+        <FormRow
+          label={msg("settings.general.field.language")}
+          name={FIELDS_GENERAL.language}
+          dividerBottom
+        >
           <AutocompleteSelect
             sx={WHITE_BG}
             name={FIELDS_GENERAL.language}
@@ -43,13 +59,16 @@ export const GeneralSettings = () => {
             renderOption={renderLanguageOption}
             placeholder="Select languages you speak"
             autoComplete="language" // TODO
+            onChange={(lang) => setLanguage(lang)}
           />
         </FormRow>
 
-        <H2 sx={{ mb: 3 }}>Password</H2>
+        <H2 sx={{ mb: 3 }}>
+          <Msg id="settings.general.password" />
+        </H2>
 
         <FormRow
-          label="Current password"
+          label={msg("settings.general.field.currentPassword")}
           name={FIELDS_GENERAL.currentPassword}
           dividerTop={false}
           dividerBottom={false}
@@ -63,7 +82,7 @@ export const GeneralSettings = () => {
         </FormRow>
 
         <FormRow
-          label="New password"
+          label={msg("settings.general.field.newPassword")}
           name={FIELDS_GENERAL.newPassword}
           dividerTop={false}
           dividerBottom={false}
@@ -77,7 +96,7 @@ export const GeneralSettings = () => {
         </FormRow>
 
         <FormRow
-          label="Confirm new password"
+          label={msg("settings.general.field.newPasswordConfirm")}
           name={FIELDS_GENERAL.newPasswordConfirm}
           dividerTop={false}
           dividerBottom={false}
@@ -92,10 +111,10 @@ export const GeneralSettings = () => {
         <FormRow dividerTop={false}>
           <ControlsContainer>
             <Button variant="outlined" sx={{ bgcolor: "white" }}>
-              Cancel
+              <Msg id="settings.general.button.cancel" />
             </Button>
             <Button type="submit" variant="contained">
-              Update password
+              <Msg id="settings.general.button.save" />
             </Button>
           </ControlsContainer>
         </FormRow>

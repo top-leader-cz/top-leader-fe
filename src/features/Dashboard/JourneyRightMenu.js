@@ -1,4 +1,5 @@
 import { Avatar, Button, Icon, Paper } from "@mui/material";
+import { Msg } from "../../components/Msg";
 import { H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
 
@@ -18,14 +19,20 @@ export const JourneyRightMenu = () => {
         // justifyContent: "space-between",
       }}
     >
-      <H2 sx={{ alignSelf: "flex-start" }}>My leadership journey</H2>
+      <H2 sx={{ alignSelf: "flex-start" }}>
+        <Msg id={"dashboard.rightmenu.title"} />
+      </H2>
       <Avatar variant="circular" sx={{ my: 5 }}>
         <Icon />
       </Avatar>
-      <H2 sx={{ mb: 1 }}>No upcoming sessions</H2>
-      <P sx={{ mb: 5 }}>Sessions with a coach will apear here</P>
+      <H2 sx={{ mb: 1 }}>
+        <Msg id="dashboard.rightmenu.upcoming.title.empty" />
+      </H2>
+      <P sx={{ mb: 5 }}>
+        <Msg id="dashboard.rightmenu.upcoming.perex.empty" />
+      </P>
       <Button fullWidth variant="contained" href={routes.newSession}>
-        Start Session
+        <Msg id="dashboard.rightmenu.upcoming.start" />
       </Button>
     </Paper>
   );

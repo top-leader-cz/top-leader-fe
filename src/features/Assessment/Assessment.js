@@ -5,12 +5,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { H1, H2, P } from "../../components/Typography";
-import { QUESTIONS } from "./questions";
+import { useQuestionsDict } from "./questions";
 import { routes } from "../../routes";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { ProgressStats } from "../../components/ProgressStats";
 import { Score } from "../../components/Score";
+import { Msg, MsgProvider } from "../../components/Msg";
+import { messages } from "./messages";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -42,7 +44,6 @@ const PROGRESS_PROPS = {
 };
 
 function CircularProgressWithLabel({ value, sx = {} }) {
-  console.log({ value });
   return (
     <Box sx={{ position: "relative", display: "inline-flex", ...sx }}>
       <CircularProgress
@@ -84,7 +85,7 @@ function CircularProgressWithLabel({ value, sx = {} }) {
         }}
       >
         <Typography variant="caption" component="div" color="text.secondary">
-          Progress
+          <Msg id="assessment.menu.progress" />
         </Typography>
         <Typography variant="h1" component="div">{`${Math.round(
           value
@@ -114,15 +115,23 @@ const AssessmentRightMenu = ({
       }}
     >
       <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
-        <H2>Find my strengths assessment</H2>
+        <H2>
+          <Msg id="assessment.menu.title" />
+        </H2>
         <CircularProgressWithLabel
           value={(100 * responsesCount) / totalCount}
           sx={{ alignSelf: "center", my: 7.5 }}
         />
         <ProgressStats
           items={[
-            { label: "Questions", value: totalCount },
-            { label: "Responses", value: responsesCount },
+            {
+              label: <Msg id="assessment.menu.questions" />,
+              value: totalCount,
+            },
+            {
+              label: <Msg id="assessment.menu.responses" />,
+              value: responsesCount,
+            },
           ]}
         />
       </Box>
@@ -132,7 +141,7 @@ const AssessmentRightMenu = ({
         onClick={onSave}
         disabled={saveDisabled}
       >
-        Save assessment
+        <Msg id="assessment.menu.save" />
       </Button>
     </Paper>
   );
@@ -168,24 +177,23 @@ const createAssessmentEntry = ({ questions, scores }) => {
   };
 };
 
-export const useAssessmentHistory = () => {
-  return useHistoryEntries({ storageKey: "assessment_history" });
-};
-
 const useAssessment = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useLocalStorage("assessment", {});
-  const assessmentHistory = useAssessmentHistory();
+  const assessmentHistory = useHistoryEntries({
+    storageKey: "assessment_history",
+  });
   const navigate = useNavigate();
 
-  const question = QUESTIONS[currentIndex];
+  const { questions } = useQuestionsDict();
+  const question = questions[currentIndex];
   const saveAssessment = useCallback(() => {
     assessmentHistory.push(
-      createAssessmentEntry({ questions: QUESTIONS, scores })
+      createAssessmentEntry({ questions: questions, scores })
     );
     setScores({});
     navigate(routes.strengths);
-  }, [assessmentHistory, navigate, scores, setScores]);
+  }, [assessmentHistory, navigate, questions, scores, setScores]);
 
   console.log("[useAssessment]", { currentIndex, scores, question });
 
@@ -193,9 +201,9 @@ const useAssessment = () => {
     saveAssessment,
     pagination: {
       currentIndex,
-      totalCount: QUESTIONS.length,
+      totalCount: questions.length,
       back: () => setCurrentIndex((i) => Math.max(0, i - 1)),
-      next: () => setCurrentIndex((i) => Math.min(QUESTIONS.length - 1, i + 1)),
+      next: () => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1)),
       onChange: ({ value }) => {
         setCurrentIndex(value);
       },
@@ -245,79 +253,89 @@ function Assessment() {
 
   console.log("[Assessment.rndr]", { pagination, question, score });
   return (
-    <Layout
-      rightMenuContent={
-        <AssessmentRightMenu
-          saveDisabled={responsesCount !== pagination.totalCount}
+    <MsgProvider messages={messages}>
+      <Layout
+        rightMenuContent={
+          <AssessmentRightMenu
+            saveDisabled={responsesCount !== pagination.totalCount}
+            currentIndex={pagination.currentIndex}
+            totalCount={pagination.totalCount}
+            responsesCount={responsesCount}
+            onSave={saveAssessment}
+          />
+        }
+      >
+        <Box mt={4} mb={3}>
+          <Box
+            display="flex"
+            flexWrap="nowrap"
+            alignItems="center"
+            flexDirection="row"
+          >
+            <Button href={routes.dashboard}>
+              <ArrowBack />
+              <H2>
+                <Msg id="assessment.header.back" />
+              </H2>
+            </Button>
+          </Box>
+          <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
+        </Box>
+        <AssessmentProgress
+          sx={{ my: 4 }}
           currentIndex={pagination.currentIndex}
           totalCount={pagination.totalCount}
-          responsesCount={responsesCount}
-          onSave={saveAssessment}
         />
-      }
-    >
-      <Box mt={4} mb={3}>
+        <H1 my={7.5} minHeight={"4rem"} align="center">
+          {question.text}
+        </H1>
+        <Box width="100%" align="center">
+          <Box
+            component="img"
+            borderRadius={2}
+            width={500}
+            alignSelf={"center"}
+            src={question.img.src}
+          />
+        </Box>
+        <Score
+          sx={{ my: 12.5 }}
+          value={score.value}
+          onChange={score.onChange}
+        />
+        {/* <ButtonGroup></ButtonGroup> */}
         <Box
-          display="flex"
-          flexWrap="nowrap"
-          alignItems="center"
-          flexDirection="row"
+          display={"flex"}
+          flexFlow="row nowrap"
+          justifyContent={"center"}
+          mt={8}
         >
-          <Button href={routes.dashboard}>
-            <ArrowBack />
-            <H2>Back to the dashboard</H2>
+          <Button
+            sx={{ mx: 4 }}
+            variant="outlined"
+            disabled={pagination.currentIndex <= 0}
+            onClick={pagination.back}
+            startIcon={<ArrowBack />}
+          >
+            <Msg id="assessment.button.back" />
+          </Button>
+          <Button
+            type="submit"
+            sx={{ mx: 4 }}
+            variant="contained"
+            disabled={typeof score.value !== "number"}
+            onClick={handleNext}
+            endIcon={<ArrowForward />}
+          >
+            {pagination.currentIndex >= pagination.totalCount - 1 ? (
+              <Msg id="assessment.button.save" />
+            ) : (
+              <Msg id="assessment.button.next" />
+            )}
           </Button>
         </Box>
-        <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
-      </Box>
-      <AssessmentProgress
-        sx={{ my: 4 }}
-        currentIndex={pagination.currentIndex}
-        totalCount={pagination.totalCount}
-      />
-      <H1 my={7.5} minHeight={"4rem"} align="center">
-        {question.text}
-      </H1>
-      <Box width="100%" align="center">
-        <Box
-          component="img"
-          borderRadius={2}
-          width={500}
-          alignSelf={"center"}
-          src={question.img.src}
-        />
-      </Box>
-      <Score sx={{ my: 12.5 }} value={score.value} onChange={score.onChange} />
-      {/* <ButtonGroup></ButtonGroup> */}
-      <Box
-        display={"flex"}
-        flexFlow="row nowrap"
-        justifyContent={"center"}
-        mt={8}
-      >
-        <Button
-          sx={{ mx: 4 }}
-          variant="outlined"
-          disabled={pagination.currentIndex <= 0}
-          onClick={pagination.back}
-          startIcon={<ArrowBack />}
-        >
-          Back
-        </Button>
-        <Button
-          type="submit"
-          sx={{ mx: 4 }}
-          variant="contained"
-          disabled={typeof score.value !== "number"}
-          onClick={handleNext}
-          endIcon={<ArrowForward />}
-        >
-          {pagination.currentIndex >= pagination.totalCount - 1
-            ? "Save"
-            : "Next"}
-        </Button>
-      </Box>
-    </Layout>
+      </Layout>
+    </MsgProvider>
   );
 }
 

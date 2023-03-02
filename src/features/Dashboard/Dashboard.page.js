@@ -9,18 +9,21 @@ import {
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
+import { Msg, MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
-import { useAssessmentHistory } from "../Assessment";
-import { TALENTS } from "../Strengths";
-import { VALUES } from "../Values";
+import { useTalentsDict } from "../../translations/talents";
+import { useValuesDict } from "../../translations/values";
+import { useAuth } from "../Authorization";
 import { JourneyRightMenu } from "./JourneyRightMenu";
+import { messages } from "./messages";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -47,17 +50,18 @@ const sx = {
   height: "100%",
 };
 
-const DashboardCardNotes = ({ title = "My Notes" }) => {
+const DashboardCardNotes = () => {
   const [note, setNote] = useLocalStorage("dashboard_note", "");
+  const msg = useMsg();
 
   return (
     <Card>
       <CardContent sx={sx}>
-        <H2 sx={{ mb: 2 }}>{title}</H2>
+        <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
         <TextField
           multiline
           minRows={18}
-          placeholder="Type something"
+          placeholder={msg("dashboard.cards.notes.placeholder.empty")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -105,20 +109,26 @@ const DashboardCard = ({
 };
 
 const DashboardCardAssessment = () => {
-  const { last } = useAssessmentHistory();
+  const { talents } = useTalentsDict();
+  const { last } = useHistoryEntries({ storageKey: "assessment_history" });
   const items = useMemo(
     () =>
       last?.orderedTalents.slice(0, 5).map((key) => ({
-        label: [TALENTS[key]?.emoji ?? "👤", TALENTS[key]?.name || key]
+        label: [talents[key]?.emoji ?? "👤", talents[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [last?.orderedTalents]
+    [last?.orderedTalents, talents]
   );
+  const msg = useMsg();
 
   return (
     <DashboardCard
-      title={items ? "My strengths" : "Find my strengths"}
+      title={
+        items
+          ? msg("dashboard.cards.strengths.title.filled")
+          : msg("dashboard.cards.strengths.title.empty")
+      }
       href={items ? routes.strengths : routes.assessment}
       items={items}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#0BA5EC" }}
@@ -128,19 +138,25 @@ const DashboardCardAssessment = () => {
 
 const DashboardCardValues = () => {
   const { last } = useHistoryEntries({ storageKey: "values_history" }); // TODO: keys vs wrapper hooks
+  const { values } = useValuesDict();
   const items = useMemo(
     () =>
       last?.selectedKeys.slice(0).map((key) => ({
-        label: [VALUES[key]?.emoji ?? "⚓️", VALUES[key]?.name || key]
+        label: [values[key]?.emoji ?? "⚓️", values[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [last?.selectedKeys]
+    [last?.selectedKeys, values]
   );
+  const msg = useMsg();
 
   return (
     <DashboardCard
-      title={items ? "My values" : "Set my values"}
+      title={
+        items
+          ? msg("dashboard.cards.values.title.filled")
+          : msg("dashboard.cards.values.title.filled")
+      }
       href={items ? routes.myValues : routes.setValues}
       items={items}
       fallbackIcon={{ name: "JoinRight", color: "#2E90FA" }}
@@ -149,9 +165,11 @@ const DashboardCardValues = () => {
 };
 
 const DashboardCardFeedback = () => {
+  const msg = useMsg();
+
   return (
     <DashboardCard
-      title={"Get feedback"}
+      title={msg("dashboard.cards.feedback.title")}
       href={routes.getFeedback}
       items={undefined}
       fallbackIcon={{ name: "Forum", color: "#6172F3" }}
@@ -160,9 +178,11 @@ const DashboardCardFeedback = () => {
 };
 
 const DashboardCardSession = () => {
+  const msg = useMsg();
+
   return (
     <DashboardCard
-      title={"Set area for my development"}
+      title={msg("dashboard.cards.sessions.title.empty")}
       href={routes.newSession}
       items={undefined}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#66C61C" }}
@@ -171,35 +191,56 @@ const DashboardCardSession = () => {
 };
 
 export function DashboardPage() {
-  // const { authFetch } = useAuth();
+  const { user, authFetch } = useAuth();
 
-  // useEffect(() => {
-  //   const res = authFetch({ url: "/api/rest/users" });
-  // }, []);
+  useEffect(() => {
+    const res = authFetch({ url: "/api/rest/users" });
+  }, []);
 
   return (
-    <Layout rightMenuContent={<JourneyRightMenu />}>
-      <Header />
-      <Box>
-        <H2>Who I am</H2>
-        <P>
-          Before you set where you are heading it's good to know from where you
-          start.
-        </P>
-        <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-          <DashboardCardAssessment />
-          <DashboardCardValues />
-          <DashboardCardNotes />
-          <DashboardCardFeedback />
-        </Masonry>
-      </Box>
-      <Box>
-        <H2>Who to become</H2>
-        <P>Become a better leader and here is how you get there.</P>
-        <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
-          <DashboardCardSession />
-        </Masonry>
-      </Box>
-    </Layout>
+    <MsgProvider messages={messages}>
+      <Layout rightMenuContent={<JourneyRightMenu />}>
+        <Header
+          avatar={
+            <Avatar
+              variant="circular"
+              src="https://i.pravatar.cc/44"
+              sx={{ mr: 2 }}
+            />
+          }
+          text={
+            <Msg
+              id="dashboard.header"
+              values={{ user: user.displayName || user.email }}
+            />
+          }
+        />
+        <Box>
+          <H2>
+            <Msg id="dashboard.section-1.heading" />
+          </H2>
+          <P>
+            <Msg id="dashboard.section-1.perex" />
+          </P>
+          <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
+            <DashboardCardAssessment />
+            <DashboardCardValues />
+            <DashboardCardNotes />
+            <DashboardCardFeedback />
+          </Masonry>
+        </Box>
+        <Box>
+          <H2>
+            <Msg id="dashboard.section-2.heading" />
+          </H2>
+          <P>
+            <Msg id="dashboard.section-2.perex" />
+          </P>
+          <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
+            <DashboardCardSession />
+          </Masonry>
+        </Box>
+      </Layout>
+    </MsgProvider>
   );
 }

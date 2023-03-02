@@ -1,24 +1,15 @@
 import { ArrowForward } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
+import { Msg } from "../../../components/Msg";
+import { useMsg } from "../../../components/Msg/Msg";
 import { SelectableChip } from "../../../components/SelectableChip";
+import { AREAS_EN } from "../../../translations/areas";
 import { SessionStepCard } from "../SessionStepCard";
-
-export const AREAS = {
-  1: { label: "Become an active listener" },
-  2: { label: "Become more efficient" },
-  3: { label: "Show appreciation, recognition and empathy for your team" },
-  4: { label: "Be honest, transparent and accountable" },
-  5: { label: "Be an effective communicator" },
-  6: { label: "Being more assertive" },
-  7: { label: "Negotiate effectively" },
-  8: { label: "Be more self-confident" },
-  9: { label: "Apply critical thinking" },
-};
 
 const useNewSession = () => {
   return {
-    areas: Object.entries(AREAS).map(([key, value]) => ({
+    areas: Object.entries(AREAS_EN).map(([key, value]) => ({
       key,
       label: value.label,
     })),
@@ -39,6 +30,7 @@ export const AreaStep = ({ handleNext, data, setData, ...props }) => {
   const next = () => {
     handleNext({ area: newArea });
   };
+  const msg = useMsg();
 
   return (
     <SessionStepCard {...props}>
@@ -69,7 +61,7 @@ export const AreaStep = ({ handleNext, data, setData, ...props }) => {
           // fullWidth
           id="customArea"
           // label="Area"
-          placeholder="Type your own area for growth"
+          placeholder={msg("sessions.new.steps.area.customarea.placeholder")}
           name="customArea"
           autoFocus
           size="small"
@@ -88,7 +80,7 @@ export const AreaStep = ({ handleNext, data, setData, ...props }) => {
           onClick={next}
           disabled={!newArea}
         >
-          Next
+          <Msg id="sessions.new.steps.area.next" />
         </Button>
       </Box>
     </SessionStepCard>

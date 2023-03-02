@@ -5,11 +5,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ActionSteps, Input } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
+import { Msg, MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { Todos } from "../../components/Todos";
 import { H1, H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
 import { FocusedList } from "./FocusedList";
+import { messages } from "./messages";
 import { StepperRightMenu, useSteps } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
@@ -50,17 +53,18 @@ const IconTile = ({ iconName, caption, text, ...props }) => {
 };
 
 const AlignStep = ({ handleNext, ...props }) => {
+  const msg = useMsg();
   return (
     <SessionStepCard {...props}>
       <Box display="flex" flexDirection="row" gap={1} mt={7.5} mb={10}>
         <IconTile
           iconName={"InsertChart"}
-          caption="Area of development"
+          caption={msg("sessions.edit.steps.align.area.caption")}
           text="Self-awareness"
         />
         <IconTile
           iconName={"InsertChart"}
-          caption="Long-term goal"
+          caption={msg("sessions.edit.steps.align.goal.caption")}
           text="Giving speeches to audiences regularly"
         />
       </Box>
@@ -73,7 +77,7 @@ const AlignStep = ({ handleNext, ...props }) => {
           endIcon={<Icon name="ArrowForward" />}
           onClick={() => handleNext()}
         >
-          Yes
+          <Msg id="sessions.edit.steps.align.confirm" />
         </Button>
       </ControlsContainer>
     </SessionStepCard>
@@ -176,36 +180,6 @@ const SetActionStepsStep = ({ onFinish, data, ...props }) => {
   );
 };
 
-const STEPS = [
-  {
-    StepComponent: AlignStep,
-    label: "Area and goal",
-    caption: "",
-    iconName: "InsertChart",
-    heading:
-      "Are you still aligned with your area for development and the long term goal? ",
-    perex: "",
-  },
-  {
-    StepComponent: ReflectStep,
-    fields: [{ name: reflectionKeyName }],
-    label: "Reflect",
-    caption: "",
-    iconName: "Lightbulb",
-    heading: "Reflection on the last session",
-    perex: "Here are the actions you set last time",
-  },
-  {
-    StepComponent: SetActionStepsStep,
-    fields: [{ name: setActionStepsKeyName }],
-    label: "Set action steps",
-    caption: "",
-    iconName: "Explore",
-    heading: "Set your action steps",
-    perex: "They should be achievable and measurable.",
-  },
-];
-
 const createSessionEntry = (timestamp, { reflection, steps }) => {
   return {
     timestamp,
@@ -219,7 +193,38 @@ const createSessionEntry = (timestamp, { reflection, steps }) => {
   };
 };
 
-export function EditSessionPage() {
+function EditSessionPageInner() {
+  const msg = useMsg();
+
+  const STEPS = [
+    {
+      StepComponent: AlignStep,
+      label: msg("sessions.edit.steps.align.label"),
+      caption: msg("sessions.edit.steps.align.caption"),
+      iconName: "InsertChart",
+      heading: msg("sessions.edit.steps.align.heading"),
+      perex: msg("sessions.edit.steps.align.perex"),
+    },
+    {
+      StepComponent: ReflectStep,
+      fields: [{ name: reflectionKeyName }],
+      label: msg("sessions.edit.steps.reflect.label"),
+      caption: msg("sessions.edit.steps.reflect.caption"),
+      iconName: "Lightbulb",
+      heading: msg("sessions.edit.steps.reflect.heading"),
+      perex: msg("sessions.edit.steps.reflect.perex"),
+    },
+    {
+      StepComponent: SetActionStepsStep,
+      fields: [{ name: setActionStepsKeyName }],
+      label: msg("sessions.edit.steps.setaction.label"),
+      caption: msg("sessions.edit.steps.setaction.caption"),
+      iconName: "Explore",
+      heading: msg("sessions.edit.steps.setaction.heading"),
+      perex: msg("sessions.edit.steps.setaction.perex"),
+    },
+  ];
+
   const { id } = useParams();
   const timestamp = Number(id);
   const history = useHistoryEntries({
@@ -283,7 +288,9 @@ export function EditSessionPage() {
             href={routes.sessions}
             startIcon={<ArrowBack />}
           >
-            <H2>Back to the sessions</H2>
+            <H2>
+              <Msg id="sessions.new.header" />
+            </H2>
           </Button>
         </Box>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
@@ -302,5 +309,13 @@ export function EditSessionPage() {
         />
       )}
     </Layout>
+  );
+}
+
+export function EditSessionPage() {
+  return (
+    <MsgProvider messages={messages}>
+      <EditSessionPageInner />
+    </MsgProvider>
   );
 }

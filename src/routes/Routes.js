@@ -26,6 +26,7 @@ import { SettingsPage } from "../features/Settings/Settings.page";
 import { StrengthsPage } from "../features/Strengths";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
+// import { Dev } from "./Dev";
 import ErrorPage from "./ErrorPage";
 
 const GlobalSpinner = () => {
@@ -150,6 +151,10 @@ export const router = createBrowserRouter([
           </RequireAuth>
         ),
       },
+      // {
+      //   path: routes.dev,
+      //   element: <Dev />,
+      // },
       {
         path: routes.muiDefaultApp,
         element: <MuiDefaultApp />,

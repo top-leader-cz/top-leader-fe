@@ -8,11 +8,12 @@ export const HistoryRightMenu = ({
   history,
   onRemove,
   buttonProps,
+  perex = "History",
   key = "timestamp",
 }) => {
   return (
     <ScrollableRightMenu heading={heading} buttonProps={buttonProps}>
-      <P mt={1}>History</P>
+      <P mt={1}>{perex}</P>
       {history.all.map((entry) => (
         <Button
           key={entry[key]}

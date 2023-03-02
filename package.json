@@ -15,10 +15,12 @@
     "date-fns": "^2.29.3",
     "date-fns-tz": "^1.3.7",
     "firebase": "^9.13.0",
+    "papaparse": "^5.4.1",
     "ramda": "^0.28.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.41.3",
+    "react-intl": "^6.2.8",
     "react-router-dom": "^6.4.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
@@ -27,7 +29,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "extract-long": "formatjs extract 'src/**/*.js*' --ignore='src/translations' --out-file extracted/en-with-descriptions.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "extract-short": "formatjs extract 'src/**/*.js*' --ignore='src/translations' --out-file extracted/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]' --format scripts/extract-translations-formatter.js",
+    "extract": "npm run extract-short ; npm run extract-long",
+    "compile": "formatjs compile",
+    "translations-match-csv": "node ./scripts/translations-csv-converter.js"
   },
   "eslintConfig": {
     "extends": [
@@ -47,5 +54,9 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://hasura-learn-tutoria.hasura.app"
+  "proxy": "https://topleader.hasura.app",
+  "devDependencies": {
+    "@formatjs/cli": "^6.0.1",
+    "string-similarity": "^4.0.4"
+  }
 }

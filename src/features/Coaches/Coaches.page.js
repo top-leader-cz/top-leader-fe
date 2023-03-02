@@ -27,11 +27,14 @@ import {
 } from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
+import { MsgProvider } from "../../components/Msg";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H1, P } from "../../components/Typography";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
+import { messages } from "./messages";
 
 const createSlot = ({ start, duration = 60 }) => ({
   start,
@@ -147,7 +150,7 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
       </Box>
       <ControlsContainer sx={{ mt: 1 }}>
         <Button variant="contained" onClick={() => onContact()}>
-          Contact
+          <Msg id="coaches.coach.contact" />
         </Button>
       </ControlsContainer>
     </Box>
@@ -173,9 +176,16 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
         <Box display="flex" flexDirection="column" maxWidth={"50%"}>
           <H1 gutterBottom>{name}</H1>
           <P gutterBottom>{role}</P>
-          <P gutterBottom>Experience: {experience} years</P>
           <P gutterBottom>
-            Language: {languages.map(getLabel(LANGUAGE_OPTIONS)).join(", ")}
+            <Msg id="coaches.coach.experience" values={{ experience }} />
+          </P>
+          <P gutterBottom>
+            <Msg
+              id="coaches.coach.languages"
+              values={{
+                languages: languages.map(getLabel(LANGUAGE_OPTIONS)).join(", "),
+              }}
+            />
           </P>
           <P gutterBottom>{description}</P>
           <Box
@@ -213,31 +223,13 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
   );
 };
 
-const EXPECT_ITEMS = [
-  {
-    heading: "€100",
-    iconName: "CreditCard",
-    text: "Fixed price of all sessions",
-  },
-  {
-    heading: "Trusted specialists",
-    iconName: "Star",
-    text: "Deleniti sed dignissimos minima quibusdam. Possimus enim asperiores quia maiores rem rerum.",
-  },
-  {
-    heading: "Privacy",
-    iconName: "Lock",
-    text: "Deleniti sed dignissimos minima quibusdam. Possimus enim asperiores quia maiores rem rerum.",
-  },
-];
-
 const COACHES = [
   {
     id: 1,
     name: "Milan Vlcek",
     role: "Associate Coach Certified - Issued by ICF",
-    experience: 3,
-    languages: ["en", "cz"],
+    experience: 7,
+    languages: ["en", "cs"],
     description:
       "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: ["football"],
@@ -248,8 +240,8 @@ const COACHES = [
     id: 2,
     name: "Darnell Brekke",
     role: "Associate Coach Certified - Issued by ICF",
-    experience: 3,
-    languages: ["en", "cz"],
+    experience: 2,
+    languages: ["en"],
     description:
       "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: ["business", "life"],
@@ -260,7 +252,7 @@ const COACHES = [
     name: "Jenna Pagac",
     role: "Associate Coach Certified - Issued by ICF",
     experience: 3,
-    languages: ["en", "cz"],
+    languages: ["en", "cs"],
     description:
       "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: ["business", "life"],
@@ -279,7 +271,26 @@ const coachPredicate =
     filterByIncludes(field, coach.fields) &&
     filterByRange(experience, coach.experience);
 
-export function CoachesPage() {
+export function CoachesPageInner() {
+  const msg = useMsg();
+  const EXPECT_ITEMS = [
+    {
+      heading: msg("coaches.aside.items.1.heading"),
+      iconName: "CreditCard",
+      text: msg("coaches.aside.items.1.text"),
+    },
+    {
+      heading: msg("coaches.aside.items.2.heading"),
+      iconName: "Star",
+      text: msg("coaches.aside.items.2.text"),
+    },
+    {
+      heading: msg("coaches.aside.items.3.heading"),
+      iconName: "Lock",
+      text: msg("coaches.aside.items.3.text"),
+    },
+  ];
+
   const [filter, setFilter] = useState(INITIAL_FILTER);
   console.log("[CoachesPage.rndr]", {});
 
@@ -292,7 +303,7 @@ export function CoachesPage() {
   return (
     <Layout
       rightMenuContent={
-        <ScrollableRightMenu heading={"What to expect"}>
+        <ScrollableRightMenu heading={<Msg id="coaches.aside.title" />}>
           {EXPECT_ITEMS.map(({ heading, iconName, text }) => (
             <InfoBox
               key={heading}
@@ -314,7 +325,9 @@ export function CoachesPage() {
           alignItems="center"
           flexDirection="row"
         >
-          <H1>Coaches</H1>
+          <H1>
+            <Msg id="coaches.heading" />
+          </H1>
         </Box>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
       </Box>
@@ -341,5 +354,13 @@ export function CoachesPage() {
         onClose={() => setContactCoach(null)}
       />
     </Layout>
+  );
+}
+
+export function CoachesPage() {
+  return (
+    <MsgProvider messages={messages}>
+      <CoachesPageInner />
+    </MsgProvider>
   );
 }

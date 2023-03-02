@@ -1,20 +1,37 @@
-import { Add, Delete } from "@mui/icons-material";
 import { Box, Button, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
+import { defineMessages } from "react-intl";
 import { DatePicker, Input } from ".";
 import { Icon } from "../Icon";
+import { MsgProvider } from "../Msg";
+import { Msg, useMsg } from "../Msg/Msg";
 import { P } from "../Typography";
 
-export const ActionSteps = ({ name, rules, control, sx = {} }) => {
+const messages = defineMessages({
+  "action-steps.label.placeholder": {
+    id: "action-steps.label.placeholder",
+    defaultMessage: "Label",
+  },
+  "action-steps.due-date.label": {
+    id: "action-steps.due-date.label",
+    defaultMessage: "Due date",
+  },
+  "action-steps.add-button": {
+    id: "action-steps.add-button",
+    defaultMessage: "Add action",
+  },
+});
+
+export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
   const methods = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control: control || methods?.control,
     name,
     rules,
   });
-
+  const msg = useMsg();
+  // <Box component={"ol"}>
   return (
-    // <Box component={"ol"}>
     <Box sx={{ ...sx }}>
       {fields.map((field, i) => (
         <Box
@@ -30,13 +47,15 @@ export const ActionSteps = ({ name, rules, control, sx = {} }) => {
           <Input
             control={control}
             name={`${name}.${i}.label`}
-            placeholder={"Label"}
+            placeholder={msg("action-steps.label.placeholder")}
             rules={{ required: true }}
             size="small"
             autoFocus
             sx={{ mx: 1, minWidth: { lg: 320 } }}
           />
-          <P sx={{ ml: 4, mr: 2 }}>Due date</P>
+          <P sx={{ ml: 4, mr: 2 }}>
+            <Msg id="action-steps.due-date.label" />
+          </P>
           <DatePicker
             control={control}
             name={`${name}.${i}.date`}
@@ -64,8 +83,14 @@ export const ActionSteps = ({ name, rules, control, sx = {} }) => {
         }
         startIcon={<Icon name="Add" />}
       >
-        Add action
+        <Msg id="action-steps.add-button" />
       </Button>
     </Box>
   );
 };
+
+export const ActionSteps = (props) => (
+  <MsgProvider messages={messages}>
+    <ActionStepsInner {...props} />
+  </MsgProvider>
+);

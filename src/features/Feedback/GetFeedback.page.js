@@ -1,9 +1,12 @@
 import { Box } from "@mui/material";
 import { useCallback, useState } from "react";
-import { TextHeader } from "../../components/Header";
+import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
+import { MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { StyledTab, StyledTabs, TabPanel } from "../Settings/Settings.page";
 import { GetFeedbackForm } from "./GetFeedbackForm";
+import { messages } from "./messages";
 import { Results } from "./Results";
 import { ShareFeedbackModal } from "./ShareFeedbackModal";
 
@@ -12,7 +15,8 @@ const TABS = {
   results: "results",
 };
 
-export function GetFeedbackPage() {
+function GetFeedbackPageInner() {
+  const msg = useMsg();
   const [tab, setTab] = useState(TABS.form);
   const handleChange = (event, newValue) => {
     setTab(newValue);
@@ -23,16 +27,16 @@ export function GetFeedbackPage() {
 
   return (
     <Layout>
-      <TextHeader text={"Feedback form"} sx={{}} />
+      <Header text={msg("feedback.heading")} />
       <Box sx={{ width: "100%" }}>
         <StyledTabs value={tab} onChange={handleChange}>
           <StyledTab
-            label={"Form"}
+            label={msg("feedback.tabs.form.label")}
             value={TABS.form}
             // {...a11yProps(TABS.form)}
           />
           <StyledTab
-            label={"Results"}
+            label={msg("feedback.tabs.results.label")}
             value={TABS.results}
             // {...a11yProps(TABS.results)}
           />
@@ -51,5 +55,13 @@ export function GetFeedbackPage() {
         link="http://topleader.io/juRcHHx7r8QTPYP"
       />
     </Layout>
+  );
+}
+
+export function GetFeedbackPage() {
+  return (
+    <MsgProvider messages={messages}>
+      <GetFeedbackPageInner />
+    </MsgProvider>
   );
 }

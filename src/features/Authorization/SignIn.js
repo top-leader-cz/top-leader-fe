@@ -7,8 +7,10 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { Msg, MsgProvider } from "../../components/Msg";
 // import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./";
+import { messages } from "./messages";
 
 export function SignInPage() {
   // const navigate = useNavigate();
@@ -43,7 +45,7 @@ export function SignInPage() {
   };
 
   return (
-    <>
+    <MsgProvider messages={messages}>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
           <Box
@@ -71,13 +73,13 @@ export function SignInPage() {
               {/* <LockOutlinedIcon /> */}
             </Avatar>
             <Typography variant="h1" mt={3}>
-              Welcome to TopLeader
+              <Msg id="auth.unauthorized.title" />
             </Typography>
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
               Please enter your details
             </Typography> */}
             <Typography variant="body1" mt={1} mb={4}>
-              Please enter your details
+              <Msg id="auth.unauthorized.perex" />
             </Typography>
 
             <Box
@@ -91,20 +93,22 @@ export function SignInPage() {
                 required
                 fullWidth
                 id="email"
-                label="Email"
+                label={<Msg id="auth.login.email.label" />}
                 name="email"
                 autoComplete="email"
                 autoFocus
+                defaultValue={"test@topleader.io"}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label={<Msg id="auth.login.password.label" />}
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                defaultValue={"Test123"}
               />
 
               {/* <FormControlLabel
@@ -120,7 +124,7 @@ export function SignInPage() {
                   // justifyContent: "flex-end"
                 }}
               >
-                Forgot password
+                <Msg id="auth.login.forgot" />
               </Button>
               {/* <Link href="#" variant="body2">
                 Forgot password
@@ -132,7 +136,7 @@ export function SignInPage() {
                 sx={{ mt: 3, mb: 3 }}
                 // href={routes.dashboard}
               >
-                Log In
+                <Msg id="auth.login.login" />
               </Button>
               <Divider />
               <Button
@@ -148,7 +152,7 @@ export function SignInPage() {
                   />
                 }
               >
-                Sign in with Google
+                <Msg id="auth.login.google" />
               </Button>
               <Button
                 type="button"
@@ -163,7 +167,7 @@ export function SignInPage() {
                   />
                 }
               >
-                Sign in with Microsoft
+                <Msg id="auth.login.microsoft" />
               </Button>
               {/* <Grid container>
                 <Grid item xs>
@@ -199,6 +203,6 @@ export function SignInPage() {
           }}
         />
       </Grid>
-    </>
+    </MsgProvider>
   );
 }

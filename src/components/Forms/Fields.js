@@ -17,7 +17,9 @@ import {
 } from "@mui/x-date-pickers";
 import React, { useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { defineMessages } from "react-intl";
 import { Icon } from "../Icon";
+import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
 
 // import { DateRangePicker } from "@mui/lab";
@@ -387,6 +389,7 @@ export const AutocompleteSelect = ({
   multiple,
   disableCloseOnSelect,
   autoComplete,
+  onChange,
   sx = {},
 }) => {
   const from = useMemo(
@@ -434,6 +437,7 @@ export const AutocompleteSelect = ({
               other,
             });
             const value = from(data);
+            onChange?.(value);
             field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
           }}
           renderInput={(params) => (
@@ -612,7 +616,7 @@ export const B = styled("b")(({ theme }) => ({
   fontWeight: 500,
 }));
 
-export const FileUpload = ({ name, src }) => {
+const FileUploadInner = ({ name, src, secondaryText }) => {
   return (
     <>
       <Avatar variant="circular" src={src} sx={{ width: 80, height: 80 }} />
@@ -652,13 +656,25 @@ export const FileUpload = ({ name, src }) => {
           </Avatar>
         </Avatar>
         <P gutterBottom sx={{ mt: 1 }}>
-          <B>Click to upload </B>
-          <span style={{ display: "none", color: "transparent" }}>
-            or drag and drop
-          </span>
+          <B>
+            <Msg id="file-upload.primary" />
+          </B>
         </P>
-        <P>SVG, PNG, JPG or GIF (max. 800 x 400px)</P>
+        <P>{secondaryText}</P>
       </Button>
     </>
   );
 };
+
+const messages = defineMessages({
+  "file-upload.primary": {
+    id: "file-upload.primary",
+    defaultMessage: "Click to upload",
+  }, // TODO: or drag and drop
+});
+
+export const FileUpload = (props) => (
+  <MsgProvider messages={messages}>
+    <FileUploadInner {...props} />
+  </MsgProvider>
+);

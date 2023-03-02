@@ -14,6 +14,8 @@ import {
   FileUpload,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
+import { Msg } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { FormRow } from "./FormRow";
@@ -63,6 +65,7 @@ const COACH = {
 };
 
 export const ProfileSettings = () => {
+  const msg = useMsg();
   const form = useForm({
     // mode: "onSubmit",
     defaultValues: { ...COACH },
@@ -77,9 +80,9 @@ export const ProfileSettings = () => {
     useMemo(
       () => (
         <ScrollableRightMenu
-          heading={"Your coach profile preview"}
+          heading={msg("settings.profile.aside.title")}
           buttonProps={{
-            children: "Save",
+            children: msg("settings.profile.aside.save"),
             type: "submit",
             onClick: (e) => {
               console.log("Save click");
@@ -123,10 +126,17 @@ export const ProfileSettings = () => {
 
   return (
     <FormProvider {...form}>
-      <H2 gutterBottom>Personal Info</H2>
-      <P sx={{ mb: -1 }}>Update your info here</P>
+      <H2 gutterBottom>
+        <Msg id="settings.profile.heading" />
+      </H2>
+      <P sx={{ mb: -1 }}>
+        <Msg id="settings.profile.perex" />
+      </P>
 
-      <FormRow label="Name" name={FIELDS.lastName}>
+      <FormRow
+        label={msg("settings.profile.field.name")}
+        name={FIELDS.lastName}
+      >
         <BareInputField
           name={FIELDS.firstName}
           rules={{ required: true, minLength: 2 }}
@@ -139,7 +149,7 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Email" name={FIELDS.email}>
+      <FormRow label={msg("settings.profile.field.email")} name={FIELDS.email}>
         <BareInputField
           name={FIELDS.email}
           autoComplete="email"
@@ -147,11 +157,15 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Photo">
-        <FileUpload name={FIELDS.imageSrc} src={COACH.imageSrc} />
+      <FormRow label={msg("settings.profile.field.photo")}>
+        <FileUpload
+          name={FIELDS.imageSrc}
+          src={COACH.imageSrc}
+          secondaryText={msg("settings.profile.field.photo.limit")}
+        />
       </FormRow>
 
-      <FormRow label="Bio" name={FIELDS.bio}>
+      <FormRow label={msg("settings.profile.field.bio")} name={FIELDS.bio}>
         <BareInputField
           name={FIELDS.bio}
           rules={{ required: true }}
@@ -160,7 +174,10 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Timezone" name={FIELDS.timezone}>
+      <FormRow
+        label={msg("settings.profile.field.timezone")}
+        name={FIELDS.timezone}
+      >
         <AutocompleteSelect
           sx={WHITE_BG}
           name={FIELDS.timezone}
@@ -169,7 +186,10 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Languages" name={FIELDS.languages}>
+      <FormRow
+        label={msg("settings.profile.field.languages")}
+        name={FIELDS.languages}
+      >
         <AutocompleteSelect
           multiple
           disableCloseOnSelect
@@ -181,7 +201,10 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Fields" name={FIELDS.fields}>
+      <FormRow
+        label={msg("settings.profile.field.fields")}
+        name={FIELDS.fields}
+      >
         <AutocompleteSelect
           multiple
           disableCloseOnSelect
@@ -192,11 +215,17 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
-      <FormRow label="Certificates" name={FIELDS.certificates}>
+      <FormRow
+        label={msg("settings.profile.field.certificates")}
+        name={FIELDS.certificates}
+      >
         <BareInputField name={FIELDS.certificates} rules={{}} />
       </FormRow>
 
-      <FormRow label="Experience (years)" name={FIELDS.experience}>
+      <FormRow
+        label={msg("settings.profile.field.experience")}
+        name={FIELDS.experience}
+      >
         <BareInputField name={FIELDS.experience} rules={{}} />
       </FormRow>
     </FormProvider>

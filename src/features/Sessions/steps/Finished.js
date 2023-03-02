@@ -3,6 +3,7 @@ import { Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
 import { useForm } from "react-hook-form";
 import { DatePicker, TimePicker } from "../../../components/Forms";
+import { Msg } from "../../../components/Msg";
 import { H1, P } from "../../../components/Typography";
 import { routes } from "../../../routes";
 import { ControlsContainer } from "./Controls";
@@ -37,9 +38,11 @@ export const Finished = () => {
           </Avatar>
         </Box>
         <H1 sx={{ mt: 2 }} gutterBottom>
-          Congratulations, you’ve completed your session!
+          <Msg id="sessions.steps.finished.title" />
         </H1>
-        <P>Would you like to book the next one?</P>
+        <P>
+          <Msg id="sessions.steps.finished.perex" />
+        </P>
         <Box
           sx={{
             display: "flex",
@@ -51,15 +54,17 @@ export const Finished = () => {
           }}
         >
           <DatePicker {...{ control, name: "date", size: "small" }} />
-          <P>at</P>
+          <P>
+            <Msg id="sessions.steps.finished.datetime.separator" />
+          </P>
           <TimePicker {...{ control, name: "time", size: "small" }} />
         </Box>
         <ControlsContainer sx={{ mt: 10 }}>
           <Button href={routes.sessions} variant="outlined">
-            Skip for now
+            <Msg id="sessions.steps.finished.button.skip" />
           </Button>
           <Button href={routes.sessions} variant="contained">
-            Schedule the session
+            <Msg id="sessions.steps.finished.button.schedule" />
           </Button>
         </ControlsContainer>
       </CardContent>
