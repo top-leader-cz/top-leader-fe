@@ -5,12 +5,12 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 // Initialize Firebase
 var firebaseConfig = {
-  apiKey: "AIzaSyC5oHKDaw5WapA8wQq7gvwbkXDQZ8mfmXg",
-  authDomain: "hasura-learn-tutorial.firebaseapp.com",
-  projectId: "hasura-learn-tutorial",
-  storageBucket: "hasura-learn-tutorial.appspot.com",
-  messagingSenderId: "22235409920",
-  appId: "1:22235409920:web:6a5bcc1eb5d28a5767f2e5",
+  apiKey: "AIzaSyC2VakNs4SRvIW3DGaP7AlIfGgPgXLg1LA",
+  authDomain: "topleader-fb.firebaseapp.com",
+  projectId: "topleader-fb",
+  storageBucket: "topleader-fb.appspot.com",
+  messagingSenderId: "801167932186",
+  appId: "1:801167932186:web:ec327d26065a0d9b324aa3",
 };
 
 const app = initializeApp(firebaseConfig);
