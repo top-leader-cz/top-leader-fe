@@ -1,5 +1,8 @@
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
+import { defineMessages } from "react-intl";
+import { MsgProvider } from "../../../components/Msg";
+import { useMsg } from "../../../components/Msg/Msg";
 
 export const ControlsContainer = ({ sx, ...props }) => {
   return (
@@ -21,13 +24,14 @@ export const Controls2 = ({ ...props }) => {
   return <ControlsContainer></ControlsContainer>;
 };
 
-export const Controls = ({
+const ControlsInner = ({
   handleNext,
   nextProps,
   handleBack,
   data,
   sx = {},
 }) => {
+  const msg = useMsg();
   console.log("[Controls.rndr]", data);
   return (
     <ControlsContainer>
@@ -36,7 +40,7 @@ export const Controls = ({
         endIcon={<ArrowBack />}
         onClick={() => handleBack(data)}
       >
-        Back
+        {msg("controls.back")}
       </Button>
 
       <Button
@@ -44,9 +48,20 @@ export const Controls = ({
         variant="contained"
         endIcon={<ArrowForward />}
         onClick={() => handleNext(data)}
-        children="Next"
+        children={msg("controls.next")}
         {...nextProps}
       />
     </ControlsContainer>
   );
 };
+
+const messages = defineMessages({
+  "controls.back": { id: "controls.back", defaultMessage: "Back" },
+  "controls.next": { id: "controls.next", defaultMessage: "Next" },
+});
+
+export const Controls = (props) => (
+  <MsgProvider messages={messages}>
+    <ControlsInner {...props} />
+  </MsgProvider>
+);

@@ -3,63 +3,19 @@ import { Box, Button, Divider } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
+import { MsgProvider } from "../../components/Msg";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
+import { messages } from "./messages";
 import { SessionStepCard } from "./SessionStepCard";
 import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
 import { VerticalStepper } from "./VerticalStepper";
-
-const STEPS = [
-  {
-    StepComponent: AreaStep,
-    label: "Choose area",
-    caption: "Area for development",
-    // caption: "InsertChart",
-    iconName: "InsertChart",
-    heading: "Set area for your development",
-    perex: "",
-  },
-  {
-    StepComponent: GoalStep,
-    label: "Set long-term goal",
-    caption: "Goals give you focus",
-    // caption: "Adjust",
-    iconName: "Adjust",
-    heading: "Set the long term goal",
-    perex:
-      "Goals give you focus. Goals help you measure progress and stay motivated.",
-    focusedList: ["Focus on building relationship", "TODO", "TODO", "TODO"],
-  },
-  {
-    StepComponent: MotivationStep,
-    label: "Motivation",
-    caption: "See yourself to excel",
-    // caption: "RocketLaunch",
-    iconName: "RocketLaunch",
-    heading: "Motivation/visualization",
-    perex: "Imagine the situation where you excel in this area.",
-    focusedList: [
-      "TODO",
-      "How do you feel when you excel in it?",
-      "How can your strenghts help you to achieve excellence in that?",
-    ],
-  },
-  {
-    StepComponent: ActionStepsStep,
-    label: "Set action steps",
-    caption: "Be specific",
-    // caption: "Explore",
-    iconName: "Explore",
-    heading: "Set your action steps",
-    perex:
-      "Create SMART goals (Specific, Measurable, Attainable, Realistic, Time-bound) - The more specific you can be with your action step, the higher the chance you’ll complete it.",
-  },
-];
 
 export const StepperRightMenu = ({
   heading,
@@ -100,7 +56,7 @@ export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   return {
     steps,
     activeStep,
-    activeStepIndex: Math.min(activeStepIndex, STEPS.length - 1),
+    activeStepIndex: Math.min(activeStepIndex, steps.length - 1),
     setActiveStepIndex,
     isFirst: activeStepIndex === 0,
     isLast: activeStepIndex === steps.length - 1,
@@ -123,7 +79,61 @@ const createSessionEntry = ({ area, goal, motivation, steps }) => {
   };
 };
 
-export function NewSessionPage() {
+function NewSessionPageInner() {
+  const msg = useMsg();
+
+  const STEPS = [
+    {
+      StepComponent: AreaStep,
+      label: msg("sessions.new.steps.area.label"),
+      caption: msg("sessions.new.steps.area.caption"),
+      // caption: "InsertChart",
+      iconName: "InsertChart",
+      heading: msg("sessions.new.steps.area.heading"),
+      perex: msg("sessions.new.steps.area.perex"),
+    },
+    {
+      StepComponent: GoalStep,
+      label: msg("sessions.new.steps.goal.label"),
+      caption: msg("sessions.new.steps.goal.caption"),
+      // caption: "Adjust",
+      iconName: "Adjust",
+      heading: msg("sessions.new.steps.goal.heading"),
+      perex: msg("sessions.new.steps.goal.perex"),
+      focusedList: [
+        msg("sessions.new.steps.goal.focusedlist.1"),
+        "TODO",
+        "TODO",
+        "TODO",
+      ],
+    },
+    {
+      StepComponent: MotivationStep,
+      label: msg("sessions.new.steps.motivation.label"),
+      caption: msg("sessions.new.steps.motivation.caption"),
+      // caption: "RocketLaunch",
+      iconName: "RocketLaunch",
+      heading: msg("sessions.new.steps.motivation.heading"),
+      perex: msg("sessions.new.steps.motivation.perex"),
+      focusedList: [
+        "TODO",
+        "TODO",
+        "TODO",
+        // "How do you feel when you excel in it?",
+        // "How can your strenghts help you to achieve excellence in that?",
+      ],
+    },
+    {
+      StepComponent: ActionStepsStep,
+      label: msg("sessions.new.steps.actionsteps.label"),
+      caption: msg("sessions.new.steps.actionsteps.caption"),
+      // caption: "Explore",
+      iconName: "Explore",
+      heading: msg("sessions.new.steps.actionsteps.heading"),
+      perex: msg("sessions.new.steps.actionsteps.perex"),
+    },
+  ];
+
   const history = useHistoryEntries({ storageKey: "sessions_history" });
   const navigate = useNavigate();
   const [finished, setFinished] = useState(false);
@@ -150,12 +160,17 @@ export function NewSessionPage() {
     <Layout
       rightMenuContent={
         <StepperRightMenu
-          heading={"My session 22/06/2022"}
+          heading={
+            <>
+              <Msg id="sessions.new.aside.title" />
+              &nbsp;22/06/2022
+            </>
+          }
           activeStepIndex={activeStepIndex}
           onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={STEPS}
           buttonProps={{
-            children: "End session",
+            children: <Msg id="sessions.new.aside.end-button" />,
             onClick: () => navigate(routes.sessions),
           }}
         />
@@ -173,7 +188,9 @@ export function NewSessionPage() {
             href={routes.sessions}
             startIcon={<ArrowBack />}
           >
-            <H2>Back to the sessions</H2>
+            <H2>
+              <Msg id="sessions.new.header" />
+            </H2>
           </Button>
         </Box>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
@@ -192,5 +209,13 @@ export function NewSessionPage() {
         />
       )}
     </Layout>
+  );
+}
+
+export function NewSessionPage() {
+  return (
+    <MsgProvider messages={messages}>
+      <NewSessionPageInner />
+    </MsgProvider>
   );
 }

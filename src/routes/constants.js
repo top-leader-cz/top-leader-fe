@@ -13,4 +13,5 @@ export const routes = {
   getFeedback: "/get-feedback",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
+  dev: "/dev",
 };

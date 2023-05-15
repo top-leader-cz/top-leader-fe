@@ -116,7 +116,7 @@ export const Layout = ({
     () => rightMenuContentProp || stack[stack.length - 1]?.element,
     [rightMenuContentProp, stack]
   );
-  console.log("[Layout.rndr]", { stack, rightMenuContent });
+  // console.log("[Layout.rndr]", { stack, rightMenuContent });
 
   return (
     <Box
@@ -157,7 +157,7 @@ export const Layout = ({
 
 const drawerWidth = 240;
 
-export const LayoutExample = () => {
+const LayoutExample = () => {
   return (
     <Box
       sx={{

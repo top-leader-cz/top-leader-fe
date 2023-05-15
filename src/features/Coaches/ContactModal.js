@@ -10,10 +10,12 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 
 // TODO: Form reset after close/submit
 export const ContactModal = ({ onClose, coach, open = !!coach }) => {
+  const msg = useMsg();
   const { id, name, role, experience, languages, description, fields, imgSrc } =
     coach ?? {};
 
@@ -62,15 +64,17 @@ export const ContactModal = ({ onClose, coach, open = !!coach }) => {
                 <Icon name="Close" sx={{ color: "#667085" }} />
               </IconButton>
             </Box>
-            <H2 id="modal-modal-title">Contact {name}</H2>
+            <H2 id="modal-modal-title">
+              <Msg id="coaches.contact.title" values={{ name }} />
+            </H2>
             <P id="modal-modal-description">
-              Let the coach know what interests you the most.
+              <Msg id="coaches.contact.perex" />
             </P>
             {/* <OutlinedField label="Subject" /> */}
             <Input
               name="subject"
               rules={{ required: true, minLength: 3 }}
-              label="Subject"
+              label={msg("coaches.contact.subject.label")}
               // placeholder={"Type your message"}
               autoFocus
               size="small"
@@ -80,8 +84,8 @@ export const ContactModal = ({ onClose, coach, open = !!coach }) => {
             <Input
               name="message"
               rules={{ required: true }}
-              label={"Message"}
-              placeholder={"Type your message"}
+              label={msg("coaches.contact.message.label")}
+              placeholder={msg("coaches.contact.message.placeholder")}
               size="small"
               hiddenLabel
               multiline
@@ -92,10 +96,10 @@ export const ContactModal = ({ onClose, coach, open = !!coach }) => {
             <Divider flexItem />
             <Box display="flex" flexDirection="row" gap={3}>
               <Button fullWidth variant="outlined" onClick={() => onClose()}>
-                Cancel
+                <Msg id="coaches.contact.button.cancel" />
               </Button>
               <Button fullWidth variant="contained" type="submit">
-                Send
+                <Msg id="coaches.contact.button.send" />
               </Button>
             </Box>
           </FormProvider>

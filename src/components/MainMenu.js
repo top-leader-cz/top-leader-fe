@@ -21,6 +21,39 @@ import * as React from "react";
 import { useMatch } from "react-router-dom";
 import { useAuth } from "../features/Authorization";
 import { routes } from "../routes";
+import { Msg, MsgProvider } from "./Msg";
+import { defineMessages } from "react-intl";
+
+const messages = defineMessages({
+  "main-menu.items.dashboard": {
+    id: "main-menu.items.dashboard",
+    defaultMessage: "Dashboard",
+  },
+  "main-menu.items.sessions": {
+    id: "main-menu.items.sessions",
+    defaultMessage: "Sessions",
+  },
+  "main-menu.items.coaches": {
+    id: "main-menu.items.coaches",
+    defaultMessage: "Coaches",
+  },
+  "main-menu.items.getFeedback": {
+    id: "main-menu.items.getFeedback",
+    defaultMessage: "Get feedback",
+  },
+  "main-menu.items.settings": {
+    id: "main-menu.items.settings",
+    defaultMessage: "Settings",
+  },
+  "main-menu.items.help": {
+    id: "main-menu.items.help",
+    defaultMessage: "Help",
+  },
+  "main-menu.items.logout": {
+    id: "main-menu.items.logout",
+    defaultMessage: "Logout",
+  },
+});
 
 const LogoImg = () => {
   return (
@@ -60,61 +93,66 @@ export const MainMenu = () => {
   const auth = useAuth();
 
   return (
-    <Paper
-      square
-      sx={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        flexWrap: "nowrap",
-        justifyContent: "space-between",
-        p: 2,
-      }}
-    >
-      <Box>
-        <LogoImg />
-        <List component="nav">
+    <MsgProvider messages={messages}>
+      <Paper
+        square
+        sx={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          flexWrap: "nowrap",
+          justifyContent: "space-between",
+          p: 2,
+        }}
+      >
+        <Box>
+          <LogoImg />
+          <List component="nav">
+            <ListItemLink
+              text={<Msg id="main-menu.items.dashboard" />}
+              icon={<HomeOutlined />}
+              to={routes.dashboard}
+            />
+            <ListItemLink
+              text={<Msg id="main-menu.items.sessions" />}
+              icon={<DescriptionOutlined />}
+              to={routes.sessions}
+            />
+            <ListItemLink
+              text={<Msg id="main-menu.items.coaches" />}
+              icon={<PersonOutlined />}
+              to={routes.coaches}
+            />
+            <ListItemLink
+              text={<Msg id="main-menu.items.getFeedback" />}
+              icon={<ForumOutlined />}
+              to={routes.getFeedback}
+            />
+          </List>
+        </Box>
+        <Box sx={{ mb: 2 }}>
           <ListItemLink
-            text="Dashboard"
-            icon={<HomeOutlined />}
-            to={routes.dashboard}
+            text={<Msg id="main-menu.items.settings" />}
+            icon={<SettingsOutlined />}
+            to={routes.settings}
           />
           <ListItemLink
-            text="Sessions"
-            icon={<DescriptionOutlined />}
-            to={routes.sessions}
+            text={<Msg id="main-menu.items.help" />}
+            icon={<HelpOutlined />}
           />
+          <Divider sx={{ my: 2 }} />
           <ListItemLink
-            text="Coaches"
-            icon={<PersonOutlined />}
-            to={routes.coaches}
+            text={<Msg id="main-menu.items.logout" />}
+            icon={<LogoutOutlined />}
+            onClick={() => {
+              auth.signout();
+              // auth.signout(() => navigate("/"));
+            }}
+            // to={routes.signIn}
           />
-          <ListItemLink
-            text="Get feedback"
-            icon={<ForumOutlined />}
-            to={routes.getFeedback}
-          />
-        </List>
-      </Box>
-      <Box sx={{ mb: 2 }}>
-        <ListItemLink
-          text="Settings"
-          icon={<SettingsOutlined />}
-          to={routes.settings}
-        />
-        <ListItemLink text="Help" icon={<HelpOutlined />} />
-        <Divider sx={{ my: 2 }} />
-        <ListItemLink
-          text="Logout"
-          icon={<LogoutOutlined />}
-          onClick={() => {
-            auth.signout();
-            // auth.signout(() => navigate("/"));
-          }}
-          // to={routes.signIn}
-        />
-      </Box>
-    </Paper>
+        </Box>
+      </Paper>
+    </MsgProvider>
   );
 };
 // <Avatar variant="rounded" sx={{ bgcolor: "primary.main" }} />

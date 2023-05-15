@@ -1,12 +1,15 @@
-import { Box, Card, CardActionArea, CardContent, Divider } from "@mui/material";
+import { Box, Card, CardActionArea, CardContent } from "@mui/material";
 import { generatePath, useNavigate } from "react-router-dom";
+import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
 import { Layout } from "../../components/Layout";
+import { Msg, MsgProvider } from "../../components/Msg";
 import { Todos } from "../../components/Todos";
-import { H1, P } from "../../components/Typography";
+import { P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { AREAS } from "./steps/AreaStep";
+import { AREAS_EN } from "../../translations/areas";
+import { messages } from "./messages";
 
 const ActionStepsTodo = ({ steps = [], label }) => {
   // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
@@ -47,9 +50,12 @@ export const SessionCard = ({
           <Box>
             <P>{type}</P>
             <P sx={{ my: 3 }}>
-              <b>{AREAS[area]?.label || area}</b>
+              <b>{AREAS_EN[area]?.label || area}</b>
             </P>
-            <ActionStepsTodo steps={steps} label="Goals" />
+            <ActionStepsTodo
+              steps={steps}
+              label={<Msg id="sessions.card.goals.title" />}
+            />
           </Box>
         </CardContent>
       </CardActionArea>
@@ -66,34 +72,26 @@ function Sessions() {
   });
 
   return (
-    <Layout
-      rightMenuContent={
-        <HistoryRightMenu
-          heading={"My sessions"}
-          history={history}
-          onRemove={history.remove}
-          buttonProps={{
-            children: "Start new session",
-            onClick: () => navigate(routes.newSession),
-          }}
-        />
-      }
-    >
-      <Box mt={4} mb={3}>
-        <Box
-          display="flex"
-          flexWrap="nowrap"
-          alignItems="center"
-          flexDirection="row"
-        >
-          <H1>Sessions</H1>
-        </Box>
-        <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
-      </Box>
-      {history.all.map((session) => (
-        <SessionCard session={session} />
-      ))}
-    </Layout>
+    <MsgProvider messages={messages}>
+      <Layout
+        rightMenuContent={
+          <HistoryRightMenu
+            heading={<Msg id="sessions.aside.title" />}
+            history={history}
+            onRemove={history.remove}
+            buttonProps={{
+              children: <Msg id="sessions.aside.start-button" />,
+              onClick: () => navigate(routes.newSession),
+            }}
+          />
+        }
+      >
+        <Header text={<Msg id="sessions.heading" />} />
+        {history.all.map((session) => (
+          <SessionCard session={session} />
+        ))}
+      </Layout>
+    </MsgProvider>
   );
 }
 

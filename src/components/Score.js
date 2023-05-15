@@ -1,11 +1,32 @@
 import { Box, Button } from "@mui/material";
+import { defineMessages } from "react-intl";
+import { Msg, MsgProvider } from "./Msg";
 import { P } from "./Typography";
 
-export const Score = ({
+const messages = defineMessages({
+  "score.min": {
+    id: "score.min",
+    defaultMessage: "Not me at all",
+  },
+  "score.max": {
+    id: "score.max",
+    defaultMessage: "Totally me",
+  },
+});
+
+const ScoreInner = ({
   value,
   onChange,
-  left = <P>Not me at all</P>,
-  right = <P>Totally me</P>,
+  left = (
+    <P>
+      <Msg id="score.min" />
+    </P>
+  ),
+  right = (
+    <P>
+      <Msg id="score.max" />
+    </P>
+  ),
   sx = {},
 }) => {
   return (
@@ -35,3 +56,9 @@ export const Score = ({
     </Box>
   );
 };
+
+export const Score = (props) => (
+  <MsgProvider messages={messages}>
+    <ScoreInner {...props} />
+  </MsgProvider>
+);

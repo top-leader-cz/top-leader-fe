@@ -17,6 +17,7 @@ import {
 } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { Icon } from "../../components/Icon";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
@@ -29,6 +30,7 @@ export const INITIAL_FILTER = {
 };
 
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
+  const msg = useMsg();
   const methods = useForm({
     // mode: "all",
     defaultValues: filter,
@@ -66,16 +68,20 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
           <Box display="flex" flexDirection="row" gap={3}>
             <AutocompleteSelect
               name="language"
-              label="Language"
+              label={msg("coaches.filter.language.label")}
               options={LANGUAGE_OPTIONS}
               renderOption={renderLanguageOption}
             />
             <AutocompleteSelect
               name="field"
-              label="Field"
+              label={msg("coaches.filter.field.label")}
               options={FIELD_OPTIONS}
             />
-            <SliderField name="experience" label="Experience" range={[1, 10]} />
+            <SliderField
+              name="experience"
+              label={msg("coaches.filter.experience.label")}
+              range={[1, 10]}
+            />
 
             {/* <OutlinedField label="Test" /> */}
           </Box>
@@ -87,7 +93,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
               startIcon={<Close />}
               sx={{ p: 1 }}
             >
-              Remove all filters
+              <Msg id="coaches.filter.clear-button" />
             </Button>
           </ControlsContainer>
         </CardContent>
@@ -97,7 +103,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
           disabled
           sx={{ width: 360, "> .MuiInputBase-root": { bgcolor: "white" } }}
           label=""
-          placeholder={"Search"}
+          placeholder={msg("coaches.filter.search.placeholder")}
           size="small"
           InputProps={{
             endAdornment: (

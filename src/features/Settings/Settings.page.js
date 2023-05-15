@@ -1,13 +1,16 @@
 import { Box, styled, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
-import { TextHeader } from "../../components/Header";
+import { useIntl } from "react-intl";
+import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
+import { MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { AvailabilitySettings } from "./AvailabilitySettings";
 import { GeneralSettings } from "./GeneralSettings";
+import { messages } from "./messages";
 import { ProfileSettings } from "./ProfileSettings";
 
 export function TabPanel({ children, value, tabName }) {
-  console.log("TabPanel", { value, tabName });
   return (
     <Box
       role="tabpanel"
@@ -65,8 +68,9 @@ const TABS = {
   AVAILABILITY: "AVAILABILITY",
 };
 
-export function SettingsPage() {
+function SettingsPageInner() {
   // const [tab, setTab] = useState(TABS.AVAILABILITY);
+  const msg = useMsg();
   const [tab, setTab] = useState(TABS.PROFILE);
 
   const handleChange = (event, newValue) => {
@@ -77,7 +81,7 @@ export function SettingsPage() {
 
   return (
     <Layout>
-      <TextHeader text={"Settings"} noDivider />
+      <Header text={msg("settings.heading")} noDivider />
       <Box sx={{ width: "100%" }}>
         <StyledTabs
           value={tab}
@@ -85,17 +89,17 @@ export function SettingsPage() {
           aria-label="basic tabs example"
         >
           <StyledTab
-            label={"Profile"}
+            label={msg("settings.tabs.profile.label")}
             value={TABS.PROFILE}
             {...a11yProps(TABS.PROFILE)}
           />
           <StyledTab
-            label={"General"}
+            label={msg("settings.tabs.general.label")}
             value={TABS.GENERAL}
             {...a11yProps(TABS.GENERAL)}
           />
           <StyledTab
-            label={"Availability"}
+            label={msg("settings.tabs.availability.label")}
             value={TABS.AVAILABILITY}
             {...a11yProps(TABS.AVAILABILITY)}
           />
@@ -112,5 +116,13 @@ export function SettingsPage() {
         </TabPanel>
       </Box>
     </Layout>
+  );
+}
+
+export function SettingsPage() {
+  return (
+    <MsgProvider messages={messages}>
+      <SettingsPageInner />
+    </MsgProvider>
   );
 }
