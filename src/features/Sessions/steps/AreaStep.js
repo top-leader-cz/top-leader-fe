@@ -4,12 +4,13 @@ import { useState } from "react";
 import { Msg } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 import { SelectableChip } from "../../../components/SelectableChip";
-import { AREAS_EN } from "../../../translations/areas";
 import { SessionStepCard } from "../SessionStepCard";
+import { useAreasDict } from "../areas";
 
 const useNewSession = () => {
+  const { areas } = useAreasDict();
   return {
-    areas: Object.entries(AREAS_EN).map(([key, value]) => ({
+    areas: Object.entries(areas).map(([key, value]) => ({
       key,
       label: value.label,
     })),

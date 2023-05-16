@@ -12,7 +12,7 @@ import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useSelection } from "../../hooks/useSelection";
 import { routes } from "../../routes";
 import { messages } from "./messages";
-import { useValuesDict } from "../../translations/values";
+import { useValuesDict } from "./values";
 
 const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
   const { values } = useValuesDict();

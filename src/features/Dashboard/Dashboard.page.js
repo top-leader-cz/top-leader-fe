@@ -19,11 +19,11 @@ import { H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
-import { useTalentsDict } from "../../translations/talents";
-import { useValuesDict } from "../../translations/values";
+import { useTalentsDict } from "../Strengths/talents";
 import { useAuth } from "../Authorization";
 import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
+import { useValuesDict } from "../Values/values";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
