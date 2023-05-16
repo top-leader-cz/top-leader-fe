@@ -11,7 +11,7 @@ import { H1, H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
 import { messages } from "./messages";
-import { useValuesDict } from "../../translations/values";
+import { useValuesDict } from "./values";
 
 export function MyValuesPage() {
   const history = useHistoryEntries({ storageKey: "values_history" });

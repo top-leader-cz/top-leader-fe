@@ -10,7 +10,7 @@ import { H1, H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
 import { messages } from "./messages";
-import { useTalentsDict } from "../../translations/talents";
+import { useTalentsDict } from "./talents";
 
 const AssessmentRightMenu = ({
   history,

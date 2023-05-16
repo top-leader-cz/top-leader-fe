@@ -8,8 +8,8 @@ import { Todos } from "../../components/Todos";
 import { P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { AREAS_EN } from "../../translations/areas";
 import { messages } from "./messages";
+import { useAreasDict } from "./areas";
 
 const ActionStepsTodo = ({ steps = [], label }) => {
   // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
@@ -37,6 +37,7 @@ export const SessionCard = ({
   } = {},
   sx = { mb: 3 },
 }) => {
+  const { areas } = useAreasDict();
   return (
     <Card sx={{ ...sx }} elevation={0}>
       <CardActionArea
@@ -50,7 +51,7 @@ export const SessionCard = ({
           <Box>
             <P>{type}</P>
             <P sx={{ my: 3 }}>
-              <b>{AREAS_EN[area]?.label || area}</b>
+              <b>{areas[area]?.label || area}</b>
             </P>
             <ActionStepsTodo
               steps={steps}

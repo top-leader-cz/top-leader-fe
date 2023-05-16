@@ -49,8 +49,8 @@ const config = {
   // TODO: EN
 };
 
-const getInputCsv = () => {
-  const csv = fs.readFileSync(config.INPUT_CSV_PATH, {
+const getInputCsv = (path = config.INPUT_CSV_PATH) => {
+  const csv = fs.readFileSync(path, {
     encoding: "utf8",
     flag: "r",
   });
@@ -123,7 +123,6 @@ const getBestMatchProps = (item) => {
 const getResults = ({ csvInput }) => {
   const exactMatched = addIndex(map)((source, index) => {
     const appKeys = vkMap[source.en];
-
     return {
       index,
       source: {
@@ -217,7 +216,7 @@ const expand = ({ keysPath }) =>
     chain((resultRow) =>
       pipe(
         pathOr(undefined, keysPath),
-        split("|"),
+        (keys) => (Array.isArray(keys) ? keys : split("|", keys)),
         map((key) => [key, resultRow])
       )(resultRow)
     )
@@ -227,6 +226,22 @@ const expand = ({ keysPath }) =>
 const pairsToKeys = map(prop(0));
 
 const pairsContainsKey = (key, pairs) => pairs.some((pair) => pair[0] === key);
+
+const createMapResultsOutputRow = (notFoundPairs) => (row) => ({
+  manual_keys: row.source.manual_keys || "",
+  ...row.source,
+  generated_keys: row.computed.keys?.join("|") ?? "",
+  best_match_performed: row.computed.bestMatch.performed ? "Performed" : "",
+  best_match_found: row.computed.bestMatch.found ? "Found" : "",
+  best_match_in_not_found: notFoundPairs // TODO? in getResults
+    .filter(([k, v]) => v === row.computed.bestMatch.matchedTranslation)
+    .map(([k]) => k)
+    .join("|"),
+  en_copy: row.source.en,
+  best_match_matchedTranslation: row.computed.bestMatch.matchedTranslation,
+  best_match_rating: row.computed.bestMatch.rating,
+  best_match_keys: row.computed.bestMatch.keys,
+});
 
 function run() {
   fs.rmSync(outputPath(), { force: true, recursive: true });
@@ -271,8 +286,9 @@ function run() {
     })
   );
 
-  const generatedPairs = expand({ keysPath: ["generated_keys"] })(csvInput);
-  const manualPairs = expand({ keysPath: ["manual_keys"] })(csvInput);
+  const intermediate = map(createMapResultsOutputRow([]), results);
+  const generatedPairs = expand({ keysPath: ["generated_keys"] })(intermediate);
+  const manualPairs = expand({ keysPath: ["manual_keys"] })(intermediate);
   const notFoundPairs = pipe(
     toPairs,
     filter(
@@ -312,21 +328,7 @@ function run() {
   writeCsv({
     name: "results",
     data: results,
-    mapRow: (row) => ({
-      manual_keys: row.source.manual_keys || "",
-      ...row.source,
-      generated_keys: row.computed.keys?.join("|") ?? "",
-      best_match_performed: row.computed.bestMatch.performed ? "Performed" : "",
-      best_match_found: row.computed.bestMatch.found ? "Found" : "",
-      best_match_in_not_found: notFoundPairs // TODO? in getResults
-        .filter(([k, v]) => v === row.computed.bestMatch.matchedTranslation)
-        .map(([k]) => k)
-        .join("|"),
-      en_copy: row.source.en,
-      best_match_matchedTranslation: row.computed.bestMatch.matchedTranslation,
-      best_match_rating: row.computed.bestMatch.rating,
-      best_match_keys: row.computed.bestMatch.keys,
-    }),
+    mapRow: createMapResultsOutputRow(notFoundPairs),
   });
   const withDefinedTsKeys = pipe(
     concat(generatedPairs),
