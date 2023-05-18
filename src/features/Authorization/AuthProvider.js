@@ -1,7 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { createContext, useCallback } from "react";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
+import {
+  useLocalStorage,
+  useSessionStorage,
+} from "../../hooks/useLocalStorage";
 
 // Initialize Firebase
 var firebaseConfig = {
@@ -19,7 +22,7 @@ const firebaseAuth = getAuth(app);
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useLocalStorage("user", null);
+  const [user, setUser] = useSessionStorage("user", null);
 
   const signin = ({ email, password }, callback = () => {}) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password)
