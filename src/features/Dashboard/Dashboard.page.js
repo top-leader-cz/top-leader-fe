@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -50,9 +50,38 @@ const sx = {
   height: "100%",
 };
 
+const useNote = () => {
+  const url = "/api/rest/note";
+  const [_note, _setNote] = useState("");
+  const { authFetch } = useAuth();
+
+  const getNote = useCallback(() => {
+    authFetch({ url }).then(({ response, json }) => {
+      // console.log(url, response.status, json);
+      _setNote(json?.note?.[0]?.content ?? "");
+    });
+  }, [authFetch, _setNote]);
+
+  useEffect(() => {
+    getNote();
+  }, []);
+
+  const setNote = useCallback(
+    ({ note }) => {
+      authFetch({ url, method: "POST", data: { content: note } }).then(() =>
+        getNote()
+      );
+    },
+    [authFetch, getNote]
+  );
+
+  return { note: _note, setNote };
+};
+
 const DashboardCardNotes = () => {
-  const [note, setNote] = useLocalStorage("dashboard_note", "");
+  // const [note, setNote] = useLocalStorage("dashboard_note", "");
   const msg = useMsg();
+  const { note, setNote } = useNote();
 
   return (
     <Card>
@@ -62,8 +91,10 @@ const DashboardCardNotes = () => {
           multiline
           minRows={18}
           placeholder={msg("dashboard.cards.notes.placeholder.empty")}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
+          defaultValue={note}
+          onBlur={(e) => setNote({ note: e.target.value })}
+          // value={note}
+          // onChange={(e) => setNote({ note: e.target.value })}
         />
       </CardContent>
     </Card>
