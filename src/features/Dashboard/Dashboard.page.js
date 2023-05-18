@@ -5,6 +5,7 @@ import {
   CardActionArea,
   CardContent,
   Chip,
+  Skeleton,
   TextField,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -53,12 +54,15 @@ const sx = {
 const useNote = () => {
   const url = "/api/rest/note";
   const [_note, _setNote] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { authFetch } = useAuth();
 
   const getNote = useCallback(() => {
+    setIsLoading(true);
     authFetch({ url }).then(({ response, json }) => {
       // console.log(url, response.status, json);
       _setNote(json?.note?.[0]?.content ?? "");
+      setIsLoading(false);
     });
   }, [authFetch, _setNote]);
 
@@ -68,31 +72,52 @@ const useNote = () => {
 
   const setNote = useCallback(
     ({ note }) => {
+      if (_note === note) return;
+      setIsLoading(true);
       authFetch({ url, method: "POST", data: { content: note } }).then(() =>
         getNote()
       );
     },
-    [authFetch, getNote]
+    [_note, authFetch, getNote]
   );
 
-  return { note: _note, setNote };
+  return { note: _note, isLoading, setNote };
+};
+
+const NotesLoader = () => {
+  console.log("NL rndr");
+  return (
+    <Box sx={{ position: "relative", height: 0, overflow: "visible" }}>
+      <Skeleton variant="text" sx={{ mb: 1 }} />
+      <Skeleton variant="text" sx={{ mb: 1 }} />
+      <Skeleton variant="text" sx={{ mb: 1 }} />
+    </Box>
+  );
 };
 
 const DashboardCardNotes = () => {
   // const [note, setNote] = useLocalStorage("dashboard_note", "");
   const msg = useMsg();
-  const { note, setNote } = useNote();
+  const { note, isLoading, setNote } = useNote();
 
   return (
     <Card>
       <CardContent sx={sx}>
         <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
+        {isLoading && <NotesLoader />}
         <TextField
           multiline
           minRows={18}
           placeholder={msg("dashboard.cards.notes.placeholder.empty")}
           defaultValue={note}
           onBlur={(e) => setNote({ note: e.target.value })}
+          sx={
+            !isLoading
+              ? undefined
+              : {
+                  visibility: "hidden",
+                }
+          }
           // value={note}
           // onChange={(e) => setNote({ note: e.target.value })}
         />
