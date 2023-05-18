@@ -80,6 +80,12 @@ export function AuthProvider({ children }) {
         // mode: "no-cors", // "cors" | "navigate" | "no-cors" | "same-origin";
         // referrer: "",
         ...(data ? { body: JSON.stringify(data) } : {}),
+      }).then(async (response) => {
+        if (!response.ok) {
+          console.log("TODO");
+        }
+        if (type === "json") return { response, json: await response.json() };
+        return { response };
       });
       // }).then((res) => res[type]());
       return promise;

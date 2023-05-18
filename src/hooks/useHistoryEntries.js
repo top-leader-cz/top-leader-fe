@@ -17,12 +17,12 @@ export const useHistoryEntries = ({
   );
   const selected = stack.find(isSelected);
 
-  console.log("%c[useHistoryEntries.rndr]", "color:blue;", {
-    selectedId,
-    selected,
-    idKey,
-    all: stack,
-  });
+  // console.log("%c[useHistoryEntries.rndr]", "color:blue;", {
+  //   selectedId,
+  //   selected,
+  //   idKey,
+  //   all: stack,
+  // });
 
   return {
     last,
