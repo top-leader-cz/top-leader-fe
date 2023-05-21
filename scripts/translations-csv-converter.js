@@ -20,6 +20,7 @@ const {
   intersection,
   omit,
   concat,
+  equals,
 } = require("ramda");
 const Papa = require("papaparse");
 const fs = require("fs");
@@ -95,7 +96,7 @@ const getBestMatchProps = (item) => {
       found: false,
     };
   const bestMatch = getBestMatchMaybe({
-    enTranslation: item.source.en,
+    enTranslation: item.source.en ?? "",
     vkValues,
   });
 
@@ -302,10 +303,27 @@ function run() {
     pairsToKeys(generatedPairs),
     pairsToKeys(manualPairs)
   );
-  if (duplicites.length)
-    throw new Error(
-      "Duplicite keys in manual and generated: " + duplicites.join(",")
+  const generatedObj = fromPairs(generatedPairs);
+  const manualObj = fromPairs(manualPairs);
+  if (duplicites.length) {
+    const mapped = duplicites.map((key) => ({
+      key,
+      generated: generatedObj[key],
+      manual: manualObj[key],
+    }));
+    const filtered = mapped.filter(
+      ({ generated, manual }) => !equals(generated, manual)
+      // ({ generated, manual }) => generated.manual_keys !== generated.generated_keys
     );
+    console.log(inspect({ manualKeys: pairsToKeys(manualPairs) }));
+    console.log(inspect({ generatedKeys: pairsToKeys(generatedPairs) }));
+    console.log(inspect({ mapped, filtered }));
+    // console.log(inspect({ generatedPairs }));
+    if (filtered.length)
+      throw new Error(
+        "Duplicite keys in manual and generated: " + duplicites.join(",")
+      );
+  }
 
   console.log(
     "output GENERATED JSON",
