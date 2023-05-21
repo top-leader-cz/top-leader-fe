@@ -222,7 +222,15 @@ export const TimePicker = ({ control, name, rules, ...props }) => {
   );
 };
 
-export const Input = ({ name, control, rules, ...props }) => {
+const debugLog = (debug) => {
+  if (debug?.msg) {
+    const { msg, color, data } = debug;
+    const msgs = color ? ["%c" + msg, `color:${color};`] : [msg];
+    console.log(...msgs, data);
+  }
+};
+
+export const RHFTextField = ({ name, control, rules, debug, ...props }) => {
   const methods = useFormContext();
 
   return (
@@ -230,14 +238,17 @@ export const Input = ({ name, control, rules, ...props }) => {
       control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field, fieldState }) => (
-        <TextField
-          error={!!fieldState.error}
-          // helperText={fieldState.error}
-          {...props}
-          {...field}
-        />
-      )}
+      render={({ field, fieldState }) =>
+        debugLog({ ...debug, data: { fieldState, field } }) || (
+          <TextField
+            error={!!fieldState.error}
+            helperText={getError(fieldState.error, rules)}
+            // helperText={fieldState.error}
+            {...props}
+            {...field}
+          />
+        )
+      }
     />
   );
 };

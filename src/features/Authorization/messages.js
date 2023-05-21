@@ -13,9 +13,21 @@ export const messages = defineMessages({
     id: "auth.login.email.label",
     defaultMessage: "Email",
   },
+  "auth.login.email.validation.required": {
+    id: "auth.login.email.validation.required",
+    defaultMessage: "Required",
+  },
+  "auth.login.email.validation.pattern": {
+    id: "auth.login.email.validation.pattern",
+    defaultMessage: "The email is not valid",
+  },
   "auth.login.password.label": {
     id: "auth.login.password.label",
     defaultMessage: "Password",
+  },
+  "auth.login.validation.invalid-credentials": {
+    id: "auth.login.validation.invalid-credentials",
+    defaultMessage: "Invalid credentials",
   },
   "auth.login.forgot": {
     id: "auth.login.forgot",

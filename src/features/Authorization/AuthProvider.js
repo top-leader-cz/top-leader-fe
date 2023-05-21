@@ -1,10 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { createContext, useCallback } from "react";
-import {
-  useLocalStorage,
-  useSessionStorage,
-} from "../../hooks/useLocalStorage";
+import { createContext, useCallback, useState } from "react";
+import { useSessionStorage } from "../../hooks/useLocalStorage";
 
 // Initialize Firebase
 var firebaseConfig = {
@@ -23,8 +20,11 @@ export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useSessionStorage("user", null);
+  const [signinPending, setSigninPending] = useState(false);
 
   const signin = ({ email, password }, callback = () => {}) => {
+    console.log("[Auth] start");
+    setSigninPending(true);
     return signInWithEmailAndPassword(firebaseAuth, email, password)
       .then((userCredential) => {
         console.log("[Auth] signedIn", { userCredential });
@@ -35,14 +35,14 @@ export function AuthProvider({ children }) {
         };
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("[Auth]", errorCode, ":", errorMessage);
-        throw new Error("");
+        console.log("[Auth] err", error.code, ":", error.message);
+        setSigninPending(false);
+        throw new Error(error);
       })
       .then(({ jwt, email }) => {
         console.log("[Auth] got token", { jwt, email });
         setUser({ jwt, email });
+        setSigninPending(false);
       });
     // return fakeAuthProvider.signin(() => {
     //   setUser(newUser);
@@ -96,7 +96,7 @@ export function AuthProvider({ children }) {
     [user]
   );
 
-  const value = { user, signin, signout, authFetch };
+  const value = { user, signin, signinPending, signout, authFetch };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

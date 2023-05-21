@@ -1,7 +1,7 @@
 import { Box, Button, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
-import { DatePicker, Input } from ".";
+import { DatePicker, RHFTextField } from ".";
 import { Icon } from "../Icon";
 import { MsgProvider } from "../Msg";
 import { Msg, useMsg } from "../Msg/Msg";
@@ -44,7 +44,7 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
           }}
         >
           <Box sx={{ width: 16, mx: 1 }}>{i + 1}.</Box>
-          <Input
+          <RHFTextField
             control={control}
             name={`${name}.${i}.label`}
             placeholder={msg("action-steps.label.placeholder")}

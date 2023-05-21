@@ -2,10 +2,10 @@ import { useCallback, useContext } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useMsgCtx } from "./";
 
-export const useMsg = () => {
+export const useMsg = ({ dict } = {}) => {
   const msgCtx = useMsgCtx();
   const intl = useIntl();
-  const messages = msgCtx.dict;
+  const messages = dict || msgCtx.dict;
 
   const msg = useCallback(
     (id, values) =>

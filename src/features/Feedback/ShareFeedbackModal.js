@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useCallback } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { AutocompleteSelect, Input } from "../../components/Forms";
+import { AutocompleteSelect, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { H2, P } from "../../components/Typography";
 
@@ -29,7 +29,7 @@ const ROLE_OPTIONS = [{ value: "manager", label: "Manager" }];
 const EmailListItem = ({ index, remove, getName }) => {
   return (
     <Box display="flex" alignItems="center" gap={3}>
-      <Input
+      <RHFTextField
         name={getName(FIELD_FIELDS.email)}
         placeholder="Email"
         rules={{}}

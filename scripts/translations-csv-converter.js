@@ -303,9 +303,9 @@ function run() {
     pairsToKeys(generatedPairs),
     pairsToKeys(manualPairs)
   );
-  const generatedObj = fromPairs(generatedPairs);
-  const manualObj = fromPairs(manualPairs);
   if (duplicites.length) {
+    const generatedObj = fromPairs(generatedPairs);
+    const manualObj = fromPairs(manualPairs);
     const mapped = duplicites.map((key) => ({
       key,
       generated: generatedObj[key],
