@@ -50,10 +50,11 @@ const config = {
   // TODO: EN
 };
 
-const getInputCsv = (path = config.INPUT_CSV_PATH) => {
+const getInputCsv = ({ path = config.INPUT_CSV_PATH, readOptions } = {}) => {
   const csv = fs.readFileSync(path, {
     encoding: "utf8",
     flag: "r",
+    ...readOptions,
   });
   // https://github.com/mholt/PapaParse
   const papaparsedCsvInput = Papa.parse(csv, { header: true });
@@ -267,7 +268,7 @@ function run() {
     })
   );
 
-  const csvInput = getInputCsv();
+  const csvInput = getInputCsv({ readOptions: { encoding: "utf8" } });
   const results = getResults({ csvInput });
 
   console.log(
