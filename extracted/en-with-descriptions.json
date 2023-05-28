@@ -38,6 +38,12 @@
   "auth.login.email.label": {
     "defaultMessage": "Email"
   },
+  "auth.login.email.validation.pattern": {
+    "defaultMessage": "The email is not valid"
+  },
+  "auth.login.email.validation.required": {
+    "defaultMessage": "Required"
+  },
   "auth.login.forgot": {
     "defaultMessage": "Forgot password"
   },
@@ -52,6 +58,9 @@
   },
   "auth.login.password.label": {
     "defaultMessage": "Password"
+  },
+  "auth.login.validation.invalid-credentials": {
+    "defaultMessage": "Invalid credentials"
   },
   "auth.unauthorized.perex": {
     "defaultMessage": "Please enter your details"

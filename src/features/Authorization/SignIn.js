@@ -4,43 +4,36 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { Msg, MsgProvider } from "../../components/Msg";
 // import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { RHFTextField } from "../../components/Forms";
+import { RHForm } from "../../components/Forms/Form";
 import { useAuth } from "./";
 import { messages } from "./messages";
+import { useMsg } from "../../components/Msg/Msg";
 
 export function SignInPage() {
   // const navigate = useNavigate();
   // const location = useLocation();
   const auth = useAuth();
+  const msg = useMsg({ dict: messages });
   console.log("Login ");
+  const form = useForm({
+    defaultValues: { email: "test~topleader.ioo", password: "Test123" },
+  });
 
   // const from = location.state?.from?.pathname || routes.dashboard;
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Login submit");
-
-    const formData = new FormData(event.currentTarget);
-
-    const user = {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
-
-    console.log("Login submit", { user });
-
-    auth.signin(user, () => {
-      // Send them back to the page they tried to visit when they were
-      // redirected to the login page. Use { replace: true } so we don't create
-      // another entry in the history stack for the login page.  This means that
-      // when they get to the protected page and click the back button, they
-      // won't end up back on the login page, which is also really nice for the
-      // user experience.
-      // navigate(from, { replace: true });
+  const handleSubmit = (data, e) => {
+    console.log("[Login submit]", data);
+    return auth.signin(data).catch((e) => {
+      console.log({ e });
+      const message = msg("auth.login.validation.invalid-credentials");
+      form.setError("email", { message: "" });
+      form.setError("password", { message });
     });
   };
 
@@ -82,33 +75,44 @@ export function SignInPage() {
               <Msg id="auth.unauthorized.perex" />
             </Typography>
 
-            <Box
+            {/* <Box
               component="form"
               noValidate
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
-            >
-              <TextField
+            > */}
+            <RHForm form={form} onSubmit={handleSubmit}>
+              <RHFTextField
+                debug={{ msg: "email", color: "crimson" }}
                 margin="normal"
                 required
+                rules={{
+                  required: {
+                    value: true,
+                    message: <Msg id="auth.login.email.validation.required" />,
+                  },
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: <Msg id="auth.login.email.validation.pattern" />,
+                  },
+                }}
                 fullWidth
                 id="email"
                 label={<Msg id="auth.login.email.label" />}
                 name="email"
                 autoComplete="email"
                 autoFocus
-                defaultValue={"test@topleader.io"}
               />
-              <TextField
+              <RHFTextField
                 margin="normal"
                 required
+                rules={{ required: "Required" }}
                 fullWidth
                 name="password"
                 label={<Msg id="auth.login.password.label" />}
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                defaultValue={"Test123"}
               />
 
               {/* <FormControlLabel
@@ -131,6 +135,7 @@ export function SignInPage() {
               </Link> */}
               <Button
                 type="submit"
+                disabled={auth.signinPending}
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 3 }}
@@ -141,6 +146,7 @@ export function SignInPage() {
               <Divider />
               <Button
                 type="button"
+                disabled={auth.signinPending}
                 fullWidth
                 variant="outlined"
                 sx={{ mt: 3 }}
@@ -156,6 +162,7 @@ export function SignInPage() {
               </Button>
               <Button
                 type="button"
+                disabled={auth.signinPending}
                 fullWidth
                 variant="outlined"
                 sx={{ mt: 3, mb: 3 }}
@@ -182,7 +189,8 @@ export function SignInPage() {
                 </Grid>
               </Grid> */}
               {/* <Copyright sx={{ mt: 5 }} /> */}
-            </Box>
+            </RHForm>
+            {/* </Box> */}
           </Box>
         </Grid>
         <Grid

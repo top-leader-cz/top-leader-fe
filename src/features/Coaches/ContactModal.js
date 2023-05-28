@@ -8,7 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { Input } from "../../components/Forms";
+import { RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
@@ -71,7 +71,7 @@ export const ContactModal = ({ onClose, coach, open = !!coach }) => {
               <Msg id="coaches.contact.perex" />
             </P>
             {/* <OutlinedField label="Subject" /> */}
-            <Input
+            <RHFTextField
               name="subject"
               rules={{ required: true, minLength: 3 }}
               label={msg("coaches.contact.subject.label")}
@@ -81,7 +81,7 @@ export const ContactModal = ({ onClose, coach, open = !!coach }) => {
               fullWidth
             />
             <Divider flexItem />
-            <Input
+            <RHFTextField
               name="message"
               rules={{ required: true }}
               label={msg("coaches.contact.message.label")}

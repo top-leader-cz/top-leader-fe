@@ -1,6 +1,6 @@
 import { Card, CardContent, TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
-import { Input } from "../../components/Forms";
+import { RHFTextField } from "../../components/Forms";
 import { FIELDS } from "./GetFeedbackForm";
 
 export const FormBuilderMeta = ({}) => {
@@ -27,7 +27,7 @@ export const FormBuilderMeta = ({}) => {
             );
           }}
         />
-        <Input
+        <RHFTextField
           name={FIELDS.description}
           placeholder={"Description (optional)"}
           rules={{}}

@@ -1,6 +1,6 @@
 import { Box, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { Input } from "../../../components/Forms";
+import { RHFTextField } from "../../../components/Forms";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { FormStepCard } from "./FormStepCard";
@@ -9,7 +9,7 @@ import { FormStepCard } from "./FormStepCard";
 const TextAreaStepTODO = ({ textAreaName, ...props }) => {
   return (
     <FormStepCard {...props}>
-      <Input
+      <RHFTextField
         name={textAreaName}
         rules={{ required: true }}
         placeholder={"Type your own " + textAreaName}

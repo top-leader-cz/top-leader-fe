@@ -2,7 +2,7 @@ import { ArrowBack } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ActionSteps, Input } from "../../components/Forms";
+import { ActionSteps, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -112,7 +112,7 @@ const ReflectStep = ({ ...props }) => {
           "What were you happy with?",
         ]}
       />
-      <Input
+      <RHFTextField
         name={reflectionKeyName}
         rules={{ required: true }}
         placeholder={"Type your own " + reflectionKeyName}

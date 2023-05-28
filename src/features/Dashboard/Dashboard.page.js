@@ -18,13 +18,12 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
-import { useTalentsDict } from "../Strengths/talents";
 import { useAuth } from "../Authorization";
+import { useTalentsDict } from "../Strengths/talents";
+import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
-import { useValuesDict } from "../Values/values";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -131,7 +130,7 @@ const DashboardCard = ({
   href,
   items,
   fallbackIcon = {},
-  minHeight = 200,
+  minHeight = 215,
 }) => {
   return (
     <Card sx={{ minHeight }}>
