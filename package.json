@@ -15,6 +15,7 @@
     "date-fns": "^2.29.3",
     "date-fns-tz": "^1.3.7",
     "firebase": "^9.13.0",
+    "iconv-lite": "^0.6.3",
     "papaparse": "^5.4.1",
     "ramda": "^0.28.0",
     "react": "^18.2.0",
@@ -35,7 +36,8 @@
     "extract-translations": "npm run extract-translations-short ; npm run extract-translations-long",
     "compile": "formatjs compile",
     "translations-match-csv": "node ./scripts/translations-csv-converter.js",
-    "generate-translations": "npm run extract-translations && npm run translations-match-csv"
+    "generate-translations": "npm run extract-translations && npm run translations-match-csv",
+    "convert-translations-from-windows-1250": "node ./scripts/win1250toutf8.js"
   },
   "eslintConfig": {
     "extends": [
