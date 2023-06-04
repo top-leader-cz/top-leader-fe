@@ -28,6 +28,7 @@ import {
   DeleteOutlined,
   PersonAdd,
   ContentCopy,
+  Storage,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -55,6 +56,7 @@ const Icons = {
   DeleteOutlined,
   PersonAdd,
   ContentCopy,
+  Storage,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

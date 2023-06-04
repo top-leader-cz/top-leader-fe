@@ -28,6 +28,7 @@ import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 // import { Dev } from "./Dev";
 import ErrorPage from "./ErrorPage";
+import { TeamPage } from "../features/Team/Team.page";
 
 const GlobalSpinner = () => {
   return (
@@ -148,6 +149,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireAuth>
             <GetFeedbackPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.team,
+        element: (
+          <RequireAuth>
+            <TeamPage />
           </RequireAuth>
         ),
       },

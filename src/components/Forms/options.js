@@ -33,8 +33,32 @@ export const renderLanguageOption = (props, option, { selected } = {}) => (
 
 export const FIELD_OPTIONS = [
   { label: "Business", value: "business" },
+  { label: "Career", value: "career" },
+  { label: "Change", value: "change" },
+  { label: "Communication", value: "communication" },
+  { label: "Confidence", value: "confidence" },
+  { label: "Conflict", value: "conflict" },
+  { label: "Diversity", value: "diversity" },
+  { label: "Entrepreneurship", value: "entrepreneurship" },
+  { label: "Executive", value: "executive" },
+  { label: "Facilitation", value: "facilitation" },
+  { label: "Fitness", value: "fitness" },
+  { label: "Health", value: "health" },
+  { label: "Leadership", value: "leadership" },
   { label: "Life", value: "life" },
-  { label: "Football", value: "football" },
+  { label: "Management", value: "management" },
+  { label: "Mental fitness", value: "mental_fitness" },
+  { label: "Mentorship", value: "mentorship" },
+  { label: "Negotiations", value: "negotiations" },
+  { label: "Organizational Development", value: "organizational_development" },
+  { label: "Performance", value: "performance" },
+  { label: "Relationships", value: "relationships" },
+  { label: "Sales", value: "sales" },
+  { label: "Teams", value: "teams" },
+  { label: "Time Management", value: "time_management" },
+  { label: "Transformations", value: "transformations" },
+  { label: "Wellbeing", value: "wellbeing" },
+  { label: "Women", value: "women" },
 ];
 
 export const getLabel = (options) => (searchValue) =>

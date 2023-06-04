@@ -11,6 +11,7 @@ export const routes = {
   coaches: "/coaches",
   settings: "/settings",
   getFeedback: "/get-feedback",
+  team: "/team",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
   dev: "/dev",
