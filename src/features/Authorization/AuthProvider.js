@@ -86,6 +86,7 @@ export function AuthProvider({ children }) {
       }).then(async (response) => {
         if (!response.ok) {
           console.log("TODO");
+          throw new Error("not ok");
         }
         if (type === "json") return { response, json: await response.json() };
         return { response };

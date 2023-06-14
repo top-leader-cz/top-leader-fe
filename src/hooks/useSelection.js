@@ -17,5 +17,5 @@ export function useSelection({
     [keyName, limit]
   );
 
-  return { selectedKeys, toggleItem };
+  return { selectedKeys, toggleItem, setSelectedKeys };
 }

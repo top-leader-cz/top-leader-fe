@@ -13,6 +13,8 @@ import { useSelection } from "../../hooks/useSelection";
 import { routes } from "../../routes";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useAuth } from "../Authorization";
 
 const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
   const { values } = useValuesDict();
@@ -51,7 +53,7 @@ const createValuesEntry = ({ selectedKeys }) => {
   };
 };
 
-const useMyValues = () => {
+const _useMyValues = () => {
   const { values } = useValuesDict();
   const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
   const { selectedKeys, toggleItem } = useSelection({
@@ -78,6 +80,62 @@ const useMyValues = () => {
     //   { label: "Accountability", key: "accountability" },
     //   { label: "Accuracy", key: "accuracy" },
     // ],
+    selectedKeys,
+    toggleItem,
+  };
+};
+
+// BE Endpoint implemented:
+// Get Note:
+// GET /api/rest/values
+//  Post Note:
+// POST /api/rest/values
+// {
+//   "content": ["value_key1", "value_key2"]
+// }
+
+const useMyValues = () => {
+  const { values } = useValuesDict();
+  // const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
+  const { selectedKeys, toggleItem, setSelectedKeys } = useSelection({});
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+  const query = useQuery(
+    "values",
+    () => authFetch({ url: "/api/rest/values", method: "GET" }),
+    { onSuccess: ({ json }) => setSelectedKeys(json.values) }
+  );
+  const mutation = useMutation(
+    (variables) =>
+      authFetch({ url: "/api/rest/values", method: "POST", data: variables }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("values");
+      },
+    }
+  );
+
+  const navigate = useNavigate();
+  const save = useCallback(() => {
+    // valuesHistory.push(createValuesEntry({ selectedKeys }));
+    mutation.mutate(
+      { values: selectedKeys },
+      {
+        onSuccess: () => navigate(routes.dashboard),
+      }
+    );
+    // navigate(routes.myValues);
+  }, [mutation, navigate, selectedKeys]);
+
+  // console.log("[useMyValues]", {});
+
+  return {
+    save,
+    items: Object.entries(values).map(([key, value]) => ({
+      data: value,
+      key,
+      label: value.name,
+    })),
     selectedKeys,
     toggleItem,
   };
