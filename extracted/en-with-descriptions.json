@@ -1437,6 +1437,9 @@
   "main-menu.items.settings": {
     "defaultMessage": "Settings"
   },
+  "main-menu.items.team": {
+    "defaultMessage": "Team"
+  },
   "score.max": {
     "defaultMessage": "Totally me"
   },
@@ -1712,6 +1715,48 @@
   },
   "strengths.tips.title": {
     "defaultMessage": "💡 Tips for action"
+  },
+  "team.credit.topup": {
+    "defaultMessage": "Top up credit"
+  },
+  "team.credit.topup-modal.desc": {
+    "defaultMessage": "Enter the amount of credits you want to top up."
+  },
+  "team.credit.topup-modal.submit": {
+    "defaultMessage": "Request credit top up"
+  },
+  "team.credit.topup-modal.title": {
+    "defaultMessage": "Credit top up"
+  },
+  "team.heading": {
+    "defaultMessage": "Team"
+  },
+  "team.members.add": {
+    "defaultMessage": "Add member"
+  },
+  "team.members.sub": {
+    "defaultMessage": "Manage your team members here"
+  },
+  "team.members.table.col.action": {
+    "defaultMessage": "Action"
+  },
+  "team.members.table.col.coach": {
+    "defaultMessage": "Coach"
+  },
+  "team.members.table.col.name": {
+    "defaultMessage": "Name"
+  },
+  "team.members.table.col.paid": {
+    "defaultMessage": "Credits paid"
+  },
+  "team.members.table.col.remaining": {
+    "defaultMessage": "Remaining credits"
+  },
+  "team.members.title": {
+    "defaultMessage": "Team members"
+  },
+  "team.members.title.count.badge": {
+    "defaultMessage": "{count} members"
   },
   "values.aside.perex": {
     "defaultMessage": "History"

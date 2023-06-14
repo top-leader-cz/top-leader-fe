@@ -4,6 +4,7 @@ import {
   HelpOutlined,
   HomeOutlined,
   LogoutOutlined,
+  People,
   PersonOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
@@ -40,6 +41,10 @@ const messages = defineMessages({
   "main-menu.items.getFeedback": {
     id: "main-menu.items.getFeedback",
     defaultMessage: "Get feedback",
+  },
+  "main-menu.items.team": {
+    id: "main-menu.items.team",
+    defaultMessage: "Team",
   },
   "main-menu.items.settings": {
     id: "main-menu.items.settings",
@@ -127,6 +132,11 @@ export const MainMenu = () => {
               text={<Msg id="main-menu.items.getFeedback" />}
               icon={<ForumOutlined />}
               to={routes.getFeedback}
+            />
+            <ListItemLink
+              text={<Msg id="main-menu.items.team" />}
+              icon={<People />}
+              to={routes.team}
             />
           </List>
         </Box>

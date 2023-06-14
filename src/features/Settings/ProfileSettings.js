@@ -59,7 +59,7 @@ const COACH = {
   // https://stackoverflow.com/questions/673905/how-to-determine-users-locale-within-browser
   // https://attacomsian.com/blog/javascript-current-timezone
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions
-  [FIELDS.fields]: ["business", "life", "football"],
+  [FIELDS.fields]: ["business", "life"],
   [FIELDS.certificates]: "Associate Coach Certified - Issued by ICF",
   [FIELDS.experience]: "3", // TODO: field
 };
