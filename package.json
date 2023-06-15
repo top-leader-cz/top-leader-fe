@@ -37,7 +37,8 @@
     "compile": "formatjs compile",
     "translations-match-csv": "node ./scripts/translations-csv-converter.js",
     "generate-translations": "npm run extract-translations && npm run translations-match-csv",
-    "convert-translations-from-windows-1250": "node ./scripts/win1250toutf8.js"
+    "convert-translations-from-windows-1250": "node ./scripts/win1250toutf8.js",
+    "convert-translations-to-windows-1250": "node ./scripts/utf8towin1250.js"
   },
   "eslintConfig": {
     "extends": [
