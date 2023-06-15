@@ -1,5 +1,9 @@
 {
+  "auth.login.email.validation.pattern": "The email is not valid",
+  "auth.login.email.validation.required": "Required",
+  "auth.login.validation.invalid-credentials": "Invalid credentials",
   "coaches.aside.items.1.heading": "€100",
+  "coaches.contact.message.label": "Message",
   "dashboard.cards.strengths.title.empty": "Find my strengths",
   "dict.questions.believer_02": "\"I believe in my values. They are a central part of who I am.\"",
   "dict.talents.analyser.positives.2": "Having valuable data in your mind gives you confidence because you can easily search for patterns.",
