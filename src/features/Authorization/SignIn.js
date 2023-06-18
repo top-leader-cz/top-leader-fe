@@ -22,7 +22,7 @@ export function SignInPage() {
   const msg = useMsg({ dict: messages });
   console.log("Login ");
   const form = useForm({
-    defaultValues: { email: "test~topleader.ioo", password: "Test123" },
+    defaultValues: { email: "test@topleader.io", password: "Test123" },
   });
 
   // const from = location.state?.from?.pathname || routes.dashboard;
