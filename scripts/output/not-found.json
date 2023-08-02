@@ -1,6 +1,5 @@
 {
   "coaches.aside.items.1.heading": "€100",
-  "dashboard.cards.feedback.title": "Get feedback",
   "dict.talents.analyser.positives.1": "You prefer facts and a logical approach, rather than intuition.",
   "dict.talents.analyser.positives.2": "Having valuable data in your mind gives you confidence because you can easily search for patterns.",
   "dict.talents.analyser.positives.3": "You seek simplicity and clarification through a huge amount of data.",
@@ -230,13 +229,11 @@
   "dict.values.accuracy.title": "Accuracy (Being exact, Correct)",
   "dict.values.beauty.title": "Beauty (Prettiness, Aesthetics)",
   "dict.values.creativity.title": "Creativity (Innovation, Ideation)",
-  "dict.values.environment.name": "Environment",
   "dict.values.environment.title": "Environment (Nature, Sustainability)",
   "dict.values.fairness.title": "Fairness (Equality, Justice)",
   "dict.values.family.title": "Family (Love, Relatives)",
   "dict.values.fitness.title": "Fitness (Physical activity, Strength)",
   "dict.values.health.title": "Health (Vitality, Vigour)",
-  "dict.values.helping.name": "Helping",
   "dict.values.helping.title": "others Helping others (Care, Compassion)",
   "dict.values.honesty.title": "Honesty (Ethics, Integrity)",
   "dict.values.independence.title": "Independence (Freedom, Sovereignty)",
@@ -256,5 +253,6 @@
   "dict.values.teamwork.title": "Teamwork (Support, Cooperation)",
   "dict.values.trust.title": "Trust (Respect, Dignity)",
   "dict.values.truth.title": "Truth (To be right)",
-  "dict.values.work.title": "Work (Self-fulfillment)"
+  "dict.values.work.title": "Work (Self-fulfillment)",
+  "main-menu.items.getFeedback": "Get feedback"
 }

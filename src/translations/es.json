@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Iniciar sesión",
-  "main-menu.items.getFeedback": "Recibir comentarios",
+  "dashboard.cards.feedback.title": "Recibir comentarios",
   "main-menu.items.logout": "Cerrar sesión",
   "dashboard.section-1.heading": "Quién soy",
   "dashboard.section-1.perex": "Antes de establecer hacia dónde se dirige, es bueno saber de dónde comienza.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Consejos para la acción",
   "values.set.perex": "Tus valores son una parte central de lo que eres. Cuando las cosas que haces y la forma en que respondes coinciden con tus valores, te sentirás seguro de que estás haciendo y diciendo lo correcto.",
   "dict.values.accountability.name": "Responsabilidad",
+  "dict.values.environment.name": "Ambiente",
+  "dict.values.helping.name": "Ayudando a otros",
   "dict.values.accountability.description": "Ser responsable se trata de crear una cultura donde las personas valoren la responsabilidad. Sus objetivos se refuerzan constantemente con la responsabilidad. Crear responsabilidad aumenta su dedicación para completar sus objetivos, y lo obliga a seguir los compromisos. La responsabilidad lo mantiene comprometido. Puede ser personalmente responsable de su éxito. ¡Solo házlo!",
   "dict.values.accuracy.description": "Sientes que es correcto tener una actitud que no acepte errores. Ves positividad en la capacidad de hacer las cosas de manera exacta. La precisión es importante en la vida personal (cuando las personas saben que pueden confiar en usted, usted gana confianza) y también en los negocios. Es muy importante ofrecer productos o servicios de calidad a sus clientes. Cuando te concentras en la precisión, la gente notará, y eso es lo que importa.",
   "dict.values.creativity.description": "Generalmente no te gustan las directivas y las pautas. El hecho de que valore la creatividad lo ayuda a ver las cosas de manera diferente y a lidiar mejor los problemas y la incertidumbre. Eres un mejor solucionador de problemas. La creatividad también conduce a una mejor autoconciencia, y hace que los seres humanos tengan éxito como individuos.",

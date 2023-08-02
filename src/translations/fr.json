@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Connexion",
-  "main-menu.items.getFeedback": "Obtenir un retour",
+  "dashboard.cards.feedback.title": "Obtenir un retour",
   "main-menu.items.logout": "Se déconnecter",
   "dashboard.section-1.heading": "Qui suis-je ?",
   "dashboard.section-1.perex": "Avant d'établir votre objectif, il est bon de savoir d'où vous partez.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Conseils pour agir",
   "values.set.perex": "Vos valeurs forment la partie centrale de qui vous êtes. Lorsque ce que vous dites correspondra à vos actions et valeurs, vous serez confiant de faire et dire des choses qui sont vraies.",
   "dict.values.accountability.name": "Responsabilité",
+  "dict.values.environment.name": "Environnement",
+  "dict.values.helping.name": "Entraide",
   "dict.values.accountability.description": "Être responsable, c'est créer une culture où les gens apprécient la responsabilité. Créer le sens de responsabilité augmente votre dévouement à atteindre vos objectifs, et cela vous oblige à suivre vos engagements. La responsabilité vous maintient engagé. Vous pouvez devenir personnellement responsable de votre succès. Allez-y!",
   "dict.values.accuracy.description": "Vous pensez qu'il est juste d'avoir une approche qui ne tolère pas les erreurs. Vous voyez la positivité dans la capacité à faire les choses de manière exacte. La précision est à la fois importante dans la vie personnelle (lorsque les gens savent qu'ils peuvent compter sur vous, vous gagnez leur confiance), et aussi dans les affaires. Il est très important de fournir des produits ou des services de qualité à vos clients. Lorsque vous vous concentrez sur la précision, les gens le remarqueront, et c'est ce qui compte.",
   "dict.values.creativity.description": "Vous n'aimez généralement pas les instructions et les directives. Le fait que vous appréciez la créativité vous aide à voir les choses différemment et à mieux faire face aux problèmes et à l'incertitude. La créativité conduit également à une meilleure conscience de sa propre valeur, et cela rend les individus fructueux.",

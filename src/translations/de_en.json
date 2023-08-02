@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Einloggen",
-  "main-menu.items.getFeedback": "Rückmeldung bekommen",
+  "dashboard.cards.feedback.title": "Rückmeldung bekommen",
   "main-menu.items.logout": "Ausloggen",
   "dashboard.section-1.heading": "Wer bin Ich",
   "dashboard.section-1.perex": "Bevor Sie festlegen, wohin Sie gehen, ist es gut zu wissen, wo Sie anfangen.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Tipps zum Handeln",
   "values.set.perex": "Ihre Werte sind ein zentraler Teil dessen, wer Sie sind. Wenn die Dinge, die Sie tun, und die Art und Weise, wie Sie reagieren, Ihren Werten übereinstimmen, werden Sie sich sicher sein, dass Sie das Richtige tun und sagen.",
   "dict.values.accountability.name": "Rechenschaftspflicht",
+  "dict.values.environment.name": "Umfeld",
+  "dict.values.helping.name": "Anderen helfen",
   "dict.values.accountability.description": "Rechenschaftspflichtig zu sein, geht darum, eine Kultur zu schaffen, in der Menschen die Verantwortung schätzen. Ihre Ziele werden ständig mit Rechenschaftspflicht verstärkt. Durch die Schaffung von Rechenschaftspflicht erhöht Ihr Engagement, um Ihre Ziele zu vervollständigen, und zwingt Sie, Verpflichtungen zu verfolgen. Rechenschaftspflicht hält Sie engagiert. Sie können persönlich für Ihren Erfolg verantwortlich werden. TU es einfach!",
   "dict.values.accuracy.description": "Sie haben das Gefühl, dass es richtig ist, eine Einstellung zu haben, die keine Fehler akzeptiert. Sie sehen Positivität in der Fähigkeit, Dinge genau zu tun. Präzision ist sowohl im persönlichen Leben wichtig (wenn Menschen wissen, dass sie sich auf Sie verlassen können, gewinnen Sie Vertrauen) als auch im Geschäft. Es ist sehr wichtig, Ihren Kunden qualitativ hochwertige Produkte oder Dienstleistungen zu liefern. Wenn Sie sich auf die Genauigkeit konzentrieren, werden die Menschen bemerken, und das ist wichtig.",
   "dict.values.creativity.description": "Sie mögen im Allgemeinen keine Richtlinien und Richtlinien. Die Tatsache, dass Sie Kreativität schätzen, hilft Ihnen, die Dinge anders zu sehen und besser mit Problemen und Unsicherheiten umzugehen. Sie sind ein besserer Problemlöser. Kreativität führt auch zu einem besseren Selbstbewusstsein und macht Menschen als Individuen erfolgreich.",

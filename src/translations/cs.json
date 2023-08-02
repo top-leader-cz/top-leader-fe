@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Přihlásit se",
-  "main-menu.items.getFeedback": "Získat zpětnou vazbu",
+  "dashboard.cards.feedback.title": "Zpětná vazba",
   "main-menu.items.logout": "Odhlásit se",
   "dashboard.section-1.heading": "Kdo jsem",
   "dashboard.section-1.perex": "Než si určíte směr, kam míříte, je dobré vědět, kde začínáte.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Tipy pro využití",
   "values.set.perex": "Vaše hodnoty jsou hlavní součástí toho, kým jste. Když věci, které děláte, a způsob, jakým jednáte, odpovídají Vašim hodnotám, budete mít jistotu, že děláte a říkáte to správné.",
   "dict.values.accountability.name": "Odpovědnost",
+  "dict.values.environment.name": "Životní prostředí",
+  "dict.values.helping.name": "Pomáhání ostatním",
   "dict.values.accountability.description": "Být odpovědným je o vytvoření kultury, kde si lidé cení odpovědnosti. Vytváření odpovědnosti zvyšuje Vaše odhodlání dokončit Vaše cíle a nutí Vás sledovat závazky. Odpovědnost Vás udržuje v kontaktu. Za svůj úspěch můžete být osobně odpovědní. Tak hurá do toho!",
   "dict.values.accuracy.description": "Máte pocit, že je správné mít takový přístup, který nepřijímá chyby. Vidíte pozitivitu ve schopnosti dělat věci přesným způsobem. Přesnost je v osobním životě a podnikání důležitá (když lidé vědí, že se na Vás mohou spolehnout, získáte důvěru). Je velmi důležité vytvářet kvalitní produkty nebo služby svým zákazníkům. Když se zaměříte na přesnost, lidé si toho všimnou a na tom právě záleží.",
   "dict.values.creativity.description": "Obecně se vám nelíbí směrnice a pokyny. Skutečnost, že si ceníte kreativity, Vám pomůže vidět věci jinak a lépe řešit problémy a nejistotu. S kreativitou lépe řešíte problémy. Kreativita také vede k lepšímu sebevědomí a činí lidské bytosti úspěšné jako jednotlivce.",

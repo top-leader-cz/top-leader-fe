@@ -9,7 +9,7 @@ auth.login.login,5,Log in,Přihlásit se,Connexion,Einloggen,Anmeldung,Iniciar s
 ,8,Dashboard,Přehled,Tableau de bord,Armaturenbrett,Überblick,Tablero,main-menu.items.dashboard,,,Dashboard,,,,
 ,9,Sessions,Osobní rozvoj,Sessions,Sitzungen,Persönliche Entwicklung,Sesiones,main-menu.items.sessions|sessions.heading,,,Sessions,,,,
 ,10,Coaches,Koučové,Formateurs,Trainer,Coach,Entrenadores,coaches.heading|main-menu.items.coaches,,,Coaches,,,,
-main-menu.items.getFeedback,11,Get Feedback,Získat zpětnou vazbu,Obtenir un retour,Rückmeldung bekommen,Rückmeldung bekommen,Recibir comentarios,,Performed,Found,Get Feedback,Get feedback,0.8,"dashboard.cards.feedback.title,main-menu.items.getFeedback",main-menu.items.getFeedback
+dashboard.cards.feedback.title,11,11,Zpětná vazba,Obtenir un retour,Rückmeldung bekommen,Rückmeldung bekommen,Recibir comentarios,,Performed,Found,Get Feedback,Get feedback,0.8,"dashboard.cards.feedback.title,main-menu.items.getFeedback",main-menu.items.getFeedback
 ,12,Settings,Nastavení,Paramètres,Einstellungen,Einstellungen,Ajustes,main-menu.items.settings|settings.heading,,,Settings,,,,
 ,13,Help,Pomoc,Aide,Hilfe,Hilfe,Ayudar,main-menu.items.help,,,Help,,,,
 main-menu.items.logout,14,Log out,Odhlásit se,Se déconnecter,Ausloggen,Ausloggen,Cerrar sesión,,Performed,Found,Log out,Logout,1,main-menu.items.logout,
@@ -1457,12 +1457,12 @@ dict.values.accountability.name,181,Accountability ,Odpovědnost,Responsabilité
 ,182,Accuracy,Přesnost,Précision,Genauigkeit,Genauigkeit,Precisión,dict.values.accuracy.name,,,Accuracy,,,,
 ,183,Beauty,Krása,Beauté,Schönheit,Schönheit,Belleza,dict.values.beauty.name,,,Beauty,,,,
 ,184,Creativity,Tvořivost,Créativité,Kreativität,Kreativität,Creatividad,dict.values.creativity.name,,,Creativity,,,,
-,185,Environment ,Životní prostředí,Environnement,Umfeld,Umfeld,Ambiente,,Performed,Found,Environment ,Environment,1,dict.values.environment.name,dict.values.environment.name
+dict.values.environment.name,185,Environment ,Životní prostředí,Environnement,Umfeld,Umfeld,Ambiente,,Performed,Found,Environment ,Environment,1,,dict.values.environment.name
 ,186,Fairness,Spravedlnost,Justice,Gerechtigkeit,Gerechtigkeit,Justicia,dict.values.fairness.name,,,Fairness,,,,
 ,187,Family,Rodina,Famille,Familie,Familie,Familia,dict.values.family.name,,,Family,,,,
 ,188,Fitness,Fitness,Fitness,Fitness,Fitness,Aptitud física,dict.values.fitness.name,,,Fitness,,,,
 ,189,Health,Zdraví,Santé,Die Gesundheit,Gesundheit,Salud,dict.values.health.name,,,Health,,,,
-,190,Helping others,Pomáhání ostatním,Entraide,Anderen helfen,Anderen helfen,Ayudando a otros,,Performed,Found,Helping others,Helping,0.6666666666666666,dict.values.helping.name,dict.values.helping.name
+dict.values.helping.name,190,Helping others,Pomáhání ostatním,Entraide,Anderen helfen,Anderen helfen,Ayudando a otros,,Performed,Found,Helping others,Helping,0.6666666666666666,,dict.values.helping.name
 ,191,Honesty,Poctivost,Honnêteté,Ehrlichkeit,Ehrlichkeit,Honestidad,dict.values.honesty.name,,,Honesty,,,,
 ,192,Independence,Nezávislost,Indépendance,Unabhängigkeit,Unabhängigkeit,Independencia,dict.values.independence.name,,,Independence,,,,
 ,193,Learning,Učení se,Apprentissage,Lernen,Lernen,Aprendiendo,dict.values.learning.name,,,Learning,,,,

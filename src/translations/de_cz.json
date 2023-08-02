@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Anmeldung",
-  "main-menu.items.getFeedback": "Rückmeldung bekommen",
+  "dashboard.cards.feedback.title": "Rückmeldung bekommen",
   "main-menu.items.logout": "Ausloggen",
   "dashboard.section-1.heading": "Wer bin Ich",
   "dashboard.section-1.perex": "Bevor Sie feststellen, wohin Sie gehen, ist es gut zu wissen, wo Sie anfangen.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Verwendung für die Verwendung",
   "values.set.perex": "Ihre Werte sind der Hauptteil dessen, wer Sie sind. Wenn die Dinge, die Sie tun und wie Sie handeln, Ihren Werten entsprechen, werden Sie sicher sein, dass Sie den richtigen und den richtigen sagen.",
   "dict.values.accountability.name": "Verantwortung",
+  "dict.values.environment.name": "Umfeld",
+  "dict.values.helping.name": "Anderen helfen",
   "dict.values.accountability.description": "Verantwortlich zu sein, geht es darum, eine Kultur zu schaffen, in der Menschen Verantwortung schätzen. Die Schaffung einer Haftung erhöht Ihre Entschlossenheit, Ihre Ziele zu vervollständigen und Sie zur Überwachung von Verbindlichkeiten zu zwingen. Verantwortung hält Sie in Kontakt. Möglicherweise sind Sie persönlich für Ihren Erfolg verantwortlich. Also mach weiter!",
   "dict.values.accuracy.description": "Sie haben das Gefühl, dass es richtig ist, einen Ansatz zu haben, der keine Fehler akzeptiert. Sie sehen Positivität in der Fähigkeit, Dinge genau zu tun. Genauigkeit ist wichtig für das persönliche Leben und Geschäft (wenn Menschen wissen, dass sie sich auf Sie verlassen können, werden Sie Vertrauen gewinnen). Es ist sehr wichtig, qualitativ hochwertige Produkte oder Dienstleistungen für Ihre Kunden zu schaffen. Wenn Sie sich auf die Genauigkeit konzentrieren, werden die Menschen bemerken und das ist wichtig.",
   "dict.values.creativity.description": "Im Allgemeinen mögen Sie Richtlinien und Anweisungen nicht. Die Tatsache, dass Sie die Kreativität schätzen, hilft Ihnen, die Dinge anders zu sehen und Probleme und Unsicherheiten besser zu lösen. Mit Kreativität lösen Sie besser Probleme. Kreativität führt auch zu einem besseren Selbstvertrauen und macht Menschen als Individuum erfolgreich.",

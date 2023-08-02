@@ -1,6 +1,6 @@
 {
   "auth.login.login": "Log in",
-  "main-menu.items.getFeedback": "Get Feedback",
+  "dashboard.cards.feedback.title": "11",
   "main-menu.items.logout": "Log out",
   "dashboard.section-1.heading": "Who am I",
   "dashboard.section-1.perex": "Before you set where you are heading it's good to know from where you started.",
@@ -31,6 +31,8 @@
   "strengths.tips.title": "Tips for action",
   "values.set.perex": "Your values are a central part of who you are. When what you say matches your actions and values, you’ll feel confident that you are putting forth an authentic you.",
   "dict.values.accountability.name": "Accountability ",
+  "dict.values.environment.name": "Environment ",
+  "dict.values.helping.name": "Helping others",
   "dict.values.accountability.description": "Being accountable is about creating a culture where people value responsibility. Creating accountability increases your dedication to complete your goals, and it forces you to follow through on commitments. Accountability keeps you engaged. You can become personally accountable for your success. Just go for it!",
   "dict.values.accuracy.description": "You feel it's right to have an attitude that doesn't accept mistakes. You see positivity in the ability to do things in an exact way. Precision is both important in personal life (when people know they can rely on you, you gain trust), and also in business. It's very important to deliver quality products or services to your customers. When you focus on accuracy, people will notice, and that's what matters. ",
   "dict.values.creativity.description": "You generally don't like directions and guidelines. The fact that you value creativity helps you to see things differently and to better deal with issues and uncertainty. Creativity also leads to better self-awareness, and it makes human beings successful as individuals.",
