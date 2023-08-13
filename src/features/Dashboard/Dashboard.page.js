@@ -19,7 +19,7 @@ import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { useAuth } from "../Authorization";
+import { useAuth, useAuth2 } from "../Authorization";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
@@ -55,6 +55,16 @@ const useNote = () => {
   const [_note, _setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { authFetch } = useAuth();
+  const auth2 = useAuth2();
+
+  useEffect(() => {
+    auth2.authFetch({ url: "/api/latest/user-info" }).then((bag) => {
+      console.log({ bag });
+    });
+    // auth2.authFetch({ url: "/latest/user-info" }).then((bag) => {
+    //   console.log({ bag });
+    // });
+  }, []);
 
   const getNote = useCallback(() => {
     setIsLoading(true);
@@ -65,9 +75,9 @@ const useNote = () => {
     });
   }, [authFetch, _setNote]);
 
-  useEffect(() => {
-    getNote();
-  }, []);
+  // useEffect(() => {
+  //   getNote();
+  // }, []);
 
   const setNote = useCallback(
     ({ note }) => {
@@ -248,9 +258,9 @@ const DashboardCardSession = () => {
 export function DashboardPage() {
   const { user, authFetch } = useAuth();
 
-  useEffect(() => {
-    const res = authFetch({ url: "/api/rest/users" });
-  }, []);
+  // useEffect(() => {
+  //   const res = authFetch({ url: "/api/rest/users" });
+  // }, []);
 
   return (
     <MsgProvider messages={messages}>

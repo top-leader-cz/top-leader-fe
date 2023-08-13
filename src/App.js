@@ -21,6 +21,7 @@ import messages_de_en from "./translations/de_en.json";
 import messages_de_cz from "./translations/de_cz.json";
 import messages_es from "./translations/es.json";
 import { useState, createContext, useCallback } from "react";
+import { AuthProvider2 } from "./features/Authorization/AuthProvider2";
 
 const messages = {
   en: messages_en,
@@ -62,10 +63,12 @@ export default function App() {
       <TranslationProvider>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <AuthProvider>
-            <RightMenuProvider>
-              <CssBaseline />
-              <RouterProvider router={router} />
-            </RightMenuProvider>
+            <AuthProvider2>
+              <RightMenuProvider>
+                <CssBaseline />
+                <RouterProvider router={router} />
+              </RightMenuProvider>
+            </AuthProvider2>
           </AuthProvider>
         </LocalizationProvider>
       </TranslationProvider>

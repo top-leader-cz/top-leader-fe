@@ -58,7 +58,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://topleader.hasura.app",
+  "proxy_bak": "https://topleader.hasura.app",
+  "proxy": "https://topleader-394306.ey.r.appspot.com",
   "devDependencies": {
     "@formatjs/cli": "^6.0.1",
     "string-similarity": "^4.0.4"
