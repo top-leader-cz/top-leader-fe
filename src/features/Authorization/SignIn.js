@@ -22,20 +22,27 @@ export function SignInPage() {
   const msg = useMsg({ dict: messages });
   console.log("Login ");
   const form = useForm({
-    defaultValues: { email: "test@topleader.io", password: "Test123" },
+    defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
   });
 
   // const from = location.state?.from?.pathname || routes.dashboard;
 
   const handleSubmit = (data, e) => {
     console.log("[Login submit]", data);
-    return auth.signin(data).catch((e) => {
-      console.log({ e });
-      const message = msg("auth.login.validation.invalid-credentials");
-      form.setError("email", { message: "" });
-      form.setError("password", { message });
-    });
+    return auth.signin(data);
+    // .catch((e) => {
+    //   console.log({ e });
+    //   const message = msg("auth.login.validation.invalid-credentials");
+    //   form.setError("email", { message: "" });
+    //   form.setError("password", { message });
+    // });
   };
+  console.log("[SignInPage.rndr]", { auth });
+
+  const disabled = auth.user.isLoading && auth.user.fetchStatus === "fetching";
+  const errorMsg = auth.user.error
+    ? msg("auth.login.validation.invalid-credentials")
+    : "";
 
   return (
     <MsgProvider messages={messages}>
@@ -113,6 +120,8 @@ export function SignInPage() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                error={!!errorMsg}
+                helperText={errorMsg}
               />
 
               {/* <FormControlLabel
@@ -135,7 +144,7 @@ export function SignInPage() {
               </Link> */}
               <Button
                 type="submit"
-                disabled={auth.signinPending}
+                disabled={disabled}
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 3 }}
@@ -146,7 +155,7 @@ export function SignInPage() {
               <Divider />
               <Button
                 type="button"
-                disabled={auth.signinPending}
+                disabled={disabled}
                 fullWidth
                 variant="outlined"
                 sx={{ mt: 3 }}
@@ -162,7 +171,7 @@ export function SignInPage() {
               </Button>
               <Button
                 type="button"
-                disabled={auth.signinPending}
+                disabled={disabled}
                 fullWidth
                 variant="outlined"
                 sx={{ mt: 3, mb: 3 }}

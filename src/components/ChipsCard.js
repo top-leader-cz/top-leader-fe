@@ -20,6 +20,7 @@ export const ChipsCard = ({
         <Stack direction="column" spacing={1}>
           {keys.map((key) => (
             <Chip
+              key={key}
               color={key === selectedKey ? "primary" : "default"}
               sx={{ borderRadius: 1, justifyContent: "flex-start" }}
               label={[dict[key]?.emoji ?? "👤", dict[key]?.name || key]

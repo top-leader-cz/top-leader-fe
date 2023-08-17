@@ -1,17 +1,24 @@
 import { initializeApp } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { createContext, useCallback, useContext, useState } from "react";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 
-var config = {
-  baseUrl: "https://topleader-394306.ey.r.appspot.com",
+// Initialize Firebase
+var firebaseConfig = {
+  apiKey: "AIzaSyC2VakNs4SRvIW3DGaP7AlIfGgPgXLg1LA",
+  authDomain: "topleader-fb.firebaseapp.com",
+  projectId: "topleader-fb",
+  storageBucket: "topleader-fb.appspot.com",
+  messagingSenderId: "801167932186",
+  appId: "1:801167932186:web:ec327d26065a0d9b324aa3",
 };
 
-const firebaseAuth = {};
+const app = initializeApp(firebaseConfig);
+const firebaseAuth = getAuth(app);
 
-export const AuthContext2 = createContext(null);
+export const AuthContext = createContext(null);
 
-export function AuthProvider2({ children }) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useSessionStorage("user", null);
   const [signinPending, setSigninPending] = useState(false);
 
@@ -57,35 +64,26 @@ export function AuthProvider2({ children }) {
   const authFetch = useCallback(
     ({
       url,
-      baseUrl = "",
-      // baseUrl = config.baseUrl,
+      baseUrl = firebaseConfig.authDomain,
       method = "GET",
       type = "json",
       data,
     }) => {
-      // if (!user) throw new Error("Not signed in");
-      const username = "slavik.dan12@gmail.com";
-      const pass = "pass";
-      const token = btoa(`${username}:${pass}`);
-      const Authorization = `Basic ${token}`;
+      if (!user) throw new Error("Not signed in");
 
-      const promise = fetch(baseUrl + url, {
+      const promise = fetch(url, {
         method,
         // credentials: "include",
         headers: [
-          ["Authorization", Authorization],
+          ["Authorization", `Bearer ${user.jwt}`],
           // ["Accept", "json"],
           // ["Content-Type", "text/json"],
-          ["Accept", "application/json"],
-          ["Content-Type", "application/json"],
-          ["Access-Control-Allow-Origin", "*"],
         ],
         /** A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request's mode. */
         // mode: "no-cors", // "cors" | "navigate" | "no-cors" | "same-origin";
-        // referrer: "https://topleader-394306.ey.r.appspot.com/",
+        // referrer: "",
         ...(data ? { body: JSON.stringify(data) } : {}),
       }).then(async (response) => {
-        console.log("%c[Auth2]", "color:crimson");
         if (!response.ok) {
           console.log("TODO", response);
         }
@@ -100,11 +98,9 @@ export function AuthProvider2({ children }) {
 
   const value = { user, signin, signinPending, signout, authFetch };
 
-  return (
-    <AuthContext2.Provider value={value}>{children}</AuthContext2.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth2() {
-  return useContext(AuthContext2);
+export function useAuth() {
+  return useContext(AuthContext);
 }

@@ -21,7 +21,7 @@ import messages_de_en from "./translations/de_en.json";
 import messages_de_cz from "./translations/de_cz.json";
 import messages_es from "./translations/es.json";
 import { useState, createContext, useCallback } from "react";
-import { AuthProvider2 } from "./features/Authorization/AuthProvider2";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const messages = {
   en: messages_en,
@@ -33,6 +33,8 @@ const messages = {
 };
 
 export const TranslationContext = createContext();
+
+const queryClient = new QueryClient();
 
 const TranslationProvider = ({ children }) => {
   const [language, _setLanguage] = useState(
@@ -62,14 +64,14 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <TranslationProvider>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <AuthProvider>
-            <AuthProvider2>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
               <RightMenuProvider>
                 <CssBaseline />
                 <RouterProvider router={router} />
               </RightMenuProvider>
-            </AuthProvider2>
-          </AuthProvider>
+            </AuthProvider>
+          </QueryClientProvider>
         </LocalizationProvider>
       </TranslationProvider>
     </ThemeProvider>

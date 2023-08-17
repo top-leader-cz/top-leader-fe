@@ -20,8 +20,13 @@ export const ProgressStats = ({ items }) => {
         justifyContent: "space-between",
       }}
     >
-      {items.map(({ label, value }) => (
-        <Count key={label} sx={{ flexGrow: 1 }} label={label} value={value} />
+      {items.map(({ label, value, key }) => (
+        <Count
+          key={key || label}
+          sx={{ flexGrow: 1 }}
+          label={label}
+          value={value}
+        />
       ))}
     </Box>
   );

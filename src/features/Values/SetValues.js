@@ -1,6 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
 import React, { useCallback } from "react";
+import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -8,9 +9,9 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { SelectableChip } from "../../components/SelectableChip";
 import { H1, H2, P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { useSelection } from "../../hooks/useSelection";
 import { routes } from "../../routes";
+import { useAuth } from "../Authorization";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
 
@@ -53,17 +54,40 @@ const createValuesEntry = ({ selectedKeys }) => {
 
 const useMyValues = () => {
   const { values } = useValuesDict();
-  const valuesHistory = useHistoryEntries({ storageKey: "values_history" });
+  const { user, fetchUser, authFetch } = useAuth();
   const { selectedKeys, toggleItem } = useSelection({
-    initialValue: valuesHistory.last?.selectedKeys ?? [],
+    initialValue: user?.data?.values,
   });
+
+  const queryClient = useQueryClient();
+  const mutation = useMutation(
+    async ({ selectedKeys }) => {
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/values`,
+        data: { data: selectedKeys },
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("values");
+      },
+    }
+  );
+
+  console.log({ user });
+
   const navigate = useNavigate();
 
   const save = useCallback(() => {
-    valuesHistory.push(createValuesEntry({ selectedKeys }));
+    mutation.mutate({ selectedKeys });
+    fetchUser();
+    // debugger;
+    // valuesHistory.push(createValuesEntry({ selectedKeys }));
     navigate(routes.dashboard);
     // navigate(routes.myValues);
-  }, [navigate, selectedKeys, valuesHistory]);
+  }, [navigate, selectedKeys]);
+  // }, [navigate, selectedKeys, valuesHistory]);
 
   console.log("[useMyValues]", {});
 
@@ -127,9 +151,11 @@ export function SetValuesPage() {
             my={7.5}
           />
         </Box>
+
         <Box sx={SelectableChip.wrapperSx}>
           {items.map((item) => (
             <SelectableChip
+              key={item.label}
               label={item.label}
               selected={selectedKeys.includes(item.key)}
               onClick={(e) => toggleItem(item)}

@@ -11,6 +11,9 @@ import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
+import { useAuth } from "../Authorization";
+import { useQuery } from "react-query";
+import { useMakeSelectable } from "../Values/MyValues";
 
 const AssessmentRightMenu = ({
   history,
@@ -95,7 +98,31 @@ const SelectedStregth = ({ positives = [], tips = "" }) => {
   );
 };
 
+const useStrengthsHistoryQuery = () => {
+  const { authFetch } = useAuth();
+  return useQuery({
+    queryKey: ["strengths"],
+    onSuccess: (data) => {
+      // console.log("q s", { data });
+    },
+    queryFn: async () =>
+      authFetch({ url: "/api/latest/history/STRENGTHS" }).then(
+        ({ json }) => json
+      ),
+  });
+};
+
 export function StrengthsPage() {
+  const { data } = useStrengthsHistoryQuery();
+  const sel = useMakeSelectable({
+    entries: data ?? [],
+    map: (el) => ({
+      // status
+      date: el.createdAt,
+      timestamp: new Date(el.createdAt).getTime(),
+      orderedTalents: el.data.strengths,
+    }),
+  });
   const assessmentHistory = useHistoryEntries({
     storageKey: "assessment_history",
   });
@@ -104,6 +131,8 @@ export function StrengthsPage() {
 
   console.log("[Strengths.rndr]", {
     assessmentHistory,
+    sel,
+    data,
   });
 
   return (
@@ -111,10 +140,10 @@ export function StrengthsPage() {
       <Layout
         rightMenuContent={
           <AssessmentRightMenu
-            history={assessmentHistory.all}
-            selectedTimestamp={assessmentHistory.selected?.timestamp}
-            onSelect={assessmentHistory.setSelected}
-            onRemove={assessmentHistory.remove}
+            history={sel.all}
+            selectedTimestamp={sel.selected?.timestamp}
+            onSelect={sel.setSelected}
+            // onRemove={assessmentHistory.remove}
             onRetake={() => navigate(routes.assessment)}
           />
         }
@@ -143,7 +172,7 @@ export function StrengthsPage() {
             <Msg id="strengths.heading.perex" />
           </P>
           <ChipsCard
-            keys={assessmentHistory.selected?.orderedTalents.slice(0, 5)}
+            keys={sel.selected?.orderedTalents.slice(0, 5)}
             dict={talents}
             renderSummary={() => (
               <CardContent>
@@ -170,9 +199,9 @@ export function StrengthsPage() {
             )}
           />
 
-          {assessmentHistory.selected?.orderedTalents.length > 5 && (
+          {sel.selected?.orderedTalents.length > 5 && (
             <ChipsCard
-              keys={assessmentHistory.selected?.orderedTalents.slice(5, 10)}
+              keys={sel.selected?.orderedTalents.slice(5, 10)}
               dict={talents}
               renderSummary={() => (
                 <CardContent>
@@ -190,9 +219,9 @@ export function StrengthsPage() {
               )}
             />
           )}
-          {assessmentHistory.selected?.orderedTalents.length > 10 && (
+          {sel.selected?.orderedTalents.length > 10 && (
             <ChipsCard
-              keys={assessmentHistory.selected?.orderedTalents.slice(10)}
+              keys={sel.selected?.orderedTalents.slice(10)}
               dict={talents}
               renderSummary={() => (
                 <CardContent>

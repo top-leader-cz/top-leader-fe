@@ -13,6 +13,8 @@ import { ProgressStats } from "../../components/ProgressStats";
 import { Score } from "../../components/Score";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { messages } from "./messages";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useAuth } from "../Authorization";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -57,7 +59,7 @@ function CircularProgressWithLabel({ value, sx = {} }) {
       />
       <CircularProgress
         variant="determinate"
-        disableShrink
+        // disableShrink
         sx={{
           position: "absolute",
           left: 0,
@@ -125,10 +127,12 @@ const AssessmentRightMenu = ({
         <ProgressStats
           items={[
             {
+              key: 0,
               label: <Msg id="assessment.menu.questions" />,
               value: totalCount,
             },
             {
+              key: 1,
               label: <Msg id="assessment.menu.responses" />,
               value: responsesCount,
             },
@@ -164,7 +168,13 @@ const createAssessmentEntry = ({ questions, scores }) => {
       ? "Assessment completed"
       : "Incomplete";
 
-  console.log({ orderedTalents, scoreSumByTalent, questions, scores, status });
+  console.log("createAssessmentEntry", {
+    orderedTalents,
+    scoreSumByTalent,
+    questions,
+    scores,
+    status,
+  });
 
   return {
     date: new Date().toISOString(),
@@ -177,53 +187,160 @@ const createAssessmentEntry = ({ questions, scores }) => {
   };
 };
 
-const useAssessment = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [scores, setScores] = useLocalStorage("assessment", {});
-  const assessmentHistory = useHistoryEntries({
-    storageKey: "assessment_history",
+const orderedTalents = [
+  "analyser",
+  "strategist",
+  "responsible",
+  "initiator",
+  "intellectual",
+  "concentrated",
+  "solver",
+  "coach",
+  "connector",
+  "believer",
+  "loverOfOrder",
+  "leader",
+  "selfDeveloper",
+  "ideamaker",
+  "empathizer",
+  "flexible",
+  "selfBeliever",
+  "positive",
+  "communicator",
+  "challenger",
+];
+
+const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
+  const queryClient = useQueryClient();
+  const { authFetch, fetchUser } = useAuth();
+
+  const deleteAnswersMutation = useMutation(
+    async () => {
+      authFetch({
+        method: "DELETE",
+        url: `/api/latest/user-assessments`,
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("assessment");
+      },
+    }
+  );
+
+  const strengthsMutation = useMutation(
+    async ({ TODO__________orderedTalents }) => {
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/strengths`,
+        data: { data: orderedTalents },
+      });
+    },
+    {
+      onSuccess: () => {
+        deleteAnswersMutation.mutate();
+        fetchUser();
+        queryClient.invalidateQueries("strengths");
+        onSuccess?.();
+      },
+    }
+  );
+  return strengthsMutation;
+};
+
+const useAnswers = ({ onFetched } = {}) => {
+  const { authFetch } = useAuth();
+  // TODO: do not invalidate on blur/focus
+  const answersQuery = useQuery({
+    queryKey: ["assessment"],
+    queryFn: async () => authFetch({ url: `/api/latest/user-assessments` }),
+    onSuccess: ({ json }) => {
+      console.log("[answersQuery.success]", { json });
+      /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
+      onFetched(json);
+    },
   });
-  const navigate = useNavigate();
-
-  const { questions } = useQuestionsDict();
-  const question = questions[currentIndex];
-  const saveAssessment = useCallback(() => {
-    assessmentHistory.push(
-      createAssessmentEntry({ questions: questions, scores })
-    );
-    setScores({});
-    navigate(routes.strengths);
-  }, [assessmentHistory, navigate, questions, scores, setScores]);
-
-  console.log("[useAssessment]", { currentIndex, scores, question });
+  const answerMutation = useMutation(
+    async ({ questionId, answer }) => {
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-assessments/${questionId}`,
+        data: { answer },
+      });
+    },
+    {
+      onSuccess: ({ json }) => {
+        console.log("[answerMutation.success]", { json });
+        // queryClient.invalidateQueries("assessment");
+      },
+    }
+  );
 
   return {
-    saveAssessment,
-    pagination: {
-      currentIndex,
-      totalCount: questions.length,
-      back: () => setCurrentIndex((i) => Math.max(0, i - 1)),
-      next: () => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1)),
-      onChange: ({ value }) => {
-        setCurrentIndex(value);
-      },
-    },
-    question: question.data,
-    score: {
-      value: scores[question.id],
-      onChange: ({ value }) => {
-        setScores((prev) => ({ ...prev, [question.id]: value }));
-      },
-    },
-    responsesCount: Object.values(scores).filter(
-      (score) => typeof score === "number"
-    ).length,
+    answersQuery,
+    answerMutation,
   };
 };
 
-function Assessment() {
-  const { pagination, question, score, responsesCount, saveAssessment } =
-    useAssessment();
+const useAssessment = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [scores, setScores] = useLocalStorage("assessment", {});
+
+  const answers = useAnswers({
+    onFetched: (assessment) => {
+      if (assessment.questionAnswered > 0) {
+        const scores = Object.fromEntries(
+          assessment.answers.map(({ answer, questionId }) => [
+            questionId,
+            answer,
+          ])
+        );
+        setScores(scores);
+      }
+    },
+  });
+  const { mutate } = useSaveStrengthsMutation({
+    onSuccess: () => {
+      setScores({});
+      navigate(routes.strengths);
+    },
+  });
+
+  const navigate = useNavigate();
+  const { questions } = useQuestionsDict();
+  const question = questions[currentIndex];
+
+  const saveAssessment = useCallback(() => {
+    const entry = createAssessmentEntry({ questions, scores });
+    mutate({ orderedTalents: entry.orderedTalents });
+  }, [mutate, questions, scores]);
+
+  const score = {
+    value: scores[question.id],
+    onChange: useCallback(
+      ({ value }) => {
+        setScores((prev) => ({ ...prev, [question.id]: value }));
+      },
+      [question.id, setScores]
+    ),
+  };
+
+  const submitDisabled =
+    typeof score.value !== "number" || answers.answersQuery.isLoading;
+
+  const pagination = {
+    currentIndex,
+    totalCount: questions.length,
+    back: useCallback(() => setCurrentIndex((i) => Math.max(0, i - 1)), []),
+    next: useCallback(
+      () => setCurrentIndex((i) => Math.min(questions.length - 1, i + 1)),
+      [questions.length]
+    ),
+    onChange: useCallback(({ value }) => {
+      setCurrentIndex(value);
+    }, []),
+  };
+
   const handleNext =
     typeof score.value !== "number"
       ? () => {}
@@ -231,14 +348,54 @@ function Assessment() {
       ? pagination.next
       : saveAssessment;
 
-  const handleNextRef = useRef(handleNext);
-  handleNextRef.current = handleNext;
+  const nextWithSave = () => {
+    if (handleNext === pagination.next) {
+      const answer = { questionId: question.id, answer: score.value };
+      console.log("nextWithSave next", answer);
+      answers.answerMutation.mutate(answer);
+    }
+    handleNext();
+  };
+
+  console.log("[useAssessment.rndr]", {
+    currentIndex,
+    scores,
+    question,
+  });
+
+  return {
+    saveAssessment,
+    pagination,
+    question: question.data,
+    score,
+    responsesCount: Object.values(scores).filter(
+      (score) => typeof score === "number"
+    ).length,
+    nextWithSave,
+    submitDisabled,
+  };
+};
+
+function Assessment() {
+  const {
+    pagination,
+    question,
+    score,
+    responsesCount,
+    saveAssessment,
+    nextWithSave,
+    submitDisabled,
+  } = useAssessment();
+
+  const handleNextRef = useRef(nextWithSave);
+  handleNextRef.current = nextWithSave;
   const handleBackRef = useRef(pagination.back);
   handleBackRef.current = pagination.back;
   const onScoreChangeRef = useRef(score.onChange);
   onScoreChangeRef.current = score.onChange;
   useEffect(() => {
     const fn = (e) => {
+      console.log("keydown eff");
       if (e.key === "Enter" || e.key === "ArrowRight") handleNextRef.current();
       if (e.key === "Escape" || e.key === "ArrowLeft") handleBackRef.current();
       if (e.key?.match(/^\d$/)) {
@@ -251,7 +408,7 @@ function Assessment() {
     return () => document.removeEventListener("keydown", fn);
   }, []);
 
-  console.log("[Assessment.rndr]", { pagination, question, score });
+  // console.log("[Assessment.rndr]", { pagination, question, score });
   return (
     <MsgProvider messages={messages}>
       <Layout
@@ -323,8 +480,8 @@ function Assessment() {
             type="submit"
             sx={{ mx: 4 }}
             variant="contained"
-            disabled={typeof score.value !== "number"}
-            onClick={handleNext}
+            disabled={submitDisabled}
+            onClick={nextWithSave}
             endIcon={<ArrowForward />}
           >
             {pagination.currentIndex >= pagination.totalCount - 1 ? (

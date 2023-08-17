@@ -17,9 +17,8 @@ import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { useAuth, useAuth2 } from "../Authorization";
+import { useAuth } from "../Authorization";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
@@ -54,27 +53,18 @@ const useNote = () => {
   const url = "/api/rest/note";
   const [_note, _setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { authFetch } = useAuth();
-  const auth2 = useAuth2();
-
-  useEffect(() => {
-    auth2.authFetch({ url: "/api/latest/user-info" }).then((bag) => {
-      console.log({ bag });
-    });
-    // auth2.authFetch({ url: "/latest/user-info" }).then((bag) => {
-    //   console.log({ bag });
-    // });
-  }, []);
+  const { _authFetch } = useAuth();
 
   const getNote = useCallback(() => {
     setIsLoading(true);
-    authFetch({ url }).then(({ response, json }) => {
+    _authFetch({ url }).then(({ response, json }) => {
       // console.log(url, response.status, json);
       _setNote(json?.note?.[0]?.content ?? "");
       setIsLoading(false);
     });
-  }, [authFetch, _setNote]);
+  }, [_authFetch, _setNote]);
 
+  // TODO
   // useEffect(() => {
   //   getNote();
   // }, []);
@@ -83,18 +73,17 @@ const useNote = () => {
     ({ note }) => {
       if (_note === note) return;
       setIsLoading(true);
-      authFetch({ url, method: "POST", data: { content: note } }).then(() =>
+      _authFetch({ url, method: "POST", data: { content: note } }).then(() =>
         getNote()
       );
     },
-    [_note, authFetch, getNote]
+    [_note, _authFetch, getNote]
   );
 
   return { note: _note, isLoading, setNote };
 };
 
 const NotesLoader = () => {
-  console.log("NL rndr");
   return (
     <Box sx={{ position: "relative", height: 0, overflow: "visible" }}>
       <Skeleton variant="text" sx={{ mb: 1 }} />
@@ -173,56 +162,54 @@ const DashboardCard = ({
   );
 };
 
-const DashboardCardAssessment = () => {
+const DashboardCardAssessment = ({ selectedKeys = [] }) => {
   const { talents } = useTalentsDict();
-  const { last } = useHistoryEntries({ storageKey: "assessment_history" });
   const items = useMemo(
     () =>
-      last?.orderedTalents.slice(0, 5).map((key) => ({
+      selectedKeys?.slice(0, 5).map((key) => ({
         label: [talents[key]?.emoji ?? "👤", talents[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [last?.orderedTalents, talents]
+    [selectedKeys, talents]
   );
   const msg = useMsg();
 
   return (
     <DashboardCard
       title={
-        items
+        items.length
           ? msg("dashboard.cards.strengths.title.filled")
           : msg("dashboard.cards.strengths.title.empty")
       }
-      href={items ? routes.strengths : routes.assessment}
+      href={items.length ? routes.strengths : routes.assessment}
       items={items}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#0BA5EC" }}
     />
   );
 };
 
-const DashboardCardValues = () => {
-  const { last } = useHistoryEntries({ storageKey: "values_history" }); // TODO: keys vs wrapper hooks
+const DashboardCardValues = ({ selectedKeys = [] }) => {
   const { values } = useValuesDict();
   const items = useMemo(
     () =>
-      last?.selectedKeys.slice(0).map((key) => ({
+      selectedKeys.map((key) => ({
         label: [values[key]?.emoji ?? "⚓️", values[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [last?.selectedKeys, values]
+    [selectedKeys, values]
   );
   const msg = useMsg();
 
   return (
     <DashboardCard
       title={
-        items
+        items.length
           ? msg("dashboard.cards.values.title.filled")
           : msg("dashboard.cards.values.title.filled")
       }
-      href={items ? routes.myValues : routes.setValues}
+      href={items.length ? routes.myValues : routes.setValues}
       items={items}
       fallbackIcon={{ name: "JoinRight", color: "#2E90FA" }}
     />
@@ -256,11 +243,8 @@ const DashboardCardSession = () => {
 };
 
 export function DashboardPage() {
-  const { user, authFetch } = useAuth();
-
-  // useEffect(() => {
-  //   const res = authFetch({ url: "/api/rest/users" });
-  // }, []);
+  const { user } = useAuth();
+  console.log("[Dashboard.rndr]", { user });
 
   return (
     <MsgProvider messages={messages}>
@@ -288,8 +272,8 @@ export function DashboardPage() {
             <Msg id="dashboard.section-1.perex" />
           </P>
           <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-            <DashboardCardAssessment />
-            <DashboardCardValues />
+            <DashboardCardAssessment selectedKeys={user?.data?.strengths} />
+            <DashboardCardValues selectedKeys={user?.data?.values} />
             <DashboardCardNotes />
             <DashboardCardFeedback />
           </Masonry>

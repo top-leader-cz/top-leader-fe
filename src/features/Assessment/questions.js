@@ -927,7 +927,6 @@ export const useQuestionsDict = () => {
       })),
     [intl]
   );
-  console.log(">>>>>", { questions });
 
   return useMemo(() => ({ questions }), [questions]);
 };
