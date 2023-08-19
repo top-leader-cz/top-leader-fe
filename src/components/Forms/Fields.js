@@ -163,11 +163,9 @@ export const SwitchField = ({ name, rules, ...props }) => {
       // control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field }) =>
-        console.log("[SwitchField.rndr]", name, { props, field }) || (
-          <Switch {...{ ...props, ...field, checked: !!field.value, name }} />
-        )
-      }
+      render={({ field }) => (
+        <Switch {...{ ...props, ...field, checked: !!field.value, name }} />
+      )}
     />
   );
 };
@@ -177,11 +175,9 @@ export const CheckboxField = ({ name, rules, ...props }) => {
     <Controller
       name={name}
       rules={rules}
-      render={({ field }) =>
-        console.log("[CheckboxField.rndr]", name, { props, field }) || (
-          <Checkbox {...{ ...props, ...field, checked: !!field.value, name }} />
-        )
-      }
+      render={({ field }) => (
+        <Checkbox {...{ ...props, ...field, checked: !!field.value, name }} />
+      )}
     />
   );
 };
@@ -238,17 +234,16 @@ export const RHFTextField = ({ name, control, rules, debug, ...props }) => {
       control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field, fieldState }) =>
-        debugLog({ ...debug, data: { fieldState, field } }) || (
-          <TextField
-            error={!!fieldState.error}
-            helperText={getError(fieldState.error, rules)}
-            // helperText={fieldState.error}
-            {...props}
-            {...field}
-          />
-        )
-      }
+      render={({ field, fieldState }) => (
+        // debugLog({ ...debug, data: { fieldState, field } }) ||
+        <TextField
+          error={!!fieldState.error}
+          helperText={getError(fieldState.error, rules)}
+          // helperText={fieldState.error}
+          {...props}
+          {...field}
+        />
+      )}
     />
   );
 };
@@ -337,7 +332,6 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
 
 const SliderFieldInner = ({ id, label, min, max, onChange, value }) => {
   const handleChange = (e, newValue) => {
-    console.log("handleChange", { newValue });
     onChange(newValue);
   };
 
@@ -641,8 +635,7 @@ const FileUploadInner = ({ name, src, secondaryText }) => {
           display: "flex",
           flexDirection: "column",
           p: 2,
-          color: (theme) =>
-            console.log({ theme }) || theme.palette.text.primary,
+          color: (theme) => theme.palette.text.primary,
           borderColor: "rgba(0, 0, 0, 0.23)",
           backgroundColor: "white",
           boxShadow: "none",

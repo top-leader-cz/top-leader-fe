@@ -2,7 +2,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import * as React from "react";
 import { RouterProvider } from "react-router-dom";
-import { AuthProvider } from "./features/Authorization/AuthProvider";
+import { AuthProvider, useAuth } from "./features/Authorization/AuthProvider";
 
 // TODO: breaks app - circular dep?
 // import { AuthProvider } from "./features/Auth";
@@ -22,6 +22,7 @@ import messages_de_cz from "./translations/de_cz.json";
 import messages_es from "./translations/es.json";
 import { useState, createContext, useCallback } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const messages = {
   en: messages_en,
@@ -59,6 +60,20 @@ const TranslationProvider = ({ children }) => {
   );
 };
 
+const GlobalLoader = ({ children }) => {
+  const auth = useAuth();
+  if (auth.isLoggedIn && !auth.user.data)
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
+  else return children;
+};
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -66,10 +81,12 @@ export default function App() {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <RightMenuProvider>
-                <CssBaseline />
-                <RouterProvider router={router} />
-              </RightMenuProvider>
+              <GlobalLoader>
+                <RightMenuProvider>
+                  <CssBaseline />
+                  <RouterProvider router={router} />
+                </RightMenuProvider>
+              </GlobalLoader>
             </AuthProvider>
           </QueryClientProvider>
         </LocalizationProvider>

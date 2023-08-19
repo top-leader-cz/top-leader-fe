@@ -6,7 +6,7 @@ export const AuthRedirect = () => {
   let auth = useAuth();
   console.log("[AuthRedirect]", { auth });
 
-  if (!auth.user?.data) {
+  if (!auth.isLoggedIn) {
     return <Navigate to={routes.signIn} replace />;
   } else {
     return <Navigate to={routes.dashboard} replace />;
@@ -16,11 +16,11 @@ export const AuthRedirect = () => {
 export function RequireAuth({ children }) {
   const auth = useAuth();
   const location = useLocation();
-  console.log("[RequireAuth]", !auth.user?.data ? " REDIRECTING" : "", {
+  console.log("[RequireAuth]", !auth.isLoggedIn ? " REDIRECTING" : "", {
     auth,
   });
 
-  if (!auth.user?.data) {
+  if (!auth.isLoggedIn) {
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
@@ -34,10 +34,10 @@ export function RequireAuth({ children }) {
 export function ForbidAuth({ children }) {
   const auth = useAuth();
   const location = useLocation();
-  console.log("[ForbidAuth]", auth.user?.data ? " REDIRECTING" : "", { auth });
+  console.log("[ForbidAuth]", auth.isLoggedIn ? " REDIRECTING" : "", { auth });
   const from = location.state?.from?.pathname || routes.dashboard;
 
-  if (auth.user?.data) {
+  if (auth.isLoggedIn) {
     return <Navigate to={from} state={{ from: location }} replace />;
   }
 

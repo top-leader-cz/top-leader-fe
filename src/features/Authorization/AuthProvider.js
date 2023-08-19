@@ -1,33 +1,48 @@
 import { createContext, useCallback, useContext } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 
 export const AuthContext = createContext(null);
 
-const tokenize = ({ email, password }) => btoa(`${email}:${password}`);
-const getAuth = ({ email, password, token = tokenize({ email, password }) }) =>
-  `Basic ${token}`;
-const getInit = ({ method, Authorization, data }) => ({
-  method,
-  headers: [
-    ["Authorization", Authorization],
-    ["Accept", "application/json"],
-    ["Content-Type", "application/json"],
-    ["Access-Control-Allow-Origin", "*"],
-  ],
-  // credentials: "include",
-  /** A string to indicate whether the request will use CORS, or will be restricted to same-origin URLs. Sets request's mode. */
-  // mode: "no-cors", // "cors" | "navigate" | "no-cors" | "same-origin";
-  // referrer: "https://topleader-394306.ey.r.appspot.com/",
-  ...(data ? { body: JSON.stringify(data) } : {}),
-});
+const getInit = ({ method, data }) => {
+  const isFormData = data instanceof FormData;
+  return {
+    method,
+    headers: [
+      ...(isFormData
+        ? []
+        : [
+            ["Accept", "application/json"],
+            ["Content-Type", "application/json"],
+          ]),
+      ["Access-Control-Allow-Origin", "*"],
+    ],
+    // credentials: "include", // TODO: test
+    // mode: "no-cors", // "cors" | "navigate" | "no-cors" | "same-origin";
+    ...(isFormData
+      ? { body: data }
+      : data
+      ? { body: JSON.stringify(data) }
+      : {}),
+  };
+};
 
-const _fetchUser = ({ authFetch, token }) =>
-  console.log("%c[Q.fetchUser]", "color:crimson", { token, authFetch }) ||
+const _login = ({ authFetch, username, password }) =>
   authFetch({
-    url: "/api/latest/user-info",
-    Authorization: getAuth({ token }),
+    type: FETCH_TYPE.FORMDATA,
+    method: "POST",
+    url: "/login",
+    data: (() => {
+      const formData = new FormData();
+      formData.append("username", username);
+      formData.append("password", password);
+      console.log("_login", { formData, username, password });
+      return formData;
+    })(),
   });
+
+const _fetchUser = ({ authFetch }) =>
+  authFetch({ url: "/api/latest/user-info" });
 
 const throwOnError = (response) => {
   console.log("FETCH ERR", { response });
@@ -41,65 +56,64 @@ const throwOnError = (response) => {
 export const FETCH_TYPE = {
   JSON: "JSON",
   JSON_WITH_META: "JSON_WITH_META",
+  FORMDATA: "FORMDATA",
 };
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useSessionStorage("");
+  // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS)
+  const [isLoggedIn, setIsLoggedIn] = useSessionStorage(false);
+
+  const queryClient = useQueryClient();
 
   const authFetch = useCallback(
-    ({
-      url,
-      method = "GET",
-      type = FETCH_TYPE.JSON,
-      data,
-      Authorization = getAuth({ token }),
-    }) =>
-      fetch(url, getInit({ method, Authorization, data })).then(
-        async (response) => {
-          if (!response.ok) throwOnError(response);
-          if (type === FETCH_TYPE.JSON) return await response.json();
-          if (type === FETCH_TYPE.JSON_WITH_META)
-            return { response, json: await response.json() };
-          return { response };
-        }
-      ),
-    [token]
+    ({ url, method = "GET", type = FETCH_TYPE.JSON, data }) =>
+      fetch(url, getInit({ method, data })).then(async (response) => {
+        if (!response.ok) throwOnError(response);
+        if (type === FETCH_TYPE.JSON) return await response.json();
+        if (type === FETCH_TYPE.JSON_WITH_META)
+          return { response, json: await response.json() };
+        return { response };
+      }),
+    []
   );
 
-  const userQuery = useQuery({
-    queryKey: ["user-info"],
-    queryFn: () => _fetchUser({ authFetch, token }),
-    enabled: !!token,
-    retry: false,
-    retryOnMount: false,
-    onError: (e) => {
-      console.log("%c[AuthProvider.userQuery.onError]", "color:coral", { e });
-      if (e?.response?.status === 401) setToken(""); // TODO: move to authFetch?
-    },
-  });
-
-  console.log("[AP.rndr]", { userQuery, token });
-
-  const signin = ({ email, password }) => {
-    setToken(tokenize({ email, password }));
+  const signin = ({ username, password }) => {
+    loginMutation.mutate({ username, password });
   };
 
   const signout = () => {
-    setToken("");
+    setIsLoggedIn(false);
+    queryClient.removeQueries({ queryKey: ["user-info"] });
   };
 
-  // TODO: rm
-  const queryClient = useQueryClient();
+  const loginMutation = useMutation({
+    mutationFn: (fields) => _login({ authFetch, ...fields }),
+    onSuccess: () => setIsLoggedIn(true),
+  });
+
+  const userQuery = useQuery({
+    queryKey: ["user-info"],
+    queryFn: () => _fetchUser({ authFetch }),
+    enabled: !!isLoggedIn,
+    onError: (e) => {
+      console.log("%c[AuthProvider.userQuery.onError]", "color:coral", { e });
+      if (e?.response?.status === 401) signout(); // TODO: move to authFetch?
+    },
+  });
 
   const value = {
+    isLoggedIn,
+    loginMutation,
     user: userQuery,
     signin,
     signout,
     authFetch,
     fetchUser: () => {
-      queryClient.invalidateQueries("user-info");
+      queryClient.invalidateQueries("user-info"); // TODO: rm?
     },
   };
+
+  console.log("[AP.rndr]", value);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -188,8 +188,8 @@ const createAssessmentEntry = ({ questions, scores }) => {
 };
 
 const orderedTalents = [
-  "analyser",
   "strategist",
+  "analyser",
   "responsible",
   "initiator",
   "intellectual",
@@ -214,37 +214,33 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
   const queryClient = useQueryClient();
   const { authFetch, fetchUser } = useAuth();
 
-  const deleteAnswersMutation = useMutation(
-    async () => {
+  const deleteAnswersMutation = useMutation({
+    mutationFn: async () => {
       authFetch({
         method: "DELETE",
         url: `/api/latest/user-assessments`,
       });
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("assessment");
-      },
-    }
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries("assessment");
+    },
+  });
 
-  const strengthsMutation = useMutation(
-    async ({ TODO__________orderedTalents }) => {
+  const strengthsMutation = useMutation({
+    mutationFn: async ({ TODO__________orderedTalents }) => {
       authFetch({
         method: "POST",
         url: `/api/latest/user-info/strengths`,
         data: { data: orderedTalents },
       });
     },
-    {
-      onSuccess: () => {
-        deleteAnswersMutation.mutate();
-        fetchUser();
-        queryClient.invalidateQueries("strengths");
-        onSuccess?.();
-      },
-    }
-  );
+    onSuccess: () => {
+      deleteAnswersMutation.mutate();
+      fetchUser();
+      queryClient.invalidateQueries("strengths");
+      onSuccess?.();
+    },
+  });
   return strengthsMutation;
 };
 
@@ -253,28 +249,22 @@ const useAnswers = ({ onFetched } = {}) => {
   // TODO: do not invalidate on blur/focus
   const answersQuery = useQuery({
     queryKey: ["assessment"],
-    queryFn: async () => authFetch({ url: `/api/latest/user-assessments` }),
+    queryFn: () => authFetch({ url: `/api/latest/user-assessments` }),
     onSuccess: (json) => {
       console.log("[answersQuery.success]", { json });
       /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
       onFetched(json);
     },
   });
-  const answerMutation = useMutation(
-    async ({ questionId, answer }) => {
+  const answerMutation = useMutation({
+    mutationFn: async ({ questionId, answer }) => {
       authFetch({
         method: "POST",
         url: `/api/latest/user-assessments/${questionId}`,
         data: { answer },
       });
     },
-    {
-      onSuccess: ({ json }) => {
-        console.log("[answerMutation.success]", { json });
-        // queryClient.invalidateQueries("assessment");
-      },
-    }
-  );
+  });
 
   return {
     answersQuery,

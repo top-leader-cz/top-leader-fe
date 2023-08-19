@@ -1,5 +1,14 @@
 import { ArrowBack, Star } from "@mui/icons-material";
-import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Button,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Divider,
+  Paper,
+} from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
@@ -107,7 +116,7 @@ const useStrengthsHistoryQuery = () => {
 };
 
 export function StrengthsPage() {
-  const { data } = useStrengthsHistoryQuery();
+  const { data, isLoading } = useStrengthsHistoryQuery();
   const sel = useMakeSelectable({
     entries: data ?? [],
     map: (el) => ({
@@ -117,16 +126,17 @@ export function StrengthsPage() {
       orderedTalents: el.data.strengths,
     }),
   });
-  const assessmentHistory = useHistoryEntries({
-    storageKey: "assessment_history",
-  });
+  // const assessmentHistory = useHistoryEntries({
+  //   storageKey: "assessment_history",
+  // });
   const navigate = useNavigate();
   const { talents } = useTalentsDict();
 
   console.log("[Strengths.rndr]", {
-    assessmentHistory,
+    // assessmentHistory,
     sel,
     data,
+    talents,
   });
 
   return (
@@ -142,6 +152,12 @@ export function StrengthsPage() {
           />
         }
       >
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <Box mt={4} mb={3}>
           <Box
             display="flex"

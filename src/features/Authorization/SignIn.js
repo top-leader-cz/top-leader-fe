@@ -6,43 +6,32 @@ import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { Msg, MsgProvider } from "../../components/Msg";
-// import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
+import { Msg, MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "./";
 import { messages } from "./messages";
-import { useMsg } from "../../components/Msg/Msg";
 
 export function SignInPage() {
-  // const navigate = useNavigate();
-  // const location = useLocation();
-  const auth = useAuth();
+  const { signin, loginMutation } = useAuth();
   const msg = useMsg({ dict: messages });
-  console.log("Login ");
   const form = useForm({
     defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
   });
-
-  // const from = location.state?.from?.pathname || routes.dashboard;
-
-  const handleSubmit = (data, e) => {
-    console.log("[Login submit]", data);
-    return auth.signin(data);
-    // .catch((e) => {
-    //   console.log({ e });
-    //   const message = msg("auth.login.validation.invalid-credentials");
-    //   form.setError("email", { message: "" });
-    //   form.setError("password", { message });
-    // });
+  const handleSubmit = ({ email, password }, e) => {
+    console.log("[Login submit]", { username: email, password });
+    return signin({ username: email, password });
+    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
   };
-  console.log("[SignInPage.rndr]", { auth });
 
-  const disabled = auth.user.isLoading && auth.user.isFetching;
-  const errorMsg = auth.user.error
+  const disabled = loginMutation.isLoading;
+  const errorMsg = loginMutation.error
     ? msg("auth.login.validation.invalid-credentials")
     : "";
+
+  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
 
   return (
     <MsgProvider messages={messages}>
@@ -50,9 +39,7 @@ export function SignInPage() {
         <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
           <Box
             sx={{
-              // mt: "200px",
               my: 8,
-              // mx: 4,
               mx: "25%",
               // width: "33%",
               display: "flex",
