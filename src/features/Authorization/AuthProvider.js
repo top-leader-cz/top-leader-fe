@@ -27,16 +27,20 @@ const _fetchUser = ({ authFetch, token }) =>
   authFetch({
     url: "/api/latest/user-info",
     Authorization: getAuth({ token }),
-    // Authorization: getAuth({ email, password }),
-  }).then(({ json }) => json);
+  });
 
 const throwOnError = (response) => {
   console.log("FETCH ERR", { response });
-  // TODO: compare stacktrace
   const error = new Error("Response not OK");
   error.response = response;
   throw error;
+  // TODO: compare stacktrace
   // throw response;
+};
+
+export const FETCH_TYPE = {
+  JSON: "JSON",
+  JSON_WITH_META: "JSON_WITH_META",
 };
 
 export function AuthProvider({ children }) {
@@ -46,16 +50,17 @@ export function AuthProvider({ children }) {
     ({
       url,
       method = "GET",
-      type = "json",
+      type = FETCH_TYPE.JSON,
       data,
       Authorization = getAuth({ token }),
     }) =>
       fetch(url, getInit({ method, Authorization, data })).then(
         async (response) => {
           if (!response.ok) throwOnError(response);
-          if (type === "json") return { response, json: await response.json() };
-          // TODO: fix {json} => json, add "json+meta" type -> {response, json}
-          // return { response };
+          if (type === FETCH_TYPE.JSON) return await response.json();
+          if (type === FETCH_TYPE.JSON_WITH_META)
+            return { response, json: await response.json() };
+          return { response };
         }
       ),
     [token]

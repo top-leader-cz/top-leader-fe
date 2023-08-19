@@ -39,7 +39,7 @@ export function SignInPage() {
   };
   console.log("[SignInPage.rndr]", { auth });
 
-  const disabled = auth.user.isLoading && auth.user.fetchStatus === "fetching";
+  const disabled = auth.user.isLoading && auth.user.isFetching;
   const errorMsg = auth.user.error
     ? msg("auth.login.validation.invalid-credentials")
     : "";

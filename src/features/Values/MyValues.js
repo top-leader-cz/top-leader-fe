@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, CardContent, Divider, Skeleton } from "@mui/material";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
@@ -14,6 +14,13 @@ import { messages } from "./messages";
 import { useValuesDict } from "./values";
 import { useAuth } from "../Authorization";
 import { useQuery } from "react-query";
+
+const useStaticCallback = (fn) => {
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+
+  return useCallback((...args) => fnRef.current?.(...args), []);
+};
 
 // {
 //     "id": 1,
@@ -38,8 +45,7 @@ const useValuesHistoryQuery = () => {
     onSuccess: (data) => {
       // console.log("q s", { data });
     },
-    queryFn: async () =>
-      authFetch({ url: "/api/latest/history/VALUES" }).then(({ json }) => json),
+    queryFn: async () => authFetch({ url: "/api/latest/history/VALUES" }),
   });
 };
 
@@ -48,7 +54,8 @@ export const useMakeSelectable = ({
   idKey = "timestamp",
   map,
 }) => {
-  const stack = useMemo(() => entries.map(map), [entries]);
+  const staticMap = useStaticCallback(map);
+  const stack = useMemo(() => entries.map(staticMap), [entries, staticMap]);
   const last = stack[stack.length - 1];
   const [selectedId, setSelectedId] = useState();
   const isSelected = useCallback(

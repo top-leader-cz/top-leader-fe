@@ -258,10 +258,7 @@ export function DashboardPage() {
             />
           }
           text={
-            <Msg
-              id="dashboard.header"
-              values={{ user: user.displayName || user.email }}
-            />
+            <Msg id="dashboard.header" values={{ user: user.data.username }} />
           }
         />
         <Box>
@@ -272,8 +269,8 @@ export function DashboardPage() {
             <Msg id="dashboard.section-1.perex" />
           </P>
           <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-            <DashboardCardAssessment selectedKeys={user?.data?.strengths} />
-            <DashboardCardValues selectedKeys={user?.data?.values} />
+            <DashboardCardAssessment selectedKeys={user.data.strengths} />
+            <DashboardCardValues selectedKeys={user.data.values} />
             <DashboardCardNotes />
             <DashboardCardFeedback />
           </Masonry>

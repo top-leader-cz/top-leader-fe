@@ -102,13 +102,7 @@ const useStrengthsHistoryQuery = () => {
   const { authFetch } = useAuth();
   return useQuery({
     queryKey: ["strengths"],
-    onSuccess: (data) => {
-      // console.log("q s", { data });
-    },
-    queryFn: async () =>
-      authFetch({ url: "/api/latest/history/STRENGTHS" }).then(
-        ({ json }) => json
-      ),
+    queryFn: () => authFetch({ url: "/api/latest/history/STRENGTHS" }),
   });
 };
 

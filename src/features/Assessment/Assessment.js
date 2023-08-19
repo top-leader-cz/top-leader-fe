@@ -254,7 +254,7 @@ const useAnswers = ({ onFetched } = {}) => {
   const answersQuery = useQuery({
     queryKey: ["assessment"],
     queryFn: async () => authFetch({ url: `/api/latest/user-assessments` }),
-    onSuccess: ({ json }) => {
+    onSuccess: (json) => {
       console.log("[answersQuery.success]", { json });
       /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
       onFetched(json);
