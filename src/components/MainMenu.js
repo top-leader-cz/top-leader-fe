@@ -24,6 +24,7 @@ import { useAuth } from "../features/Authorization";
 import { routes } from "../routes";
 import { Msg, MsgProvider } from "./Msg";
 import { defineMessages } from "react-intl";
+import { LinkBehavior } from "./LinkBehavior";
 
 const messages = defineMessages({
   "main-menu.items.dashboard": {
@@ -67,6 +68,7 @@ const LogoImg = () => {
       src="/topleader-big.png"
       sx={{
         width: "100%",
+        height: 42,
         px: 2,
         my: 2,
         // maxHeight: { xs: 233, md: 167 },
@@ -83,6 +85,7 @@ const ListItemLink = ({ to, text, icon, onClick }) => {
   return (
     <ListItem disablePadding>
       <ListItemButton
+        component={LinkBehavior}
         selected={Boolean(to && match)}
         href={to}
         onClick={onClick}

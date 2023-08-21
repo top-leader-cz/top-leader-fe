@@ -10,19 +10,19 @@ import {
   Paper,
 } from "@mui/material";
 import React from "react";
+import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
 import { InfoBox, PRIMARY_BG_LIGHT } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
+import { useAuth } from "../Authorization";
+import { useMakeSelectable } from "../Values/MyValues";
+import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
-import { useAuth } from "../Authorization";
-import { useQuery } from "react-query";
-import { useMakeSelectable } from "../Values/MyValues";
 
 const AssessmentRightMenu = ({
   history,
@@ -82,13 +82,22 @@ const AssessmentRightMenu = ({
   );
 };
 
-const SelectedStregth = ({ positives = [], tips = "" }) => {
+const SelectedStregth = ({
+  positives = [],
+  tips = [],
+  positivesHeading = <Msg id="strengths.positives.title" />,
+}) => {
   return (
     <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
       <InfoBox
         color="primary"
-        heading={<Msg id="strengths.positives.title" />}
-        sx={{ flex: "1 1 50%" }}
+        heading={positivesHeading}
+        sx={{
+          width: "50%",
+          minWidth: "49%",
+          maxWidth: "50%",
+          overflow: "hidden",
+        }}
       >
         <ul>
           {positives.map((text) => (
@@ -99,9 +108,16 @@ const SelectedStregth = ({ positives = [], tips = "" }) => {
       <InfoBox
         color="default"
         heading={<Msg id="strengths.tips.title" />}
-        sx={{ flex: "1 1 50%" }}
+        sx={{
+          width: "50%",
+          minWidth: "49%",
+          maxWidth: "50%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <P>{tips}</P>
+        <SwipeableStepper steps={tips.map((text) => ({ key: text, text }))} />
       </InfoBox>
     </CardContent>
   );
@@ -243,6 +259,7 @@ export function StrengthsPage() {
               )}
               renderSelected={(selected) => (
                 <SelectedStregth
+                  positivesHeading={<Msg id="strengths.positives.title-last" />}
                   positives={selected.positives}
                   tips={selected.tips}
                 />

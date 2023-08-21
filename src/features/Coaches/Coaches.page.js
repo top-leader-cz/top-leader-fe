@@ -46,12 +46,13 @@ const DAY_FORMAT = "E d";
 
 const VISIBLE_DAYS_COUNT = 7;
 
-export const TimeSlot = ({ hour, isFree, sx }) => {
+const TimeSlot = ({ hour, isFree, sx }) => {
   return (
     <Box
       key={hour}
       borderRadius="6px"
-      p={1}
+      py={1}
+      px={0.5}
       bgcolor={isFree ? "#F9F8FF" : "transparent"}
       color={isFree ? "primary.main" : "inherit"}
       fontWeight={isFree ? 500 : 400}
@@ -79,8 +80,17 @@ export const CalendarDaySlots = ({
       isFree: freeHours.includes(index + startHour),
     }));
   return (
-    <Box display="flex" alignItems="stretch" textAlign="center" gap={1} sx={sx}>
-      <Box p={1} sx={dateSx}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "stretch",
+        textAlign: "center",
+        gap: 1,
+        width: "100%",
+        ...sx,
+      }}
+    >
+      <Box py={1} px={0.5} sx={dateSx}>
         {format(DAY_FORMAT, date)}
       </Box>
       {daySlots.map(({ hour, isFree }) => (
@@ -105,12 +115,20 @@ export const CREATE_OFFSET =
 const isWithinDay = (dayDate) =>
   isWithinInterval({ start: startOfDay(dayDate), end: endOfDay(dayDate) });
 
-const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [] }) => {
+const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [], sx }) => {
   const TODAY = new Date();
   const MOCK_OFFSET = CREATE_OFFSET(TODAY);
 
   return (
-    <Box width={468} display="flex" flexDirection="column" gap={1}>
+    <Box
+      sx={{
+        width: 335,
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+        ...sx,
+      }}
+    >
       <Box
         bgcolor="#DAD2F1"
         height={44}
@@ -173,7 +191,15 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
           image={imgSrc}
           alt={name}
         />
-        <Box display="flex" flexDirection="column" maxWidth={"50%"}>
+        <Box
+          sx={{
+            maxWidth: "50%",
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 10,
+            width: "150px",
+          }}
+        >
           <H1 gutterBottom>{name}</H1>
           <P gutterBottom>{role}</P>
           <P gutterBottom>
@@ -188,35 +214,22 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
             />
           </P>
           <P gutterBottom>{description}</P>
-          <Box
-            flex="1 1 auto"
-            display="flex"
-            flexDirection="column"
-            flexWrap="nowrap"
-            alignItems="flex-start"
-          >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-end",
-                height: "100%",
-                gap: 1,
-              }}
-            >
-              {fields.map(getLabel(FIELD_OPTIONS)).map((label) => (
-                <Chip
-                  key={label}
-                  sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
-                  label={label}
-                />
-              ))}
-            </Box>
+          <Box flex="1 1 auto" display="flex" />
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            {fields.map(getLabel(FIELD_OPTIONS)).map((label) => (
+              <Chip
+                key={label}
+                sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
+                label={label}
+              />
+            ))}
           </Box>
         </Box>
         <TimeSlots
           slotsRange={[startOfDay(TODAY), pipe(addDays(6), endOfDay)(TODAY)]}
           freeSlots={freeSlots}
           onContact={() => onContact(coach)}
+          sx={{ flexShrink: 0 }}
         />
       </CardContent>
     </Card>
