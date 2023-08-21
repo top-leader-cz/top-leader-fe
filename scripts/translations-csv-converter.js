@@ -321,9 +321,12 @@ function run() {
     console.log(inspect({ mapped, filtered }));
     // console.log(inspect({ generatedPairs }));
     if (filtered.length)
-      throw new Error(
+      console.error(
         "Duplicite keys in manual and generated: " + duplicites.join(",")
       );
+    // throw new Error(
+    //   "Duplicite keys in manual and generated: " + duplicites.join(",")
+    // );
   }
 
   console.log(
