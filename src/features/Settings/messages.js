@@ -94,6 +94,10 @@ export const messages = defineMessages({
     id: "settings.general.field.newPasswordConfirm",
     defaultMessage: "Confirm new password",
   },
+  "settings.general.field.newPasswordConfirm.error-match": {
+    id: "settings.general.field.newPasswordConfirm.error-match",
+    defaultMessage: "Password confirm must match",
+  },
   "settings.general.password": {
     id: "settings.general.password",
     defaultMessage: "Password",

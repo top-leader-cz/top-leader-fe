@@ -14,6 +14,7 @@ import { messages } from "./messages";
 import { useValuesDict } from "./values";
 import { useAuth } from "../Authorization";
 import { useQuery } from "react-query";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const useStaticCallback = (fn) => {
   const fnRef = useRef(fn);
@@ -74,9 +75,9 @@ export const useMakeSelectable = ({
 };
 
 export function MyValuesPage() {
-  const { data, isLoading } = useValuesHistoryQuery();
+  const query = useValuesHistoryQuery();
   const sel = useMakeSelectable({
-    entries: data ?? [],
+    entries: query.data ?? [],
     map: (el) => ({
       date: el.createdAt,
       timestamp: new Date(el.createdAt).getTime(),
@@ -91,7 +92,7 @@ export function MyValuesPage() {
 
   console.log("[MyValues.rndr]", {
     // history,
-    data,
+    query,
     sel,
   });
 
@@ -138,34 +139,29 @@ export function MyValuesPage() {
           <P mt={1} mb={3}>
             <Msg id="values.perex" />
           </P>
-          {isLoading ? (
-            <>
-              <Skeleton variant="rounded" sx={{ mb: 1 }} />
-              <Skeleton variant="rounded" sx={{ mb: 1 }} />
-              <Skeleton variant="rounded" sx={{ mb: 1 }} />
-            </>
-          ) : (
-            <ChipsCard
-              keys={sel.selected?.selectedKeys}
-              // keys={query.data[0]?.data.values}
-              // keys={history.selected?.selectedKeys}
-              dict={values}
-              renderSummary={() => (
-                <CardContent>
-                  <P>
-                    <Msg id="values.card.summary" />
-                  </P>
-                </CardContent>
-              )}
-              renderSelected={({ name, description }) => (
-                <CardContent>
-                  <InfoBox color="primary" heading={name}>
-                    {description}
-                  </InfoBox>
-                </CardContent>
-              )}
-            />
-          )}
+          <QueryRenderer
+            {...query}
+            success={() => (
+              <ChipsCard
+                keys={sel.selected?.selectedKeys}
+                dict={values}
+                renderSummary={() => (
+                  <CardContent>
+                    <P>
+                      <Msg id="values.card.summary" />
+                    </P>
+                  </CardContent>
+                )}
+                renderSelected={({ name, description }) => (
+                  <CardContent>
+                    <InfoBox color="primary" heading={name}>
+                      {description}
+                    </InfoBox>
+                  </CardContent>
+                )}
+              />
+            )}
+          />
         </Box>
       </Layout>
     </MsgProvider>

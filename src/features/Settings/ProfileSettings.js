@@ -2,10 +2,11 @@ import { Box, Chip } from "@mui/material";
 import { format } from "date-fns-tz";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { useQuery } from "react-query";
 import {
   FIELD_OPTIONS,
-  getLabel,
   LANGUAGE_OPTIONS,
+  getLabel,
   renderLanguageOption,
 } from "../../components/Forms";
 import {
@@ -18,6 +19,7 @@ import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
+import { useAuth } from "../Authorization";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 
@@ -65,11 +67,18 @@ const COACH = {
 };
 
 export const ProfileSettings = () => {
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["coach-info"],
+    queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
+  });
   const msg = useMsg();
   const form = useForm({
     // mode: "onSubmit",
     defaultValues: { ...COACH },
   });
+
+  console.log("[ProfileSettings.onSubmit]", { query });
 
   const onSubmit = (data, e) =>
     console.log("[ProfileSettings.onSubmit]", data, e);

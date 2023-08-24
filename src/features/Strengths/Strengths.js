@@ -23,6 +23,7 @@ import { useMakeSelectable } from "../Values/MyValues";
 import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const AssessmentRightMenu = ({
   history,
@@ -132,9 +133,9 @@ const useStrengthsHistoryQuery = () => {
 };
 
 export function StrengthsPage() {
-  const { data, isLoading } = useStrengthsHistoryQuery();
+  const query = useStrengthsHistoryQuery();
   const sel = useMakeSelectable({
-    entries: data ?? [],
+    entries: query.data ?? [],
     map: (el) => ({
       // status
       date: el.createdAt,
@@ -151,7 +152,7 @@ export function StrengthsPage() {
   console.log("[Strengths.rndr]", {
     // assessmentHistory,
     sel,
-    data,
+    query,
     talents,
   });
 
@@ -168,12 +169,6 @@ export function StrengthsPage() {
           />
         }
       >
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
         <Box mt={4} mb={3}>
           <Box
             display="flex"
@@ -197,75 +192,84 @@ export function StrengthsPage() {
           <P mt={1} mb={3}>
             <Msg id="strengths.heading.perex" />
           </P>
-          <ChipsCard
-            keys={sel.selected?.orderedTalents.slice(0, 5)}
-            dict={talents}
-            renderSummary={() => (
-              <CardContent>
-                <H1 gutterBottom>
-                  1-5&nbsp;
-                  <Chip
-                    sx={{ borderRadius: 0.5 }}
-                    label="Top"
-                    icon={<Star />}
-                    size="small"
-                    color="warning"
+          <QueryRenderer
+            {...query}
+            success={() => (
+              <>
+                <ChipsCard
+                  keys={sel.selected?.orderedTalents.slice(0, 5)}
+                  dict={talents}
+                  renderSummary={() => (
+                    <CardContent>
+                      <H1 gutterBottom>
+                        1-5&nbsp;
+                        <Chip
+                          sx={{ borderRadius: 0.5 }}
+                          label="Top"
+                          icon={<Star />}
+                          size="small"
+                          color="warning"
+                        />
+                      </H1>
+                      <P>
+                        <Msg id="strengths.first.summary" />
+                      </P>
+                    </CardContent>
+                  )}
+                  renderSelected={(selected) => (
+                    <SelectedStregth
+                      positives={selected.positives}
+                      tips={selected.tips}
+                    />
+                  )}
+                />
+
+                {sel.selected?.orderedTalents.length > 5 && (
+                  <ChipsCard
+                    keys={sel.selected?.orderedTalents.slice(5, 10)}
+                    dict={talents}
+                    renderSummary={() => (
+                      <CardContent>
+                        <H1 gutterBottom>6-10</H1>
+                        <P>
+                          <Msg id="strengths.second.summary" />
+                        </P>
+                      </CardContent>
+                    )}
+                    renderSelected={(selected) => (
+                      <SelectedStregth
+                        positives={selected.positives}
+                        tips={selected.tips}
+                      />
+                    )}
                   />
-                </H1>
-                <P>
-                  <Msg id="strengths.first.summary" />
-                </P>
-              </CardContent>
-            )}
-            renderSelected={(selected) => (
-              <SelectedStregth
-                positives={selected.positives}
-                tips={selected.tips}
-              />
+                )}
+                {sel.selected?.orderedTalents.length > 10 && (
+                  <ChipsCard
+                    keys={sel.selected?.orderedTalents.slice(10)}
+                    dict={talents}
+                    renderSummary={() => (
+                      <CardContent>
+                        <H1 gutterBottom>11-20</H1>
+                        <P>
+                          <Msg id="strengths.third.summary" />
+                        </P>
+                      </CardContent>
+                    )}
+                    renderSelected={(selected) => (
+                      <SelectedStregth
+                        positivesHeading={
+                          <Msg id="strengths.positives.title-last" />
+                        }
+                        positives={selected.positives}
+                        tips={selected.tips}
+                      />
+                    )}
+                  />
+                )}
+              </>
             )}
           />
-
-          {sel.selected?.orderedTalents.length > 5 && (
-            <ChipsCard
-              keys={sel.selected?.orderedTalents.slice(5, 10)}
-              dict={talents}
-              renderSummary={() => (
-                <CardContent>
-                  <H1 gutterBottom>6-10</H1>
-                  <P>
-                    <Msg id="strengths.second.summary" />
-                  </P>
-                </CardContent>
-              )}
-              renderSelected={(selected) => (
-                <SelectedStregth
-                  positives={selected.positives}
-                  tips={selected.tips}
-                />
-              )}
-            />
-          )}
-          {sel.selected?.orderedTalents.length > 10 && (
-            <ChipsCard
-              keys={sel.selected?.orderedTalents.slice(10)}
-              dict={talents}
-              renderSummary={() => (
-                <CardContent>
-                  <H1 gutterBottom>11-20</H1>
-                  <P>
-                    <Msg id="strengths.third.summary" />
-                  </P>
-                </CardContent>
-              )}
-              renderSelected={(selected) => (
-                <SelectedStregth
-                  positivesHeading={<Msg id="strengths.positives.title-last" />}
-                  positives={selected.positives}
-                  tips={selected.tips}
-                />
-              )}
-            />
-          )}
         </Box>
       </Layout>
     </MsgProvider>

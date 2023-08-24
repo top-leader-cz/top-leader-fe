@@ -13,6 +13,8 @@ import { H2, P } from "../../components/Typography";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
+import { useMutation } from "react-query";
+import { useAuth } from "../Authorization";
 
 const FIELDS_GENERAL = {
   language: "language",
@@ -21,7 +23,22 @@ const FIELDS_GENERAL = {
   newPasswordConfirm: "newPasswordConfirm",
 };
 
+const PASSWORD_MIN_LENGTH = 3;
+
 export const GeneralSettings = () => {
+  const { authFetch } = useAuth();
+  const passwordMutation = useMutation({
+    mutationFn: (values) =>
+      console.log("PSSSWORD POST", values) ||
+      authFetch({
+        method: "POST",
+        url: "/api/latest/password",
+        data: {
+          oldPassword: values[FIELDS_GENERAL.currentPassword],
+          newPassword: values[FIELDS_GENERAL.newPassword],
+        },
+      }),
+  });
   const msg = useMsg();
   const { language, setLanguage } = useContext(TranslationContext);
   const form = useForm({
@@ -32,13 +49,21 @@ export const GeneralSettings = () => {
     },
   });
 
-  const onSubmit = (data, e) =>
-    console.log("[GeneralSettings.onSubmit]", data, e);
+  const onSubmit = (data, e) => {
+    if (
+      data[FIELDS_GENERAL.newPassword] !==
+      data[FIELDS_GENERAL.newPasswordConfirm]
+    )
+      form.setError(FIELDS_GENERAL.newPasswordConfirm, {
+        message: msg("settings.general.field.newPasswordConfirm.error-match"),
+      });
+    else passwordMutation.mutate(data);
+  };
   const onError = (errors, e) =>
     console.log("[GeneralSettings.onError]", errors, e);
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <FormProvider {...form}>
         <H2 gutterBottom>
           <Msg id="settings.general.heading" />
@@ -76,6 +101,7 @@ export const GeneralSettings = () => {
         >
           <BareInputField
             name={FIELDS_GENERAL.currentPassword}
+            rules={{ required: true, minLength: PASSWORD_MIN_LENGTH }}
             type="password"
             autoComplete="current-password"
           />
@@ -90,6 +116,7 @@ export const GeneralSettings = () => {
         >
           <BareInputField
             name={FIELDS_GENERAL.newPassword}
+            rules={{ required: true, minLength: PASSWORD_MIN_LENGTH }}
             type="password"
             autoComplete="new-password"
           />
@@ -104,6 +131,7 @@ export const GeneralSettings = () => {
         >
           <BareInputField
             name={FIELDS_GENERAL.newPasswordConfirm}
+            rules={{ required: true, minLength: PASSWORD_MIN_LENGTH }}
             type="password"
             autoComplete="new-password"
           />
@@ -113,7 +141,11 @@ export const GeneralSettings = () => {
             <Button variant="outlined" sx={{ bgcolor: "white" }}>
               <Msg id="settings.general.button.cancel" />
             </Button>
-            <Button type="submit" variant="contained">
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={passwordMutation.isLoading}
+            >
               <Msg id="settings.general.button.save" />
             </Button>
           </ControlsContainer>
