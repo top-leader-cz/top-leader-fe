@@ -35,6 +35,9 @@ import { ControlsContainer } from "../Sessions/steps/Controls";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
+import { useQuery } from "react-query";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const createSlot = ({ start, duration = 60 }) => ({
   start,
@@ -312,6 +315,58 @@ const coachPredicate =
     filterByIncludes(field, coach.fields) &&
     filterByRange(experience, coach.experience);
 
+const getPayload = ({
+  filter: {
+    language, //: "en",
+    field, //: null,
+    experience: [experienceFrom, experienceTo] = [], //: [1, 7],
+    search, //: "",
+  },
+  page = {
+    pageNumber: 0,
+    pageSize: 1000000,
+  },
+}) =>
+  console.log("getPayload", { filter, page }) || {
+    page,
+    languages: [language],
+    fields: field ? [field] : undefined,
+    experienceFrom,
+    experienceTo,
+    prices: [],
+    name: search,
+    // name: search ? search : undefined,
+  };
+
+const responseData = {
+  content: [],
+  pageable: {
+    sort: {
+      empty: true,
+      sorted: false,
+      unsorted: true,
+    },
+    offset: 0,
+    pageNumber: 0,
+    pageSize: 30,
+    paged: true,
+    unpaged: false,
+  },
+  totalPages: 0,
+  totalElements: 0,
+  last: true,
+  size: 30,
+  number: 0,
+  sort: {
+    empty: true,
+    sorted: false,
+    unsorted: true,
+  },
+  numberOfElements: 0,
+  first: true,
+  empty: true,
+};
+
 export function CoachesPageInner() {
   const msg = useMsg();
   const EXPECT_ITEMS = [
@@ -340,6 +395,17 @@ export function CoachesPageInner() {
 
   const [contactCoach, setContactCoach] = useState(null);
   const handleContact = (coach) => setContactCoach(coach);
+
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["coaches", filter],
+    queryFn: () =>
+      authFetch({
+        method: "POST",
+        url: "/api/latest/coaches",
+        data: getPayload({ filter }),
+      }),
+  });
 
   return (
     <Layout
@@ -373,22 +439,51 @@ export function CoachesPageInner() {
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
       </Box>
       <CoachesFilter filter={filter} setFilter={setFilter} />
-      {COACHES.filter(coachPredicate(filter)).map((coach, i) => (
-        <CoachCard
-          key={coach.id}
-          coach={coach}
-          sx={{ my: 3 }}
-          onContact={handleContact}
-          freeSlots={[
-            MOCK_SLOT(0 + (i % 3), 9),
-            MOCK_SLOT(0 + (i % 3), 10),
-            MOCK_SLOT(0 + (i % 3), 11),
-            MOCK_SLOT(2 + (i % 3), 10),
-            MOCK_SLOT(3 + (i % 3), 9),
-            MOCK_SLOT(4 + (i % 3), 11),
-          ]}
-        />
-      ))}
+
+      <QueryRenderer
+        {...query}
+        // success={({ data: { content = [] } }) =>
+        //   content.map((coach, i) => (
+        //     <CoachCard
+        //       key={coach.id}
+        //       coach={coach}
+        //       sx={{ my: 3 }}
+        //       onContact={handleContact}
+        //       freeSlots={[
+        //         MOCK_SLOT(0 + (i % 3), 9),
+        //         MOCK_SLOT(0 + (i % 3), 10),
+        //         MOCK_SLOT(0 + (i % 3), 11),
+        //         MOCK_SLOT(2 + (i % 3), 10),
+        //         MOCK_SLOT(3 + (i % 3), 9),
+        //         MOCK_SLOT(4 + (i % 3), 11),
+        //       ]}
+        //     />
+        //   ))
+        // }
+      />
+
+      {Array(25)
+        .fill(null)
+        .map((_, i) => COACHES)
+        .reduce((acc, v) => acc.concat(v), [])
+        .filter(coachPredicate(filter))
+        .map((coach, i) => (
+          <CoachCard
+            key={coach.id}
+            coach={coach}
+            sx={{ my: 3 }}
+            onContact={handleContact}
+            freeSlots={[
+              MOCK_SLOT(0 + (i % 3), 9),
+              MOCK_SLOT(0 + (i % 3), 10),
+              MOCK_SLOT(0 + (i % 3), 11),
+              MOCK_SLOT(2 + (i % 3), 10),
+              MOCK_SLOT(3 + (i % 3), 9),
+              MOCK_SLOT(4 + (i % 3), 11),
+            ]}
+          />
+        ))}
+
       <ContactModal
         // coach={COACHES[0]}
         coach={contactCoach}
