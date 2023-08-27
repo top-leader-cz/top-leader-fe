@@ -22,7 +22,8 @@ import messages_de_cz from "./translations/de_cz.json";
 import messages_es from "./translations/es.json";
 import { useState, createContext, useCallback } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Backdrop, Button, CircularProgress } from "@mui/material";
+import { ErrorBoundary } from "react-error-boundary";
 
 const messages = {
   en: messages_en,
@@ -32,31 +33,61 @@ const messages = {
   de_cz: messages_de_cz,
   es: messages_es,
 };
+const supportedLocales = Object.keys(messages);
 
 export const TranslationContext = createContext();
 
 const queryClient = new QueryClient();
 
+function renderResetLang({ error, resetErrorBoundary }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+      <Button variant="contained" onClick={() => resetErrorBoundary("en")}>
+        Reset lang to English
+      </Button>
+    </div>
+  );
+}
+
 const TranslationProvider = ({ children }) => {
+  const browserLocale = Intl.DateTimeFormat()
+    .resolvedOptions()
+    .locale.substring(0, 2);
+  const savedLocale = window.sessionStorage.getItem("language");
+  const defaultLocale = supportedLocales.includes(browserLocale)
+    ? browserLocale
+    : "en";
   const [language, _setLanguage] = useState(
-    window.sessionStorage.getItem("language") || "en"
+    supportedLocales.includes(savedLocale) ? savedLocale : defaultLocale
   );
   const setLanguage = useCallback((lang) => {
     _setLanguage(lang);
     window.sessionStorage.setItem("language", lang);
   }, []);
 
+  const onReset = useCallback(
+    ({ args }) => {
+      console.log({ args });
+      setLanguage(args?.[0] || "en");
+    },
+    [setLanguage]
+  );
+
   return (
-    <TranslationContext.Provider value={{ language, setLanguage }}>
-      <IntlProvider
-        // messages={{ exampleMessageId: "Example message" }}
-        locale={language}
-        defaultLocale="en"
-        messages={messages[language]}
-      >
-        {children}
-      </IntlProvider>
-    </TranslationContext.Provider>
+    <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
+      <TranslationContext.Provider value={{ language, setLanguage }}>
+        <IntlProvider
+          // messages={{ exampleMessageId: "Example message" }}
+          locale={language}
+          defaultLocale="en"
+          messages={messages[language] || {}}
+        >
+          {children}
+        </IntlProvider>
+      </TranslationContext.Provider>
+    </ErrorBoundary>
   );
 };
 
@@ -74,21 +105,40 @@ const GlobalLoader = ({ children }) => {
   else return children;
 };
 
+const RESET = () => {
+  sessionStorage.clear();
+  localStorage.clear();
+};
+
+function ResetAll({ error, resetErrorBoundary }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre style={{ color: "red" }}>{error.message}</pre>
+      <Button variant="contained" onClick={() => resetErrorBoundary()}>
+        Reset
+      </Button>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <TranslationProvider>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <GlobalLoader>
-                <RightMenuProvider>
-                  <CssBaseline />
-                  <RouterProvider router={router} />
-                </RightMenuProvider>
-              </GlobalLoader>
-            </AuthProvider>
-          </QueryClientProvider>
+          <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
+            <QueryClientProvider client={queryClient}>
+              <AuthProvider>
+                <GlobalLoader>
+                  <RightMenuProvider>
+                    <CssBaseline />
+                    <RouterProvider router={router} />
+                  </RightMenuProvider>
+                </GlobalLoader>
+              </AuthProvider>
+            </QueryClientProvider>
+          </ErrorBoundary>
         </LocalizationProvider>
       </TranslationProvider>
     </ThemeProvider>

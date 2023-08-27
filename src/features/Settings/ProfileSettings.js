@@ -1,6 +1,13 @@
-import { Box, Chip } from "@mui/material";
+import { Alert, Box, Chip } from "@mui/material";
 import { format } from "date-fns-tz";
-import { useEffect, useMemo, useRef } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import {
@@ -25,6 +32,7 @@ import { useAuth } from "../Authorization";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { TranslationContext } from "../../App";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -73,74 +81,96 @@ const _COACH = {
   [FIELDS.publicProfile]: false,
 };
 
-const to = (data) => {
+const to = ({ photo, ...data }, { userLocale }) => {
   const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone; // TODO: notify user that timezone settings is different than currently set!
   return {
     ...data,
+    rate: data.rate || "",
+    experienceSince: data.experienceSince, // TODO: utc
     timeZone: data.timezone || userTz,
+    languages: data.languages?.length ? data.languages : [userLocale],
+    imageSrc: photo?.[0],
   };
 };
-export const ProfileSettings = () => {
-  const { authFetch } = useAuth();
-  // const query = useQuery({
-  //   queryKey: ["coach-info"],
-  //   queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
-  // });
 
-  const initialValuesPromiseRef = useRef();
+const from = ({ imageSrc, ...values }) => {
+  console.log("from", { imageSrc, ...values });
+  return {
+    ...values,
+    photo: imageSrc && [imageSrc],
+    experienceSince: values.experienceSince, // TODO
+  };
+};
+
+export const ProfileSettings = () => {
+  const { authFetch, user } = useAuth();
   const msg = useMsg();
-  const form = useForm({
-    // mode: "onSubmit",
-    // defaultValues: async () => {
-    //   // executed twice, TODO - unmount eff log
-    //   // const promise =
-    //   //   initialValuesPromiseRef.current || initialValuesMutation.mutate();
-    //   // if (!initialValuesPromiseRef.current)
-    //   //   initialValuesPromiseRef.current = promise;
-    //   // const data = await promise;
-    //   const data = await authFetch({ url: "/api/latest/coach-info" });
-    //   const toData = to(data)
-    //   console.log("%c[PS.defaultValues]", "color:pink", {
-    //     data,
-    //     toData,
-    //     TIMEZONE_OPTIONS,
-    //   });
-    //   return toData
-    // },
-    // defaultValues: { ...COACH },
-  });
+  const form = useForm({});
+  const { language } = useContext(TranslationContext);
+
+  const [loading, setLoading] = useState(true);
+  const { reset } = form;
+  const resetForm = useCallback(
+    (data) => {
+      reset(to(data, { userLocale: language }));
+
+      // Autocomplete needs remount after form reset, TODO
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
+    },
+    [language, reset]
+  );
 
   const initialValuesQuery = useQuery({
-    queryKey: ["coach"], // TODO
+    queryKey: ["coach-info"], // TODO?
     queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
-    onSuccess: (data) => {
-      // console.log("%cDATA", "color:blue", { data });
-      form.reset(to(data));
-    },
+    staleTime: 20 * 1000,
+    retry: 1,
+    // refetchOnMount: "always",
+    // Reset needed on every component mount -> eff
+    // onSuccess: (data) => {
+    //   // console.log("%cDATA", "color:blue", { data });
+    //   resetForm(data);
+    // },
   });
 
-  const timeZoneValue = form.watch("timeZone");
-
   const saveMutation = useMutation({
-    mutationFn: ({ imageSrc, ...values }) =>
-      console.log("[save start]", { ...values, imageSrc }) ||
+    mutationFn: (values) =>
+      console.log("[save start]", { ...values }) ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
-        data: { ...values },
+        data: from(values),
       }),
     onSuccess: (data) => {
       console.log("[save success]", { data });
-      form.reset(data); // TODO: test
+      resetForm(data);
     },
   });
+
+  const { data } = initialValuesQuery;
+  useEffect(() => {
+    console.log("%c[PS.eff reset]", "color:lime", { data: data });
+    if (data) resetForm(data);
+
+    // stuck on loading?
+    // if (data) reset(to((data));
+    // else setLoading(false);
+  }, [data, resetForm]);
+
+  // const isJustLoaderDisplayed = !initialValuesQuery.data || initialValuesQuery.isFetching;
+  // const isJustLoaderDisplayed = !form.formState.defaultValues?.timeZone || loading;
+  // const isJustLoaderDisplayed = !initialValuesQuery.data || loading;
+  const isJustLoaderDisplayed = initialValuesQuery.isLoading || loading;
 
   const COACH = form.formState.defaultValues ?? {}; // TODO
   console.log("%c[PS.rndr]", "color:deepskyblue", {
     initialValuesQuery,
     form,
     saveMutation,
-    timeZoneValue,
+    isJustLoaderDisplayed,
   });
 
   const onSubmit = (data, e) =>
@@ -156,6 +186,7 @@ export const ProfileSettings = () => {
           buttonProps={{
             children: msg("settings.profile.aside.save"),
             type: "submit",
+            disabled: saveMutation.isLoading,
             onClick: (e) => {
               console.log("Save click");
               form.handleSubmit(saveMutation.mutateAsync, onError)(e);
@@ -205,13 +236,22 @@ export const ProfileSettings = () => {
         COACH.lastName,
         form,
         msg,
+        saveMutation.isLoading,
         saveMutation.mutateAsync,
       ]
     )
   );
 
-  if (!initialValuesQuery.data)
-    return <QueryRenderer {...initialValuesQuery} success={() => null} />;
+  if (initialValuesQuery.error)
+    return (
+      <QueryRenderer
+        error={initialValuesQuery.error}
+        errored={() => <Alert severity="error">Profile fetch failed</Alert>}
+      />
+    );
+
+  // reset of MUI Autocomplete
+  if (isJustLoaderDisplayed) return <QueryRenderer isLoading />;
 
   return (
     <FormProvider {...form}>
@@ -251,7 +291,8 @@ export const ProfileSettings = () => {
         <BareInputField
           name={FIELDS.email}
           autoComplete="email"
-          rules={{ required: true, minLength: 4 }}
+          rules={{ minLength: 5 }}
+          placeholder={user.data?.username ?? ""}
         />
       </FormRow>
 
@@ -266,7 +307,7 @@ export const ProfileSettings = () => {
       <FormRow label={msg("settings.profile.field.bio")} name={FIELDS.bio}>
         <BareInputField
           name={FIELDS.bio}
-          rules={{ required: true }}
+          // rules={{ required: true }}
           multiline
           rows={4}
         />
@@ -276,31 +317,25 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.timezone")}
         name={FIELDS.timeZone}
       >
-        <QueryRenderer
-          isLoading={initialValuesQuery.isLoading}
-          data={initialValuesQuery.data}
-          success={() => (
-            <AutocompleteSelect
-              sx={WHITE_BG}
-              name={FIELDS.timeZone}
-              options={TIMEZONE_OPTIONS}
-              rules={{ required: true }}
-              placeholder="Select your timezone" // TODO: translations!
-              // getValue={(field) => {
-              //   console.log(
-              //     "%c[PS.rndr.getValue]" + field.name,
-              //     "color:coral",
-              //     {
-              //       field,
-              //     }
-              //   );
-              //   return field.value;
-              //   return LANGUAGE_OPTIONS.find(
-              //     (option) => option.value === field.value
-              //   );
-              // }}
-            />
-          )}
+        <AutocompleteSelect
+          sx={WHITE_BG}
+          name={FIELDS.timeZone}
+          options={TIMEZONE_OPTIONS}
+          rules={{ required: true }}
+          placeholder="Select your timezone" // TODO: translations!
+          // getValue={(field) => {
+          //   console.log(
+          //     "%c[PS.rndr.getValue]" + field.name,
+          //     "color:coral",
+          //     {
+          //       field,
+          //     }
+          //   );
+          //   return field.value;
+          //   return LANGUAGE_OPTIONS.find(
+          //     (option) => option.value === field.value
+          //   );
+          // }}
         />
       </FormRow>
 
@@ -309,32 +344,14 @@ export const ProfileSettings = () => {
         name={FIELDS.languages}
       >
         {/* {form.formState.defaultValues?.timeZone ? NOT WORKING!?! */}
-        <QueryRenderer
-          isLoading={initialValuesQuery.isLoading}
-          data={initialValuesQuery.data}
-          success={() => (
-            <AutocompleteSelect
-              multiple
-              disableCloseOnSelect
-              sx={WHITE_BG}
-              // getValue={(field) => { // BROKEN
-              //   console.log(
-              //     "%c[PS.rndr.getValue]" + field.name,
-              //     "color:coral",
-              //     {
-              //       field,
-              //     }
-              //   );
-              //   return LANGUAGE_OPTIONS.find(
-              //     (option) => option.value === field.value
-              //   );
-              // }}
-              name={FIELDS.languages}
-              options={LANGUAGE_OPTIONS}
-              // renderOption={renderLanguageOption}
-              placeholder="Select languages you speak"
-            />
-          )}
+        <AutocompleteSelect
+          multiple
+          disableCloseOnSelect
+          sx={WHITE_BG}
+          name={FIELDS.languages}
+          options={LANGUAGE_OPTIONS}
+          renderOption={renderLanguageOption}
+          placeholder="Select languages you speak"
         />
       </FormRow>
 
@@ -342,19 +359,13 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.fields")}
         name={FIELDS.fields}
       >
-        <QueryRenderer
-          isLoading={initialValuesQuery.isLoading}
-          data={initialValuesQuery.data}
-          success={() => (
-            <AutocompleteSelect
-              multiple
-              disableCloseOnSelect
-              sx={WHITE_BG}
-              name={FIELDS.fields}
-              options={FIELD_OPTIONS}
-              placeholder="Select fields you work in"
-            />
-          )}
+        <AutocompleteSelect
+          multiple
+          disableCloseOnSelect
+          sx={WHITE_BG}
+          name={FIELDS.fields}
+          options={FIELD_OPTIONS}
+          placeholder="Select fields you work in"
         />
       </FormRow>
 
@@ -369,7 +380,12 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.experience")}
         name={FIELDS.experienceSince}
       >
-        <DatePickerField name={FIELDS.experienceSince} sx={WHITE_BG} />
+        <DatePickerField
+          name={FIELDS.experienceSince}
+          inputFormat="MM/dd/yyyy"
+          sx={{ ...WHITE_BG, width: "100%" }}
+          size="small"
+        />
       </FormRow>
 
       <FormRow label={msg("settings.profile.field.rate")} name={FIELDS.rate}>

@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 
 export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
-  { value: "cs", label: "Czech" },
+  { value: "cs", label: "Čeština" },
   { value: "fr", label: "fr" },
   { value: "de_en", label: "de_en" },
   { value: "de_cz", label: "de_cz" },

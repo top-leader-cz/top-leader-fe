@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { TranslationContext } from "../../App";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
@@ -59,6 +59,17 @@ export const GeneralSettings = () => {
       });
     else passwordMutation.mutate(data);
   };
+  const onCancel = useCallback(() => {
+    console.log("TODO");
+    setLanguage(language);
+    form.reset({
+      [FIELDS_GENERAL.language]: language,
+      [FIELDS_GENERAL.currentPassword]: "",
+      [FIELDS_GENERAL.newPassword]: "",
+      [FIELDS_GENERAL.newPasswordConfirm]: "",
+    });
+  }, [form, language, setLanguage]);
+
   const onError = (errors, e) =>
     console.log("[GeneralSettings.onError]", errors, e);
 
@@ -83,7 +94,7 @@ export const GeneralSettings = () => {
             options={LANGUAGE_OPTIONS}
             renderOption={renderLanguageOption}
             placeholder="Select languages you speak"
-            autoComplete="language" // TODO
+            autoComplete="off" // TODO: not working
             onChange={(lang) => setLanguage(lang)}
           />
         </FormRow>
@@ -138,7 +149,11 @@ export const GeneralSettings = () => {
         </FormRow>
         <FormRow dividerTop={false}>
           <ControlsContainer>
-            <Button variant="outlined" sx={{ bgcolor: "white" }}>
+            <Button
+              variant="outlined"
+              onClick={onCancel}
+              sx={{ bgcolor: "white" }}
+            >
               <Msg id="settings.general.button.cancel" />
             </Button>
             <Button

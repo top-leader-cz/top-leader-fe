@@ -10,7 +10,7 @@ import { GeneralSettings } from "./GeneralSettings";
 import { messages } from "./messages";
 import { ProfileSettings } from "./ProfileSettings";
 
-export function TabPanel({ children, value, tabName }) {
+export function TabPanel({ children, Component, value, tabName }) {
   return (
     <Box
       role="tabpanel"
@@ -19,7 +19,7 @@ export function TabPanel({ children, value, tabName }) {
       aria-labelledby={`simple-tab-${tabName}`}
       sx={{ mt: 3, pb: 4 }}
     >
-      {value === tabName && children}
+      {value === tabName && (children || <Component />)}
     </Box>
   );
 }
@@ -105,15 +105,21 @@ function SettingsPageInner() {
           />
         </StyledTabs>
         {/* </Box> */}
-        <TabPanel value={tab} tabName={TABS.PROFILE}>
-          <ProfileSettings />
-        </TabPanel>
-        <TabPanel value={tab} tabName={TABS.GENERAL}>
-          <GeneralSettings />
-        </TabPanel>
-        <TabPanel value={tab} tabName={TABS.AVAILABILITY}>
-          <AvailabilitySettings />
-        </TabPanel>
+        <TabPanel
+          value={tab}
+          tabName={TABS.PROFILE}
+          Component={ProfileSettings}
+        />
+        <TabPanel
+          value={tab}
+          tabName={TABS.GENERAL}
+          Component={GeneralSettings}
+        />
+        <TabPanel
+          value={tab}
+          tabName={TABS.AVAILABILITY}
+          Component={AvailabilitySettings}
+        />
       </Box>
     </Layout>
   );

@@ -82,8 +82,8 @@ export function AuthProvider({ children }) {
   };
 
   const signout = () => {
-    setIsLoggedIn(false);
-    queryClient.removeQueries({ queryKey: ["user-info"] });
+    queryClient.removeQueries();
+    setIsLoggedIn(false); // TODO: check
   };
 
   const loginMutation = useMutation({

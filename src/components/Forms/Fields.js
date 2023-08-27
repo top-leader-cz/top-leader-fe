@@ -464,7 +464,7 @@ export const AutocompleteSelect = ({
                   autoComplete: autoComplete,
                   "auto-complete": autoComplete,
                   // ...InputProps,
-                  ...params.inputProps, // should contain value
+                  ...params.inputProps, // should contain value, but after form init it is ""
                   // value: field.value, // TODO: test
                   //   autoComplete: "new-password", // disable autocomplete and autofill
                 }}

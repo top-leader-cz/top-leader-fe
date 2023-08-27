@@ -13,6 +13,11 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "./";
 import { messages } from "./messages";
+import { H2, P } from "../../components/Typography";
+import { Icon } from "../../components/Icon";
+
+const EMAIL = "support@topleader.io";
+const EMAIL_SUBJECT = "SignIn";
 
 export function SignInPage() {
   const { signin, loginMutation } = useAuth();
@@ -36,7 +41,16 @@ export function SignInPage() {
   return (
     <MsgProvider messages={messages}>
       <Grid container component="main" sx={{ height: "100vh" }}>
-        <Grid item xs={12} sm={8} md={6} component={Paper} elevation={6} square>
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={6}
+          component={Paper}
+          elevation={6}
+          square
+          sx={{ position: "relative" }}
+        >
           <Box
             sx={{
               my: 8,
@@ -187,6 +201,22 @@ export function SignInPage() {
               {/* <Copyright sx={{ mt: 5 }} /> */}
             </RHForm>
             {/* </Box> */}
+          </Box>
+          <Box sx={{ position: "absolute", right: "24px", bottom: "24px" }}>
+            <P
+              component="a"
+              href={`mailto:${EMAIL}?subject=${EMAIL_SUBJECT}`}
+              target="_blank"
+              sx={{
+                color: "#475467",
+                fontWeight: 500,
+                textDecoration: "none",
+                display: "inline-flex",
+              }}
+            >
+              <Icon name="MailOutline" sx={{ fontSize: "16px" }} />
+              &nbsp;{EMAIL}
+            </P>
           </Box>
         </Grid>
         <Grid

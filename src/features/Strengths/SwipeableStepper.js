@@ -53,9 +53,14 @@ export function SwipeableStepper({ steps }) {
           index={activeStep}
           onChangeIndex={handleStepChange}
           enableMouseEvents
-          style={{ width: "100%", maxWidth: "100%", position: "relative" }}
-          slideStyle={{ width: "100%", maxWidth: "100%" }} // each slide component
-          containerStyle={{ width: "100%", maxWidth: "100%" }} // each slide container
+          style={{
+            width: "100%",
+            minWidth: "20px",
+            maxWidth: "100%",
+            position: "relative",
+          }}
+          slideStyle={{ width: "100%", minWidth: "20px", maxWidth: "100%" }} // each slide component
+          containerStyle={{ width: "100%", minWidth: "20px", maxWidth: "100%" }} // each slide container
         >
           {steps.map((step, index) => (
             <div key={step.key || index}>
