@@ -2,7 +2,7 @@ import { EmojiEvents } from "@mui/icons-material";
 import { Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
 import { useForm } from "react-hook-form";
-import { DatePicker, TimePicker } from "../../../components/Forms";
+import { DatePickerField, TimePicker } from "../../../components/Forms";
 import { Msg } from "../../../components/Msg";
 import { H1, P } from "../../../components/Typography";
 import { routes } from "../../../routes";
@@ -53,7 +53,7 @@ export const Finished = () => {
             my: 7.5,
           }}
         >
-          <DatePicker {...{ control, name: "date", size: "small" }} />
+          <DatePickerField {...{ control, name: "date", size: "small" }} />
           <P>
             <Msg id="sessions.steps.finished.datetime.separator" />
           </P>

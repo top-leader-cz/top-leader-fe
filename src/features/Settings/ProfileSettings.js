@@ -1,8 +1,8 @@
 import { Box, Chip } from "@mui/material";
 import { format } from "date-fns-tz";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import {
   FIELD_OPTIONS,
   LANGUAGE_OPTIONS,
@@ -12,7 +12,9 @@ import {
 import {
   AutocompleteSelect,
   BareInputField,
+  DatePickerField,
   FileUpload,
+  SwitchField,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
 import { Msg } from "../../components/Msg";
@@ -22,6 +24,7 @@ import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -37,23 +40,25 @@ const FIELDS = {
   firstName: "firstName",
   lastName: "lastName",
   email: "email",
-  imageSrc: "imageSrc",
+  imageSrc: "imageSrc", // "photo": [ "string" ],
   bio: "bio",
-  timezone: "timezone",
+  timeZone: "timeZone",
   languages: "languages",
   fields: "fields",
-  certificates: "certificates",
-  experience: "experience",
+  // certificates: "certificates", // rm
+  experienceSince: "experienceSince",
+  publicProfile: "publicProfile",
+  rate: "rate",
 };
 
-const COACH = {
+const _COACH = {
   [FIELDS.firstName]: "Darnell",
   [FIELDS.lastName]: "Brekke",
   [FIELDS.email]: "darnell.brekke@gmail.com",
   [FIELDS.imageSrc]: `https://i.pravatar.cc/225?u=${Math.random()}`, // TODO: upload form field
   [FIELDS.bio]:
     "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-  [FIELDS.timezone]: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  [FIELDS.timeZone]: Intl.DateTimeFormat().resolvedOptions().timeZone,
   [FIELDS.languages]: [
     Intl.DateTimeFormat().resolvedOptions().locale.substring(0, 2),
   ],
@@ -62,23 +67,81 @@ const COACH = {
   // https://attacomsian.com/blog/javascript-current-timezone
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions
   [FIELDS.fields]: ["business", "life"],
-  [FIELDS.certificates]: "Associate Coach Certified - Issued by ICF",
-  [FIELDS.experience]: "3", // TODO: field
+  // [FIELDS.certificates]: "Associate Coach Certified - Issued by ICF",
+  [FIELDS.experienceSince]: new Date(Date.now() - 7 * 24 * 3600 * 1000),
+  [FIELDS.rate]: "",
+  [FIELDS.publicProfile]: false,
 };
 
+const to = (data) => {
+  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone; // TODO: notify user that timezone settings is different than currently set!
+  return {
+    ...data,
+    timeZone: data.timezone || userTz,
+  };
+};
 export const ProfileSettings = () => {
   const { authFetch } = useAuth();
-  const query = useQuery({
-    queryKey: ["coach-info"],
-    queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
-  });
+  // const query = useQuery({
+  //   queryKey: ["coach-info"],
+  //   queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
+  // });
+
+  const initialValuesPromiseRef = useRef();
   const msg = useMsg();
   const form = useForm({
     // mode: "onSubmit",
-    defaultValues: { ...COACH },
+    // defaultValues: async () => {
+    //   // executed twice, TODO - unmount eff log
+    //   // const promise =
+    //   //   initialValuesPromiseRef.current || initialValuesMutation.mutate();
+    //   // if (!initialValuesPromiseRef.current)
+    //   //   initialValuesPromiseRef.current = promise;
+    //   // const data = await promise;
+    //   const data = await authFetch({ url: "/api/latest/coach-info" });
+    //   const toData = to(data)
+    //   console.log("%c[PS.defaultValues]", "color:pink", {
+    //     data,
+    //     toData,
+    //     TIMEZONE_OPTIONS,
+    //   });
+    //   return toData
+    // },
+    // defaultValues: { ...COACH },
   });
 
-  console.log("[ProfileSettings.onSubmit]", { query });
+  const initialValuesQuery = useQuery({
+    queryKey: ["coach"], // TODO
+    queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
+    onSuccess: (data) => {
+      // console.log("%cDATA", "color:blue", { data });
+      form.reset(to(data));
+    },
+  });
+
+  const timeZoneValue = form.watch("timeZone");
+
+  const saveMutation = useMutation({
+    mutationFn: ({ imageSrc, ...values }) =>
+      console.log("[save start]", { ...values, imageSrc }) ||
+      authFetch({
+        url: "/api/latest/coach-info",
+        method: "POST",
+        data: { ...values },
+      }),
+    onSuccess: (data) => {
+      console.log("[save success]", { data });
+      form.reset(data); // TODO: test
+    },
+  });
+
+  const COACH = form.formState.defaultValues ?? {}; // TODO
+  console.log("%c[PS.rndr]", "color:deepskyblue", {
+    initialValuesQuery,
+    form,
+    saveMutation,
+    timeZoneValue,
+  });
 
   const onSubmit = (data, e) =>
     console.log("[ProfileSettings.onSubmit]", data, e);
@@ -95,7 +158,7 @@ export const ProfileSettings = () => {
             type: "submit",
             onClick: (e) => {
               console.log("Save click");
-              form.handleSubmit(onSubmit, onError)(e);
+              form.handleSubmit(saveMutation.mutateAsync, onError)(e);
             },
           }}
         >
@@ -108,9 +171,12 @@ export const ProfileSettings = () => {
               src={COACH.imageSrc}
             />
           </Box>
-          <H2 mt={3}>{`${COACH.firstName} ${COACH.lastName}`}</H2>
-          <P mt={1}>{COACH.certificates}</P>
-          <P mt={1}>Experience: {COACH.experience} years</P>
+          <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
+          {/* <P mt={1}>{COACH.certificates}</P> */}
+          <P mt={1}>
+            Experience:{" "}
+            {COACH.experienceSince ? `${COACH.experienceSince}` : ""}
+          </P>
           <P mt={1}>Languages: {[].concat(COACH.languages).join(", ")}</P>
           <P my={3} color="black">
             {COACH.bio}
@@ -129,9 +195,23 @@ export const ProfileSettings = () => {
           </Box>
         </ScrollableRightMenu>
       ),
-      [form]
+      [
+        COACH.bio,
+        COACH.experienceSince,
+        COACH.fields,
+        COACH.firstName,
+        COACH.imageSrc,
+        COACH.languages,
+        COACH.lastName,
+        form,
+        msg,
+        saveMutation.mutateAsync,
+      ]
     )
   );
+
+  if (!initialValuesQuery.data)
+    return <QueryRenderer {...initialValuesQuery} success={() => null} />;
 
   return (
     <FormProvider {...form}>
@@ -141,6 +221,15 @@ export const ProfileSettings = () => {
       <P sx={{ mb: -1 }}>
         <Msg id="settings.profile.perex" />
       </P>
+
+      <FormRow
+        label={msg("settings.profile.field.publicProfile")}
+        name={FIELDS.publicProfile}
+      >
+        <Box display="flex">
+          <SwitchField name={FIELDS.publicProfile} />
+        </Box>
+      </FormRow>
 
       <FormRow
         label={msg("settings.profile.field.name")}
@@ -185,13 +274,33 @@ export const ProfileSettings = () => {
 
       <FormRow
         label={msg("settings.profile.field.timezone")}
-        name={FIELDS.timezone}
+        name={FIELDS.timeZone}
       >
-        <AutocompleteSelect
-          sx={WHITE_BG}
-          name={FIELDS.timezone}
-          options={TIMEZONE_OPTIONS}
-          rules={{ required: true }}
+        <QueryRenderer
+          isLoading={initialValuesQuery.isLoading}
+          data={initialValuesQuery.data}
+          success={() => (
+            <AutocompleteSelect
+              sx={WHITE_BG}
+              name={FIELDS.timeZone}
+              options={TIMEZONE_OPTIONS}
+              rules={{ required: true }}
+              placeholder="Select your timezone" // TODO: translations!
+              // getValue={(field) => {
+              //   console.log(
+              //     "%c[PS.rndr.getValue]" + field.name,
+              //     "color:coral",
+              //     {
+              //       field,
+              //     }
+              //   );
+              //   return field.value;
+              //   return LANGUAGE_OPTIONS.find(
+              //     (option) => option.value === field.value
+              //   );
+              // }}
+            />
+          )}
         />
       </FormRow>
 
@@ -199,14 +308,33 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.languages")}
         name={FIELDS.languages}
       >
-        <AutocompleteSelect
-          multiple
-          disableCloseOnSelect
-          sx={WHITE_BG}
-          name={FIELDS.languages}
-          options={LANGUAGE_OPTIONS}
-          renderOption={renderLanguageOption}
-          placeholder="Select languages you speak"
+        {/* {form.formState.defaultValues?.timeZone ? NOT WORKING!?! */}
+        <QueryRenderer
+          isLoading={initialValuesQuery.isLoading}
+          data={initialValuesQuery.data}
+          success={() => (
+            <AutocompleteSelect
+              multiple
+              disableCloseOnSelect
+              sx={WHITE_BG}
+              // getValue={(field) => { // BROKEN
+              //   console.log(
+              //     "%c[PS.rndr.getValue]" + field.name,
+              //     "color:coral",
+              //     {
+              //       field,
+              //     }
+              //   );
+              //   return LANGUAGE_OPTIONS.find(
+              //     (option) => option.value === field.value
+              //   );
+              // }}
+              name={FIELDS.languages}
+              options={LANGUAGE_OPTIONS}
+              // renderOption={renderLanguageOption}
+              placeholder="Select languages you speak"
+            />
+          )}
         />
       </FormRow>
 
@@ -214,28 +342,38 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.fields")}
         name={FIELDS.fields}
       >
-        <AutocompleteSelect
-          multiple
-          disableCloseOnSelect
-          sx={WHITE_BG}
-          name={FIELDS.fields}
-          options={FIELD_OPTIONS}
-          placeholder="Select fields you work in"
+        <QueryRenderer
+          isLoading={initialValuesQuery.isLoading}
+          data={initialValuesQuery.data}
+          success={() => (
+            <AutocompleteSelect
+              multiple
+              disableCloseOnSelect
+              sx={WHITE_BG}
+              name={FIELDS.fields}
+              options={FIELD_OPTIONS}
+              placeholder="Select fields you work in"
+            />
+          )}
         />
       </FormRow>
 
-      <FormRow
+      {/* <FormRow
         label={msg("settings.profile.field.certificates")}
         name={FIELDS.certificates}
       >
         <BareInputField name={FIELDS.certificates} rules={{}} />
-      </FormRow>
+      </FormRow> */}
 
       <FormRow
         label={msg("settings.profile.field.experience")}
-        name={FIELDS.experience}
+        name={FIELDS.experienceSince}
       >
-        <BareInputField name={FIELDS.experience} rules={{}} />
+        <DatePickerField name={FIELDS.experienceSince} sx={WHITE_BG} />
+      </FormRow>
+
+      <FormRow label={msg("settings.profile.field.rate")} name={FIELDS.rate}>
+        <BareInputField name={FIELDS.rate} />
       </FormRow>
     </FormProvider>
   );

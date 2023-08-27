@@ -1,7 +1,7 @@
 import { Box, Button, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
-import { DatePicker, RHFTextField } from ".";
+import { DatePickerField, RHFTextField } from ".";
 import { Icon } from "../Icon";
 import { MsgProvider } from "../Msg";
 import { Msg, useMsg } from "../Msg/Msg";
@@ -56,7 +56,7 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
           <P sx={{ ml: 4, mr: 2 }}>
             <Msg id="action-steps.due-date.label" />
           </P>
-          <DatePicker
+          <DatePickerField
             control={control}
             name={`${name}.${i}.date`}
             size="small"

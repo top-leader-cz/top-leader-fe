@@ -182,7 +182,7 @@ export const CheckboxField = ({ name, rules, ...props }) => {
   );
 };
 
-export const DatePicker = ({ control, name, rules, ...props }) => {
+export const DatePickerField = ({ control, name, rules, ...props }) => {
   const methods = useFormContext();
 
   return (
@@ -395,6 +395,7 @@ export const AutocompleteSelect = ({
   disableCloseOnSelect,
   autoComplete,
   onChange,
+  getValue = (f) => f.value,
   sx = {},
 }) => {
   const from = useMemo(
@@ -415,15 +416,16 @@ export const AutocompleteSelect = ({
           fullWidth
           id={id}
           {...field}
+          value={getValue(field)}
           sx={sx}
           multiple={multiple}
           disableCloseOnSelect={disableCloseOnSelect}
           options={options}
-          isOptionEqualToValue={
-            disableIsOptionEqualToValue
-              ? undefined
-              : (option, value) => option.value === value
-          }
+          // isOptionEqualToValue={
+          //   disableIsOptionEqualToValue
+          //     ? undefined
+          //     : (option, value) => option.value === value
+          // }
           // getOptionSelected
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
@@ -434,49 +436,51 @@ export const AutocompleteSelect = ({
           renderOption={renderOption}
           // value={getValue(options, field.value)}
           onChange={(event, data, action, other) => {
-            console.log(...color("blue", "[AutocompleteSelect.onChange]"), {
-              name,
-              data,
-              field,
-              action,
-              other,
-            });
+            // console.log(...color("blue", "[AutocompleteSelect.onChange]"), {
+            //   name,
+            //   data,
+            //   field,
+            //   action,
+            //   other,
+            // });
             const value = from(data);
             onChange?.(value);
             field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
           }}
-          renderInput={(params) => (
-            // console.log("[AutocompleteSelect.renderInput]", {
-            //   field,
-            //   params,
-            // }) ||
-            <TextField
-              {...params}
-              label={label}
-              placeholder={placeholder}
-              error={!!fieldState.error}
-              helperText={getError(fieldState.error, rules)}
-              inputProps={{
-                // TODO: language autocomplete
-                autocomplete: autoComplete,
-                autoComplete: autoComplete,
-                "auto-complete": autoComplete,
-                // ...InputProps,
-                ...params.inputProps,
-                //   autoComplete: "new-password", // disable autocomplete and autofill
-              }}
-              // InputProps={{ ...InputProps }}
-              InputLabelProps={{
-                shrink: !!label,
-              }}
-              sx={
-                {
-                  // mt: 1,
-                  // "label + .MuiOutlinedInput-root": { marginTop: 3 },
+          renderInput={(params) =>
+            console.log("[AutocompleteSelect.renderInput]", name, {
+              field,
+              params,
+            }) || (
+              <TextField
+                {...params}
+                label={label}
+                placeholder={placeholder}
+                error={!!fieldState.error}
+                helperText={getError(fieldState.error, rules)}
+                inputProps={{
+                  // TODO: language autocomplete
+                  autocomplete: autoComplete,
+                  autoComplete: autoComplete,
+                  "auto-complete": autoComplete,
+                  // ...InputProps,
+                  ...params.inputProps, // should contain value
+                  // value: field.value, // TODO: test
+                  //   autoComplete: "new-password", // disable autocomplete and autofill
+                }}
+                // InputProps={{ ...InputProps }}
+                InputLabelProps={{
+                  shrink: !!label,
+                }}
+                sx={
+                  {
+                    // mt: 1,
+                    // "label + .MuiOutlinedInput-root": { marginTop: 3 },
+                  }
                 }
-              }
-            />
-          )}
+              />
+            )
+          }
           // inputValue={`${field.value}`}
           // onInputChange={(event, newInputValue) => {
           //   console.log("[AutocompleteSelect.onInputChange]", {
@@ -583,31 +587,30 @@ export const BareInputField = ({
     <Controller
       name={name}
       rules={rules}
-      render={({ field, fieldState, formState }) =>
-        console.log(fieldState.error, { field, fieldState }) || (
-          <Box width="100%" position="relative">
-            <StyledOutlinedInput
-              error={!!fieldState.error}
-              // helperText={getError(fieldState.error)}
-              size={size}
-              id={name}
-              fullWidth={fullWidth}
-              {...props}
-              {...field}
-            />
-            <P
-              sx={{
-                color: "error.main",
-                position: "absolute",
-                bottom: "-20px",
-                left: "8px",
-              }}
-            >
-              {getError(fieldState.error, rules)}
-            </P>
-          </Box>
-        )
-      }
+      render={({ field, fieldState, formState }) => (
+        // console.log(fieldState.error, { field, fieldState }) ||
+        <Box width="100%" position="relative">
+          <StyledOutlinedInput
+            error={!!fieldState.error}
+            // helperText={getError(fieldState.error)}
+            size={size}
+            id={name}
+            fullWidth={fullWidth}
+            {...props}
+            {...field}
+          />
+          <P
+            sx={{
+              color: "error.main",
+              position: "absolute",
+              bottom: "-20px",
+              left: "8px",
+            }}
+          >
+            {getError(fieldState.error, rules)}
+          </P>
+        </Box>
+      )}
     />
   );
 };

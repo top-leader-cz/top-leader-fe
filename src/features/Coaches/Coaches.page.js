@@ -469,7 +469,7 @@ export function CoachesPageInner() {
         .filter(coachPredicate(filter))
         .map((coach, i) => (
           <CoachCard
-            key={coach.id}
+            key={coach.id + i}
             coach={coach}
             sx={{ my: 3 }}
             onContact={handleContact}
