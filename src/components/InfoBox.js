@@ -24,7 +24,7 @@ export const InfoBox = ({
         >
           <Icon name={iconName} sx={{ fontSize: 30, color: "primary.main" }} />
         </Avatar>
-        <Box>{rightContent}</Box>
+        <Box sx={{ whiteSpace: "normal" }}>{rightContent}</Box>
       </Box>
     );
   };

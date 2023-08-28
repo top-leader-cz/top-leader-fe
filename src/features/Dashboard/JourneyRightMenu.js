@@ -15,6 +15,8 @@ export const JourneyRightMenu = () => {
         flexDirection: "column",
         flexWrap: "nowrap",
         alignItems: "center",
+        minWidth: 0,
+        overflow: "hidden",
         // alignItems: "stretch",
         // justifyContent: "space-between",
       }}

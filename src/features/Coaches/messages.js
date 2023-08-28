@@ -30,7 +30,7 @@ export const messages = defineMessages({
   },
   "coaches.coach.languages": {
     id: "coaches.coach.languages",
-    defaultMessage: "Language: {languages}",
+    defaultMessage: "Languages",
   },
   "coaches.coach.contact": {
     id: "coaches.coach.contact",

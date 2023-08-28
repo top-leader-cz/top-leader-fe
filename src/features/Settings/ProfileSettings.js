@@ -178,6 +178,7 @@ export const ProfileSettings = () => {
   const onError = (errors, e) =>
     console.log("[ProfileSettings.onError]", errors, e);
 
+  const saveDisabled = saveMutation.isLoading || !!initialValuesQuery.error;
   useRightMenu(
     useMemo(
       () => (
@@ -186,7 +187,7 @@ export const ProfileSettings = () => {
           buttonProps={{
             children: msg("settings.profile.aside.save"),
             type: "submit",
-            disabled: saveMutation.isLoading,
+            disabled: saveDisabled,
             onClick: (e) => {
               console.log("Save click");
               form.handleSubmit(saveMutation.mutateAsync, onError)(e);
@@ -236,7 +237,7 @@ export const ProfileSettings = () => {
         COACH.lastName,
         form,
         msg,
-        saveMutation.isLoading,
+        saveDisabled,
         saveMutation.mutateAsync,
       ]
     )

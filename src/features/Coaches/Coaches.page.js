@@ -180,9 +180,24 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [], sx }) => {
 
 const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
   // eslint-disable-next-line no-unused-vars
-  const { id, name, role, experience, languages, description, fields, imgSrc } =
-    coach;
+  const {
+    username,
+    email,
+    rate,
+    firstName,
+    lastName,
+    name = `${firstName} ${lastName}`,
+    role, // TODO: rm?
+    experience,
+    languages,
+    bio,
+    fields,
+    photo,
+    imgSrc = photo, // TODO: rm
+  } = coach;
   const TODAY = new Date();
+
+  console.log("[CoachCard.rndr]", name, { languages });
 
   return (
     // <Card sx={{ maxWidth: "100%", ...sx }}>
@@ -209,14 +224,11 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
             <Msg id="coaches.coach.experience" values={{ experience }} />
           </P>
           <P gutterBottom>
-            <Msg
-              id="coaches.coach.languages"
-              values={{
-                languages: languages.map(getLabel(LANGUAGE_OPTIONS)).join(", "),
-              }}
-            />
+            <Msg id="coaches.coach.languages" />
+            {": "}
+            {languages.map(getLabel(LANGUAGE_OPTIONS)).join(", ")}
           </P>
-          <P gutterBottom>{description}</P>
+          <P gutterBottom>{bio}</P>
           <Box flex="1 1 auto" display="flex" />
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             {fields.map(getLabel(FIELD_OPTIONS)).map((label) => (
@@ -246,8 +258,7 @@ const COACHES = [
     role: "Associate Coach Certified - Issued by ICF",
     experience: 7,
     languages: ["en", "cs"],
-    description:
-      "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
+    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: [
       "business",
       "career",
@@ -286,8 +297,7 @@ const COACHES = [
     role: "Associate Coach Certified - Issued by ICF",
     experience: 2,
     languages: ["en"],
-    description:
-      "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
+    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: ["business", "life"],
     imgSrc: `https://i.pravatar.cc/225?u=${"" + Math.random()}`,
   },
@@ -297,8 +307,7 @@ const COACHES = [
     role: "Associate Coach Certified - Issued by ICF",
     experience: 3,
     languages: ["en", "cs"],
-    description:
-      "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
+    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
     fields: ["business", "life"],
     imgSrc: `https://i.pravatar.cc/225?u=${"" + Math.random()}`,
   },
@@ -332,40 +341,12 @@ const getPayload = ({
     languages: [language],
     fields: field ? [field] : undefined,
     experienceFrom,
-    experienceTo,
-    prices: [],
     name: search,
-    // name: search ? search : undefined,
-  };
 
-const responseData = {
-  content: [],
-  pageable: {
-    sort: {
-      empty: true,
-      sorted: false,
-      unsorted: true,
-    },
-    offset: 0,
-    pageNumber: 0,
-    pageSize: 30,
-    paged: true,
-    unpaged: false,
-  },
-  totalPages: 0,
-  totalElements: 0,
-  last: true,
-  size: 30,
-  number: 0,
-  sort: {
-    empty: true,
-    sorted: false,
-    unsorted: true,
-  },
-  numberOfElements: 0,
-  first: true,
-  empty: true,
-};
+    // TODO: BE bug - not accepting from-to, just one value from range
+    // experienceTo,
+    // prices: [],
+  };
 
 export function CoachesPageInner() {
   const msg = useMsg();
@@ -442,27 +423,30 @@ export function CoachesPageInner() {
 
       <QueryRenderer
         {...query}
-        // success={({ data: { content = [] } }) =>
-        //   content.map((coach, i) => (
-        //     <CoachCard
-        //       key={coach.id}
-        //       coach={coach}
-        //       sx={{ my: 3 }}
-        //       onContact={handleContact}
-        //       freeSlots={[
-        //         MOCK_SLOT(0 + (i % 3), 9),
-        //         MOCK_SLOT(0 + (i % 3), 10),
-        //         MOCK_SLOT(0 + (i % 3), 11),
-        //         MOCK_SLOT(2 + (i % 3), 10),
-        //         MOCK_SLOT(3 + (i % 3), 9),
-        //         MOCK_SLOT(4 + (i % 3), 11),
-        //       ]}
-        //     />
-        //   ))
-        // }
+        success={({ data: { content = [] } }) =>
+          content.map((coach, i) => (
+            <CoachCard
+              key={coach.username}
+              coach={coach}
+              sx={{ my: 3 }}
+              onContact={handleContact}
+              freeSlots={[
+                MOCK_SLOT(0 + (i % 3), 9),
+                MOCK_SLOT(0 + (i % 3), 10),
+                MOCK_SLOT(0 + (i % 3), 11),
+                MOCK_SLOT(2 + (i % 3), 10),
+                MOCK_SLOT(3 + (i % 3), 9),
+                MOCK_SLOT(4 + (i % 3), 11),
+              ]}
+            />
+          ))
+        }
       />
 
-      {Array(25)
+      <Divider>Mocked users:</Divider>
+
+      {/* {Array(25) */}
+      {Array(1)
         .fill(null)
         .map((_, i) => COACHES)
         .reduce((acc, v) => acc.concat(v), [])

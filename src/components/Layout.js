@@ -1,9 +1,8 @@
 import {
   AppBar,
-  Avatar,
-  Button,
   Divider,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -11,39 +10,90 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  styled,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
-import * as React from "react";
-import { useReducer } from "react";
-import { useContext } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
-import { routes } from "../routes";
-import { Icon } from "./Icon";
+import { createContext, useCallback, useMemo, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MainMenu } from "./MainMenu";
-import { H2, P } from "./Typography";
+import { Icon } from "./Icon";
 
-const SideMenu = ({ children, width, anchor }) => {
+const drawerWidth = 256;
+
+const openedMixin = ({ theme, width }) => ({
+  width: width,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+});
+
+const closedMixin = ({ theme, width }) => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: width || `calc(${theme.spacing(7)} + 1px)`,
+  [theme.breakpoints.up("sm")]: {
+    width: width || `calc(${theme.spacing(8)} + 1px)`,
+  },
+});
+
+const MyDrawer = styled(Drawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open, width, ...rest }) => ({
+  width: width,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin({ theme, width }),
+    "& .MuiDrawer-paper": openedMixin({ theme, width }),
+  }),
+  ...(!open && {
+    ...closedMixin({ theme, width }),
+    "& .MuiDrawer-paper": closedMixin({ theme, width }),
+  }),
+}));
+
+const SideMenu = ({ children, width, anchor, toggleMobile, open }) => {
   return (
-    <Drawer
+    <MyDrawer
+      id="side-menu"
+      width={width}
       sx={{
-        width,
+        position: "relative",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width,
+          ...(toggleMobile ? { overflow: "visible" } : {}),
           boxSizing: "border-box",
         },
       }}
       variant="permanent"
       anchor={anchor}
+      open={open}
     >
       {children}
-    </Drawer>
+      {toggleMobile ? (
+        <Box
+          sx={{
+            position: "absolute",
+            ...(anchor === "left" ? { right: "-20px" } : { left: "-20px" }),
+            top: "55px",
+          }}
+        >
+          {toggleMobile}
+        </Box>
+      ) : null}
+    </MyDrawer>
   );
 };
 
-export const RightMenuContext = React.createContext();
+export const RightMenuContext = createContext();
 
 const update =
   ({ id, element }) =>
@@ -67,14 +117,14 @@ const update =
 
 export const RightMenuProvider = ({ children }) => {
   const [stack, setStack] = useState([]);
-  const context = React.useMemo(
+  const context = useMemo(
     () => ({
       updateStack: ({ id, element }) => setStack(update({ id, element })),
       stack,
     }),
     [stack]
   );
-  console.log("[RightMenuProvider]", stack);
+  // console.log("[RightMenuProvider]", stack);
 
   return (
     <RightMenuContext.Provider value={context}>
@@ -89,17 +139,17 @@ export const useRightMenu = (element) => {
   const [id] = useState(() => counter++);
   const { updateStack } = useContext(RightMenuContext);
 
-  const updateStackRef = React.useRef(updateStack);
+  const updateStackRef = useRef(updateStack);
   updateStackRef.current = updateStack;
 
   useEffect(() => {
-    console.log("%c[useRightMenu.eff]", "color:coral;", { id, element });
+    // console.log("%c[useRightMenu.eff]", "color:coral;", { id, element });
     updateStackRef.current({ id, element });
   }, [element, id]);
 
   useEffect(
     () => () => {
-      console.log("%c[useRightMenu.eff cleanup]", "color:coral;", { id });
+      // console.log("%c[useRightMenu.eff cleanup]", "color:coral;", { id });
       updateStackRef.current({ id, element: null });
     },
     [id]
@@ -111,15 +161,38 @@ export const Layout = ({
   rightMenuContent: rightMenuContentProp,
   contentWrapperSx,
 }) => {
+  const theme = useTheme();
+  const downLg = useMediaQuery(theme.breakpoints.down("lg"));
+  const downMd = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [leftOpen, setLeftOpen] = useState(!downLg);
+  useEffect(() => {
+    setLeftOpen(!downLg);
+  }, [downLg]);
+  const handleToggleLeft = useCallback(() => {
+    setLeftOpen((leftOpen) => !leftOpen);
+  }, []);
+
+  const [rightOpen, setRightOpen] = useState(!downMd);
+  useEffect(() => {
+    setRightOpen(!downMd);
+  }, [downMd]);
+  const handleToggleRight = useCallback(() => {
+    setRightOpen((rightOpen) => !rightOpen);
+  }, []);
+
   const { stack } = useContext(RightMenuContext);
-  const rightMenuContent = React.useMemo(
+  const rightMenuContent = useMemo(
     () => rightMenuContentProp || stack[stack.length - 1]?.element,
     [rightMenuContentProp, stack]
   );
+  const leftWidth = leftOpen ? 256 : 88;
+  const rightWidth = rightOpen ? (downLg ? 300 : 392) : 12;
   // console.log("[Layout.rndr]", { stack, rightMenuContent });
 
   return (
     <Box
+      id="layout"
       sx={{
         display: "flex",
         bgcolor: "#EAECF0",
@@ -127,8 +200,26 @@ export const Layout = ({
         minHeight: "100%",
       }}
     >
-      <SideMenu width={256} anchor="left">
-        <MainMenu />
+      <SideMenu
+        width={leftWidth}
+        anchor="left"
+        open={leftOpen}
+        toggleMobile={
+          !downLg ? null : (
+            <IconButton
+              variant="outlined"
+              size="small"
+              disableRipple
+              sx={{ backgroundColor: "white", border: "1px solid #EAECF0" }}
+              onClick={handleToggleLeft}
+            >
+              <Icon name={leftOpen ? "ArrowBack" : "ArrowForward"} />
+            </IconButton>
+          )
+        }
+      >
+        {/* <SideMenu width={256} anchor="left"> */}
+        <MainMenu open={leftOpen} />
       </SideMenu>
 
       <Box
@@ -147,7 +238,24 @@ export const Layout = ({
       </Box>
 
       {rightMenuContent && (
-        <SideMenu width={392} anchor="right">
+        <SideMenu
+          width={rightWidth}
+          anchor="right"
+          open={rightOpen}
+          toggleMobile={
+            !downMd ? null : (
+              <IconButton
+                variant="outlined"
+                size="small"
+                disableRipple
+                sx={{ backgroundColor: "white", border: "1px solid #EAECF0" }}
+                onClick={handleToggleRight}
+              >
+                <Icon name={rightOpen ? "ArrowForward" : "ArrowBack"} />
+              </IconButton>
+            )
+          }
+        >
           {rightMenuContent}
         </SideMenu>
       )}
@@ -155,7 +263,7 @@ export const Layout = ({
   );
 };
 
-const drawerWidth = 240;
+// const drawerWidth = 240;
 
 const LayoutExample = () => {
   return (

@@ -25,6 +25,7 @@ import { routes } from "../routes";
 import { Msg, MsgProvider } from "./Msg";
 import { defineMessages } from "react-intl";
 import { LinkBehavior } from "./LinkBehavior";
+import theme from "../theme";
 
 const messages = defineMessages({
   "main-menu.items.dashboard": {
@@ -61,7 +62,26 @@ const messages = defineMessages({
   },
 });
 
-const LogoImg = () => {
+// TODO: mobile
+const LogoImg = ({ mobile }) => {
+  if (mobile)
+    return (
+      <Box
+        component="div"
+        sx={{
+          width: 32,
+          height: 32,
+          borderRadius: 1,
+          backgroundColor: theme.palette.primary.main,
+          // px: 2,
+          my: 2,
+          mx: "auto",
+          // maxHeight: { xs: 233, md: 167 },
+          // maxWidth: { xs: 350, md: 250 },
+        }}
+      />
+    );
+
   return (
     <Box
       component="img"
@@ -79,7 +99,7 @@ const LogoImg = () => {
   );
 };
 
-const ListItemLink = ({ to, text, icon, onClick }) => {
+const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
   const match = useMatch(to ?? "");
 
   return (
@@ -91,18 +111,20 @@ const ListItemLink = ({ to, text, icon, onClick }) => {
         onClick={onClick}
       >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
-        <ListItemText primary={text} />
+        <ListItemText primary={text} sx={{ opacity: mobile ? 0 : 1 }} />
       </ListItemButton>
     </ListItem>
   );
 };
 
-export const MainMenu = () => {
+export const MainMenu = ({ open }) => {
   const auth = useAuth();
+  const mobile = !open;
 
   return (
     <MsgProvider messages={messages}>
       <Paper
+        id="main-menu"
         square
         sx={{
           height: "100vh",
@@ -114,29 +136,34 @@ export const MainMenu = () => {
         }}
       >
         <Box>
-          <LogoImg />
+          <LogoImg mobile={mobile} />
           <List component="nav">
             <ListItemLink
+              mobile={mobile}
               text={<Msg id="main-menu.items.dashboard" />}
               icon={<HomeOutlined />}
               to={routes.dashboard}
             />
             <ListItemLink
+              mobile={mobile}
               text={<Msg id="main-menu.items.sessions" />}
               icon={<DescriptionOutlined />}
               to={routes.sessions}
             />
             <ListItemLink
+              mobile={mobile}
               text={<Msg id="main-menu.items.coaches" />}
               icon={<PersonOutlined />}
               to={routes.coaches}
             />
             <ListItemLink
+              mobile={mobile}
               text={<Msg id="main-menu.items.getFeedback" />}
               icon={<ForumOutlined />}
               to={routes.getFeedback}
             />
             <ListItemLink
+              mobile={mobile}
               text={<Msg id="main-menu.items.team" />}
               icon={<People />}
               to={routes.team}
@@ -145,16 +172,19 @@ export const MainMenu = () => {
         </Box>
         <Box sx={{ mb: 2 }}>
           <ListItemLink
+            mobile={mobile}
             text={<Msg id="main-menu.items.settings" />}
             icon={<SettingsOutlined />}
             to={routes.settings}
           />
           <ListItemLink
+            mobile={mobile}
             text={<Msg id="main-menu.items.help" />}
             icon={<HelpOutlined />}
           />
           <Divider sx={{ my: 2 }} />
           <ListItemLink
+            mobile={mobile}
             text={<Msg id="main-menu.items.logout" />}
             icon={<LogoutOutlined />}
             onClick={() => {
