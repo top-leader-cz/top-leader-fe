@@ -47,7 +47,15 @@ const ControlsInner = ({
         type="submit"
         variant="contained"
         endIcon={<ArrowForward />}
-        onClick={() => handleNext(data)}
+        onClick={(e) => {
+          console.log(
+            "%c[ControlsInner.submit] e.preventDefault()",
+            "color:crimson",
+            e
+          );
+          e.preventDefault();
+          return handleNext(data);
+        }}
         children={msg("controls.next")}
         {...nextProps}
       />

@@ -1,4 +1,11 @@
-import { Box, Card, CardActionArea, CardContent } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActionArea,
+  CardContent,
+  Typography,
+} from "@mui/material";
 import { generatePath, useNavigate } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
@@ -13,6 +20,39 @@ import { useAreasDict } from "./areas";
 import { useQuery } from "react-query";
 import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { useMakeSelectable } from "../Values/MyValues";
+import { useMsg } from "../../components/Msg/Msg";
+import { Icon } from "../../components/Icon";
+
+const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
+  return (
+    <Box
+      display="flex"
+      flexDirection="row"
+      alignItems="center"
+      width={"100%"}
+      sx={sx}
+    >
+      <Avatar
+        variant="rounded"
+        sx={{
+          width: 32,
+          height: 32,
+          bgcolor: "#DAD2F1",
+          // borderRadius: 3,
+        }}
+      >
+        <Icon name={iconName} sx={{ fontSize: 16, color: "primary.main" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column", px: 1 }}>
+        <Typography>{caption}</Typography>
+        <Typography variant="h2" fontSize={14}>
+          {text}
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 const ActionStepsTodo = ({ steps = [], label }) => {
   // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
@@ -41,22 +81,37 @@ const SessionCard = ({
   sx = { mb: 3 },
 }) => {
   const { areas } = useAreasDict();
+  const msg = useMsg();
+
   return (
     <Card sx={{ ...sx }} elevation={0}>
       <CardActionArea
         sx={{ height: "100%" }}
         disableRipple
-        // href={generatePath(routes.editSession, { id })} // TODO?
+        href={generatePath(routes.editSession, { id })} // TODO?
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
             <P>{date} -&nbsp;</P>
           </Box>
-          <Box>
+          <Box sx={{ width: "100%" }}>
             <P>{type}</P>
-            <P sx={{ my: 3 }}>
-              <b>{areas[areaOfDevelopment]?.label || areaOfDevelopment}</b>
-            </P>
+            <Box sx={{ display: "flex", mt: 3 }}>
+              <SessionCardIconTile
+                iconName={"InsertChart"}
+                caption={msg("sessions.edit.steps.align.area.caption")}
+                text={areas[areaOfDevelopment]?.label || areaOfDevelopment}
+                sx={{}}
+              />
+              <SessionCardIconTile
+                iconName={"InsertChart"}
+                caption={msg("sessions.edit.steps.align.goal.caption")}
+                text={longTermGoal}
+                // text="Giving speeches to audiences regularly" // TODO: width
+                sx={{}}
+              />
+            </Box>
+            <P sx={{ my: 3 }}></P>
             <ActionStepsTodo
               steps={actionSteps}
               label={<Msg id="sessions.card.goals.title" />}
@@ -69,23 +124,40 @@ const SessionCard = ({
 };
 
 function Sessions() {
-  const history = useHistoryEntries({ storageKey: "sessions_history" });
   const { authFetch } = useAuth();
-  const query = useQuery({
-    queryKey: ["user-sessions"],
-    queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
+  const sessionsQuery = useQuery({
+    queryKey: ["user-sessions", "history"],
+    queryFn: () => authFetch({ url: `/api/latest/history/USER_SESSION` }),
     // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
   });
+  const sel = useMakeSelectable({
+    entries: sessionsQuery.data ?? [],
+    map: (el) => ({
+      // Right menu
+      status: "Private session",
+      id: el.id,
+      date: el.createdAt,
+      timestamp: new Date(el.createdAt).getTime(),
+
+      type: "Private session",
+      areaOfDevelopment: el.data.areaOfDevelopment,
+      longTermGoal: el.data.longTermGoal,
+      motivation: el.data.motivation,
+      actionSteps: el.data.actionSteps,
+    }),
+  });
+
+  // const query = useQuery({
+  //   queryKey: ["user-sessions"],
+  //   queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
+  //   // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
+  // });
   const navigate = useNavigate();
 
   console.log("[Sessions.rndr]", {
-    history,
-    query,
+    sessionsQuery,
+    sel,
   });
-
-  const maybeSession = query.data?.areaOfDevelopment?.length
-    ? query.data
-    : undefined; // empty array initially
 
   const renderSuccess = () => (
     <MsgProvider messages={messages}>
@@ -93,8 +165,8 @@ function Sessions() {
         rightMenuContent={
           <HistoryRightMenu
             heading={<Msg id="sessions.aside.title" />}
-            history={history}
-            onRemove={history.remove}
+            history={sel}
+            // onRemove={history.remove}
             buttonProps={{
               children: <Msg id="sessions.aside.start-button" />,
               onClick: () => navigate(routes.newSession),
@@ -103,15 +175,12 @@ function Sessions() {
         }
       >
         <Header text={<Msg id="sessions.heading" />} />
-        {maybeSession && <SessionCard session={maybeSession} />}
-        {/* {history.all.map((session) => (
-          <SessionCard session={session} />
-        ))} */}
+        <SessionCard session={sel.selected} />
       </Layout>
     </MsgProvider>
   );
 
-  return <QueryRenderer {...query} success={renderSuccess} />;
+  return <QueryRenderer {...sessionsQuery} success={renderSuccess} />;
 }
 
 export default Sessions;

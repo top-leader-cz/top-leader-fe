@@ -12,6 +12,7 @@ export const ActionStepsStep = ({
   data,
   setData,
   onFinish,
+  disabled: disabledProp,
   ...props
 }) => {
   const keyName = "actionSteps";
@@ -41,7 +42,8 @@ export const ActionStepsStep = ({
     "formState.isValid": formState.isValid,
   });
   // TODO: not working useFieldArray rules validation? must be required?
-  const disabled = !nextData[keyName]?.length || !formState.isValid;
+  const disabled =
+    !nextData[keyName]?.length || !formState.isValid || disabledProp;
 
   return (
     <SessionStepCard {...props}>

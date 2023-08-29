@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -177,30 +177,44 @@ function NewSessionPageInner() {
     //   setData(data);
     // },
   });
+
+  const activeStepIndexRef = useRef(activeStepIndex);
+  activeStepIndexRef.current = activeStepIndex;
   useEffect(() => {
-    console.log("[onSuccess]", { qData: query.data });
-    if (query.data) reinit(query.data);
+    console.log("[NewSession.eff]", { qData: query.data });
+    if (query.data && activeStepIndexRef.current === 0) {
+      console.log("%c[NewSession.eff]", "color:pink", { qData: query.data });
+      reinit(query.data);
+    }
   }, [query.data, reinit]);
   const mutation = useMutation({
     mutationFn: ({ actionSteps = [], ...data }) => {
-      const mapStep = ({ label, date }) => {
-        const UTC_DAY_FORMAT = "yyyy-MM-dd"; // TODO: extract
-        const formattedDate = format(date, UTC_DAY_FORMAT);
-        console.log("mapStep", { date, formattedDate });
-        return {
-          label,
-          date: formattedDate,
-        };
-      };
-      throw new Error("TODO:check");
+      console.log("%cMUTATION", "color:lime", { actionSteps, ...data });
       return authFetch({
         method: "POST",
         url: "/api/latest/user-sessions",
         data: {
           ...data,
-          actionSteps: actionSteps.map(mapStep),
+          actionSteps: actionSteps.map(({ label, date }) => {
+            const UTC_DAY_FORMAT = "yyyy-MM-dd"; // TODO: extract
+            const formattedDate = format(date, UTC_DAY_FORMAT);
+            console.log("mapStep", { date, formattedDate });
+            return {
+              label,
+              date: formattedDate,
+            };
+          }),
         },
       });
+      // .then((arg) => {
+      //   debugger;
+      //   return arg;
+      // });
+    },
+    onSuccess: (data) => {
+      // TODO: not called!
+      console.log("mutation.onSuccess", data);
+      setFinished(true);
     },
   });
 
@@ -208,11 +222,15 @@ function NewSessionPageInner() {
   const navigate = useNavigate();
   const [finished, setFinished] = useState(false);
 
-  const onFinish = async (data) => {
+  const onFinish = (data) => {
     // const entry = createSessionEntry(data);
     // history.push(entry);
-    await mutation.mutateAsync(data);
-    setFinished(true);
+    console.log("[NewSession.onFinish]", { data });
+    // await mutation.mutateAsync(data); // todo: broken, reloads page
+    mutation.mutate(data);
+    // setFinished(true);
+    // navigate(routes.sessions);
+
     // TODO: update @mui/x-date-pickers 5 -> 6
   };
 
@@ -271,6 +289,7 @@ function NewSessionPageInner() {
           handleNext={handleNext}
           handleBack={handleBack}
           onFinish={onFinish}
+          disabled={mutation.isLoading}
         />
       )}
     </Layout>

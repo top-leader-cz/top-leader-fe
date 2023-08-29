@@ -20,7 +20,7 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 
-const IconTile = ({ iconName, caption, text, ...props }) => {
+const IconTile = ({ iconName, caption, text }) => {
   return (
     <Box
       display="flex"
@@ -29,7 +29,6 @@ const IconTile = ({ iconName, caption, text, ...props }) => {
       width={"100%"}
       bgcolor="#FCFCFD"
       p={3}
-      {...props}
     >
       <Avatar
         variant="rounded"
