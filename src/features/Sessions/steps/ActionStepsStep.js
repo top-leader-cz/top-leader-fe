@@ -14,15 +14,16 @@ export const ActionStepsStep = ({
   onFinish,
   ...props
 }) => {
+  const keyName = "actionSteps";
   const { control, watch, formState } = useForm({
     mode: "onBlur",
     defaultValues: {
-      steps: data.steps?.length ? data.steps : DEFAULT_VALUE_ROW,
+      [keyName]: data[keyName]?.length ? data[keyName] : DEFAULT_VALUE_ROW,
     },
   });
   const nextData = {
     ...data,
-    steps: watch("steps"),
+    [keyName]: watch(keyName),
   };
 
   // TODO: fieldArray errors?
@@ -30,16 +31,17 @@ export const ActionStepsStep = ({
     nextData,
     errors: {
       "formState.errors": formState.errors,
-      "formState.errors?.steps": formState.errors?.steps,
+      [`formState.errors?.[${keyName}]`]: formState.errors?.[keyName],
       "formState.errors?.fieldArray": formState.errors?.fieldArray,
       "formState.errors?.fieldArray?.root": formState.errors?.fieldArray?.root,
-      "formState.errors?.steps?.root": formState.errors?.steps?.root,
+      [`formState.errors?.[${keyName}]?.root`]:
+        formState.errors?.[keyName]?.root,
     },
-    "nextData.steps?.length": nextData.steps?.length,
+    [`nextData.[${keyName}]?.length`]: nextData[keyName]?.length,
     "formState.isValid": formState.isValid,
   });
   // TODO: not working useFieldArray rules validation? must be required?
-  const disabled = !nextData.steps?.length || !formState.isValid;
+  const disabled = !nextData[keyName]?.length || !formState.isValid;
 
   return (
     <SessionStepCard {...props}>
@@ -50,7 +52,7 @@ export const ActionStepsStep = ({
         sx={{ mt: 1 }}
       >
         <ActionSteps
-          name="steps"
+          name={keyName}
           control={control}
           rules={{ required: true, minLength: 1 }}
           sx={{ my: 5 }}

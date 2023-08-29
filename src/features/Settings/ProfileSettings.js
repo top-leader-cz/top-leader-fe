@@ -33,6 +33,7 @@ import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { TranslationContext } from "../../App";
+import { messages as coachesMessages } from "../Coaches/messages";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -81,13 +82,12 @@ const _COACH = {
   [FIELDS.publicProfile]: false,
 };
 
-const to = ({ photo, ...data }, { userLocale }) => {
-  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone; // TODO: notify user that timezone settings is different than currently set!
+const to = ({ photo, ...data }, { userLocale, userTz }) => {
   return {
     ...data,
     rate: data.rate || "",
     experienceSince: data.experienceSince, // TODO: utc
-    timeZone: data.timezone || userTz,
+    timeZone: data.timezone || userTz, // TODO: userTz ctx
     languages: data.languages?.length ? data.languages : [userLocale],
     imageSrc: photo?.[0],
   };
@@ -106,13 +106,19 @@ export const ProfileSettings = () => {
   const { authFetch, user } = useAuth();
   const msg = useMsg();
   const form = useForm({});
-  const { language } = useContext(TranslationContext);
+  const { language, userTz } = useContext(TranslationContext);
 
   const [loading, setLoading] = useState(true);
   const { reset } = form;
   const resetForm = useCallback(
     (data) => {
-      reset(to(data, { userLocale: language }));
+      reset(
+        to(data, {
+          userLocale: language,
+          // TODO: notify user that timezone settings is different than currently set!
+          userTz,
+        })
+      );
 
       // Autocomplete needs remount after form reset, TODO
       setLoading(true);
@@ -160,9 +166,6 @@ export const ProfileSettings = () => {
     // else setLoading(false);
   }, [data, resetForm]);
 
-  // const isJustLoaderDisplayed = !initialValuesQuery.data || initialValuesQuery.isFetching;
-  // const isJustLoaderDisplayed = !form.formState.defaultValues?.timeZone || loading;
-  // const isJustLoaderDisplayed = !initialValuesQuery.data || loading;
   const isJustLoaderDisplayed = initialValuesQuery.isLoading || loading;
 
   const COACH = form.formState.defaultValues ?? {}; // TODO
@@ -206,10 +209,15 @@ export const ProfileSettings = () => {
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
           {/* <P mt={1}>{COACH.certificates}</P> */}
           <P mt={1}>
-            Experience:{" "}
+            {msg("settings.profile.field.experience")}
+            {": "}
             {COACH.experienceSince ? `${COACH.experienceSince}` : ""}
           </P>
-          <P mt={1}>Languages: {[].concat(COACH.languages).join(", ")}</P>
+          <P mt={1}>
+            {msg("settings.profile.field.languages")}
+            {": "}
+            {[].concat(COACH.languages).join(", ")}
+          </P>
           <P my={3} color="black">
             {COACH.bio}
           </P>
@@ -352,7 +360,7 @@ export const ProfileSettings = () => {
           name={FIELDS.languages}
           options={LANGUAGE_OPTIONS}
           renderOption={renderLanguageOption}
-          placeholder="Select languages you speak"
+          placeholder={msg("settings.profile.field.languages.placeholder")}
         />
       </FormRow>
 
@@ -366,7 +374,7 @@ export const ProfileSettings = () => {
           sx={WHITE_BG}
           name={FIELDS.fields}
           options={FIELD_OPTIONS}
-          placeholder="Select fields you work in"
+          placeholder={msg("settings.profile.field.fields.placeholder")}
         />
       </FormRow>
 

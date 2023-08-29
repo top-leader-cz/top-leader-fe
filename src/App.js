@@ -67,6 +67,9 @@ const TranslationProvider = ({ children }) => {
     window.sessionStorage.setItem("language", lang);
   }, []);
 
+  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const [userTz, setUserTz] = useState(browserTz);
+
   const onReset = useCallback(
     ({ args }) => {
       console.log({ args });
@@ -77,7 +80,9 @@ const TranslationProvider = ({ children }) => {
 
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
-      <TranslationContext.Provider value={{ language, setLanguage }}>
+      <TranslationContext.Provider
+        value={{ language, setLanguage, userTz, setUserTz }}
+      >
         <IntlProvider
           // messages={{ exampleMessageId: "Example message" }}
           locale={language}
@@ -124,23 +129,23 @@ function ResetAll({ error, resetErrorBoundary }) {
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <TranslationProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-            <QueryClientProvider client={queryClient}>
-              <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <TranslationProvider>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
                 <GlobalLoader>
                   <RightMenuProvider>
                     <CssBaseline />
                     <RouterProvider router={router} />
                   </RightMenuProvider>
                 </GlobalLoader>
-              </AuthProvider>
-            </QueryClientProvider>
-          </ErrorBoundary>
-        </LocalizationProvider>
-      </TranslationProvider>
-    </ThemeProvider>
+              </ErrorBoundary>
+            </LocalizationProvider>
+          </TranslationProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

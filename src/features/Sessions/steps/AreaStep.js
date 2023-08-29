@@ -17,24 +17,39 @@ const useNewSession = () => {
   };
 };
 
-export const AreaStep = ({ handleNext, data, setData, ...props }) => {
+export const AreaStep = ({
+  keyName = "areaOfDevelopment",
+  handleNext,
+  data,
+  setData,
+  step,
+  stepper,
+}) => {
   const { areas } = useNewSession();
+  const valueArr = data[keyName];
+  const value = valueArr?.length ? valueArr[0] : "";
 
-  const isCustomArea = !areas.some((area) => area.key === data.area);
-  const [selected, setSelected] = useState(
-    isCustomArea ? undefined : data.area
-  );
-  const [customArea, setCustomArea] = useState(isCustomArea ? data.area : "");
-  console.log({ selected, customArea });
+  const isCustomArea = !areas.some((area) => area.key === value);
+  const [selected, setSelected] = useState(isCustomArea ? undefined : value);
+  const [customArea, setCustomArea] = useState(isCustomArea ? value : "");
 
   const newArea = customArea || selected;
   const next = () => {
-    handleNext({ area: newArea });
+    handleNext({ [keyName]: [newArea] });
   };
   const msg = useMsg();
 
+  console.log("[AreaStep.rndr]", {
+    data,
+    selected,
+    customArea,
+    areas,
+    isCustomArea,
+    value,
+  });
+
   return (
-    <SessionStepCard {...props}>
+    <SessionStepCard {...{ step, stepper }}>
       <Box sx={{ my: 12.5, ...SelectableChip.wrapperSx }}>
         {areas.map((item) => (
           <SelectableChip

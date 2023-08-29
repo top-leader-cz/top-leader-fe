@@ -3,6 +3,7 @@ import { Box } from "@mui/system";
 import React from "react";
 import {
   createBrowserRouter,
+  createHashRouter,
   Form,
   Outlet,
   redirect,
@@ -49,7 +50,7 @@ const Root = ({ children, ...props }) => {
   );
 };
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: "/",
     element: <Root />,
@@ -197,7 +198,7 @@ const Root2 = () => {
   return <Outlet />;
 };
 
-export const router1 = createBrowserRouter([
+const router1 = createBrowserRouter([
   {
     path: "/",
     element: <Root2 />,

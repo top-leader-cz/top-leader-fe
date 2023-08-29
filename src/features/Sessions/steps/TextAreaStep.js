@@ -81,5 +81,5 @@ export const MotivationStep = (props) => (
 );
 
 export const GoalStep = (props) => (
-  <TextAreaStep textAreaName={"goal"} {...props} />
+  <TextAreaStep textAreaName={"longTermGoal"} {...props} />
 );

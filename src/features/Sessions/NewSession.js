@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -16,6 +16,10 @@ import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
 import { VerticalStepper } from "./VerticalStepper";
+import { useMutation, useQuery } from "react-query";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
+import { format } from "date-fns";
 
 export const StepperRightMenu = ({
   heading,
@@ -67,6 +71,7 @@ export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   };
 };
 
+// BACKUP for reference
 const createSessionEntry = ({ area, goal, motivation, steps }) => {
   return {
     timestamp: new Date().getTime(),
@@ -77,6 +82,7 @@ const createSessionEntry = ({ area, goal, motivation, steps }) => {
     motivation,
     steps,
   };
+  /* NEW BE: return { timestamp: new Date().getTime(), date: new Date().toISOString(), type: "Private session", areaOfDevelopment, longTermGoal, motivation, actionSteps, }; */
 };
 
 function NewSessionPageInner() {
@@ -134,9 +140,6 @@ function NewSessionPageInner() {
     },
   ];
 
-  const history = useHistoryEntries({ storageKey: "sessions_history" });
-  const navigate = useNavigate();
-  const [finished, setFinished] = useState(false);
   const {
     activeStep: { StepComponent = SessionStepCard, ...activeStep } = {},
     activeStepIndex,
@@ -149,12 +152,74 @@ function NewSessionPageInner() {
     steps: STEPS,
     initialIndex: 0,
   });
-  const onFinish = (data) => {
-    const entry = createSessionEntry(data);
-    history.push(entry);
+
+  const [unmountedUi, setUnmountedUi] = useState(false);
+  const reinit = useCallback(
+    (data) => {
+      setUnmountedUi(true);
+      setData(data);
+      setTimeout(() => setUnmountedUi(false), 0);
+    },
+    [setData]
+  );
+
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["user-sessions"],
+    queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
+    cacheTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
+    // onSuccess: (data) => {
+    //   console.log("[onSuccess]", { data });
+    //   setData(data);
+    // },
+  });
+  useEffect(() => {
+    console.log("[onSuccess]", { qData: query.data });
+    if (query.data) reinit(query.data);
+  }, [query.data, reinit]);
+  const mutation = useMutation({
+    mutationFn: ({ actionSteps = [], ...data }) => {
+      const mapStep = ({ label, date }) => {
+        const UTC_DAY_FORMAT = "yyyy-MM-dd"; // TODO: extract
+        const formattedDate = format(date, UTC_DAY_FORMAT);
+        console.log("mapStep", { date, formattedDate });
+        return {
+          label,
+          date: formattedDate,
+        };
+      };
+      throw new Error("TODO:check");
+      return authFetch({
+        method: "POST",
+        url: "/api/latest/user-sessions",
+        data: {
+          ...data,
+          actionSteps: actionSteps.map(mapStep),
+        },
+      });
+    },
+  });
+
+  // const history = useHistoryEntries({ storageKey: "sessions_history" });
+  const navigate = useNavigate();
+  const [finished, setFinished] = useState(false);
+
+  const onFinish = async (data) => {
+    // const entry = createSessionEntry(data);
+    // history.push(entry);
+    await mutation.mutateAsync(data);
     setFinished(true);
+    // TODO: update @mui/x-date-pickers 5 -> 6
   };
-  console.log("[NewSessionPage.rndr]", { data });
+
+  const isLoading = unmountedUi || query.isFetching || mutation.isLoading;
+  console.log("[NewSessionPage.rndr]", { data, query, isLoading });
+
+  if (isLoading) return <QueryRenderer isLoading />;
 
   return (
     <Layout

@@ -10,6 +10,9 @@ import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
 import { messages } from "./messages";
 import { useAreasDict } from "./areas";
+import { useQuery } from "react-query";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const ActionStepsTodo = ({ steps = [], label }) => {
   // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
@@ -22,18 +25,18 @@ const ActionStepsTodo = ({ steps = [], label }) => {
     </>
   );
 };
-
+// {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
 // TODO: grid
-export const SessionCard = ({
+const SessionCard = ({
   session: {
     timestamp,
     id = timestamp,
     date,
     type,
-    area,
-    goal,
+    areaOfDevelopment,
+    longTermGoal,
     motivation,
-    steps,
+    actionSteps,
   } = {},
   sx = { mb: 3 },
 }) => {
@@ -42,7 +45,8 @@ export const SessionCard = ({
     <Card sx={{ ...sx }} elevation={0}>
       <CardActionArea
         sx={{ height: "100%" }}
-        href={generatePath(routes.editSession, { id })}
+        disableRipple
+        // href={generatePath(routes.editSession, { id })} // TODO?
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
@@ -51,10 +55,10 @@ export const SessionCard = ({
           <Box>
             <P>{type}</P>
             <P sx={{ my: 3 }}>
-              <b>{areas[area]?.label || area}</b>
+              <b>{areas[areaOfDevelopment]?.label || areaOfDevelopment}</b>
             </P>
             <ActionStepsTodo
-              steps={steps}
+              steps={actionSteps}
               label={<Msg id="sessions.card.goals.title" />}
             />
           </Box>
@@ -66,13 +70,24 @@ export const SessionCard = ({
 
 function Sessions() {
   const history = useHistoryEntries({ storageKey: "sessions_history" });
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["user-sessions"],
+    queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
+    // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
+  });
   const navigate = useNavigate();
 
   console.log("[Sessions.rndr]", {
     history,
+    query,
   });
 
-  return (
+  const maybeSession = query.data?.areaOfDevelopment?.length
+    ? query.data
+    : undefined; // empty array initially
+
+  const renderSuccess = () => (
     <MsgProvider messages={messages}>
       <Layout
         rightMenuContent={
@@ -88,12 +103,15 @@ function Sessions() {
         }
       >
         <Header text={<Msg id="sessions.heading" />} />
-        {history.all.map((session) => (
+        {maybeSession && <SessionCard session={maybeSession} />}
+        {/* {history.all.map((session) => (
           <SessionCard session={session} />
-        ))}
+        ))} */}
       </Layout>
     </MsgProvider>
   );
+
+  return <QueryRenderer {...query} success={renderSuccess} />;
 }
 
 export default Sessions;

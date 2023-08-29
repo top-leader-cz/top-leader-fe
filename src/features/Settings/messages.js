@@ -58,9 +58,17 @@ export const messages = defineMessages({
     id: "settings.profile.field.languages",
     defaultMessage: "Languages",
   },
+  "settings.profile.field.languages.placeholder": {
+    id: "settings.profile.field.languages.placeholder",
+    defaultMessage: "Select languages you speak",
+  },
   "settings.profile.field.fields": {
     id: "settings.profile.field.fields",
     defaultMessage: "Fields",
+  },
+  "settings.profile.field.fields.placeholder": {
+    id: "settings.profile.field.fields.placeholder",
+    defaultMessage: "Select fields you work in",
   },
   "settings.profile.field.certificates": {
     id: "settings.profile.field.certificates",
