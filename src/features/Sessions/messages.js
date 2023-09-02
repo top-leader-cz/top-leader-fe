@@ -131,6 +131,10 @@ export const messages = defineMessages({
     id: "sessions.edit.steps.align.confirm",
     defaultMessage: "Yes",
   },
+  "sessions.edit.steps.align.adjust": {
+    id: "sessions.edit.steps.align.adjust",
+    defaultMessage: "No, I would like to adjust",
+  },
   // reflect
   "sessions.edit.steps.reflect.label": {
     id: "sessions.edit.steps.reflect.label",

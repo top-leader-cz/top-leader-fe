@@ -30,8 +30,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
+    "build": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "extract-translations-long": "formatjs extract 'src/**/*.js*' --ignore='src/translations' --out-file extracted/en-with-descriptions.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",

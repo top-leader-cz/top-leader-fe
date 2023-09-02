@@ -32,7 +32,7 @@ import { useAuth } from "../Authorization";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { TranslationContext } from "../../App";
+import { I18nContext } from "../../App";
 import { messages as coachesMessages } from "../Coaches/messages";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
@@ -87,7 +87,7 @@ const to = ({ photo, ...data }, { userLocale, userTz }) => {
     ...data,
     rate: data.rate || "",
     experienceSince: data.experienceSince, // TODO: utc
-    timeZone: data.timezone || userTz, // TODO: userTz ctx
+    timeZone: data.timezone || userTz,
     languages: data.languages?.length ? data.languages : [userLocale],
     imageSrc: photo?.[0],
   };
@@ -106,7 +106,7 @@ export const ProfileSettings = () => {
   const { authFetch, user } = useAuth();
   const msg = useMsg();
   const form = useForm({});
-  const { language, userTz } = useContext(TranslationContext);
+  const { language, userTz } = useContext(I18nContext);
 
   const [loading, setLoading] = useState(true);
   const { reset } = form;
@@ -126,7 +126,7 @@ export const ProfileSettings = () => {
         setLoading(false);
       }, 0);
     },
-    [language, reset]
+    [language, reset, userTz]
   );
 
   const initialValuesQuery = useQuery({
@@ -144,7 +144,10 @@ export const ProfileSettings = () => {
 
   const saveMutation = useMutation({
     mutationFn: (values) =>
-      console.log("[save start]", { ...values }) ||
+      console.log("[save start]", { values, payload: from(values) }) ||
+      (() => {
+        // debugger;
+      })() ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
@@ -174,6 +177,9 @@ export const ProfileSettings = () => {
     form,
     saveMutation,
     isJustLoaderDisplayed,
+    userTz,
+    language,
+    experienceSince: form.watch("experienceSince"),
   });
 
   const onSubmit = (data, e) =>
@@ -391,7 +397,7 @@ export const ProfileSettings = () => {
       >
         <DatePickerField
           name={FIELDS.experienceSince}
-          inputFormat="MM/dd/yyyy"
+          inputFormat={"MM/dd/yyyy"}
           sx={{ ...WHITE_BG, width: "100%" }}
           size="small"
         />
