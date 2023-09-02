@@ -184,7 +184,7 @@ function NewSessionPageInner() {
     console.log("[NewSession.eff]", { qData: query.data });
     if (query.data && activeStepIndexRef.current === 0) {
       console.log("%c[NewSession.eff]", "color:pink", { qData: query.data });
-      reinit(query.data);
+      // reinit(query.data);
     }
   }, [query.data, reinit]);
   const mutation = useMutation({
@@ -212,7 +212,7 @@ function NewSessionPageInner() {
       // });
     },
     onSuccess: (data) => {
-      // TODO: not called!
+      // TODO: not called sometimes!
       console.log("mutation.onSuccess", data);
       setFinished(true);
     },
@@ -223,14 +223,11 @@ function NewSessionPageInner() {
   const [finished, setFinished] = useState(false);
 
   const onFinish = (data) => {
-    // const entry = createSessionEntry(data);
-    // history.push(entry);
     console.log("[NewSession.onFinish]", { data });
+
     // await mutation.mutateAsync(data); // todo: broken, reloads page
     mutation.mutate(data);
-    // setFinished(true);
     // navigate(routes.sessions);
-
     // TODO: update @mui/x-date-pickers 5 -> 6
   };
 

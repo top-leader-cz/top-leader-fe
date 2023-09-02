@@ -1033,7 +1033,7 @@ const talentsKeys = [
 ];
 
 export const useTalentsDict = () => {
-  // const { language, setLanguage } = useContext(TranslationContext);
+  // const { language, setLanguage } = useContext(I18nContext);
   const intl = useIntl();
   const talents = useMemo(
     () =>

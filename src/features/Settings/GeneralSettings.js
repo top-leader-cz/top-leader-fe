@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { TranslationContext } from "../../App";
+import { I18nContext } from "../../App";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
   AutocompleteSelect,
@@ -40,7 +40,7 @@ export const GeneralSettings = () => {
       }),
   });
   const msg = useMsg();
-  const { language, setLanguage } = useContext(TranslationContext);
+  const { language, setLanguage } = useContext(I18nContext);
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯

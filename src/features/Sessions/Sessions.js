@@ -23,6 +23,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { useMsg } from "../../components/Msg/Msg";
 import { Icon } from "../../components/Icon";
+import { ErrorBoundary } from "react-error-boundary";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (
@@ -88,7 +89,7 @@ const SessionCard = ({
       <CardActionArea
         sx={{ height: "100%" }}
         disableRipple
-        href={generatePath(routes.editSession, { id })} // TODO?
+        href={id ? generatePath(routes.editSession, { id }) : undefined} // TODO?
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
@@ -175,7 +176,15 @@ function Sessions() {
         }
       >
         <Header text={<Msg id="sessions.heading" />} />
-        <SessionCard session={sel.selected} />
+        <ErrorBoundary
+          fallbackRender={({ error }) => (
+            <Card sx={{}} elevation={0}>
+              Error occured: {error.message}
+            </Card>
+          )}
+        >
+          {sel.selected && <SessionCard session={sel.selected} />}
+        </ErrorBoundary>
       </Layout>
     </MsgProvider>
   );
