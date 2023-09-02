@@ -39,6 +39,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        token_format: 'access_token'
+        workload_identity_provider: 'projects/topleader-394306/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+        service_account: 'topleader-394306@appspot.gserviceaccount.com'
+
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
