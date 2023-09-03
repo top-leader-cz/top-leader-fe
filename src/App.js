@@ -25,11 +25,18 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Backdrop, Button, CircularProgress } from "@mui/material";
 import { ErrorBoundary } from "react-error-boundary";
 import enGB from "date-fns/locale/en-GB";
+import enUS from "date-fns/locale/en-US";
 import cs from "date-fns/locale/cs";
 import { useMemo } from "react";
+import { formatWithOptions, startOfWeekWithOptions } from "date-fns/fp";
+import * as dfnsfp from "date-fns/fp";
+
+window.dfnsfp = dfnsfp;
 
 const messages = {
   en: messages_en,
+  "en-US": messages_en,
+  "en-GB": messages_en,
   cs: messages_cs,
   fr: messages_fr,
   de_en: messages_de_en,
@@ -37,11 +44,28 @@ const messages = {
   es: messages_es,
 };
 const locales = {
-  en: enGB,
+  en: enGB, // TODO
+  "en-GB": enGB,
+  "en-US": enUS,
   cs: cs,
   // fr: enGB,
   // es: enGB,
 };
+/*
+var locale = {
+  code: 'cs',
+  formatDistance: _index.default,
+  formatLong: _index2.default,
+  formatRelative: _index3.default,
+  localize: _index4.default,
+  match: _index5.default,
+  options: {
+    weekStartsOn: 1
+    // Monday 
+    ,
+    firstWeekContainsDate: 4
+  }
+*/
 
 if (Object.keys(messages).join() !== Object.keys(locales).join()) {
   console.error("messages and locales must match");
@@ -72,21 +96,41 @@ function renderResetLang({ error, resetErrorBoundary }) {
   );
 }
 
+export const UTC_DATE_FORMAT = "yyyy-MM-dd";
+export const API_TIME_FORMAT = "HH:mm:ss";
+
 const useI18n = ({ userTz, language }) => {
   const currentLocale = locales[language];
   if (!currentLocale) {
     throw new Error("Unsupported locale language: " + language);
   }
-  const formats = useMemo(() => {
-    return { dateShort: currentLocale.formatLong.date({ width: "short" }) };
-  }, [currentLocale]);
+  // const formats = useMemo(() => {
+  //   return { dateShort: currentLocale.formatLong.date({ width: "short" }) };
+  // }, [currentLocale]);
 
-  const format = useCallback(
-    (date, formatStr = "PP") => {
-      console.log("[useI18n.format] TODO: UTC", { date, formatStr });
-      return format(date, formatStr, {
-        locale: currentLocale,
-      });
+  const formatLocal = useCallback(
+    (formatStr = "PP", date) => {
+      console.log("[useI18n.formatLocal] TODO: UTC", { date, formatStr });
+      return formatWithOptions(
+        {
+          locale: currentLocale,
+        },
+        formatStr,
+        date
+      );
+    },
+    [currentLocale]
+  );
+
+  const startOfWeek = useCallback(
+    (...args) => {
+      console.log("[useI18n.startOfWeek] TODO: UTC", { args });
+      return startOfWeekWithOptions(
+        {
+          locale: currentLocale,
+        },
+        ...args
+      );
     },
     [currentLocale]
   );
@@ -94,10 +138,18 @@ const useI18n = ({ userTz, language }) => {
   const i18n = useMemo(
     () => ({
       // TODO: https://date-fns.org/v2.29.3/docs/I18n
-      uiFormats: { inputDateFormat: formats.dateShort },
-      format,
+      uiFormats: {
+        inputDateFormat: currentLocale.formatLong.date({ width: "short" }),
+        inputTimeFormat: currentLocale.formatLong.time({ width: "short" }),
+        apiDateFormat: UTC_DATE_FORMAT,
+        apiTimeFormat: API_TIME_FORMAT,
+      },
+      currentLocale,
+      formatLocal,
+      startOfWeek,
+      weekStartsOn: currentLocale.options.weekStartsOn,
     }),
-    [format, formats]
+    [currentLocale, formatLocal, startOfWeek]
   );
   return i18n;
 };
@@ -107,6 +159,9 @@ const I18nProvider = ({ children }) => {
   const browserLocale = Intl.DateTimeFormat()
     .resolvedOptions()
     .locale.substring(0, 2);
+  const browserLocaleFull = Intl.DateTimeFormat()
+    .resolvedOptions()
+    .locale.substring(0, 5);
   const savedLocale = window.localStorage.getItem("language");
   const defaultLocale = supportedLocales.includes(browserLocale)
     ? browserLocale
@@ -115,6 +170,11 @@ const I18nProvider = ({ children }) => {
     supportedLocales.includes(savedLocale) ? savedLocale : defaultLocale
   );
   const setLanguage = useCallback((lang) => {
+    console.log("[i18n.setLanguage]", {
+      lang,
+      browserLocale,
+      browserLocaleFull,
+    });
     _setLanguage(lang);
     window.localStorage.setItem("language", lang);
   }, []);
@@ -124,7 +184,7 @@ const I18nProvider = ({ children }) => {
 
   const onReset = useCallback(
     ({ args }) => {
-      console.log({ args });
+      console.log("[i18n.reset]", { args, browserLocaleFull });
       setLanguage(args?.[0] || "en");
     },
     [setLanguage]

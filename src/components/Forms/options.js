@@ -2,6 +2,8 @@ import { Box } from "@mui/material";
 
 export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
+  { value: "en-GB", label: "GB English" },
+  { value: "en-US", label: "US English" },
   { value: "cs", label: "Čeština" },
   { value: "fr", label: "fr" },
   { value: "de_en", label: "de_en" },
@@ -12,6 +14,8 @@ export const LANGUAGE_OPTIONS = [
 const getFlagSrc = (option, isBigger) => {
   let code = option.value.toLowerCase();
   if (code === "en") code = "gb";
+  if (code === "en-us") code = "us";
+  if (code === "en-gb") code = "gb";
   if (code === "cs") code = "cz";
 
   if (isBigger) return `https://flagcdn.com/40x30/${code}.png 2x`;

@@ -102,32 +102,46 @@ const from = ({ imageSrc, ...values }) => {
   };
 };
 
+export const useResetForm = ({ to, form, initialResetting }) => {
+  const [resetting, setResetting] = useState(initialResetting);
+  const { reset } = form;
+  const resetForm = useCallback(
+    (data) => {
+      reset(to(data));
+
+      // Autocomplete needs remount after form reset, TODO
+      setResetting(true);
+      setTimeout(() => {
+        setResetting(false);
+      }, 0);
+    },
+    [reset, to]
+  );
+
+  return {
+    resetting,
+    resetForm,
+  };
+};
+
 export const ProfileSettings = () => {
   const { authFetch, user } = useAuth();
   const msg = useMsg();
   const form = useForm({});
   const { language, userTz } = useContext(I18nContext);
-
-  const [loading, setLoading] = useState(true);
-  const { reset } = form;
-  const resetForm = useCallback(
-    (data) => {
-      reset(
+  const { resetForm, resetting } = useResetForm({
+    initialResetting: true,
+    form,
+    to: useCallback(
+      (data) =>
         to(data, {
-          userLocale: language,
+          userLocale: language.substring(0, 2),
           // TODO: notify user that timezone settings is different than currently set!
           userTz,
-        })
-      );
-
-      // Autocomplete needs remount after form reset, TODO
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 0);
-    },
-    [language, reset, userTz]
-  );
+        }),
+      [language, userTz]
+    ),
+  });
 
   const initialValuesQuery = useQuery({
     queryKey: ["coach-info"], // TODO?
@@ -163,13 +177,9 @@ export const ProfileSettings = () => {
   useEffect(() => {
     console.log("%c[PS.eff reset]", "color:lime", { data: data });
     if (data) resetForm(data);
-
-    // stuck on loading?
-    // if (data) reset(to((data));
-    // else setLoading(false);
   }, [data, resetForm]);
 
-  const isJustLoaderDisplayed = initialValuesQuery.isLoading || loading;
+  const isJustLoaderDisplayed = initialValuesQuery.isLoading || resetting;
 
   const COACH = form.formState.defaultValues ?? {}; // TODO
   console.log("%c[PS.rndr]", "color:deepskyblue", {
@@ -397,7 +407,7 @@ export const ProfileSettings = () => {
       >
         <DatePickerField
           name={FIELDS.experienceSince}
-          inputFormat={"MM/dd/yyyy"}
+          // inputFormat={"MM/dd/yyyy"}
           sx={{ ...WHITE_BG, width: "100%" }}
           size="small"
         />

@@ -1,12 +1,12 @@
-import { Box, Divider } from "@mui/material";
+import { Alert, Box, Divider } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
   B,
   CheckboxField,
   DateRangePickerField,
-  RangePickerField,
+  TimeRangePickerField,
   SwitchField,
 } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
@@ -16,23 +16,41 @@ import { H2, P } from "../../components/Typography";
 import { CalendarDaySlots, CREATE_OFFSET } from "../Coaches/Coaches.page";
 import { FieldLayout, FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
+import { useMutation, useQuery } from "react-query";
+import { useAuth } from "../Authorization";
+import { useContext } from "react";
+import { API_TIME_FORMAT, I18nContext, UTC_DATE_FORMAT } from "../../App";
+import { pipe } from "ramda";
+import { getTimezoneOffset, zonedTimeToUtc } from "date-fns-tz";
+import { format, parse, parseISO } from "date-fns";
+import { useResetForm } from "./ProfileSettings";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
-const DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const DAY_NAMES = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+  "SUNDAY",
+];
 
+// TODO: i18n
 const DAYS = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
+  MONDAY: "Monday",
+  TUESDAY: "Tuesday",
+  WEDNESDAY: "Wednesday",
+  THURSDAY: "Thursday",
+  FRIDAY: "Friday",
+  SATURDAY: "Saturday",
+  SUNDAY: "Sunday",
 };
 
 const DaySlots = ({ dayName }) => {
   const msg = useMsg();
   const enabled = useFormContext().watch(enabledName(dayName));
-  console.log(dayName, enabled);
+  console.log("[DaySlots.rndr]", dayName, enabled);
 
   return (
     <FieldLayout
@@ -47,7 +65,7 @@ const DaySlots = ({ dayName }) => {
     >
       <Box display="flex">
         {enabled ? (
-          <RangePickerField
+          <TimeRangePickerField
             Component={TimePicker}
             name={dayRangesName(dayName)}
             inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
@@ -59,6 +77,8 @@ const DaySlots = ({ dayName }) => {
     </FieldLayout>
   );
 };
+
+const TODO = true;
 
 export const Recurrence = () => {
   const msg = useMsg();
@@ -72,7 +92,7 @@ export const Recurrence = () => {
       name={FIELDS_AVAILABILITY.recurring}
     >
       <Box display="flex">
-        <SwitchField name={FIELDS_AVAILABILITY.recurring} />
+        <SwitchField name={FIELDS_AVAILABILITY.recurring} disabled={TODO} />
         {!recurring && (
           <DateRangePickerField
             name={FIELDS_AVAILABILITY.recurrenceRange}
@@ -84,8 +104,8 @@ export const Recurrence = () => {
   );
 };
 
-const enabledName = (name) => `enabled_${name}`;
-const dayRangesName = (name) => `day_${name}`;
+const enabledName = (name) => `_enabled_${name}`;
+const dayRangesName = (name) => `_day_${name}`;
 
 export const FIELDS_AVAILABILITY = {
   recurring: "recurring",
@@ -94,36 +114,213 @@ export const FIELDS_AVAILABILITY = {
 
 const MOCK_RANGE = [new Date(2022, 0, 0, 9, 0), new Date(2022, 0, 0, 17, 0)];
 
+const AVAILABILITY_TYPE = {
+  RECURRING: "RECURRING",
+  NON_RECURRING: "NON_RECURRING",
+  ALL: "ALL",
+};
+/*
+{ RECURRING
+  "availabilities" : {
+    "MONDAY": [ { "timeFrom": "01:00:00", "timeTo": "02:00:00" } ],
+  }
+}
+{ NONRECURRING
+  "firstDayOfTheWeek": "2023-08-14",
+  "availabilities" : {
+    "MONDAY": [ { "timeFrom": "01:00:00", "timeTo": "02:00:00" } ],
+  }
+} */
+
+const tzOffsetChangeInRange = ({ from, to, tz }) => {
+  // TODO: when offset change in {this week/recurrence range}
+  // BE should send local time + TZ, otherwise timezone+UTC would change user range during DST!
+
+  if (getTimezoneOffset(tz, from) !== getTimezoneOffset(tz, to))
+    return true; // getTimezoneOffset -> ms
+  else return false;
+};
+
+const getAvailabilities = ({ formValues, i18n, userTz }) => {
+  const ranges = DAY_NAMES.map((dayName) => ({
+    dayName,
+    enabled: formValues[enabledName(dayName)],
+    range: formValues[dayRangesName(dayName)],
+  })).filter(({ enabled }) => enabled);
+
+  const availabilities = ranges
+    .map(({ dayName, range }) => {
+      const [from, to] = range || [];
+      const utc = [zonedTimeToUtc(from, userTz), zonedTimeToUtc(to, userTz)];
+      const utcF = utc.map((d) => format(d, i18n.uiFormats.apiTimeFormat));
+
+      // Same as utcF:
+      const timeFrom = format(from, i18n.uiFormats.apiTimeFormat);
+      const timeTo = format(to, i18n.uiFormats.apiTimeFormat);
+
+      console.log("%c[getAvailabilities]" + dayName, "color:magenta", {
+        range,
+        utc,
+        utcF,
+        timeFrom,
+        timeTo,
+      });
+
+      // debugger;
+
+      return {
+        dayName,
+        timeFrom,
+        timeTo,
+      };
+    })
+    .map(({ dayName, timeFrom, timeTo }) => [dayName, [{ timeFrom, timeTo }]]);
+
+  return Object.fromEntries(availabilities);
+};
+
+const from = ({ values, i18n, userTz }) => {
+  const { recurring, recurrenceRange: [from, to] = [], ...rest } = values;
+  const payload = {
+    availabilities: getAvailabilities({ formValues: rest, i18n, userTz }),
+    ...(recurring
+      ? {}
+      : {
+          firstDayOfTheWeek: i18n.formatLocal(
+            UTC_DATE_FORMAT,
+            i18n.startOfWeek(from)
+          ),
+        }), // TODO: timezone needed, startOfWeek affected by tz
+  };
+
+  return payload;
+};
+
+// {
+//     "day": "TUESDAY",
+//     "date": null,
+//     "timeFrom": "09:00:00",
+//     "timeTo": "17:00:00",
+//     "recurring": true
+// }
+const to = (data) => {
+  const initialValues = DAY_NAMES.map((dayName) => {
+    const ranges = data[dayName];
+    // console.log("[to.map] ", dayName, { data, dayName });
+
+    if (!ranges)
+      return {
+        [enabledName(dayName)]: false,
+        [dayRangesName(dayName)]: MOCK_RANGE,
+      };
+
+    const { day, date, timeFrom, timeTo, recurring } = ranges[0] || {}; // TODO
+
+    return {
+      [enabledName(dayName)]: true,
+      [dayRangesName(dayName)]: [
+        parse(timeFrom, API_TIME_FORMAT, new Date()),
+        parse(timeTo, API_TIME_FORMAT, new Date()),
+      ],
+    };
+  }).reduce((acc, values) => {
+    return { ...acc, ...values };
+  }, {});
+
+  console.log("[to]", { data, initialValues });
+
+  // TODO
+  return {
+    [FIELDS_AVAILABILITY.recurring]: true, // TODO
+    recurrenceRange: [
+      new Date(),
+      new Date(Date.now() + 3 * 7 * 24 * 3600 * 1000),
+    ],
+    ...initialValues,
+  };
+};
+
 export const AvailabilitySettings = () => {
-  const msg = useMsg();
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: {
-      [FIELDS_AVAILABILITY.recurring]: true,
-      recurrenceRange: [
-        new Date(),
-        new Date(Date.now() + 3 * 7 * 24 * 3600 * 1000),
-      ],
-      [enabledName("mon")]: true,
-      [enabledName("tue")]: true,
-      [enabledName("wed")]: true,
-      [enabledName("thu")]: true,
-      [enabledName("fri")]: true,
-      [enabledName("sat")]: false,
-      [enabledName("sun")]: false,
-      [dayRangesName("mon")]: MOCK_RANGE,
-      [dayRangesName("tue")]: MOCK_RANGE,
-      [dayRangesName("wed")]: MOCK_RANGE,
-      [dayRangesName("thu")]: MOCK_RANGE,
-      [dayRangesName("fri")]: MOCK_RANGE,
-      [dayRangesName("sat")]: MOCK_RANGE,
-      [dayRangesName("sun")]: MOCK_RANGE,
+    // defaultValues,
+  });
+
+  const { resetForm, resetting } = useResetForm({
+    initialResetting: false,
+    form,
+    to: useCallback(
+      (data) =>
+        to(data, {
+          // userLocale: language,
+          // TODO: notify user that timezone settings is different than currently set!
+          // userTz,
+        }),
+      []
+    ),
+  });
+
+  const msg = useMsg();
+  const { i18n, userTz } = useContext(I18nContext);
+  const { authFetch } = useAuth();
+  const availabilityType = AVAILABILITY_TYPE.RECURRING; // TODO
+  const availabilityQuery = useQuery({
+    queryKey: ["coach-availability", availabilityType],
+    queryFn: () =>
+      authFetch({ url: `/api/latest/coach-availability/${availabilityType}` }),
+    // When empty:
+    // Request URL: http://localhost:3000/api/latest/coach-availability/ALL
+    // Request Method: GET
+    // Status Code: 400 Bad Request
+    // RECURRING  initially "{}"
+    cacheTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  const { data } = availabilityQuery;
+  useEffect(() => {
+    console.log("%c[eff reset]", "color:lime", { data });
+    if (data) resetForm(data);
+  }, [data, resetForm]);
+
+  const availabilityMutation = useMutation({
+    mutationFn: (values) => {
+      const { recurring } = values;
+      const type = recurring
+        ? AVAILABILITY_TYPE.RECURRING
+        : AVAILABILITY_TYPE.NON_RECURRING;
+      const payload = from({ values, i18n, userTz });
+
+      console.log("%cMUTATION", "color:lime", { values, type, payload });
+      debugger;
+      return authFetch({
+        method: "POST",
+        url: `/api/latest/coach-availability/${type}`,
+        data: payload,
+      });
     },
+    onSuccess: useCallback((data) => {
+      console.log("mutation.onSuccess", data);
+      // setFinished(true);
+    }, []),
+  });
+
+  const saveDisabled = availabilityMutation.isLoading; // || !!query.error;
+
+  const isJustLoaderDisplayed = !availabilityQuery.data || resetting;
+
+  console.log("[AvailabilitySettings.rndr]", {
+    availabilityType,
+    availabilityQuery,
+    availabilityMutation,
+    form,
   });
 
   const onSubmit = (data, e) =>
-    console.log("[AvailabilitySettings.onSubmit]", data, e);
+    console.log("[AvailabilitySettings.onSubmit] SHOULD NEVER HAPPEN", data, e);
   const onError = (errors, e) =>
     console.log("[AvailabilitySettings.onError]", errors, e);
 
@@ -134,7 +331,12 @@ export const AvailabilitySettings = () => {
           heading={msg("settings.availability.aside.title")}
           buttonProps={{
             children: msg("settings.availability.aside.save"),
-            onClick: () => console.log("Save click"),
+            type: "submit",
+            disabled: saveDisabled,
+            onClick: (e) => {
+              console.log("Save click");
+              form.handleSubmit(availabilityMutation.mutateAsync, onError)(e);
+            },
           }}
         >
           <B>September</B>
@@ -158,9 +360,20 @@ export const AvailabilitySettings = () => {
           </Box>
         </ScrollableRightMenu>
       ),
-      []
+      [availabilityMutation.mutateAsync, form, msg, saveDisabled]
     )
   );
+
+  if (availabilityQuery.error)
+    return (
+      <QueryRenderer
+        error={availabilityQuery.error}
+        errored={() => <Alert severity="error">Fetch failed</Alert>}
+      />
+    );
+
+  // reset of MUI Autocomplete
+  if (isJustLoaderDisplayed) return <QueryRenderer isLoading />;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit, onError)}>
@@ -174,7 +387,7 @@ export const AvailabilitySettings = () => {
 
         <Recurrence />
         {DAY_NAMES.map((dayName) => (
-          <DaySlots dayName={dayName} />
+          <DaySlots key={dayName} dayName={dayName} />
         ))}
       </FormProvider>
     </form>

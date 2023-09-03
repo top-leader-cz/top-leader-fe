@@ -21,6 +21,8 @@ import { defineMessages } from "react-intl";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
+import { useContext } from "react";
+import { I18nContext } from "../../App";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -43,50 +45,64 @@ import { P } from "../Typography";
 //   );
 // };
 
-const DateRangePicker = React.forwardRef(({ field, sx, ...props }, ref) => {
-  // console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
-  //   field,
-  //   props,
-  // });
+const DateRangePicker = React.forwardRef(
+  ({ field, sx, inputFormat, ...props }, ref) => {
+    // console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
+    //   field,
+    //   props,
+    // });
 
-  const [startValue, endValue] = field.value ?? [];
-  const onChange = (idx) => (date) => {
-    const newValue = [startValue, endValue];
-    newValue[idx] = date;
-    return field.onChange(newValue);
-  };
+    const [startValue, endValue] = field.value ?? [];
+    const onChange = (idx) => (date) => {
+      const newValue = [startValue, endValue];
+      newValue[idx] = date;
+      return field.onChange(newValue);
+    };
 
-  return (
-    <Box display="flex" sx={sx}>
-      <DesktopDatePicker
-        ref={ref}
-        renderInput={(params) => (
-          <TextField size="small" sx={{ width: 180 }} {...props} {...params} />
-        )}
-        name={field.name}
-        onChange={onChange(0)}
-        onBlur={field.onBlur}
-        value={startValue}
-      />
-      <Box alignSelf="center" sx={{ mx: 1 }}>
-        -
+    return (
+      <Box display="flex" sx={sx}>
+        <DesktopDatePicker
+          ref={ref}
+          renderInput={(params) => (
+            <TextField
+              size="small"
+              sx={{ width: 180 }}
+              {...props}
+              {...params}
+            />
+          )}
+          name={field.name}
+          onChange={onChange(0)}
+          onBlur={field.onBlur}
+          value={startValue}
+          inputFormat={inputFormat}
+        />
+        <Box alignSelf="center" sx={{ mx: 1 }}>
+          -
+        </Box>
+        <DesktopDatePicker
+          renderInput={(params) => (
+            <TextField
+              size="small"
+              sx={{ width: 180 }}
+              {...props}
+              {...params}
+            />
+          )}
+          // name={field.name}
+          onChange={onChange(1)}
+          onBlur={field.onBlur}
+          value={endValue}
+          inputFormat={inputFormat}
+        />
       </Box>
-      <DesktopDatePicker
-        renderInput={(params) => (
-          <TextField size="small" sx={{ width: 180 }} {...props} {...params} />
-        )}
-        // name={field.name}
-        onChange={onChange(1)}
-        onBlur={field.onBlur}
-        value={endValue}
-      />
-    </Box>
-  );
-});
+    );
+  }
+);
 
-const RangePicker = React.forwardRef(
-  ({ Component, inputProps, field, sx, ...props }, ref) => {
-    // console.log("%c[RangePicker.rndr]", "color:coral;", field.name, {
+const TimeRangePicker = React.forwardRef(
+  ({ inputProps, field, sx, inputFormat, ...props }, ref) => {
+    // console.log("%c[TimeRangePicker.rndr]", "color:coral;", field.name, {
     //   field,
     //   props,
     // });
@@ -99,7 +115,7 @@ const RangePicker = React.forwardRef(
 
     return (
       <Box display="flex" sx={sx}>
-        <Component
+        <MuiTimePicker
           ref={ref}
           renderInput={(params) => (
             <TextField size="small" {...props} {...params} {...inputProps} />
@@ -108,11 +124,12 @@ const RangePicker = React.forwardRef(
           onChange={onChange(0)}
           onBlur={field.onBlur}
           value={field.value?.[0]}
+          inputFormat={inputFormat}
         />
         <Box alignSelf="center" sx={{ mx: 1 }}>
           -
         </Box>
-        <Component
+        <MuiTimePicker
           renderInput={(params) => (
             <TextField size="small" {...props} {...params} {...inputProps} />
           )}
@@ -120,28 +137,48 @@ const RangePicker = React.forwardRef(
           onChange={onChange(1)}
           onBlur={field.onBlur}
           value={field.value?.[1]}
+          inputFormat={inputFormat}
         />
       </Box>
     );
   }
 );
 
-export const RangePickerField = ({ Component, name, rules, ...props }) => {
-  if (!Component)
-    throw new Error("Missing Component for RangePickerField name=" + name);
+export const TimeRangePickerField = ({
+  name,
+  rules,
+  inputFormat: inputFormatProp,
+  inputProps,
+}) => {
+  const { i18n } = useContext(I18nContext);
+  const inputFormat = useMemo(
+    () => inputFormatProp || i18n.uiFormats.inputTimeFormat,
+    [i18n.uiFormats.inputTimeFormat, inputFormatProp]
+  );
 
   return (
     <Controller
       name={name}
       rules={rules}
       render={({ field }) => (
-        <RangePicker {...props} {...{ Component, field }} />
+        <TimeRangePicker {...{ field, inputFormat, inputProps }} />
       )}
     />
   );
 };
 
-export const DateRangePickerField = ({ name, rules, ...props }) => {
+export const DateRangePickerField = ({
+  name,
+  rules,
+  inputFormat: inputFormatProp,
+  ...props
+}) => {
+  const { i18n } = useContext(I18nContext);
+  const inputFormat = useMemo(
+    () => inputFormatProp || i18n.uiFormats.inputDateFormat,
+    [i18n.uiFormats.inputDateFormat, inputFormatProp]
+  );
+
   return (
     // <LocalizationProvider
     //   dateAdapter={AdapterDateFns}
@@ -151,7 +188,9 @@ export const DateRangePickerField = ({ name, rules, ...props }) => {
       // control={methods?.control}
       name={name}
       rules={rules}
-      render={({ field }) => <DateRangePicker {...props} field={field} />}
+      render={({ field }) => (
+        <DateRangePicker {...props} inputFormat={inputFormat} field={field} />
+      )}
     />
     // </LocalizationProvider>
   );
@@ -182,7 +221,19 @@ export const CheckboxField = ({ name, rules, ...props }) => {
   );
 };
 
-export const DatePickerField = ({ control, name, rules, ...props }) => {
+export const DatePickerField = ({
+  control,
+  name,
+  rules,
+  inputFormat: inputFormatProp,
+  ...props
+}) => {
+  const { i18n } = useContext(I18nContext);
+  const inputFormat = useMemo(
+    () => inputFormatProp || i18n.uiFormats.inputDateFormat,
+    [i18n.uiFormats.inputDateFormat, inputFormatProp]
+  );
+  // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
   const methods = useFormContext();
 
   return (
@@ -193,6 +244,7 @@ export const DatePickerField = ({ control, name, rules, ...props }) => {
       render={({ field }) => (
         <DesktopDatePicker
           renderInput={(params) => <TextField {...props} {...params} />}
+          inputFormat={inputFormat}
           {...field}
         />
       )}
@@ -447,40 +499,39 @@ export const AutocompleteSelect = ({
             onChange?.(value);
             field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
           }}
-          renderInput={(params) =>
-            console.log("[AutocompleteSelect.renderInput]", name, {
-              field,
-              params,
-            }) || (
-              <TextField
-                {...params}
-                label={label}
-                placeholder={placeholder}
-                error={!!fieldState.error}
-                helperText={getError(fieldState.error, rules)}
-                inputProps={{
-                  // TODO: language autocomplete
-                  autocomplete: autoComplete,
-                  autoComplete: autoComplete,
-                  "auto-complete": autoComplete,
-                  // ...InputProps,
-                  ...params.inputProps, // should contain value, but after form init it is ""
-                  // value: field.value, // TODO: test
-                  //   autoComplete: "new-password", // disable autocomplete and autofill
-                }}
-                // InputProps={{ ...InputProps }}
-                InputLabelProps={{
-                  shrink: !!label,
-                }}
-                sx={
-                  {
-                    // mt: 1,
-                    // "label + .MuiOutlinedInput-root": { marginTop: 3 },
-                  }
+          renderInput={(params) => (
+            // console.log("[AutocompleteSelect.renderInput]", name, {
+            //   field,
+            //   params,
+            // }) ||
+            <TextField
+              {...params}
+              label={label}
+              placeholder={placeholder}
+              error={!!fieldState.error}
+              helperText={getError(fieldState.error, rules)}
+              inputProps={{
+                // TODO: profile language autocomplete
+                // autocomplete: autoComplete,
+                // autoComplete: autoComplete,
+                // "auto-complete": autoComplete,
+                // ...InputProps,
+                ...params.inputProps, // should contain value, but after form init it is ""
+                // value: field.value, // TODO: test
+                //   autoComplete: "new-password", // disable autocomplete and autofill
+              }}
+              // InputProps={{ ...InputProps }}
+              InputLabelProps={{
+                shrink: !!label,
+              }}
+              sx={
+                {
+                  // mt: 1,
+                  // "label + .MuiOutlinedInput-root": { marginTop: 3 },
                 }
-              />
-            )
-          }
+              }
+            />
+          )}
           // inputValue={`${field.value}`}
           // onInputChange={(event, newInputValue) => {
           //   console.log("[AutocompleteSelect.onInputChange]", {

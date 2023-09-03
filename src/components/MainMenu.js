@@ -206,8 +206,10 @@ export const MainMenu = ({ open }) => {
             textAlign: "center",
           }}
         >
-          <Typography color={"silver"}>
-            {!mobile ? "commit: " : ""}
+          <Typography color={"silver"} sx={{ cursor: "default" }}>
+            <span style={{ userSelect: "none" }}>
+              {!mobile ? "commit: " : ""}
+            </span>
             {process.env.REACT_APP_GIT_SHA}
           </Typography>
         </Box>

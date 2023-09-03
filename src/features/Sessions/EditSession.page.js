@@ -26,6 +26,7 @@ import { AreaStep } from "./steps/AreaStep";
 import { GoalStep } from "./steps/TextAreaStep";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useAreasDict } from "./areas";
+import { UTC_DATE_FORMAT } from "../../App";
 
 const IconTile = ({ iconName, caption, text }) => {
   return (
@@ -326,8 +327,7 @@ function EditSessionPageInner() {
         data: {
           ...data,
           newActionSteps: actionSteps.map(({ label, date }) => {
-            const UTC_DAY_FORMAT = "yyyy-MM-dd"; // TODO: extract
-            const formattedDate = format(date, UTC_DAY_FORMAT);
+            const formattedDate = format(date, UTC_DATE_FORMAT);
             console.log("mapStep", { date, formattedDate });
             return {
               label,
