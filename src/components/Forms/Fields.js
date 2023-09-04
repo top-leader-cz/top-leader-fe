@@ -15,7 +15,7 @@ import {
   DesktopDatePicker,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import { Icon } from "../Icon";
@@ -512,11 +512,11 @@ export const AutocompleteSelect = ({
               helperText={getError(fieldState.error, rules)}
               inputProps={{
                 // TODO: profile language autocomplete
-                // autocomplete: autoComplete,
-                // autoComplete: autoComplete,
-                // "auto-complete": autoComplete,
-                // ...InputProps,
                 ...params.inputProps, // should contain value, but after form init it is ""
+                // autocomplete: autoComplete,
+                autoComplete: autoComplete,
+                // "aria-autocomplete": autoComplete, // default is "list"
+                // ...InputProps,
                 // value: field.value, // TODO: test
                 //   autoComplete: "new-password", // disable autocomplete and autofill
               }}
@@ -675,10 +675,32 @@ export const B = styled("b")(({ theme }) => ({
   fontWeight: 500,
 }));
 
+export async function getBase64(file) {
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+  return new Promise((res, rej) => {
+    reader.onload = function () {
+      console.log("[getBase64.onload]", reader.result);
+      res(reader.result);
+    };
+    reader.onerror = function (error) {
+      console.log("[getBase64.onerror]", error);
+      rej(error);
+    };
+  });
+}
+
+// https://claritydev.net/blog/react-hook-form-multipart-form-data-file-uploads
 const FileUploadInner = ({ name, src, secondaryText }) => {
+  const { register, watch } = useFormContext();
+  const fileList = watch(name);
+  const file = fileList?.[0];
+  const fileSrc = file ? URL.createObjectURL(file) : undefined;
+
+  console.log("FileUploadInner.rndr", { name, src, fileList, fileSrc });
   return (
     <>
-      <Avatar variant="circular" src={src} sx={{ width: 80, height: 80 }} />
+      <Avatar variant="circular" src={fileSrc} sx={{ width: 80, height: 80 }} />
       <Button
         variant="outlined"
         component="label"
@@ -701,7 +723,17 @@ const FileUploadInner = ({ name, src, secondaryText }) => {
           },
         }}
       >
-        <input hidden accept="image/*" multiple type="file" />
+        <input
+          hidden
+          accept="image/*"
+          // multiple
+          type="file"
+          name={name}
+          {...register(name, {
+            required: "Picture is required",
+          })}
+          // onChange={onChange}
+        />
         <Avatar
           variant="circular"
           sx={{ width: 48, height: 48, bgcolor: "#F9FAFB", opacity: 1.6 }}

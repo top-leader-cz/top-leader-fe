@@ -1,26 +1,25 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { I18nContext, UTC_DATE_FORMAT } from "../../App";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { messages } from "./messages";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { SessionStepCard } from "./SessionStepCard";
+import { VerticalStepper } from "./VerticalStepper";
+import { messages } from "./messages";
 import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
-import { VerticalStepper } from "./VerticalStepper";
-import { useMutation, useQuery } from "react-query";
-import { useAuth } from "../Authorization";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { format } from "date-fns";
-import { UTC_DATE_FORMAT } from "../../App";
 
 export const StepperRightMenu = ({
   heading,
@@ -88,6 +87,7 @@ const createSessionEntry = ({ area, goal, motivation, steps }) => {
 
 function NewSessionPageInner() {
   const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
 
   const STEPS = [
     {
@@ -243,7 +243,7 @@ function NewSessionPageInner() {
           heading={
             <>
               <Msg id="sessions.new.aside.title" />
-              &nbsp;22/06/2022
+              &nbsp; {i18n.formatLocal(new Date(), "P")}
             </>
           }
           activeStepIndex={activeStepIndex}

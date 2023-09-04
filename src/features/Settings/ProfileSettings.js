@@ -11,7 +11,6 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import {
-  FIELD_OPTIONS,
   LANGUAGE_OPTIONS,
   getLabel,
   renderLanguageOption,
@@ -22,6 +21,7 @@ import {
   DatePickerField,
   FileUpload,
   SwitchField,
+  getBase64,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
 import { Msg } from "../../components/Msg";
@@ -34,6 +34,7 @@ import { WHITE_BG } from "./Settings.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { I18nContext } from "../../App";
 import { messages as coachesMessages } from "../Coaches/messages";
+import { useFieldsDict } from "./useFieldsDict";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -93,11 +94,15 @@ const to = ({ photo, ...data }, { userLocale, userTz }) => {
   };
 };
 
-const from = ({ imageSrc, ...values }) => {
-  console.log("from", { imageSrc, ...values });
+const from = async ({ imageSrc, ...values }) => {
+  const file = imageSrc ? imageSrc?.[0] : undefined;
+  const photo = await getBase64(file);
+  console.log("from", { imageSrc, photo, file, ...values });
+
   return {
     ...values,
-    photo: imageSrc && [imageSrc],
+    photo,
+    // photo: [photo],
     experienceSince: values.experienceSince, // TODO
   };
 };
@@ -127,8 +132,9 @@ export const useResetForm = ({ to, form, initialResetting }) => {
 export const ProfileSettings = () => {
   const { authFetch, user } = useAuth();
   const msg = useMsg();
+  const { fieldsOptions } = useFieldsDict();
   const form = useForm({});
-  const { language, userTz } = useContext(I18nContext);
+  const { language, userTz, i18n } = useContext(I18nContext);
   const { resetForm, resetting } = useResetForm({
     initialResetting: true,
     form,
@@ -157,15 +163,15 @@ export const ProfileSettings = () => {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (values) =>
-      console.log("[save start]", { values, payload: from(values) }) ||
+    mutationFn: async (values) =>
+      console.log("[save start]", { values, payload: await from(values) }) ||
       (() => {
         // debugger;
       })() ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
-        data: from(values),
+        data: await from(values),
       }),
     onSuccess: (data) => {
       console.log("[save success]", { data });
@@ -227,12 +233,19 @@ export const ProfileSettings = () => {
           <P mt={1}>
             {msg("settings.profile.field.experience")}
             {": "}
-            {COACH.experienceSince ? `${COACH.experienceSince}` : ""}
+            {COACH.experienceSince
+              ? `${i18n.formatDistanceToNow(
+                  i18n.parseDate(COACH.experienceSince)
+                )}`
+              : ""}
           </P>
           <P mt={1}>
             {msg("settings.profile.field.languages")}
             {": "}
-            {[].concat(COACH.languages).join(", ")}
+            {[]
+              .concat(COACH.languages)
+              .map(getLabel(LANGUAGE_OPTIONS))
+              .join(", ")}
           </P>
           <P my={3} color="black">
             {COACH.bio}
@@ -240,7 +253,7 @@ export const ProfileSettings = () => {
           <Box display="flex" gap={1}>
             {[]
               .concat(COACH.fields)
-              .map(getLabel(FIELD_OPTIONS))
+              .map(getLabel(fieldsOptions))
               .map((label) => (
                 <Chip
                   key={label}
@@ -259,7 +272,9 @@ export const ProfileSettings = () => {
         COACH.imageSrc,
         COACH.languages,
         COACH.lastName,
+        fieldsOptions,
         form,
+        i18n,
         msg,
         saveDisabled,
         saveMutation.mutateAsync,
@@ -389,7 +404,7 @@ export const ProfileSettings = () => {
           disableCloseOnSelect
           sx={WHITE_BG}
           name={FIELDS.fields}
-          options={FIELD_OPTIONS}
+          options={fieldsOptions}
           placeholder={msg("settings.profile.field.fields.placeholder")}
         />
       </FormRow>

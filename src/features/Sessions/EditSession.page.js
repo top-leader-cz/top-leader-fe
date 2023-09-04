@@ -1,7 +1,10 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
+import { useCallback, useContext, useRef, useState } from "react";
+import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import { I18nContext, UTC_DATE_FORMAT } from "../../App";
 import { ActionSteps, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -9,24 +12,20 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { Todos } from "../../components/Todos";
 import { H1, H2, P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { FocusedList } from "./FocusedList";
-import { messages } from "./messages";
 import { StepperRightMenu, useSteps } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
+import { useAreasDict } from "./areas";
+import { messages } from "./messages";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
+import { AreaStep } from "./steps/AreaStep";
 import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
-import { useAuth } from "../Authorization";
-import { useMutation, useQuery } from "react-query";
-import { format } from "date-fns";
-import { AreaStep } from "./steps/AreaStep";
 import { GoalStep } from "./steps/TextAreaStep";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { useAreasDict } from "./areas";
-import { UTC_DATE_FORMAT } from "../../App";
 
 const IconTile = ({ iconName, caption, text }) => {
   return (
@@ -216,6 +215,7 @@ const createSessionEntry = (timestamp, { reflection, actionSteps }) => {
 
 function EditSessionPageInner() {
   const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
 
   const STEPS = [
     {
@@ -367,11 +367,25 @@ function EditSessionPageInner() {
 
   if (isLoading) return <QueryRenderer isLoading />;
 
+  const date = new Date();
+  const formattedDate = i18n.formatLocalMaybe(date, "P");
+  // console.log({
+  //   sessionQuery,
+  //   stringDate: sessionQuery.data.createdAt,
+  //   date,
+  //   formattedDate,
+  // });
+
   return (
     <Layout
       rightMenuContent={
         <StepperRightMenu
-          heading={"My session 22/06/2022"}
+          heading={
+            <>
+              <Msg id="sessions.new.aside.title" />
+              &nbsp; {formattedDate}
+            </>
+          }
           activeStepIndex={activeStepIndex}
           onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={steps}

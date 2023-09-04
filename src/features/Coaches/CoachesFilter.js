@@ -10,15 +10,12 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import {
-  FIELD_OPTIONS,
-  LANGUAGE_OPTIONS,
-  renderLanguageOption,
-} from "../../components/Forms";
+import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
+import { useFieldsDict } from "../Settings/useFieldsDict";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
@@ -31,6 +28,7 @@ export const INITIAL_FILTER = {
 
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   const msg = useMsg();
+  const { fieldsOptions } = useFieldsDict();
   const methods = useForm({
     // mode: "all",
     defaultValues: filter,
@@ -75,7 +73,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <AutocompleteSelect
               name="field"
               label={msg("coaches.filter.field.label")}
-              options={FIELD_OPTIONS}
+              options={fieldsOptions}
             />
             <SliderField
               name="experience"

@@ -1,30 +1,38 @@
 import { Alert, Box, Divider } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers";
-import { useCallback, useEffect, useMemo } from "react";
+import { format, getDay, parse, setDay } from "date-fns";
+import { getTimezoneOffset } from "date-fns-tz";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { API_TIME_FORMAT, I18nContext, UTC_DATE_FORMAT } from "../../App";
 import {
   B,
   CheckboxField,
   DateRangePickerField,
-  TimeRangePickerField,
   SwitchField,
+  TimeRangePickerField,
 } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
-import { CalendarDaySlots, CREATE_OFFSET } from "../Coaches/Coaches.page";
-import { FieldLayout, FormRow } from "./FormRow";
-import { WHITE_BG } from "./Settings.page";
-import { useMutation, useQuery } from "react-query";
 import { useAuth } from "../Authorization";
-import { useContext } from "react";
-import { API_TIME_FORMAT, I18nContext, UTC_DATE_FORMAT } from "../../App";
-import { pipe } from "ramda";
-import { getTimezoneOffset, zonedTimeToUtc } from "date-fns-tz";
-import { format, parse, parseISO } from "date-fns";
-import { useResetForm } from "./ProfileSettings";
+import { CREATE_OFFSET, CalendarDaySlots } from "../Coaches/Coaches.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { FieldLayout, FormRow } from "./FormRow";
+import { useResetForm } from "./ProfileSettings";
+import { WHITE_BG } from "./Settings.page";
+
+const INDEX_TO_DAY = [
+  "SUNDAY", // 0
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+];
 
 const DAY_NAMES = [
   "MONDAY",
@@ -36,27 +44,37 @@ const DAY_NAMES = [
   "SUNDAY",
 ];
 
-// TODO: i18n
-const DAYS = {
-  MONDAY: "Monday",
-  TUESDAY: "Tuesday",
-  WEDNESDAY: "Wednesday",
-  THURSDAY: "Thursday",
-  FRIDAY: "Friday",
-  SATURDAY: "Saturday",
-  SUNDAY: "Sunday",
+const translateDay = ({
+  dayIndex,
+  width = "medium", // 3char
+  format = width === "short" ? "EEEEEE" : width === "long" ? "EEEE" : "E",
+  i18n,
+}) => {
+  // return i18n.currentLocale.localize.day(dayIndex); // todo: width
+  const date = setDay(new Date(), dayIndex);
+  return i18n.formatLocal(date, format);
 };
 
 const DaySlots = ({ dayName }) => {
   const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
   const enabled = useFormContext().watch(enabledName(dayName));
-  console.log("[DaySlots.rndr]", dayName, enabled);
+  const dayLabel = translateDay({
+    dayIndex: INDEX_TO_DAY.findIndex((name) => name === dayName),
+    width: "long",
+    i18n,
+  });
+
+  // console.log("[DaySlots.rndr]", dayName, enabled);
 
   return (
     <FieldLayout
       label={
         <>
-          <CheckboxField name={enabledName(dayName)} /> {DAYS[dayName]}
+          <CheckboxField name={enabledName(dayName)} />
+          <Box component={"span"} sx={{ textTransform: "capitalize" }}>
+            {dayLabel}
+          </Box>
         </>
       }
       LabelComponent={P}
@@ -151,21 +169,13 @@ const getAvailabilities = ({ formValues, i18n, userTz }) => {
   const availabilities = ranges
     .map(({ dayName, range }) => {
       const [from, to] = range || [];
-      const utc = [zonedTimeToUtc(from, userTz), zonedTimeToUtc(to, userTz)];
-      const utcF = utc.map((d) => format(d, i18n.uiFormats.apiTimeFormat));
-
+      // const utc = [zonedTimeToUtc(from, userTz), zonedTimeToUtc(to, userTz)];
+      // const utcF = utc.map((d) => format(d, i18n.uiFormats.apiTimeFormat));
       // Same as utcF:
       const timeFrom = format(from, i18n.uiFormats.apiTimeFormat);
       const timeTo = format(to, i18n.uiFormats.apiTimeFormat);
 
-      console.log("%c[getAvailabilities]" + dayName, "color:magenta", {
-        range,
-        utc,
-        utcF,
-        timeFrom,
-        timeTo,
-      });
-
+      // console.log("%c[getAvailabilities]" + dayName, "color:magenta", { range, utc, utcF, timeFrom, timeTo, });
       // debugger;
 
       return {
@@ -187,8 +197,8 @@ const from = ({ values, i18n, userTz }) => {
       ? {}
       : {
           firstDayOfTheWeek: i18n.formatLocal(
-            UTC_DATE_FORMAT,
-            i18n.startOfWeek(from)
+            i18n.startOfWeek(from), // TODO: Dan
+            UTC_DATE_FORMAT
           ),
         }), // TODO: timezone needed, startOfWeek affected by tz
   };
@@ -240,6 +250,28 @@ const to = (data) => {
   };
 };
 
+const parseTimeHours = (time) => {
+  const [h = "", m, s] = time?.split?.(":") || [];
+  if (m === "00" && s === "00" && h?.match?.(/^\d{2}$/)) {
+    return parseInt(h, 10);
+  } else return NaN;
+};
+const getRangeHours = ({ timeFrom, timeTo }) => {
+  const startHour = parseTimeHours(timeFrom);
+  const endHour = parseTimeHours(timeTo);
+  if (isNaN(startHour) || isNaN(endHour)) {
+    throw new Error(
+      "getRangeHours cannot parse time: " + JSON.stringify({ timeFrom, timeTo })
+    );
+  }
+
+  const hoursCount = endHour - startHour;
+  const hours = Array(hoursCount)
+    .fill(null)
+    .map((_, i) => startHour + i);
+  return hours;
+};
+
 export const AvailabilitySettings = () => {
   const form = useForm({
     // mode: "onSubmit",
@@ -264,6 +296,7 @@ export const AvailabilitySettings = () => {
   const msg = useMsg();
   const { i18n, userTz } = useContext(I18nContext);
   const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
   const availabilityType = AVAILABILITY_TYPE.RECURRING; // TODO
   const availabilityQuery = useQuery({
     queryKey: ["coach-availability", availabilityType],
@@ -295,17 +328,21 @@ export const AvailabilitySettings = () => {
       const payload = from({ values, i18n, userTz });
 
       console.log("%cMUTATION", "color:lime", { values, type, payload });
-      debugger;
+      // debugger;
       return authFetch({
         method: "POST",
         url: `/api/latest/coach-availability/${type}`,
         data: payload,
       });
     },
-    onSuccess: useCallback((data) => {
-      console.log("mutation.onSuccess", data);
-      // setFinished(true);
-    }, []),
+    onSuccess: useCallback(
+      (data) => {
+        console.log("mutation.onSuccess", data);
+        queryClient.removeQueries("coach-availability");
+        // setFinished(true);
+      },
+      [queryClient]
+    ),
   });
 
   const saveDisabled = availabilityMutation.isLoading; // || !!query.error;
@@ -317,12 +354,57 @@ export const AvailabilitySettings = () => {
     availabilityQuery,
     availabilityMutation,
     form,
+    i18n,
   });
 
   const onSubmit = (data, e) =>
     console.log("[AvailabilitySettings.onSubmit] SHOULD NEVER HAPPEN", data, e);
   const onError = (errors, e) =>
     console.log("[AvailabilitySettings.onError]", errors, e);
+
+  const previewDays = useMemo(() => {
+    const dayCount = 7;
+    const rows = Array(dayCount)
+      .fill(null)
+      .map((_, i) => {
+        const date = CREATE_OFFSET(new Date())(i, 0);
+        const dayIndex = getDay(date); // 0 - Sun
+        const dayName = INDEX_TO_DAY[dayIndex];
+        const ranges = availabilityQuery.data?.[dayName] ?? [];
+        // const { day, date: _date, timeFrom, timeTo, recurring } = ranges?.[0] || {}; // TODO
+        const freeHours = ranges.reduce((acc, range) => {
+          const { day, date: _date, timeFrom, timeTo, recurring } = range;
+          const rangeHours = getRangeHours({ timeFrom, timeTo });
+          return [...acc, ...rangeHours];
+        }, []);
+        // const freeHours = [9, 10, 11, 13, 14, 16];
+
+        return {
+          date,
+          freeHours,
+        };
+      });
+
+    return rows;
+  }, [availabilityQuery.data]);
+  const [firstHour, lastHour] = previewDays.reduce(
+    (acc, { date, freeHours }) => {
+      const sorted = [...(freeHours ?? [])].sort((a, b) => a - b);
+      const lowest = sorted[0];
+      const highest = sorted[sorted.length - 1];
+      const newLowest =
+        typeof acc[0] !== "number" || lowest < acc[0] ? lowest : acc[0];
+      const newHighest =
+        typeof acc[1] !== "number" || highest > acc[1] ? highest : acc[1];
+
+      return [newLowest, newHighest];
+    },
+    []
+  );
+  const slotsCount = firstHour === lastHour ? 0 : lastHour - firstHour + 1;
+
+  // firstDay + 3 days -> month
+  const rightMenuSubtitle = i18n.formatLocal(previewDays[3].date, "LLLL");
 
   useRightMenu(
     useMemo(
@@ -339,30 +421,84 @@ export const AvailabilitySettings = () => {
             },
           }}
         >
-          <B>September</B>
+          <B>{rightMenuSubtitle}</B>
           <Divider sx={{ my: 2 }} />
-          <Box display="flex" flexDirection="column" gap={2} overflow="scroll">
-            {Array(7)
-              .fill(null)
-              .map((_, i) => (
+          {!availabilityQuery.data ? null : (
+            <Box
+              display="flex"
+              flexDirection="column"
+              gap={2}
+              overflow="scroll"
+            >
+              {previewDays.map(({ date, freeHours }, i) => (
                 <CalendarDaySlots
                   sx={{ flexDirection: "row", alignItems: "center", gap: 2 }}
                   dateSx={{ minWidth: "40px", p: 0 }}
                   // slotSx={{ width: "60px" }}
                   key={i}
-                  startHour={9}
-                  slotsCount={8}
-                  date={CREATE_OFFSET(new Date())(i, 0)}
-                  freeHours={[9, 10, 11, 13, 14, 16]}
+                  startHour={firstHour ?? 9}
+                  slotsCount={slotsCount}
+                  date={date}
+                  freeHours={freeHours}
                   // freeHours={getDayFreeHours(freeSlots, addDays(i, TODAY))}
                 />
               ))}
-          </Box>
+            </Box>
+          )}
         </ScrollableRightMenu>
       ),
-      [availabilityMutation.mutateAsync, form, msg, saveDisabled]
+      [
+        availabilityMutation.mutateAsync,
+        availabilityQuery.data,
+        firstHour,
+        form,
+        msg,
+        previewDays,
+        rightMenuSubtitle,
+        saveDisabled,
+        slotsCount,
+      ]
     )
   );
+  // useRightMenu(
+  //   useMemo(
+  //     () => (
+  //       <ScrollableRightMenu
+  //         heading={msg("settings.availability.aside.title")}
+  //         buttonProps={{
+  //           children: msg("settings.availability.aside.save"),
+  //           type: "submit",
+  //           disabled: saveDisabled,
+  //           onClick: (e) => {
+  //             console.log("Save click");
+  //             form.handleSubmit(availabilityMutation.mutateAsync, onError)(e);
+  //           },
+  //         }}
+  //       >
+  //         <B>{rightMenuSubtitle}</B>
+  //         <Divider sx={{ my: 2 }} />
+  //         <Box display="flex" flexDirection="column" gap={2} overflow="scroll">
+  //           {Array(7)
+  //             .fill(null)
+  //             .map((_, i) => (
+  //               <CalendarDaySlots
+  //                 sx={{ flexDirection: "row", alignItems: "center", gap: 2 }}
+  //                 dateSx={{ minWidth: "40px", p: 0 }}
+  //                 // slotSx={{ width: "60px" }}
+  //                 key={i}
+  //                 startHour={9}
+  //                 slotsCount={8}
+  //                 date={CREATE_OFFSET(new Date())(i, 0)}
+  //                 freeHours={[9, 10, 11, 13, 14, 16]}
+  //                 // freeHours={getDayFreeHours(freeSlots, addDays(i, TODAY))}
+  //               />
+  //             ))}
+  //         </Box>
+  //       </ScrollableRightMenu>
+  //     ),
+  //     [availabilityMutation.mutateAsync, form, msg, saveDisabled]
+  //   )
+  // );
 
   if (availabilityQuery.error)
     return (

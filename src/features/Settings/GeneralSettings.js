@@ -94,7 +94,7 @@ export const GeneralSettings = () => {
             options={LANGUAGE_OPTIONS}
             renderOption={renderLanguageOption}
             placeholder="Select languages you speak"
-            autoComplete="off" // TODO: not working
+            autoComplete="language" // TODO: not working
             onChange={(lang) => setLanguage(lang)}
           />
         </FormRow>

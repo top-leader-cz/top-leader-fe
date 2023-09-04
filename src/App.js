@@ -30,6 +30,8 @@ import cs from "date-fns/locale/cs";
 import { useMemo } from "react";
 import { formatWithOptions, startOfWeekWithOptions } from "date-fns/fp";
 import * as dfnsfp from "date-fns/fp";
+import { formatDistanceToNow, isValid, parse } from "date-fns";
+import * as tz from "date-fns-tz";
 
 window.dfnsfp = dfnsfp;
 
@@ -109,8 +111,8 @@ const useI18n = ({ userTz, language }) => {
   // }, [currentLocale]);
 
   const formatLocal = useCallback(
-    (formatStr = "PP", date) => {
-      console.log("[useI18n.formatLocal] TODO: UTC", { date, formatStr });
+    (date, formatStr = "PP") => {
+      // console.log("[useI18n.formatLocal] TODO: UTC", { date, formatStr });
       return formatWithOptions(
         {
           locale: currentLocale,
@@ -122,15 +124,52 @@ const useI18n = ({ userTz, language }) => {
     [currentLocale]
   );
 
+  const parseUTC = useCallback(
+    (utcStr) => {
+      // { zonedTimeToUtc, format }
+      const date = new Date(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
+      const zonedDate = tz.utcToZonedTime(date, userTz);
+
+      return zonedDate;
+    },
+    [userTz]
+  );
+
+  const formatLocalMaybe = useCallback(
+    (maybeDate, formatStr = "PP", defaultStr = "") => {
+      const valid = isValid(maybeDate);
+
+      console.log("formatLocalMaybe", {
+        maybeDate,
+        formatStr,
+        defaultStr,
+        valid,
+      });
+
+      return !valid ? defaultStr : formatLocal(maybeDate, formatStr);
+    },
+    [formatLocal]
+  );
+
   const startOfWeek = useCallback(
     (...args) => {
-      console.log("[useI18n.startOfWeek] TODO: UTC", { args });
+      // console.log("[useI18n.startOfWeek] TODO: UTC", { args });
       return startOfWeekWithOptions(
         {
           locale: currentLocale,
         },
         ...args
       );
+    },
+    [currentLocale]
+  );
+
+  const parseDate = useCallback((input, referenceDate = new Date()) => {
+    return parse(input, UTC_DATE_FORMAT, referenceDate);
+  }, []);
+  const _formatDistanceToNow = useCallback(
+    (date, options = {}) => {
+      return formatDistanceToNow(date, { ...options, locale: currentLocale });
     },
     [currentLocale]
   );
@@ -146,10 +185,22 @@ const useI18n = ({ userTz, language }) => {
       },
       currentLocale,
       formatLocal,
+      formatLocalMaybe,
+      parseUTC,
+      parseDate,
       startOfWeek,
+      formatDistanceToNow: _formatDistanceToNow,
       weekStartsOn: currentLocale.options.weekStartsOn,
     }),
-    [currentLocale, formatLocal, startOfWeek]
+    [
+      _formatDistanceToNow,
+      currentLocale,
+      formatLocal,
+      formatLocalMaybe,
+      parseUTC,
+      parseDate,
+      startOfWeek,
+    ]
   );
   return i18n;
 };
@@ -163,18 +214,15 @@ const I18nProvider = ({ children }) => {
     .resolvedOptions()
     .locale.substring(0, 5);
   const savedLocale = window.localStorage.getItem("language");
-  const defaultLocale = supportedLocales.includes(browserLocale)
+  const defaultLocale = supportedLocales.includes(browserLocaleFull)
+    ? browserLocaleFull
+    : supportedLocales.includes(browserLocale)
     ? browserLocale
     : "en";
   const [language, _setLanguage] = useState(
     supportedLocales.includes(savedLocale) ? savedLocale : defaultLocale
   );
   const setLanguage = useCallback((lang) => {
-    console.log("[i18n.setLanguage]", {
-      lang,
-      browserLocale,
-      browserLocaleFull,
-    });
     _setLanguage(lang);
     window.localStorage.setItem("language", lang);
   }, []);
@@ -184,7 +232,6 @@ const I18nProvider = ({ children }) => {
 
   const onReset = useCallback(
     ({ args }) => {
-      console.log("[i18n.reset]", { args, browserLocaleFull });
       setLanguage(args?.[0] || "en");
     },
     [setLanguage]

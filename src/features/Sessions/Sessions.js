@@ -6,24 +6,25 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
+import { useContext } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { useQuery } from "react-query";
 import { generatePath, useNavigate } from "react-router-dom";
+import { I18nContext } from "../../App";
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
+import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { Todos } from "../../components/Todos";
 import { P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { messages } from "./messages";
-import { useAreasDict } from "./areas";
-import { useQuery } from "react-query";
 import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
-import { useMsg } from "../../components/Msg/Msg";
-import { Icon } from "../../components/Icon";
-import { ErrorBoundary } from "react-error-boundary";
+import { useAreasDict } from "./areas";
+import { messages } from "./messages";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (
@@ -83,6 +84,15 @@ const SessionCard = ({
 }) => {
   const { areas } = useAreasDict();
   const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
+  const parsed = i18n.parseUTC(date);
+  const formattedDate = i18n.formatLocalMaybe(parsed, "Pp");
+
+  // console.log("[SC.rndr]", {
+  //   date,
+  //   formattedDate,
+  //   parsed,
+  // });
 
   return (
     <Card sx={{ ...sx }} elevation={0}>
@@ -93,7 +103,7 @@ const SessionCard = ({
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
-            <P>{date} -&nbsp;</P>
+            <P>{formattedDate} -</P>
           </Box>
           <Box sx={{ width: "100%" }}>
             <P>{type}</P>

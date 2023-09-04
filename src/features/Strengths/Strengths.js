@@ -1,17 +1,9 @@
 import { ArrowBack, Star } from "@mui/icons-material";
-import {
-  Backdrop,
-  Box,
-  Button,
-  CardContent,
-  Chip,
-  CircularProgress,
-  Divider,
-  Paper,
-} from "@mui/material";
-import React from "react";
+import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
+import React, { useContext } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { I18nContext } from "../../App";
 import { ChipsCard } from "../../components/ChipsCard";
 import { InfoBox, PRIMARY_BG_LIGHT } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -19,11 +11,11 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
-import { QueryRenderer } from "../QM/QueryRenderer";
 
 const AssessmentRightMenu = ({
   history,
@@ -32,6 +24,7 @@ const AssessmentRightMenu = ({
   onRemove,
   onRetake,
 }) => {
+  const { i18n } = useContext(I18nContext);
   return (
     <Paper
       square
@@ -70,7 +63,7 @@ const AssessmentRightMenu = ({
             }
             // variant={"contained"}
           >
-            {entry.date}
+            {i18n.formatLocal(i18n.parseUTC(entry.date), "Pp")}
             <br />
             <P>{entry.status}</P>
           </Button>

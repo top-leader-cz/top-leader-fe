@@ -1,5 +1,5 @@
 export const routes = {
-  signIn: "/mui-sign-in",
+  signIn: "/sign-in",
   dashboard: "/dashboard",
   assessment: "/assessment",
   strengths: "/strengths",
