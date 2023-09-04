@@ -11,7 +11,6 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import {
-  FIELD_OPTIONS,
   LANGUAGE_OPTIONS,
   getLabel,
   renderLanguageOption,
@@ -22,6 +21,7 @@ import {
   DatePickerField,
   FileUpload,
   SwitchField,
+  getBase64,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
 import { Msg } from "../../components/Msg";
@@ -32,8 +32,9 @@ import { useAuth } from "../Authorization";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { TranslationContext } from "../../App";
+import { I18nContext } from "../../App";
 import { messages as coachesMessages } from "../Coaches/messages";
+import { useFieldsDict } from "./useFieldsDict";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -87,47 +88,66 @@ const to = ({ photo, ...data }, { userLocale, userTz }) => {
     ...data,
     rate: data.rate || "",
     experienceSince: data.experienceSince, // TODO: utc
-    timeZone: data.timezone || userTz, // TODO: userTz ctx
+    timeZone: data.timezone || userTz,
     languages: data.languages?.length ? data.languages : [userLocale],
     imageSrc: photo?.[0],
   };
 };
 
-const from = ({ imageSrc, ...values }) => {
-  console.log("from", { imageSrc, ...values });
+const from = async ({ imageSrc, ...values }) => {
+  const file = imageSrc ? imageSrc?.[0] : undefined;
+  const photo = await getBase64(file);
+  console.log("from", { imageSrc, photo, file, ...values });
+
   return {
     ...values,
-    photo: imageSrc && [imageSrc],
+    photo,
+    // photo: [photo],
     experienceSince: values.experienceSince, // TODO
+  };
+};
+
+export const useResetForm = ({ to, form, initialResetting }) => {
+  const [resetting, setResetting] = useState(initialResetting);
+  const { reset } = form;
+  const resetForm = useCallback(
+    (data) => {
+      reset(to(data));
+
+      // Autocomplete needs remount after form reset, TODO
+      setResetting(true);
+      setTimeout(() => {
+        setResetting(false);
+      }, 0);
+    },
+    [reset, to]
+  );
+
+  return {
+    resetting,
+    resetForm,
   };
 };
 
 export const ProfileSettings = () => {
   const { authFetch, user } = useAuth();
   const msg = useMsg();
+  const { fieldsOptions } = useFieldsDict();
   const form = useForm({});
-  const { language, userTz } = useContext(TranslationContext);
-
-  const [loading, setLoading] = useState(true);
-  const { reset } = form;
-  const resetForm = useCallback(
-    (data) => {
-      reset(
+  const { language, userTz, i18n } = useContext(I18nContext);
+  const { resetForm, resetting } = useResetForm({
+    initialResetting: true,
+    form,
+    to: useCallback(
+      (data) =>
         to(data, {
-          userLocale: language,
+          userLocale: language.substring(0, 2),
           // TODO: notify user that timezone settings is different than currently set!
           userTz,
-        })
-      );
-
-      // Autocomplete needs remount after form reset, TODO
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 0);
-    },
-    [language, reset]
-  );
+        }),
+      [language, userTz]
+    ),
+  });
 
   const initialValuesQuery = useQuery({
     queryKey: ["coach-info"], // TODO?
@@ -143,12 +163,15 @@ export const ProfileSettings = () => {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (values) =>
-      console.log("[save start]", { ...values }) ||
+    mutationFn: async (values) =>
+      console.log("[save start]", { values, payload: await from(values) }) ||
+      (() => {
+        // debugger;
+      })() ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
-        data: from(values),
+        data: await from(values),
       }),
     onSuccess: (data) => {
       console.log("[save success]", { data });
@@ -160,13 +183,9 @@ export const ProfileSettings = () => {
   useEffect(() => {
     console.log("%c[PS.eff reset]", "color:lime", { data: data });
     if (data) resetForm(data);
-
-    // stuck on loading?
-    // if (data) reset(to((data));
-    // else setLoading(false);
   }, [data, resetForm]);
 
-  const isJustLoaderDisplayed = initialValuesQuery.isLoading || loading;
+  const isJustLoaderDisplayed = initialValuesQuery.isLoading || resetting;
 
   const COACH = form.formState.defaultValues ?? {}; // TODO
   console.log("%c[PS.rndr]", "color:deepskyblue", {
@@ -174,6 +193,9 @@ export const ProfileSettings = () => {
     form,
     saveMutation,
     isJustLoaderDisplayed,
+    userTz,
+    language,
+    experienceSince: form.watch("experienceSince"),
   });
 
   const onSubmit = (data, e) =>
@@ -211,12 +233,19 @@ export const ProfileSettings = () => {
           <P mt={1}>
             {msg("settings.profile.field.experience")}
             {": "}
-            {COACH.experienceSince ? `${COACH.experienceSince}` : ""}
+            {COACH.experienceSince
+              ? `${i18n.formatDistanceToNow(
+                  i18n.parseDate(COACH.experienceSince)
+                )}`
+              : ""}
           </P>
           <P mt={1}>
             {msg("settings.profile.field.languages")}
             {": "}
-            {[].concat(COACH.languages).join(", ")}
+            {[]
+              .concat(COACH.languages)
+              .map(getLabel(LANGUAGE_OPTIONS))
+              .join(", ")}
           </P>
           <P my={3} color="black">
             {COACH.bio}
@@ -224,7 +253,7 @@ export const ProfileSettings = () => {
           <Box display="flex" gap={1}>
             {[]
               .concat(COACH.fields)
-              .map(getLabel(FIELD_OPTIONS))
+              .map(getLabel(fieldsOptions))
               .map((label) => (
                 <Chip
                   key={label}
@@ -243,7 +272,9 @@ export const ProfileSettings = () => {
         COACH.imageSrc,
         COACH.languages,
         COACH.lastName,
+        fieldsOptions,
         form,
+        i18n,
         msg,
         saveDisabled,
         saveMutation.mutateAsync,
@@ -373,7 +404,7 @@ export const ProfileSettings = () => {
           disableCloseOnSelect
           sx={WHITE_BG}
           name={FIELDS.fields}
-          options={FIELD_OPTIONS}
+          options={fieldsOptions}
           placeholder={msg("settings.profile.field.fields.placeholder")}
         />
       </FormRow>
@@ -391,7 +422,7 @@ export const ProfileSettings = () => {
       >
         <DatePickerField
           name={FIELDS.experienceSince}
-          inputFormat="MM/dd/yyyy"
+          // inputFormat={"MM/dd/yyyy"}
           sx={{ ...WHITE_BG, width: "100%" }}
           size="small"
         />

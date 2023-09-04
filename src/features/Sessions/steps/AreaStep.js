@@ -7,13 +7,22 @@ import { SelectableChip } from "../../../components/SelectableChip";
 import { SessionStepCard } from "../SessionStepCard";
 import { useAreasDict } from "../areas";
 
-const useNewSession = () => {
-  const { areas } = useAreasDict();
+const useAreas = ({ value }) => {
+  const { areas: areasDict } = useAreasDict();
+  const areasArr = Object.entries(areasDict).map(([key, value]) => ({
+    key,
+    label: value.label,
+  }));
+  const areaMaybe = areasArr.find((area) => area.key === value);
+  const isCustomArea = !areaMaybe;
+  const customAreaMaybe = isCustomArea ? value : undefined;
+
   return {
-    areas: Object.entries(areas).map(([key, value]) => ({
-      key,
-      label: value.label,
-    })),
+    isCustomArea,
+    areaMaybe,
+    customAreaMaybe,
+    areaLabelMaybe: areaMaybe?.label,
+    areasArr,
   };
 };
 
@@ -25,13 +34,14 @@ export const AreaStep = ({
   step,
   stepper,
 }) => {
-  const { areas } = useNewSession();
   const valueArr = data[keyName];
   const value = valueArr?.length ? valueArr[0] : "";
+  const { areasArr, isCustomArea, areaMaybe, customAreaMaybe } = useAreas({
+    value,
+  });
 
-  const isCustomArea = !areas.some((area) => area.key === value);
-  const [selected, setSelected] = useState(isCustomArea ? undefined : value);
-  const [customArea, setCustomArea] = useState(isCustomArea ? value : "");
+  const [selected, setSelected] = useState(areaMaybe?.key);
+  const [customArea, setCustomArea] = useState(customAreaMaybe ?? "");
 
   const newArea = customArea || selected;
   const next = () => {
@@ -43,7 +53,7 @@ export const AreaStep = ({
     data,
     selected,
     customArea,
-    areas,
+    areasArr,
     isCustomArea,
     value,
   });
@@ -51,7 +61,7 @@ export const AreaStep = ({
   return (
     <SessionStepCard {...{ step, stepper }}>
       <Box sx={{ my: 12.5, ...SelectableChip.wrapperSx }}>
-        {areas.map((item) => (
+        {areasArr.map((item) => (
           <SelectableChip
             key={item.key}
             label={item.label}

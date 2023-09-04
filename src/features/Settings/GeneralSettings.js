@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { TranslationContext } from "../../App";
+import { I18nContext } from "../../App";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
   AutocompleteSelect,
@@ -40,7 +40,7 @@ export const GeneralSettings = () => {
       }),
   });
   const msg = useMsg();
-  const { language, setLanguage } = useContext(TranslationContext);
+  const { language, setLanguage } = useContext(I18nContext);
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
@@ -94,7 +94,7 @@ export const GeneralSettings = () => {
             options={LANGUAGE_OPTIONS}
             renderOption={renderLanguageOption}
             placeholder="Select languages you speak"
-            autoComplete="off" // TODO: not working
+            autoComplete="language" // TODO: not working
             onChange={(lang) => setLanguage(lang)}
           />
         </FormRow>

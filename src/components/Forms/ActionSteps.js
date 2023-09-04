@@ -60,7 +60,7 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
             control={control}
             name={`${name}.${i}.date`}
             size="small"
-            inputFormat="MM/dd/yyyy"
+            // inputFormat="MM/dd/yyyy"
           />
           {i > 0 && (
             <IconButton

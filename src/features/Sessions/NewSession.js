@@ -1,25 +1,25 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { format } from "date-fns";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { I18nContext, UTC_DATE_FORMAT } from "../../App";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
-import { messages } from "./messages";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { SessionStepCard } from "./SessionStepCard";
+import { VerticalStepper } from "./VerticalStepper";
+import { messages } from "./messages";
 import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
-import { VerticalStepper } from "./VerticalStepper";
-import { useMutation, useQuery } from "react-query";
-import { useAuth } from "../Authorization";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { format } from "date-fns";
 
 export const StepperRightMenu = ({
   heading,
@@ -87,6 +87,7 @@ const createSessionEntry = ({ area, goal, motivation, steps }) => {
 
 function NewSessionPageInner() {
   const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
 
   const STEPS = [
     {
@@ -184,7 +185,7 @@ function NewSessionPageInner() {
     console.log("[NewSession.eff]", { qData: query.data });
     if (query.data && activeStepIndexRef.current === 0) {
       console.log("%c[NewSession.eff]", "color:pink", { qData: query.data });
-      reinit(query.data);
+      // reinit(query.data);
     }
   }, [query.data, reinit]);
   const mutation = useMutation({
@@ -196,8 +197,7 @@ function NewSessionPageInner() {
         data: {
           ...data,
           actionSteps: actionSteps.map(({ label, date }) => {
-            const UTC_DAY_FORMAT = "yyyy-MM-dd"; // TODO: extract
-            const formattedDate = format(date, UTC_DAY_FORMAT);
+            const formattedDate = format(date, UTC_DATE_FORMAT);
             console.log("mapStep", { date, formattedDate });
             return {
               label,
@@ -212,7 +212,7 @@ function NewSessionPageInner() {
       // });
     },
     onSuccess: (data) => {
-      // TODO: not called!
+      // TODO: not called sometimes!
       console.log("mutation.onSuccess", data);
       setFinished(true);
     },
@@ -223,14 +223,11 @@ function NewSessionPageInner() {
   const [finished, setFinished] = useState(false);
 
   const onFinish = (data) => {
-    // const entry = createSessionEntry(data);
-    // history.push(entry);
     console.log("[NewSession.onFinish]", { data });
+
     // await mutation.mutateAsync(data); // todo: broken, reloads page
     mutation.mutate(data);
-    // setFinished(true);
     // navigate(routes.sessions);
-
     // TODO: update @mui/x-date-pickers 5 -> 6
   };
 
@@ -246,7 +243,7 @@ function NewSessionPageInner() {
           heading={
             <>
               <Msg id="sessions.new.aside.title" />
-              &nbsp;22/06/2022
+              &nbsp; {i18n.formatLocal(new Date(), "P")}
             </>
           }
           activeStepIndex={activeStepIndex}

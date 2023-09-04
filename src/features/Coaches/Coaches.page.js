@@ -19,25 +19,23 @@ import {
   startOfDay,
 } from "date-fns/fp";
 import { filter, identity, map, pipe } from "ramda";
-import { useState } from "react";
-import {
-  FIELD_OPTIONS,
-  getLabel,
-  LANGUAGE_OPTIONS,
-} from "../../components/Forms";
+import { useContext, useState } from "react";
+import { useQuery } from "react-query";
+import { I18nContext } from "../../App";
+import { LANGUAGE_OPTIONS, getLabel } from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H1, P } from "../../components/Typography";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { ControlsContainer } from "../Sessions/steps/Controls";
+import { useFieldsDict } from "../Settings/useFieldsDict";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
-import { useQuery } from "react-query";
-import { useAuth } from "../Authorization";
-import { QueryRenderer } from "../QM/QueryRenderer";
 
 const createSlot = ({ start, duration = 60 }) => ({
   start,
@@ -45,8 +43,6 @@ const createSlot = ({ start, duration = 60 }) => ({
 });
 
 const HEADER_FORMAT = "d MMM";
-const DAY_FORMAT = "E d";
-
 const VISIBLE_DAYS_COUNT = 7;
 
 const TimeSlot = ({ hour, isFree, sx }) => {
@@ -75,6 +71,7 @@ export const CalendarDaySlots = ({
   dateSx,
   slotSx,
 }) => {
+  const { i18n } = useContext(I18nContext);
   const daySlots = Array(slotsCount)
     .fill(null)
     .map((_, index) => ({
@@ -94,7 +91,7 @@ export const CalendarDaySlots = ({
       }}
     >
       <Box py={1} px={0.5} sx={dateSx}>
-        {format(DAY_FORMAT, date)}
+        {i18n.formatLocal(date, "E d")}
       </Box>
       {daySlots.map(({ hour, isFree }) => (
         <TimeSlot key={hour} hour={hour} isFree={isFree} sx={slotSx} />
@@ -196,6 +193,7 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     imgSrc = photo, // TODO: rm
   } = coach;
   const TODAY = new Date();
+  const { fieldsOptions } = useFieldsDict();
 
   console.log("[CoachCard.rndr]", name, { languages });
 
@@ -231,7 +229,7 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
           <P gutterBottom>{bio}</P>
           <Box flex="1 1 auto" display="flex" />
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {fields.map(getLabel(FIELD_OPTIONS)).map((label) => (
+            {fields.map(getLabel(fieldsOptions)).map((label) => (
               <Chip
                 key={label}
                 sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}

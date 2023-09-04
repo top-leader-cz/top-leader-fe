@@ -35,7 +35,7 @@ const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
           <InfoBox
             color="primary"
             heading={name}
-            sx={{ p: 2, mb: 3, borderRadius: "6px" }}
+            sx={{ p: 2, mb: 3, borderRadius: "6px", textWrap: "wrap" }}
           >
             <P>{description}</P>
           </InfoBox>

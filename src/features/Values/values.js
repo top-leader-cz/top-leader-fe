@@ -367,7 +367,7 @@ const translateValue = (intl, key) => {
   return {
     name: intl.formatMessage({ ...messages[getId("name")] }),
     emoji: emojis[key],
-    title: intl.formatMessage({ ...messages[getId("title")] }),
+    // title: intl.formatMessage({ ...messages[getId("title")] }),
     description: intl.formatMessage({ ...messages[getId("description")] }),
   };
 };
@@ -405,7 +405,7 @@ const valuesKeys = [
 ];
 
 export const useValuesDict = () => {
-  // const { language, setLanguage } = useContext(TranslationContext);
+  // const { language, setLanguage } = useContext(I18nContext);
   const intl = useIntl();
   const values = useMemo(
     () =>

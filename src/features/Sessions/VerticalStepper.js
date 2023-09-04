@@ -61,7 +61,7 @@ export const VerticalStepper = ({ activeStepIndex, onStepClick, steps }) => {
       orientation="vertical"
     >
       {steps.map(({ label, caption, iconName }, index) => (
-        <Step key={label}>
+        <Step key={`${label}_${caption}_${iconName}`}>
           <StepLabel
             //   icon={<Avatar><Icon name={step.iconName} fontSize="small" /></Avatar>}
             StepIconComponent={StepIcon}

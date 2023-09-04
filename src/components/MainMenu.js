@@ -15,6 +15,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -133,6 +134,7 @@ export const MainMenu = ({ open }) => {
           flexWrap: "nowrap",
           justifyContent: "space-between",
           p: 2,
+          position: "relative",
         }}
       >
         <Box>
@@ -193,6 +195,23 @@ export const MainMenu = ({ open }) => {
             }}
             // to={routes.signIn}
           />
+        </Box>
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 2,
+            left: 0,
+            right: 0,
+            height: "auto",
+            textAlign: "center",
+          }}
+        >
+          <Typography color={"silver"} sx={{ cursor: "default" }}>
+            <span style={{ userSelect: "none" }}>
+              {!mobile ? "commit: " : ""}
+            </span>
+            {process.env.REACT_APP_GIT_SHA}
+          </Typography>
         </Box>
       </Paper>
     </MsgProvider>
