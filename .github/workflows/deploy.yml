@@ -68,7 +68,7 @@ jobs:
         version: '>= 363.0.0'
 
     - name: Invalidate CDN Cache
-      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path /*
+      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path "/*"
 
 
 
