@@ -14,7 +14,7 @@ name: Build and Deploy to top-leader-fe
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "deploy-test" ]
   pull_request:
     branches: [ "main" ]
 
@@ -24,9 +24,8 @@ env:
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+    name: Deploy
     runs-on: ubuntu-latest
-    environment: production
     strategy:
       matrix:
         node-version: [18.x]
@@ -39,14 +38,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-
     - id: 'auth'
-      name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
       with:
-        token_format: 'access_token'
-        workload_identity_provider: 'projects/572595541175/locations/global/workloadIdentityPools/deploy-pool/providers/deploy-provider'
-        service_account: 'deploy-service@topleader-394306.iam.gserviceaccount.com'
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+
+    # - id: 'auth'
+    #   name: 'Authenticate to Google Cloud'
+    #   uses: 'google-github-actions/auth@v0'
+    #   with:
+    #     token_format: 'access_token'
+    #     workload_identity_provider: 'projects/572595541175/locations/global/workloadIdentityPools/deploy-pool/providers/deploy-provider'
+    #     service_account: 'deploy-service@topleader-394306.iam.gserviceaccount.com'
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
