@@ -26,7 +26,6 @@ jobs:
   setup-build-publish-deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    ESLINT_NO_DEV_ERRORS: true
     strategy:
       matrix:
         node-version: [18.x]
