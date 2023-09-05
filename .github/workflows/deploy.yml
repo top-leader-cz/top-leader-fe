@@ -50,7 +50,7 @@ jobs:
     - name: Build
       run: npm run build-github
 
-    - name: auth
+    - name: Cloud Authentication
       uses: google-github-actions/auth@v0
       with:
         credentials_json: ${{ secrets.GCP_CREDENTIALS }}
@@ -65,10 +65,10 @@ jobs:
       with:
         parent: false
         path: build
-        destination: deploy-test-3654
+        destination: www.toplead.app
 
-#    - name: Invalidate CDN Cache
-#      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path /*
+    - name: Invalidate CDN Cache
+      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path /*
 
 
 
