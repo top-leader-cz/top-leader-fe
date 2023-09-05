@@ -35,6 +35,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { I18nContext } from "../../App";
 import { messages as coachesMessages } from "../Coaches/messages";
 import { useFieldsDict } from "./useFieldsDict";
+import { img1 } from "./exampleImg";
 
 const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 
@@ -225,7 +226,8 @@ export const ProfileSettings = () => {
               borderRadius={2}
               width={225}
               alignSelf={"center"}
-              src={COACH.imageSrc}
+              // src={COACH.imageSrc}
+              src={img1}
             />
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
@@ -269,7 +271,6 @@ export const ProfileSettings = () => {
         COACH.experienceSince,
         COACH.fields,
         COACH.firstName,
-        COACH.imageSrc,
         COACH.languages,
         COACH.lastName,
         fieldsOptions,
@@ -339,7 +340,8 @@ export const ProfileSettings = () => {
       <FormRow label={msg("settings.profile.field.photo")}>
         <FileUpload
           name={FIELDS.imageSrc}
-          src={COACH.imageSrc}
+          // src={COACH.imageSrc}
+          src={img1}
           secondaryText={msg("settings.profile.field.photo.limit")}
         />
       </FormRow>

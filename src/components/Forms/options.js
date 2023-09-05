@@ -1,14 +1,15 @@
 import { Box } from "@mui/material";
 
 export const LANGUAGE_OPTIONS = [
+  { value: "cs", label: "Čeština" },
+  { value: "de", label: "Deutsch" },
   { value: "en", label: "English" },
   { value: "en-GB", label: "GB English" },
   { value: "en-US", label: "US English" },
-  { value: "cs", label: "Čeština" },
   { value: "fr", label: "fr" },
+  { value: "es", label: "es" },
   { value: "de_en", label: "de_en" },
   { value: "de_cz", label: "de_cz" },
-  { value: "es", label: "es" },
 ];
 
 const getFlagSrc = (option, isBigger) => {
