@@ -48,7 +48,7 @@ jobs:
       run: npm install -f
 
     - name: Build
-      run: npm run build-prod
+      run: npm run build-github
 
     - name: auth
       uses: google-github-actions/auth@v0
@@ -58,7 +58,7 @@ jobs:
     - name: upload-folder
       uses: google-github-actions/upload-cloud-storage@v1
       with:
-        path: build
+        path: build/*
         destination: deploy-test-3654
 
 
