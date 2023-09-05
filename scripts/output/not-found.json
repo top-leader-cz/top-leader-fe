@@ -34,5 +34,11 @@
   "dict.values.trust.title": "Trust (Respect, Dignity)",
   "dict.values.truth.title": "Truth (To be right)",
   "dict.values.work.title": "Work (Self-fulfillment)",
+  "sessions.edit.steps.align.adjust": "No, I would like to adjust",
+  "settings.general.field.newPasswordConfirm.error-match": "Password confirm must match",
+  "settings.profile.field.fields.placeholder": "Select fields you work in",
+  "settings.profile.field.languages.placeholder": "Select languages you speak",
+  "settings.profile.field.publicProfile": "Public account",
+  "settings.profile.field.rate": "Rate",
   "strengths.positives.title-last": "What’s great about talent"
 }

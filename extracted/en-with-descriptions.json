@@ -96,7 +96,7 @@
     "defaultMessage": "Experience: {experience} years"
   },
   "coaches.coach.languages": {
-    "defaultMessage": "Language: {languages}"
+    "defaultMessage": "Languages"
   },
   "coaches.contact.button.cancel": {
     "defaultMessage": "Cancel"
@@ -221,6 +221,87 @@
   },
   "dict.areas.9": {
     "defaultMessage": "Apply critical thinking"
+  },
+  "dict.fields.business.label": {
+    "defaultMessage": "Business"
+  },
+  "dict.fields.career.label": {
+    "defaultMessage": "Career"
+  },
+  "dict.fields.change.label": {
+    "defaultMessage": "Change"
+  },
+  "dict.fields.communication.label": {
+    "defaultMessage": "Communication"
+  },
+  "dict.fields.confidence.label": {
+    "defaultMessage": "Confidence"
+  },
+  "dict.fields.conflict.label": {
+    "defaultMessage": "Conflict"
+  },
+  "dict.fields.diversity.label": {
+    "defaultMessage": "Diversity"
+  },
+  "dict.fields.entrepreneurship.label": {
+    "defaultMessage": "Entrepreneurship"
+  },
+  "dict.fields.executive.label": {
+    "defaultMessage": "Executive"
+  },
+  "dict.fields.facilitation.label": {
+    "defaultMessage": "Facilitation"
+  },
+  "dict.fields.fitness.label": {
+    "defaultMessage": "Fitness"
+  },
+  "dict.fields.health.label": {
+    "defaultMessage": "Health"
+  },
+  "dict.fields.leadership.label": {
+    "defaultMessage": "Leadership"
+  },
+  "dict.fields.life.label": {
+    "defaultMessage": "Life"
+  },
+  "dict.fields.management.label": {
+    "defaultMessage": "Management"
+  },
+  "dict.fields.mental_fitness.label": {
+    "defaultMessage": "Mental fitness"
+  },
+  "dict.fields.mentorship.label": {
+    "defaultMessage": "Mentorship"
+  },
+  "dict.fields.negotiations.label": {
+    "defaultMessage": "Negotiations"
+  },
+  "dict.fields.organizational_development.label": {
+    "defaultMessage": "Organizational Development"
+  },
+  "dict.fields.performance.label": {
+    "defaultMessage": "Performance"
+  },
+  "dict.fields.relationships.label": {
+    "defaultMessage": "Relationships"
+  },
+  "dict.fields.sales.label": {
+    "defaultMessage": "Sales"
+  },
+  "dict.fields.teams.label": {
+    "defaultMessage": "Teams"
+  },
+  "dict.fields.time_management.label": {
+    "defaultMessage": "Time Management"
+  },
+  "dict.fields.transformations.label": {
+    "defaultMessage": "Transformations"
+  },
+  "dict.fields.wellbeing.label": {
+    "defaultMessage": "Wellbeing"
+  },
+  "dict.fields.women.label": {
+    "defaultMessage": "Women"
   },
   "dict.questions.analyser_01": {
     "defaultMessage": "\"I love it when I can back things up with facts and logical thinking.\""
@@ -1455,6 +1536,9 @@
   "sessions.card.goals.title": {
     "defaultMessage": "Goals"
   },
+  "sessions.edit.steps.align.adjust": {
+    "defaultMessage": "No, I would like to adjust"
+  },
   "sessions.edit.steps.align.area.caption": {
     "defaultMessage": "Area of development"
   },
@@ -1620,6 +1704,9 @@
   "settings.general.field.newPasswordConfirm": {
     "defaultMessage": "Confirm new password"
   },
+  "settings.general.field.newPasswordConfirm.error-match": {
+    "defaultMessage": "Password confirm must match"
+  },
   "settings.general.heading": {
     "defaultMessage": "General"
   },
@@ -1648,13 +1735,19 @@
     "defaultMessage": "Email"
   },
   "settings.profile.field.experience": {
-    "defaultMessage": "Experience (years)"
+    "defaultMessage": "Coaching experience"
   },
   "settings.profile.field.fields": {
     "defaultMessage": "Fields"
   },
+  "settings.profile.field.fields.placeholder": {
+    "defaultMessage": "Select fields you work in"
+  },
   "settings.profile.field.languages": {
     "defaultMessage": "Languages"
+  },
+  "settings.profile.field.languages.placeholder": {
+    "defaultMessage": "Select languages you speak"
   },
   "settings.profile.field.name": {
     "defaultMessage": "Name"
@@ -1664,6 +1757,12 @@
   },
   "settings.profile.field.photo.limit": {
     "defaultMessage": "SVG, PNG, JPG or GIF (max. 800 x 400px)"
+  },
+  "settings.profile.field.publicProfile": {
+    "defaultMessage": "Public account"
+  },
+  "settings.profile.field.rate": {
+    "defaultMessage": "Rate"
   },
   "settings.profile.field.timezone": {
     "defaultMessage": "Timezone"

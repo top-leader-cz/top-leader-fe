@@ -17,6 +17,7 @@ import { IntlProvider } from "react-intl";
 import messages_en from "./translations/en.json";
 import messages_cs from "./translations/cs.json";
 import messages_fr from "./translations/fr.json";
+import messages_de from "./translations/de.json";
 import messages_de_en from "./translations/de_en.json";
 import messages_de_cz from "./translations/de_cz.json";
 import messages_es from "./translations/es.json";
@@ -27,6 +28,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import enGB from "date-fns/locale/en-GB";
 import enUS from "date-fns/locale/en-US";
 import cs from "date-fns/locale/cs";
+import de from "date-fns/locale/de";
 import { useMemo } from "react";
 import { formatWithOptions, startOfWeekWithOptions } from "date-fns/fp";
 import * as dfnsfp from "date-fns/fp";
@@ -40,6 +42,7 @@ const messages = {
   "en-US": messages_en,
   "en-GB": messages_en,
   cs: messages_cs,
+  de: messages_de,
   fr: messages_fr,
   de_en: messages_de_en,
   de_cz: messages_de_cz,
@@ -50,6 +53,7 @@ const locales = {
   "en-GB": enGB,
   "en-US": enUS,
   cs: cs,
+  de: de,
   // fr: enGB,
   // es: enGB,
 };

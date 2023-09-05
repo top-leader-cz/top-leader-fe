@@ -371,6 +371,10 @@ function run() {
     data: withDefinedTsKeys,
   });
   rewriteTranslation({
+    code: "de",
+    data: withDefinedTsKeys,
+  });
+  rewriteTranslation({
     code: "de_en",
     data: withDefinedTsKeys,
   });

@@ -680,7 +680,8 @@ export async function getBase64(file) {
   reader.readAsDataURL(file);
   return new Promise((res, rej) => {
     reader.onload = function () {
-      console.log("[getBase64.onload]", reader.result);
+      console.log("[getBase64.onload]");
+      console.log(reader.result);
       res(reader.result);
     };
     reader.onerror = function (error) {
@@ -695,7 +696,7 @@ const FileUploadInner = ({ name, src, secondaryText }) => {
   const { register, watch } = useFormContext();
   const fileList = watch(name);
   const file = fileList?.[0];
-  const fileSrc = file ? URL.createObjectURL(file) : undefined;
+  const fileSrc = file ? URL.createObjectURL(file) : src;
 
   console.log("FileUploadInner.rndr", { name, src, fileList, fileSrc });
   return (
