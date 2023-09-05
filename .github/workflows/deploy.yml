@@ -24,9 +24,8 @@ env:
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+    name: Deploy
     runs-on: ubuntu-latest
-    environment: production
     strategy:
       matrix:
         node-version: [18.x]
@@ -54,7 +53,7 @@ jobs:
     #     service_account: 'deploy-service@topleader-394306.iam.gserviceaccount.com'
 
     - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
 
