@@ -78,7 +78,7 @@ jobs:
         uses: google-github-actions/upload-cloud-storage@v1
         with:
           parent: false
-          path: current/working/directory/build
+          path: current/working/directory
           destination: www.toplead.app
 
       - name: Set up Cloud SDK
