@@ -34,7 +34,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - run: mkdir -p store/build
 
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -48,10 +47,12 @@ jobs:
       run: npm run build-github
 
     - name: Create Build Artifacts
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v3
       with:
         name: build
         path: build
+        if-no-files-found: error
 
   deploy:
     name: Deploy top-leader-fe
@@ -70,11 +71,14 @@ jobs:
         with:
           name: build
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Upload Build to Bucket
         uses: google-github-actions/upload-cloud-storage@v1
         with:
           parent: false
-          path: build
+          path: current/working/directory/build
           destination: www.toplead.app
 
       - name: Set up Cloud SDK
