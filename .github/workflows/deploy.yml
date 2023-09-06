@@ -10,21 +10,17 @@
 #
 # For more support on how to run the workflow, please visit https://github.com/google-github-actions/setup-gcloud/tree/master/example-workflows/gke-kustomize
 
-name: Build and Deploy to top-leader-fe
+name: Build
 
 on:
   push:
-    branches: [ "main", "deploy-test" ]
+    branches: [ "main"]
   pull_request:
     branches: [ "main" ]
 
-env:
-  PROJECT_ID: topleader-394306
-
-
 jobs:
-  setup-build-publish-deploy:
-    name: Deploy top-leader-fe
+  build:
+    name: Build top-leader-fe
     runs-on: ubuntu-latest
     environment: production
     strategy:
@@ -49,25 +45,32 @@ jobs:
     - name: Build
       run: npm run build-github
 
-    - name: Cloud Authentication
-      uses: google-github-actions/auth@v0
-      with:
-        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+  deploy:
+    name: Deploy top-leader-fe
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Cloud Authentication
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    - name: Upload Build to Bucket
-      uses: google-github-actions/upload-cloud-storage@v1
-      with:
-        parent: false
-        path: build
-        destination: www.toplead.app
+      - name: Upload Build to Bucket
+        uses: google-github-actions/upload-cloud-storage@v1
+        with:
+          parent: false
+          path: build
+          destination: www.toplead.app
 
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        version: '>= 363.0.0'
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          version: '>= 363.0.0'
 
-    - name: Invalidate CDN Cache
-      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path "/*"
+      - name: Invalidate CDN Cache
+        run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path "/*"
+
 
 
 
