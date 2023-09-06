@@ -20,7 +20,7 @@ import { useFieldsDict } from "../Settings/useFieldsDict";
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
 export const INITIAL_FILTER = {
-  language: "en",
+  language: "en", // TODO
   field: null,
   experience: [1, 7],
   search: "",

@@ -29,6 +29,7 @@ import enGB from "date-fns/locale/en-GB";
 import enUS from "date-fns/locale/en-US";
 import cs from "date-fns/locale/cs";
 import de from "date-fns/locale/de";
+import fr from "date-fns/locale/fr";
 import { useMemo } from "react";
 import { formatWithOptions, startOfWeekWithOptions } from "date-fns/fp";
 import * as dfnsfp from "date-fns/fp";
@@ -44,9 +45,9 @@ const messages = {
   cs: messages_cs,
   de: messages_de,
   fr: messages_fr,
-  de_en: messages_de_en,
-  de_cz: messages_de_cz,
-  es: messages_es,
+  // de_en: messages_de_en,
+  // de_cz: messages_de_cz,
+  // es: messages_es,
 };
 const locales = {
   en: enGB, // TODO
@@ -54,9 +55,10 @@ const locales = {
   "en-US": enUS,
   cs: cs,
   de: de,
-  // fr: enGB,
+  fr: fr,
   // es: enGB,
 };
+const defaultLanguage = "en";
 /*
 var locale = {
   code: 'cs',
@@ -73,7 +75,9 @@ var locale = {
   }
 */
 
-if (Object.keys(messages).join() !== Object.keys(locales).join()) {
+if (
+  Object.keys(messages).sort().join() !== Object.keys(locales).sort().join()
+) {
   console.error("messages and locales must match");
   // throw new Error("messages and locales must match")
 }
@@ -95,7 +99,10 @@ function renderResetLang({ error, resetErrorBoundary }) {
     <div role="alert">
       <p>Something went wrong:</p>
       <pre style={{ color: "red" }}>{error.message}</pre>
-      <Button variant="contained" onClick={() => resetErrorBoundary("en")}>
+      <Button
+        variant="contained"
+        onClick={() => resetErrorBoundary(defaultLanguage)}
+      >
         Reset lang to English
       </Button>
     </div>
@@ -222,7 +229,7 @@ const I18nProvider = ({ children }) => {
     ? browserLocaleFull
     : supportedLocales.includes(browserLocale)
     ? browserLocale
-    : "en";
+    : defaultLanguage;
   const [language, _setLanguage] = useState(
     supportedLocales.includes(savedLocale) ? savedLocale : defaultLocale
   );
@@ -236,7 +243,7 @@ const I18nProvider = ({ children }) => {
 
   const onReset = useCallback(
     ({ args }) => {
-      setLanguage(args?.[0] || "en");
+      setLanguage(args?.[0] || defaultLanguage);
     },
     [setLanguage]
   );
@@ -250,7 +257,7 @@ const I18nProvider = ({ children }) => {
       >
         <IntlProvider
           locale={language}
-          defaultLocale="en"
+          defaultLocale={defaultLanguage}
           messages={messages[language] || {}}
           // messages={{ exampleMessageId: "Example message" }}
         >

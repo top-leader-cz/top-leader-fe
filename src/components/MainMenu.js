@@ -196,23 +196,32 @@ export const MainMenu = ({ open }) => {
             // to={routes.signIn}
           />
         </Box>
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 2,
-            left: 0,
-            right: 0,
-            height: "auto",
-            textAlign: "center",
-          }}
-        >
-          <Typography color={"silver"} sx={{ cursor: "default" }}>
-            <span style={{ userSelect: "none" }}>
-              {!mobile ? "commit: " : ""}
-            </span>
-            {process.env.REACT_APP_GIT_SHA}
-          </Typography>
-        </Box>
+        {process.env.REACT_APP_GIT_SHA && (
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 2,
+              left: 0,
+              right: 0,
+              height: "auto",
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              component={"a"}
+              target="_blank"
+              rel="noreferrer"
+              href={`https://github.com/top-leader-cz/top-leader-fe/commit/${process.env.REACT_APP_GIT_SHA}`}
+              color={"silver"}
+              sx={{ textDecoration: "none" }}
+            >
+              <span style={{ userSelect: "none" }}>
+                {!mobile ? "commit: " : ""}
+              </span>
+              {process.env.REACT_APP_GIT_SHA}
+            </Typography>
+          </Box>
+        )}
       </Paper>
     </MsgProvider>
   );

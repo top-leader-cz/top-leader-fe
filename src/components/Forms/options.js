@@ -6,10 +6,10 @@ export const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "en-GB", label: "GB English" },
   { value: "en-US", label: "US English" },
-  { value: "fr", label: "fr" },
-  { value: "es", label: "es" },
-  { value: "de_en", label: "de_en" },
-  { value: "de_cz", label: "de_cz" },
+  { value: "fr", label: "Français" },
+  // { value: "es", label: "es" },
+  // { value: "de_en", label: "de_en" },
+  // { value: "de_cz", label: "de_cz" },
 ];
 
 const getFlagSrc = (option, isBigger) => {
