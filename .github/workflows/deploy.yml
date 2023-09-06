@@ -48,7 +48,7 @@ jobs:
   deploy:
     name: Deploy top-leader-fe
     if: github.ref == 'refs/heads/main'
-    needs: [ Build top-leader-fe ]
+    needs: [ build ]
     runs-on: ubuntu-latest
     environment: production
     steps:
