@@ -70,15 +70,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
+          path: build
 
       - name: Display structure of downloaded files
-        run: ls -R
+        run: pwd & ls -l
 
       - name: Upload Build to Bucket
         uses: google-github-actions/upload-cloud-storage@v1
+        run: pwd & ls -l
         with:
           parent: false
-          path: current/working/directory
+          path: build
           destination: www.toplead.app
 
       - name: Set up Cloud SDK
