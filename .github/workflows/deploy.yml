@@ -14,7 +14,7 @@ name: Build and Deploy to top-leader-fe
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "deploy-test" ]
   pull_request:
     branches: [ "main" ]
 
@@ -24,13 +24,12 @@ env:
 
 jobs:
   setup-build-publish-deploy:
-    name: Setup, Build, Publish, and Deploy
+    name: Deploy top-leader-fe
     runs-on: ubuntu-latest
     environment: production
     strategy:
       matrix:
         node-version: [18.x]
-
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -39,37 +38,36 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v0'
-      with:
-        token_format: 'access_token'
-        workload_identity_provider: 'projects/572595541175/locations/global/workloadIdentityPools/deploy-pool/providers/deploy-provider'
-        service_account: 'deploy-service@topleader-394306.iam.gserviceaccount.com'
-
     - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: npm install -f
 
     - name: Build
-      run: npm run build
+      run: npm run build-github
 
-    # Configure Workload Identity Federation and generate an access token.
-    # - id: 'auth'
-    #   name: 'Authenticate to Google Cloud'
-    #   uses: 'google-github-actions/auth@v0'
-    #   with:
-    #     token_format: 'access_token'
-    #     workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
-    #     service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+    - name: Cloud Authentication
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-    # Alternative option - authentication via credentials json
-    # - id: 'auth'
-    #   uses: 'google-github-actions/auth@v0'
-    #   with:
-    #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+    - name: Upload Build to Bucket
+      uses: google-github-actions/upload-cloud-storage@v1
+      with:
+        parent: false
+        path: build
+        destination: www.toplead.app
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        version: '>= 363.0.0'
+
+    - name: Invalidate CDN Cache
+      run: gcloud compute url-maps invalidate-cdn-cache topleader-qa-lbc --path "/*"
+
+
+
