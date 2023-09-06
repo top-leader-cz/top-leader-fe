@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x]
-
     permissions:
       contents: 'read'
       id-token: 'write'
