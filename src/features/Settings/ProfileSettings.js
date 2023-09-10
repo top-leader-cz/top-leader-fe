@@ -1,5 +1,5 @@
 import { Alert, Box, Chip } from "@mui/material";
-import { format } from "date-fns-tz";
+
 import {
   useCallback,
   useContext,
@@ -37,23 +37,12 @@ import { messages as coachesMessages } from "../Coaches/messages";
 import { useFieldsDict } from "./useFieldsDict";
 import { img1 } from "./exampleImg";
 
-const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
-
-const formatTimezone = (tz) => `${tz} (${tzf("z", tz)}) ${tzf("O", tz)}`; // | ${tzf("zzzz", tz)}`;
-
-const timeZones = Intl.supportedValuesOf("timeZone");
-const TIMEZONE_OPTIONS = timeZones.map((value) => ({
-  value,
-  label: formatTimezone(value),
-}));
-
 const FIELDS = {
   firstName: "firstName",
   lastName: "lastName",
   email: "email",
   imageSrc: "imageSrc", // "photo": [ "string" ],
   bio: "bio",
-  timeZone: "timeZone",
   languages: "languages",
   fields: "fields",
   // certificates: "certificates", // rm
@@ -69,7 +58,6 @@ const _COACH = {
   [FIELDS.imageSrc]: `https://i.pravatar.cc/225?u=${Math.random()}`, // TODO: upload form field
   [FIELDS.bio]:
     "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-  [FIELDS.timeZone]: Intl.DateTimeFormat().resolvedOptions().timeZone,
   [FIELDS.languages]: [
     Intl.DateTimeFormat().resolvedOptions().locale.substring(0, 2),
   ],
@@ -89,7 +77,6 @@ const to = ({ photo, ...data }, { userLocale, userTz }) => {
     ...data,
     rate: data.rate || "",
     experienceSince: data.experienceSince, // TODO: utc
-    timeZone: data.timezone || userTz,
     languages: data.languages?.length ? data.languages : [userLocale],
     imageSrc: photo?.[0],
   };
@@ -135,18 +122,13 @@ export const ProfileSettings = () => {
   const msg = useMsg();
   const { fieldsOptions } = useFieldsDict();
   const form = useForm({});
-  const { language, userTz, i18n } = useContext(I18nContext);
+  const { language, i18n } = useContext(I18nContext);
   const { resetForm, resetting } = useResetForm({
     initialResetting: true,
     form,
     to: useCallback(
-      (data) =>
-        to(data, {
-          userLocale: language.substring(0, 2),
-          // TODO: notify user that timezone settings is different than currently set!
-          userTz,
-        }),
-      [language, userTz]
+      (data) => to(data, { userLocale: language.substring(0, 2) }),
+      [language]
     ),
   });
 
@@ -194,7 +176,6 @@ export const ProfileSettings = () => {
     form,
     saveMutation,
     isJustLoaderDisplayed,
-    userTz,
     language,
     experienceSince: form.watch("experienceSince"),
   });
@@ -223,7 +204,7 @@ export const ProfileSettings = () => {
           <Box width="100%" align="left" mt={3}>
             <Box
               component="img"
-              borderRadius={2}
+              borderRadius={1}
               width={225}
               alignSelf={"center"}
               // src={COACH.imageSrc}
@@ -356,36 +337,9 @@ export const ProfileSettings = () => {
       </FormRow>
 
       <FormRow
-        label={msg("settings.profile.field.timezone")}
-        name={FIELDS.timeZone}
-      >
-        <AutocompleteSelect
-          sx={WHITE_BG}
-          name={FIELDS.timeZone}
-          options={TIMEZONE_OPTIONS}
-          rules={{ required: true }}
-          placeholder="Select your timezone" // TODO: translations!
-          // getValue={(field) => {
-          //   console.log(
-          //     "%c[PS.rndr.getValue]" + field.name,
-          //     "color:coral",
-          //     {
-          //       field,
-          //     }
-          //   );
-          //   return field.value;
-          //   return LANGUAGE_OPTIONS.find(
-          //     (option) => option.value === field.value
-          //   );
-          // }}
-        />
-      </FormRow>
-
-      <FormRow
         label={msg("settings.profile.field.languages")}
         name={FIELDS.languages}
       >
-        {/* {form.formState.defaultValues?.timeZone ? NOT WORKING!?! */}
         <AutocompleteSelect
           multiple
           disableCloseOnSelect

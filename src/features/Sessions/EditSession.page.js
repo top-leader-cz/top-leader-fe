@@ -1,7 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import { format } from "date-fns";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { I18nContext, UTC_DATE_FORMAT } from "../../App";
@@ -113,6 +113,31 @@ const AlignStep = ({
   );
 };
 
+export const lazyList = ({ i = 0, get, max, items = [] }) => {
+  const item = items.length >= max ? undefined : get(i);
+
+  if (!item) return items;
+
+  return lazyList({ i: i + 1, get, max, items: [...items, item] });
+};
+
+export const getTranslatedList = ({ tsKey, msg, startIndex = 1, max = 10 }) => {
+  return lazyList({
+    max,
+    get: (i) => {
+      const index = startIndex + i;
+      const translationKey = `${tsKey.replace(/\.$/, "")}.${index}`;
+      const translation = msg(translationKey);
+      const isTranslated = !!translation && translation !== translationKey;
+
+      // console.log({ i, index, translation, translationKey, isTranslated });
+
+      if (isTranslated) return translation;
+      else return undefined;
+    },
+  });
+};
+
 const exampleTodos = [
   { id: 1, label: "Quaerat voluptate eos similique corporis quisquam" },
   { id: 2, label: "Cupiditate aut recusandae soluta consequatur." },
@@ -131,16 +156,22 @@ const ReflectStep = ({
   motivationOrReflection = "",
   previousActionSteps = [],
 }) => {
+  const msg = useMsg();
+  const hints = useMemo(
+    () =>
+      getTranslatedList({
+        tsKey: "sessions.edit.steps.reflect.hints",
+        msg,
+        startIndex: 1,
+      }),
+    [msg]
+  );
+
   return (
     <FormStepCard {...{ step, stepper, data, setData, handleNext, handleBack }}>
       <Todos items={previousActionSteps} keyProp="id" />
       <P my={2}>{motivationOrReflection}</P>
-      <FocusedList
-        items={[
-          "What have you learned when aiming to that action step?",
-          "What were you happy with?",
-        ]}
-      />
+      <FocusedList items={hints} />
       <RHFTextField
         name={reflectionKeyName}
         rules={{ required: true }}

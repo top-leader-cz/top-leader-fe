@@ -98,6 +98,12 @@
   "coaches.coach.languages": {
     "defaultMessage": "Languages"
   },
+  "coaches.coach.rate": {
+    "defaultMessage": "Rate"
+  },
+  "coaches.coach.show-more": {
+    "defaultMessage": "Show more"
+  },
   "coaches.contact.button.cancel": {
     "defaultMessage": "Cancel"
   },
@@ -130,6 +136,9 @@
   },
   "coaches.filter.language.label": {
     "defaultMessage": "Language"
+  },
+  "coaches.filter.rate.label": {
+    "defaultMessage": "Rate"
   },
   "coaches.filter.search.placeholder": {
     "defaultMessage": "Search"
@@ -1512,6 +1521,9 @@
   "main-menu.items.logout": {
     "defaultMessage": "Logout"
   },
+  "main-menu.items.messages": {
+    "defaultMessage": "Messages"
+  },
   "main-menu.items.sessions": {
     "defaultMessage": "Sessions"
   },
@@ -1520,6 +1532,18 @@
   },
   "main-menu.items.team": {
     "defaultMessage": "Team"
+  },
+  "messages.aside.pick-coach": {
+    "defaultMessage": "Pick the coach"
+  },
+  "messages.conversation.message.placeholder": {
+    "defaultMessage": "Type you message..."
+  },
+  "messages.conversation.send": {
+    "defaultMessage": "Send"
+  },
+  "messages.heading": {
+    "defaultMessage": "Messages"
   },
   "score.max": {
     "defaultMessage": "Totally me"
@@ -1543,7 +1567,7 @@
     "defaultMessage": "Area of development"
   },
   "sessions.edit.steps.align.caption": {
-    "defaultMessage": ""
+    "defaultMessage": "Are you aligned with the area and the goal?"
   },
   "sessions.edit.steps.align.confirm": {
     "defaultMessage": "Yes"
@@ -1561,10 +1585,16 @@
     "defaultMessage": ""
   },
   "sessions.edit.steps.reflect.caption": {
-    "defaultMessage": ""
+    "defaultMessage": "Reflection on the last session"
   },
   "sessions.edit.steps.reflect.heading": {
     "defaultMessage": "Reflection on the last session"
+  },
+  "sessions.edit.steps.reflect.hints.1": {
+    "defaultMessage": "What have you learned when aiming to that action step?"
+  },
+  "sessions.edit.steps.reflect.hints.2": {
+    "defaultMessage": "What were you happy with?"
   },
   "sessions.edit.steps.reflect.label": {
     "defaultMessage": "Reflect"
@@ -1573,7 +1603,7 @@
     "defaultMessage": "Here are the actions you set last time"
   },
   "sessions.edit.steps.setaction.caption": {
-    "defaultMessage": ""
+    "defaultMessage": "Be specific"
   },
   "sessions.edit.steps.setaction.heading": {
     "defaultMessage": "Set your action steps"

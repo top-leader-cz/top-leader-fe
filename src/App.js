@@ -1,6 +1,6 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import * as React from "react";
+import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./features/Authorization/AuthProvider";
 
@@ -18,11 +18,11 @@ import messages_en from "./translations/en.json";
 import messages_cs from "./translations/cs.json";
 import messages_fr from "./translations/fr.json";
 import messages_de from "./translations/de.json";
-import messages_de_en from "./translations/de_en.json";
-import messages_de_cz from "./translations/de_cz.json";
-import messages_es from "./translations/es.json";
+// import messages_de_en from "./translations/de_en.json";
+// import messages_de_cz from "./translations/de_cz.json";
+// import messages_es from "./translations/es.json";
 import { useState, createContext, useCallback } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider, useMutation } from "react-query";
 import { Backdrop, Button, CircularProgress } from "@mui/material";
 import { ErrorBoundary } from "react-error-boundary";
 import enGB from "date-fns/locale/en-GB";
@@ -58,7 +58,7 @@ const locales = {
   fr: fr,
   // es: enGB,
 };
-const defaultLanguage = "en";
+export const defaultLanguage = "en";
 /*
 var locale = {
   code: 'cs',
@@ -238,8 +238,26 @@ const I18nProvider = ({ children }) => {
     window.localStorage.setItem("language", lang);
   }, []);
 
+  const { authFetch, user, fetchUser } = useAuth();
+
   const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [userTz, setUserTz] = useState(browserTz);
+  const userTz = useMemo(
+    () => user.timeZone || browserTz,
+    [browserTz, user.timeZone]
+  );
+  // const [userTz, setUserTz] = useState(browserTz);
+  // useEffect(() => {
+  //   if (user.timeZone) setUserTz(user.timeZone)
+  // }, [user.timeZone]);
+  const userTzMutation = useMutation({
+    mutationFn: (timezone) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/timezone`,
+        data: { timezone },
+      }),
+    onSuccess: () => fetchUser(),
+  });
 
   const onReset = useCallback(
     ({ args }) => {
@@ -253,7 +271,7 @@ const I18nProvider = ({ children }) => {
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
       <I18nContext.Provider
-        value={{ language, setLanguage, userTz, setUserTz, i18n }}
+        value={{ language, setLanguage, userTz, userTzMutation, i18n }}
       >
         <IntlProvider
           locale={language}

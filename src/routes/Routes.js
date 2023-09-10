@@ -30,6 +30,7 @@ import { routes } from "./constants";
 // import { Dev } from "./Dev";
 import ErrorPage from "./ErrorPage";
 import { TeamPage } from "../features/Team/Team.page";
+import { MessagesPage } from "../features/Messages/Messages.page";
 
 const GlobalSpinner = () => {
   return (
@@ -158,6 +159,14 @@ export const router = createHashRouter([
         element: (
           <RequireAuth>
             <TeamPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.messages,
+        element: (
+          <RequireAuth>
+            <MessagesPage />
           </RequireAuth>
         ),
       },

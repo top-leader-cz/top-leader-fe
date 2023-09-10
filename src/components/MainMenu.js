@@ -7,6 +7,7 @@ import {
   People,
   PersonOutlined,
   SettingsOutlined,
+  ChatBubbleOutlineOutlined,
 } from "@mui/icons-material";
 import {
   Divider,
@@ -48,6 +49,10 @@ const messages = defineMessages({
   "main-menu.items.team": {
     id: "main-menu.items.team",
     defaultMessage: "Team",
+  },
+  "main-menu.items.messages": {
+    id: "main-menu.items.messages",
+    defaultMessage: "Messages",
   },
   "main-menu.items.settings": {
     id: "main-menu.items.settings",
@@ -169,6 +174,12 @@ export const MainMenu = ({ open }) => {
               text={<Msg id="main-menu.items.team" />}
               icon={<People />}
               to={routes.team}
+            />
+            <ListItemLink
+              mobile={mobile}
+              text={<Msg id="main-menu.items.messages" />}
+              icon={<ChatBubbleOutlineOutlined />}
+              to={routes.messages}
             />
           </List>
         </Box>

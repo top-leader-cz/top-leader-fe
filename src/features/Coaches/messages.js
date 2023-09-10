@@ -14,6 +14,10 @@ export const messages = defineMessages({
     id: "coaches.filter.experience.label",
     defaultMessage: "Experience",
   },
+  "coaches.filter.rate.label": {
+    id: "coaches.filter.rate.label",
+    defaultMessage: "Rate",
+  },
 
   "coaches.filter.clear-button": {
     id: "coaches.filter.clear-button",
@@ -28,9 +32,17 @@ export const messages = defineMessages({
     id: "coaches.coach.experience",
     defaultMessage: "Experience: {experience} years",
   },
+  "coaches.coach.show-more": {
+    id: "coaches.coach.show-more",
+    defaultMessage: "Show more",
+  },
   "coaches.coach.languages": {
     id: "coaches.coach.languages",
     defaultMessage: "Languages",
+  },
+  "coaches.coach.rate": {
+    id: "coaches.coach.rate",
+    defaultMessage: "Rate",
   },
   "coaches.coach.contact": {
     id: "coaches.coach.contact",

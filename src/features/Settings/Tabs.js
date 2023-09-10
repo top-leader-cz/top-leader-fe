@@ -2,122 +2,145 @@ import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/system";
 import { useState } from "react";
 
-const AntTabs = styled(Tabs)({
-  borderBottom: "1px solid #e8e8e8",
+export function TabPanel({ children, Component, value, tabName, props = {} }) {
+  return (
+    <Box
+      role="tabpanel"
+      hidden={value !== tabName}
+      id={`simple-tabpanel-${tabName}`}
+      aria-labelledby={`simple-tab-${tabName}`}
+      sx={{ mt: 3, pb: 4 }}
+    >
+      {value === tabName && (children || <Component {...props} />)}
+    </Box>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+// const StyledTab = Tab;
+
+export const StyledTabs = styled(Tabs)(({ theme }) => ({
+  // padding: "0 8px",
+  minWidth: 8,
+  minHeight: "16px",
+  borderBottom: `1px solid rgba(0,0,0,0.12)`,
+  // fontWeight: 400,
+  // textTransform: "none",
   "& .MuiTabs-indicator": {
-    backgroundColor: "#1890ff",
+    backgroundColor: theme.palette.primary.main,
   },
-});
+}));
 
-const AntTab = styled((props) => <Tab disableRipple {...props} />)(
-  ({ theme }) => ({
-    textTransform: "none",
-    minWidth: 0,
-    [theme.breakpoints.up("sm")]: {
-      minWidth: 0,
-    },
-    fontWeight: theme.typography.fontWeightRegular,
-    marginRight: theme.spacing(1),
-    color: "rgba(0, 0, 0, 0.85)",
-    fontFamily: [
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-    ].join(","),
-    "&:hover": {
-      color: "#40a9ff",
-      opacity: 1,
-    },
-    "&.Mui-selected": {
-      color: "#1890ff",
-      fontWeight: theme.typography.fontWeightMedium,
-    },
-    "&.Mui-focusVisible": {
-      backgroundColor: "#d1eaff",
-    },
-  })
-);
-
-// interface StyledTabsProps {
-//   children?: React.ReactNode;
-//   value: number;
-//   onChange: (event: React.SyntheticEvent, newValue: number) => void;
-// }
-
-const StyledTabs = styled((props) => (
-  <Tabs
-    {...props}
-    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-  />
-))({
-  "& .MuiTabs-indicator": {
-    display: "flex",
-    justifyContent: "center",
-    backgroundColor: "transparent",
+export const StyledTab = styled(Tab)(({ theme }) => ({
+  textTransform: "none",
+  fontWeight: 400,
+  paddingTop: 0,
+  paddingRight: 0,
+  paddingBottom: "8px",
+  paddingLeft: 0,
+  minWidth: 8,
+  minHeight: "16px",
+  margin: "0 16px",
+  "&:first-of-type": {
+    marginLeft: 0,
   },
-  "& .MuiTabs-indicatorSpan": {
-    maxWidth: 40,
-    width: "100%",
-    backgroundColor: "#635ee7",
-  },
-});
+}));
 
 // interface StyledTabProps {
 //   label: string;
 // }
 
-const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
-  ({ theme }) => ({
-    textTransform: "none",
-    fontWeight: theme.typography.fontWeightRegular,
-    fontSize: theme.typography.pxToRem(15),
-    marginRight: theme.spacing(1),
-    color: "rgba(255, 255, 255, 0.7)",
-    "&.Mui-selected": {
-      color: "#fff",
-    },
-    "&.Mui-focusVisible": {
-      backgroundColor: "rgba(100, 95, 228, 0.32)",
-    },
-  })
-);
+// const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
+//   ({ theme }) => ({
+//     textTransform: "none",
+//     fontWeight: theme.typography.fontWeightRegular,
+//     fontSize: theme.typography.pxToRem(15),
+//     marginRight: theme.spacing(1),
+//     color: "rgba(255, 255, 255, 0.7)",
+//     "&.Mui-selected": {
+//       color: "#fff",
+//     },
+//     "&.Mui-focusVisible": {
+//       backgroundColor: "rgba(100, 95, 228, 0.32)",
+//     },
+//   })
+// );
 
-export default function CustomizedTabs() {
-  const [value, setValue] = useState(0);
+export const TLTabs = ({
+  tabs = [],
+  initialTabKey = tabs[0]?.key,
+  ariaLabel = "tabs",
+}) => {
+  const [tabName, setTab] = useState(initialTabKey);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setTab(newValue);
   };
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Box sx={{ bgcolor: "#fff" }}>
-        <AntTabs value={value} onChange={handleChange} aria-label="ant example">
-          <AntTab label="Tab 1" />
-          <AntTab label="Tab 2" />
-          <AntTab label="Tab 3" />
-        </AntTabs>
-        <Box sx={{ p: 3 }} />
-      </Box>
-      <Box sx={{ bgcolor: "#2e1534" }}>
-        <StyledTabs
-          value={value}
-          onChange={handleChange}
-          aria-label="styled tabs example"
-        >
-          <StyledTab label="Workflows" />
-          <StyledTab label="Datasets" />
-          <StyledTab label="Connections" />
-        </StyledTabs>
-        <Box sx={{ p: 3 }} />
-      </Box>
+      <StyledTabs
+        value={tabName}
+        onChange={handleChange}
+        aria-label={ariaLabel}
+      >
+        {tabs.map((tab) => (
+          <StyledTab
+            label={tab.label}
+            value={tab.key}
+            {...a11yProps(tab.label)}
+          />
+        ))}
+      </StyledTabs>
+
+      {tabs.map((tab) => (
+        <TabPanel
+          key={tab.key}
+          value={tabName}
+          tabName={tab.key}
+          Component={tab.Component}
+          props={tab.props}
+        />
+      ))}
     </Box>
   );
-}
+};
+
+// function CustomizedTabs() {
+//   const [value, setValue] = useState(0);
+
+//   const handleChange = (event, newValue) => {
+//     setValue(newValue);
+//   };
+
+//   return (
+//     <Box sx={{ width: "100%" }}>
+//       <Box sx={{ bgcolor: "#fff" }}>
+//         <AntTabs value={value} onChange={handleChange} aria-label="ant example">
+//           <AntTab label="Tab 1" />
+//           <AntTab label="Tab 2" />
+//           <AntTab label="Tab 3" />
+//         </AntTabs>
+//         <Box sx={{ p: 3 }} />
+//       </Box>
+//       <Box sx={{ bgcolor: "#2e1534" }}>
+//         <StyledTabs
+//           value={value}
+//           onChange={handleChange}
+//           aria-label="styled tabs example"
+//         >
+//           <StyledTab label="Workflows" />
+//           <StyledTab label="Datasets" />
+//           <StyledTab label="Connections" />
+//         </StyledTabs>
+//         <Box sx={{ p: 3 }} />
+//       </Box>
+//     </Box>
+//   );
+// }

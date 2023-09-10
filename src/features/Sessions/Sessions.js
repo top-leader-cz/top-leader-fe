@@ -9,7 +9,7 @@ import {
 import { useContext } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useQuery } from "react-query";
-import { generatePath, useNavigate } from "react-router-dom";
+import { Navigate, generatePath, useNavigate } from "react-router-dom";
 import { I18nContext } from "../../App";
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
@@ -198,6 +198,10 @@ function Sessions() {
       </Layout>
     </MsgProvider>
   );
+
+  if (!sel.all?.length && !!sessionsQuery.data)
+    // TODO: test properly, sometimes redirects when there are sessions
+    return <Navigate to={routes.newSession} replace />;
 
   return <QueryRenderer {...sessionsQuery} success={renderSuccess} />;
 }

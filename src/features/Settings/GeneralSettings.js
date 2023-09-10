@@ -15,15 +15,27 @@ import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useMutation } from "react-query";
 import { useAuth } from "../Authorization";
+import { format } from "date-fns-tz";
 
 const FIELDS_GENERAL = {
   language: "language",
+  timeZone: "timeZone",
   currentPassword: "currentPassword",
   newPassword: "newPassword",
   newPasswordConfirm: "newPasswordConfirm",
 };
 
 const PASSWORD_MIN_LENGTH = 3;
+
+const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
+
+const formatTimezone = (tz) => `${tz} (${tzf("z", tz)}) ${tzf("O", tz)}`; // | ${tzf("zzzz", tz)}`;
+
+const timeZones = Intl.supportedValuesOf("timeZone");
+const TIMEZONE_OPTIONS = timeZones.map((value) => ({
+  value,
+  label: formatTimezone(value),
+}));
 
 export const GeneralSettings = () => {
   const { authFetch } = useAuth();
@@ -40,12 +52,14 @@ export const GeneralSettings = () => {
       }),
   });
   const msg = useMsg();
-  const { language, setLanguage } = useContext(I18nContext);
+  const { language, setLanguage, userTz, userTzMutation } =
+    useContext(I18nContext);
   const form = useForm({
     // mode: "onSubmit",
     // mode: "all",¯
     defaultValues: {
       language,
+      timeZone: userTz,
     },
   });
 
@@ -64,11 +78,12 @@ export const GeneralSettings = () => {
     setLanguage(language);
     form.reset({
       [FIELDS_GENERAL.language]: language,
+      [FIELDS_GENERAL.timeZone]: userTz,
       [FIELDS_GENERAL.currentPassword]: "",
       [FIELDS_GENERAL.newPassword]: "",
       [FIELDS_GENERAL.newPasswordConfirm]: "",
     });
-  }, [form, language, setLanguage]);
+  }, [form, language, setLanguage, userTz]);
 
   const onError = (errors, e) =>
     console.log("[GeneralSettings.onError]", errors, e);
@@ -86,7 +101,8 @@ export const GeneralSettings = () => {
         <FormRow
           label={msg("settings.general.field.language")}
           name={FIELDS_GENERAL.language}
-          dividerBottom
+          dividerBottom={false}
+          sx={{ mb: 3 }}
         >
           <AutocompleteSelect
             sx={WHITE_BG}
@@ -96,6 +112,35 @@ export const GeneralSettings = () => {
             placeholder="Select languages you speak"
             autoComplete="language" // TODO: not working
             onChange={(lang) => setLanguage(lang)}
+          />
+        </FormRow>
+        <FormRow
+          label={msg("settings.profile.field.timezone")}
+          name={FIELDS_GENERAL.timeZone}
+          dividerTop={false}
+          dividerBottom={true}
+        >
+          <AutocompleteSelect
+            sx={WHITE_BG}
+            name={FIELDS_GENERAL.timeZone}
+            options={TIMEZONE_OPTIONS}
+            // rules={{ required: true }}
+            placeholder="Select your timezone" // TODO: translations!
+            onChange={(timeZone) => userTzMutation.mutate(timeZone)}
+            disbled={userTzMutation.isLoading}
+            // getValue={(field) => {
+            //   console.log(
+            //     "%c[PS.rndr.getValue]" + field.name,
+            //     "color:coral",
+            //     {
+            //       field,
+            //     }
+            //   );
+            //   return field.value;
+            //   return LANGUAGE_OPTIONS.find(
+            //     (option) => option.value === field.value
+            //   );
+            // }}
           />
         </FormRow>
 
