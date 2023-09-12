@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Avatar,
   Divider,
   Drawer,
   IconButton,
@@ -19,6 +20,7 @@ import { createContext, useCallback, useMemo, useRef } from "react";
 import { useContext, useEffect, useState } from "react";
 import { MainMenu } from "./MainMenu";
 import { Icon } from "./Icon";
+import { Header } from "./Header";
 
 const drawerWidth = 256;
 
@@ -156,8 +158,24 @@ export const useRightMenu = (element) => {
   );
 };
 
+const LayoutHeader = ({ avatarSrc, heading, noDivider, withMessages }) => {
+  return (
+    <Header
+      avatar={
+        avatarSrc && (
+          <Avatar variant="circular" src={avatarSrc} sx={{ mr: 2 }} />
+        )
+      }
+      text={heading}
+      noDivider={noDivider}
+      withMessages={withMessages}
+    />
+  );
+};
+
 export const Layout = ({
   children,
+  header,
   rightMenuContent: rightMenuContentProp,
   contentWrapperSx,
 }) => {
@@ -234,6 +252,7 @@ export const Layout = ({
           ...contentWrapperSx,
         }}
       >
+        {header && <LayoutHeader {...header} />}
         {children}
       </Box>
 

@@ -355,21 +355,34 @@ const messages = defineMessages({
 
 const emojis = {
   accountability: "🤝",
+  accuracy: "📐",
+  beauty: "🌸",
+  creativity: "🎨",
   environment: "🌳",
+  fairness: "👨‍⚖️",
   family: "🏡",
+  fitness: "🏋️",
+  health: "❤️",
+  helping: "🤲",
+  honesty: "✊",
+  independence: "🧑‍💻",
   learning: "📚",
+  love: "👩‍❤️‍💋‍👨",
+  loyalty: "💙",
+  money: "💵",
+  passion: "💕",
+  patience: "♟️",
+  patriotism: "👍",
+  peace: "🧘‍♀️",
   performance: "📈",
-};
-
-const translateValue = (intl, key) => {
-  const getId = (prop) => `dict.values.${key}.${prop}`;
-
-  return {
-    name: intl.formatMessage({ ...messages[getId("name")] }),
-    emoji: emojis[key],
-    // title: intl.formatMessage({ ...messages[getId("title")] }),
-    description: intl.formatMessage({ ...messages[getId("description")] }),
-  };
+  power: "💪",
+  relationships: "👫",
+  reliability: "🙏",
+  success: "🥇",
+  teamwork: "🤾‍♂️",
+  trust: "🤝",
+  truth: "🤥",
+  work: "💼",
 };
 
 const valuesKeys = [
@@ -403,6 +416,17 @@ const valuesKeys = [
   "truth",
   "work",
 ];
+
+const translateValue = (intl, key) => {
+  const getId = (prop) => `dict.values.${key}.${prop}`;
+
+  return {
+    name: intl.formatMessage({ ...messages[getId("name")] }),
+    emoji: emojis[key],
+    // title: intl.formatMessage({ ...messages[getId("title")] }),
+    description: intl.formatMessage({ ...messages[getId("description")] }),
+  };
+};
 
 export const useValuesDict = () => {
   // const { language, setLanguage } = useContext(I18nContext);

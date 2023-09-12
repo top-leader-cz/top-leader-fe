@@ -139,14 +139,16 @@ const AssessmentRightMenu = ({
           ]}
         />
       </Box>
-      <Button
-        fullWidth
-        variant="contained"
-        onClick={onSave}
-        disabled={saveDisabled}
-      >
-        <Msg id="assessment.menu.save" />
-      </Button>
+      {onSave && (
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={onSave}
+          disabled={saveDisabled}
+        >
+          <Msg id="assessment.menu.save" />
+        </Button>
+      )}
     </Paper>
   );
 };
@@ -266,14 +268,15 @@ const useAssessment = () => {
       }
     },
   });
+  const navigate = useNavigate();
+  const handleLeave = useCallback(() => {
+    setScores({});
+    navigate(routes.strengths);
+  }, [navigate, setScores]);
   const { mutate } = useSaveStrengthsMutation({
-    onSuccess: () => {
-      setScores({});
-      navigate(routes.strengths);
-    },
+    onSuccess: handleLeave,
   });
 
-  const navigate = useNavigate();
   const { questions } = useQuestionsDict();
   const question = questions[currentIndex];
 
@@ -315,14 +318,22 @@ const useAssessment = () => {
       ? pagination.next
       : saveAssessment;
 
+  const saveAnswer = useCallback(() => {
+    const answer = { questionId: question.id, answer: score.value };
+    console.log("nextWithSave next", answer);
+    answers.answerMutation.mutate(answer);
+  }, [answers.answerMutation, question.id, score.value]);
+
   const nextWithSave = () => {
     if (handleNext === pagination.next) {
-      const answer = { questionId: question.id, answer: score.value };
-      console.log("nextWithSave next", answer);
-      answers.answerMutation.mutate(answer);
+      saveAnswer();
     }
     handleNext();
   };
+  const handleSaveAndLeave = useCallback(() => {
+    if (typeof score.value === "number") saveAnswer();
+    handleLeave();
+  }, [handleLeave, saveAnswer, score.value]);
 
   console.log("[useAssessment.rndr]", {
     currentIndex,
@@ -331,7 +342,7 @@ const useAssessment = () => {
   });
 
   return {
-    saveAssessment,
+    handleSaveAndLeave,
     pagination,
     question: question.data,
     score,
@@ -349,7 +360,7 @@ function Assessment() {
     question,
     score,
     responsesCount,
-    saveAssessment,
+    handleSaveAndLeave,
     nextWithSave,
     submitDisabled,
   } = useAssessment();
@@ -381,11 +392,11 @@ function Assessment() {
       <Layout
         rightMenuContent={
           <AssessmentRightMenu
-            saveDisabled={responsesCount !== pagination.totalCount}
+            // saveDisabled={responsesCount !== pagination.totalCount}
             currentIndex={pagination.currentIndex}
             totalCount={pagination.totalCount}
             responsesCount={responsesCount}
-            onSave={saveAssessment}
+            onSave={handleSaveAndLeave}
           />
         }
       >

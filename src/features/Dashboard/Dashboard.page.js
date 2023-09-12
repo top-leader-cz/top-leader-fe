@@ -10,8 +10,7 @@ import {
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Header } from "../../components/Header";
+import React, { useCallback, useMemo, useState } from "react";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -248,19 +247,16 @@ export function DashboardPage() {
 
   return (
     <MsgProvider messages={messages}>
-      <Layout rightMenuContent={<JourneyRightMenu />}>
-        <Header
-          avatar={
-            <Avatar
-              variant="circular"
-              src="https://i.pravatar.cc/44"
-              sx={{ mr: 2 }}
-            />
-          }
-          text={
+      <Layout
+        rightMenuContent={<JourneyRightMenu />}
+        header={{
+          withMessages: true,
+          avatarSrc: "https://i.pravatar.cc/44",
+          heading: (
             <Msg id="dashboard.header" values={{ user: user.data.username }} />
-          }
-        />
+          ),
+        }}
+      >
         <Box>
           <H2>
             <Msg id="dashboard.section-1.heading" />
