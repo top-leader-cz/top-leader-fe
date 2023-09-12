@@ -227,7 +227,7 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
   });
 
   const strengthsMutation = useMutation({
-    mutationFn: async ({ TODO__________orderedTalents }) => {
+    mutationFn: async ({ orderedTalents }) => {
       authFetch({
         method: "POST",
         url: `/api/latest/user-info/strengths`,
