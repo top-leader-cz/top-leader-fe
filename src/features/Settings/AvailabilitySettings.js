@@ -96,7 +96,7 @@ const DaySlots = ({ dayName }) => {
   );
 };
 
-const TODO = true;
+const TODO_DISABLED_RECURRENCE = false;
 
 export const Recurrence = () => {
   const msg = useMsg();
@@ -110,7 +110,10 @@ export const Recurrence = () => {
       name={FIELDS_AVAILABILITY.recurring}
     >
       <Box display="flex">
-        <SwitchField name={FIELDS_AVAILABILITY.recurring} disabled={TODO} />
+        <SwitchField
+          name={FIELDS_AVAILABILITY.recurring}
+          disabled={TODO_DISABLED_RECURRENCE}
+        />
         {!recurring && (
           <DateRangePickerField
             name={FIELDS_AVAILABILITY.recurrenceRange}
@@ -302,6 +305,22 @@ export const AvailabilitySettings = () => {
     queryKey: ["coach-availability", availabilityType],
     queryFn: () =>
       authFetch({ url: `/api/latest/coach-availability/${availabilityType}` }),
+    // When empty:
+    // Request URL: http://localhost:3000/api/latest/coach-availability/ALL
+    // Request Method: GET
+    // Status Code: 400 Bad Request
+    // RECURRING  initially "{}"
+    cacheTime: 0,
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const availabilityQuery2 = useQuery({
+    queryKey: ["coach-availability", AVAILABILITY_TYPE.NON_RECURRING],
+    queryFn: () =>
+      authFetch({
+        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
+      }),
     // When empty:
     // Request URL: http://localhost:3000/api/latest/coach-availability/ALL
     // Request Method: GET

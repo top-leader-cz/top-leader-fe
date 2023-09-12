@@ -1,7 +1,12 @@
 import { Box, Button, Paper } from "@mui/material";
 import { H2 } from "./Typography";
 
-export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
+export const ScrollableRightMenu = ({
+  heading,
+  children,
+  buttonProps,
+  sx = {},
+}) => {
   return (
     <Paper
       square
@@ -13,9 +18,10 @@ export const ScrollableRightMenu = ({ heading, children, buttonProps }) => {
         flexDirection: "column",
         flexWrap: "nowrap",
         justifyContent: "space-between",
+        ...sx,
       }}
     >
-      <H2 sx={{ my: 4 }}>{heading}</H2>
+      {heading && <H2 sx={{ my: 4 }}>{heading}</H2>}
       <Box
         sx={{
           overflow: "scroll",

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
+import * as qs from "qs";
 
 export const AuthContext = createContext(null);
 
@@ -59,6 +60,20 @@ export const FETCH_TYPE = {
   FORMDATA: "FORMDATA",
 };
 
+// src/main/java/com/topleader/topleader/user/User.java
+export const Authority = {
+  COACH: "COACH",
+  USER: "USER",
+};
+
+console.log({ qs });
+
+const qstr = (url, query) => {
+  if (!query) return url;
+  const qStr = typeof query === "string" ? query : qs.stringify(query);
+  return [url, qStr].filter(Boolean).join("?");
+};
+
 export function AuthProvider({ children }) {
   // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS)
   const [isLoggedIn, setIsLoggedIn] = useSessionStorage(false);
@@ -66,14 +81,16 @@ export function AuthProvider({ children }) {
   const queryClient = useQueryClient();
 
   const authFetch = useCallback(
-    ({ url, method = "GET", type = FETCH_TYPE.JSON, data }) =>
-      fetch(url, getInit({ method, data })).then(async (response) => {
-        if (!response.ok) throwOnError(response);
-        if (type === FETCH_TYPE.JSON) return await response.json();
-        if (type === FETCH_TYPE.JSON_WITH_META)
-          return { response, json: await response.json() };
-        return { response };
-      }),
+    ({ url, query, method = "GET", type = FETCH_TYPE.JSON, data }) =>
+      fetch(qstr(url, query), getInit({ method, data })).then(
+        async (response) => {
+          if (!response.ok) throwOnError(response);
+          if (type === FETCH_TYPE.JSON) return await response.json();
+          if (type === FETCH_TYPE.JSON_WITH_META)
+            return { response, json: await response.json() };
+          return { response };
+        }
+      ),
     []
   );
 
@@ -113,6 +130,7 @@ export function AuthProvider({ children }) {
     fetchUser: () => {
       queryClient.invalidateQueries("user-info"); // TODO: rm?
     },
+    isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
   };
 
   console.log("[AP.rndr]", value);

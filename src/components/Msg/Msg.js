@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useMsgCtx } from "./";
 
@@ -9,13 +9,21 @@ export const useMsg = ({ dict } = {}) => {
 
   const msg = useCallback(
     (id, values) =>
-      intl.formatMessage({
-        ...messages[id],
-        id,
-        values,
-      }),
+      intl.formatMessage(
+        {
+          ...messages[id],
+          id,
+        },
+        values
+      ),
     [intl, messages]
   );
+  // useEffect(() => {
+  //   console.log("[useMsg] intl changed");
+  // }, [intl]);
+  // useEffect(() => {
+  //   console.log("[useMsg] messages changed");
+  // }, [messages]);
   return msg;
 };
 

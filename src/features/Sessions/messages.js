@@ -107,7 +107,7 @@ export const messages = defineMessages({
   },
   "sessions.edit.steps.align.caption": {
     id: "sessions.edit.steps.align.caption",
-    defaultMessage: " ",
+    defaultMessage: "Are you aligned with the area and the goal?",
   },
   "sessions.edit.steps.align.heading": {
     id: "sessions.edit.steps.align.heading",
@@ -142,7 +142,7 @@ export const messages = defineMessages({
   },
   "sessions.edit.steps.reflect.caption": {
     id: "sessions.edit.steps.reflect.caption",
-    defaultMessage: " ",
+    defaultMessage: "Reflection on the last session",
   },
   "sessions.edit.steps.reflect.heading": {
     id: "sessions.edit.steps.reflect.heading",
@@ -152,6 +152,14 @@ export const messages = defineMessages({
     id: "sessions.edit.steps.reflect.perex",
     defaultMessage: "Here are the actions you set last time",
   },
+  "sessions.edit.steps.reflect.hints.1": {
+    id: "sessions.edit.steps.reflect.hints.1",
+    defaultMessage: "What have you learned when aiming to that action step?",
+  },
+  "sessions.edit.steps.reflect.hints.2": {
+    id: "sessions.edit.steps.reflect.hints.2",
+    defaultMessage: "What were you happy with?",
+  },
 
   // setaction
   "sessions.edit.steps.setaction.label": {
@@ -160,7 +168,7 @@ export const messages = defineMessages({
   },
   "sessions.edit.steps.setaction.caption": {
     id: "sessions.edit.steps.setaction.caption",
-    defaultMessage: " ",
+    defaultMessage: "Be specific",
   },
   "sessions.edit.steps.setaction.heading": {
     id: "sessions.edit.steps.setaction.heading",

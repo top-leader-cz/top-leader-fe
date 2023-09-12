@@ -187,29 +187,6 @@ const createAssessmentEntry = ({ questions, scores }) => {
   };
 };
 
-const orderedTalents = [
-  "strategist",
-  "analyser",
-  "responsible",
-  "initiator",
-  "intellectual",
-  "concentrated",
-  "solver",
-  "coach",
-  "connector",
-  "believer",
-  "loverOfOrder",
-  "leader",
-  "selfDeveloper",
-  "ideamaker",
-  "empathizer",
-  "flexible",
-  "selfBeliever",
-  "positive",
-  "communicator",
-  "challenger",
-];
-
 const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
   const queryClient = useQueryClient();
   const { authFetch, fetchUser } = useAuth();

@@ -8,7 +8,7 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
@@ -16,15 +16,23 @@ import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
+import { defaultLanguage } from "../../App";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
-export const INITIAL_FILTER = {
-  language: "en", // TODO
-  field: null,
+export const INITIAL_FILTER = ({ userLang = defaultLanguage }) => ({
+  languages: [userLang.substring(0, 2)],
+  fields: [],
   experience: [1, 7],
+  prices: [],
   search: "",
-};
+});
+
+const ratesOptions = [
+  { value: "$", label: "$" },
+  { value: "$$", label: "$$" },
+  { value: "$$$", label: "$$$" },
+];
 
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   const msg = useMsg();
@@ -34,18 +42,20 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
     defaultValues: filter,
   });
   const onClearFilters = () => {
-    methods.setValue("language", null);
-    methods.setValue("field", null);
+    methods.setValue("languages", null);
+    methods.setValue("fields", null);
     methods.setValue("experience", null);
+    methods.setValue("prices", null);
   };
 
-  const language = methods.watch("language");
-  const field = methods.watch("field");
+  const languages = methods.watch("languages");
+  const fields = methods.watch("fields");
   const experience = methods.watch("experience");
+  const prices = methods.watch("prices");
 
   const values = useMemo(
-    () => ({ language, field, experience }),
-    [field, language, experience]
+    () => ({ languages, fields, experience, prices }),
+    [languages, fields, experience, prices]
   );
 
   console.log(...color("pink", "[CoachesFilter]"), {
@@ -58,6 +68,17 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   useEffect(() => {
     setFilterRef.current((filter) => ({ ...filter, ...values }));
   }, [values]);
+  const onSearch = useCallback(
+    (e) => {
+      const root = e.target.closest(".MuiInputBase-root");
+      const input = root?.querySelector("input");
+      const value = input?.value || "";
+
+      console.log("[onSearch]", { e, root, input, value });
+      setFilter((filter) => ({ ...filter, search: value }));
+    },
+    [setFilter]
+  );
 
   return (
     <FormProvider {...methods}>
@@ -65,20 +86,31 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
         <CardContent sx={{ "&:last-child": { pb: 2 } }}>
           <Box display="flex" flexDirection="row" gap={3}>
             <AutocompleteSelect
-              name="language"
+              name="languages"
               label={msg("coaches.filter.language.label")}
               options={LANGUAGE_OPTIONS}
               renderOption={renderLanguageOption}
+              multiple
+              disableCloseOnSelect
             />
             <AutocompleteSelect
-              name="field"
+              name="fields"
               label={msg("coaches.filter.field.label")}
               options={fieldsOptions}
+              multiple
+              disableCloseOnSelect
             />
             <SliderField
               name="experience"
               label={msg("coaches.filter.experience.label")}
               range={[1, 10]}
+            />
+            <AutocompleteSelect
+              name="prices"
+              label={msg("coaches.filter.rate.label")}
+              options={ratesOptions}
+              multiple
+              disableCloseOnSelect
             />
 
             {/* <OutlinedField label="Test" /> */}
@@ -98,7 +130,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
       </Card>
       <Box display="flex" flexDirection="row">
         <TextField
-          disabled
+          // disabled
           sx={{ width: 360, "> .MuiInputBase-root": { bgcolor: "white" } }}
           label=""
           placeholder={msg("coaches.filter.search.placeholder")}
@@ -107,6 +139,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             endAdornment: (
               <InputAdornment position="end">
                 <Button
+                  onClick={onSearch}
                   sx={{
                     mr: -2,
                     px: 1,

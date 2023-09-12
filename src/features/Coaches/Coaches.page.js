@@ -37,7 +37,7 @@ import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
 
-const createSlot = ({ start, duration = 60 }) => ({
+export const createSlot = ({ start, duration = 60 }) => ({
   start,
   // duration,
 });
@@ -115,7 +115,12 @@ export const CREATE_OFFSET =
 const isWithinDay = (dayDate) =>
   isWithinInterval({ start: startOfDay(dayDate), end: endOfDay(dayDate) });
 
-const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [], sx }) => {
+export const TimeSlots = ({
+  // slotsRange = [],
+  onContact,
+  freeSlots = [],
+  sx,
+}) => {
   const TODAY = new Date();
   const MOCK_OFFSET = CREATE_OFFSET(TODAY);
 
@@ -166,11 +171,90 @@ const TimeSlots = ({ slotsRange = [], onContact, freeSlots = [], sx }) => {
             />
           ))}
       </Box>
-      <ControlsContainer sx={{ mt: 1 }}>
-        <Button variant="contained" onClick={() => onContact()}>
-          <Msg id="coaches.coach.contact" />
-        </Button>
-      </ControlsContainer>
+      {onContact && (
+        <ControlsContainer sx={{ mt: 1 }}>
+          <Button variant="contained" onClick={() => onContact()}>
+            <Msg id="coaches.coach.contact" />
+          </Button>
+        </ControlsContainer>
+      )}
+    </Box>
+  );
+};
+
+export const ShowMore = ({
+  text = "",
+  maxChars = 1000,
+  moreTranslation = "Show more",
+  initialShowAll = false,
+}) => {
+  const [isMore, setIsMore] = useState(initialShowAll);
+  const elipsis = "... ";
+  const getShortened = () => (
+    <>
+      {text.substring(0, maxChars)}
+      {elipsis}
+      <Button variant="text" onClick={() => setIsMore(true)}>
+        {moreTranslation}
+      </Button>
+    </>
+  );
+  const maxCharsWithOffset =
+    maxChars + elipsis.length + (moreTranslation?.length || 0);
+
+  return isMore || text.length <= maxCharsWithOffset ? text : getShortened();
+};
+
+export const CoachInfo = ({
+  coach: { name, role, experience, languages, rate, bio, fields } = {},
+  maxBioChars = 50,
+  sx = {},
+}) => {
+  const msg = useMsg({ dict: messages });
+  const { fieldsOptions } = useFieldsDict();
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        ...sx,
+      }}
+    >
+      <H1 gutterBottom>{name}</H1>
+      <P gutterBottom>{role}</P>
+      <P gutterBottom>{msg("coaches.coach.experience", { experience })}</P>
+      <P gutterBottom>
+        {msg("coaches.coach.languages")}
+        {": "}
+        {languages.map(getLabel(LANGUAGE_OPTIONS)).join(", ")}
+      </P>
+      <P gutterBottom>
+        {msg("coaches.coach.rate")}
+        {": "}
+        {rate}
+      </P>
+      <P
+        emphasized
+        gutterBottom
+        sx={{ fontSize: 14, my: 2, whiteSpace: "normal" }}
+      >
+        <ShowMore
+          maxChars={maxBioChars}
+          text={bio}
+          moreTranslation={msg("coaches.coach.show-more")}
+        />
+      </P>
+      <Box flex="1 1 auto" display="flex" />
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+        {fields.map(getLabel(fieldsOptions)).map((label) => (
+          <Chip
+            key={label}
+            sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
+            label={label}
+          />
+        ))}
+      </Box>
     </Box>
   );
 };
@@ -180,7 +264,7 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
   const {
     username,
     email,
-    rate,
+    rate, // TODO
     firstName,
     lastName,
     name = `${firstName} ${lastName}`,
@@ -192,8 +276,6 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     photo,
     imgSrc = photo, // TODO: rm
   } = coach;
-  const TODAY = new Date();
-  const { fieldsOptions } = useFieldsDict();
 
   console.log("[CoachCard.rndr]", name, { languages });
 
@@ -203,43 +285,17 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
       <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
         <CardMedia
           component="img"
-          sx={{ width: 225 }}
+          sx={{ width: 225, borderRadius: 0.6 }}
           image={imgSrc}
           alt={name}
         />
-        <Box
-          sx={{
-            maxWidth: "50%",
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 10,
-            width: "150px",
-          }}
-        >
-          <H1 gutterBottom>{name}</H1>
-          <P gutterBottom>{role}</P>
-          <P gutterBottom>
-            <Msg id="coaches.coach.experience" values={{ experience }} />
-          </P>
-          <P gutterBottom>
-            <Msg id="coaches.coach.languages" />
-            {": "}
-            {languages.map(getLabel(LANGUAGE_OPTIONS)).join(", ")}
-          </P>
-          <P gutterBottom>{bio}</P>
-          <Box flex="1 1 auto" display="flex" />
-          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {fields.map(getLabel(fieldsOptions)).map((label) => (
-              <Chip
-                key={label}
-                sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
-                label={label}
-              />
-            ))}
-          </Box>
-        </Box>
+        <CoachInfo
+          coach={{ name, role, experience, languages, rate, bio, fields }}
+          maxBioChars={50}
+          sx={{ maxWidth: "50%", flexGrow: 10, width: "150px" }}
+        />
         <TimeSlots
-          slotsRange={[startOfDay(TODAY), pipe(addDays(6), endOfDay)(TODAY)]}
+          // slotsRange={[startOfDay(TODAY), pipe(addDays(6), endOfDay)(TODAY)]}
           freeSlots={freeSlots}
           onContact={() => onContact(coach)}
           sx={{ flexShrink: 0 }}
@@ -311,23 +367,13 @@ const COACHES = [
   },
 ];
 
-const filterByIncludes = (value, arr) => !value || arr.includes(value);
-const filterByRange = (value, number) =>
-  !value || (value[0] <= number && value[1] >= number);
-
-const coachPredicate =
-  ({ language, field, experience }) =>
-  (coach) =>
-    filterByIncludes(language, coach.languages) &&
-    filterByIncludes(field, coach.fields) &&
-    filterByRange(experience, coach.experience);
-
 const getPayload = ({
   filter: {
-    language, //: "en",
-    field, //: null,
-    experience: [experienceFrom, experienceTo] = [], //: [1, 7],
-    search, //: "",
+    languages,
+    fields,
+    experience: [experienceFrom, experienceTo] = [],
+    search,
+    prices,
   },
   page = {
     pageNumber: 0,
@@ -336,24 +382,25 @@ const getPayload = ({
 }) =>
   console.log("getPayload", { filter, page }) || {
     page,
-    languages: [language],
-    fields: field ? [field] : undefined,
+    languages: languages?.length ? languages : undefined,
+    fields: fields?.length ? fields : undefined,
     experienceFrom,
-    name: search,
-
     // TODO: BE bug - not accepting from-to, just one value from range
     // experienceTo,
-    // prices: [],
+    name: search,
+    prices: prices?.length ? prices : undefined,
   };
 
 export function CoachesPageInner() {
   const msg = useMsg();
+  const { language } = useContext(I18nContext);
+
   const EXPECT_ITEMS = [
-    {
-      heading: msg("coaches.aside.items.1.heading"),
-      iconName: "CreditCard",
-      text: msg("coaches.aside.items.1.text"),
-    },
+    // {
+    //   heading: msg("coaches.aside.items.1.heading"),
+    //   iconName: "CreditCard",
+    //   text: msg("coaches.aside.items.1.text"),
+    // },
     {
       heading: msg("coaches.aside.items.2.heading"),
       iconName: "Star",
@@ -366,7 +413,7 @@ export function CoachesPageInner() {
     },
   ];
 
-  const [filter, setFilter] = useState(INITIAL_FILTER);
+  const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
   console.log("[CoachesPage.rndr]", {});
 
   const TODAY = new Date();
@@ -448,7 +495,7 @@ export function CoachesPageInner() {
         .fill(null)
         .map((_, i) => COACHES)
         .reduce((acc, v) => acc.concat(v), [])
-        .filter(coachPredicate(filter))
+        // .filter(coachPredicate(filter))
         .map((coach, i) => (
           <CoachCard
             key={coach.id + i}

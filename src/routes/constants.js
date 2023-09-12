@@ -12,6 +12,7 @@ export const routes = {
   settings: "/settings",
   getFeedback: "/get-feedback",
   team: "/team",
+  messages: "/messages",
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
   dev: "/dev",
