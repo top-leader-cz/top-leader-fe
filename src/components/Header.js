@@ -16,40 +16,51 @@ import {
 } from "@mui/material";
 import { H1, H2 } from "./Typography";
 import { Icon } from "./Icon";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useMsg } from "./Msg/Msg";
 import { messages as generalMessages } from "./messages";
+import { useQuery } from "react-query";
+import { useAuth } from "../features/Authorization";
+import { I18nContext } from "../App";
 
 const defaultAvaratSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`;
 
 const longTxt =
   "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.";
 const shortTxt = "Lorem ipsum dolor sit";
-const MESSAGES_MOCK = [
+const NOTIFICATIONS_MOCK = [
   {
     key: 0,
-    from: "Dan",
+    from: "Mockname",
     text: shortTxt,
+    unread: true,
+    createdAt: "2023-09-18T22:00:36.838Z",
+    // createdAt: "2023-08-15T17:12:10.640453" // ?? previous api datetime format
   },
   {
-    key: 0,
-    from: "Dan",
+    key: 1,
+    from: "Mockname",
     text: longTxt,
+    unread: false,
+    createdAt: "2023-09-18T22:00:36.838Z",
   },
   {
-    key: 0,
-    from: "Dan",
+    key: 2,
+    from: "Mockname",
     text: "Hi hello lorem ipsum",
+    unread: false,
+    createdAt: "2023-09-18T22:00:36.838Z",
   },
 ];
-const MessagesPopover = ({ messages = MESSAGES_MOCK, sx = {} }) => {
+const NotificationsPopover = ({ notifications = [], sx = {} }) => {
   const msg = useMsg({ dict: generalMessages });
+  const { i18n } = useContext(I18nContext);
   const onSelect = useCallback((message) => {
     console.log("[onSelect]", { message });
   }, []);
 
   return (
-    <Card sx={{ mt: 1, maxWidth: "500px", ...sx }} elevation={0}>
+    <Card sx={{ mt: 1, width: "500px", ...sx }} elevation={0}>
       <CardContent>
         <H2 sx={{ mb: 2 }}>{msg("general.notifications")}</H2>
         <Divider sx={{ my: 0 }} orientation="horizontal" flexItem />
@@ -60,7 +71,7 @@ const MessagesPopover = ({ messages = MESSAGES_MOCK, sx = {} }) => {
             bgcolor: "background.paper",
           }}
         >
-          {messages.map((message, index, arr) => (
+          {notifications.map((message, index, arr) => (
             <ListItem
               key={message.key}
               alignItems="flex-start"
@@ -90,11 +101,27 @@ const MessagesPopover = ({ messages = MESSAGES_MOCK, sx = {} }) => {
                   />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={<H2>{message.from}</H2>}
+                  primary={
+                    <H2>
+                      {msg(
+                        message.unread
+                          ? "general.new-message-from"
+                          : "general.message-from",
+                        { from: message.from }
+                      )}
+                    </H2>
+                  }
                   secondary={
                     <>
                       {message.text}
-                      <Box sx={{ textAlign: "right" }}>15 min ago</Box>
+                      <Box sx={{ textAlign: "right" }}>
+                        {message.createdAt
+                          ? `${i18n.formatDistanceToNow(
+                              i18n.parseUTC(message.createdAt),
+                              { addSuffix: true }
+                            )}`
+                          : ""}
+                      </Box>
                     </>
                   }
                   sx={{ width: "100%", overflow: "auto" }}
@@ -113,7 +140,42 @@ const MessagesPopover = ({ messages = MESSAGES_MOCK, sx = {} }) => {
   );
 };
 
-const Messages = ({ tooltip = "Messages" }) => {
+const Notifications = ({ tooltip = "Notifications" }) => {
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () =>
+      authFetch({
+        url: `/api/latest/notifications`,
+        query: {
+          page: 0,
+          size: 1000000,
+          // sort: ["string"],
+        },
+      }),
+  });
+
+  const notifications = (
+    query.data?.content?.map(
+      ({
+        id,
+        username,
+        type,
+        read,
+        createdAt,
+        context: { type: ctxType, fromUser, message },
+      }) => ({
+        key: id,
+        from: username,
+        text: message,
+        unread: !read,
+        createdAt,
+      })
+    ) ?? []
+  ).concat(NOTIFICATIONS_MOCK);
+
+  // : _notifications;
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {
@@ -127,7 +189,9 @@ const Messages = ({ tooltip = "Messages" }) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-  const badgeContent = 1;
+  const badgeContent = notifications.filter(({ unread }) => unread).length;
+
+  if (!notifications.length) return null;
 
   return (
     <>
@@ -161,13 +225,13 @@ const Messages = ({ tooltip = "Messages" }) => {
           horizontal: "right",
         }}
       >
-        <MessagesPopover />
+        <NotificationsPopover notifications={notifications} />
       </Popover>
     </>
   );
 };
 
-export const Header = ({ avatar, text, noDivider, withMessages }) => {
+export const Header = ({ avatar, text, noDivider, withNotifications }) => {
   return (
     <Box mt={4} mb={3}>
       <Box
@@ -178,7 +242,7 @@ export const Header = ({ avatar, text, noDivider, withMessages }) => {
       >
         {avatar}
         <H1 sx={{ flexGrow: 1 }}>{text}</H1>
-        {withMessages && <Messages />}
+        {withNotifications && <Notifications />}
       </Box>
       {!noDivider && <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />}
     </Box>

@@ -250,7 +250,7 @@ export function DashboardPage() {
       <Layout
         rightMenuContent={<JourneyRightMenu />}
         header={{
-          withMessages: true,
+          withNotifications: true,
           avatarSrc: "https://i.pravatar.cc/44",
           heading: (
             <Msg id="dashboard.header" values={{ user: user.data.username }} />

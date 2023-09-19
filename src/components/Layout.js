@@ -158,7 +158,7 @@ export const useRightMenu = (element) => {
   );
 };
 
-const LayoutHeader = ({ avatarSrc, heading, noDivider, withMessages }) => {
+const LayoutHeader = ({ avatarSrc, heading, noDivider, withNotifications }) => {
   return (
     <Header
       avatar={
@@ -168,7 +168,7 @@ const LayoutHeader = ({ avatarSrc, heading, noDivider, withMessages }) => {
       }
       text={heading}
       noDivider={noDivider}
-      withMessages={withMessages}
+      withNotifications={withNotifications}
     />
   );
 };
