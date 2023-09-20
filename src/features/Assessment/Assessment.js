@@ -1,7 +1,13 @@
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { H1, H2, P } from "../../components/Typography";
@@ -15,6 +21,8 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { messages } from "./messages";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
+import { groupBy, sort } from "ramda";
+import { pipeP } from "composable-fetch";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -228,44 +236,128 @@ const useAnswers = ({ onFetched } = {}) => {
   // TODO: do not invalidate on blur/focus
   const answersQuery = useQuery({
     queryKey: ["assessment"],
-    queryFn: () => authFetch({ url: `/api/latest/user-assessments` }),
-    onSuccess: (json) => {
-      console.log("[answersQuery.success]", { json });
-      /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
-      onFetched(json);
+    queryFn: () =>
+      authFetch({ url: `/api/latest/user-assessments` }).then((assessment) => {
+        /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
+        // if (assessment.questionAnswered > 0) {
+        const scores = Object.fromEntries(
+          assessment.answers?.map(({ answer, questionId }) => [
+            questionId,
+            answer,
+          ]) ?? []
+        );
+        return scores;
+      }),
+    onSuccess: (scores) => {
+      console.log("[answersQuery.success]", { scores });
+      onFetched(scores);
     },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
   const answerMutation = useMutation({
-    mutationFn: async ({ questionId, answer }) => {
+    mutationFn: async ({ questionId, answer }) =>
       authFetch({
         method: "POST",
         url: `/api/latest/user-assessments/${questionId}`,
         data: { answer },
-      });
+      }),
+  });
+
+  const answersMutation = useMutation({
+    mutationFn: async (scores) => {
+      console.log("answersMutation", { scores });
+      // const diff = // TODO: fetch current state, diff, modify
+      const posts = Object.entries(scores).map(
+        ([questionId, answer]) =>
+          () =>
+            authFetch({
+              method: "POST",
+              url: `/api/latest/user-assessments/${questionId}`,
+              data: { answer },
+            })
+      );
+      return pipeP(...posts)();
     },
   });
 
   return {
     answersQuery,
     answerMutation,
+    answersMutation,
   };
 };
 
+const shuffle = sort(() => Math.random() - 0.5);
+
+// It looks better for the user when questions are in different order for each assessment
+const useRandomizedQuestions = ({ originalQuestions }) => {
+  const [state, setState] = useState({ questions: [], answeredCount: 0 });
+  const { questions, answeredCount } = state;
+  const onAnswersFetched = useCallback(
+    (scores) => {
+      if (questions.length) {
+        throw new Error("useRandomizedQuestions initialized twice!"); // TODO
+      }
+      const answeredIds = Object.keys(scores);
+      const { answered, unanswered } = groupBy(
+        (question) =>
+          answeredIds.includes(`${question.id}`) ? "answered" : "unanswered",
+        originalQuestions
+      );
+      const randomized = [
+        ...shuffle(answered || []),
+        ...shuffle(unanswered || []),
+      ];
+      console.log("[useRandomizedQuestions]", {
+        originalQuestions,
+        questions,
+        scores,
+        answeredIds,
+        answered,
+        unanswered,
+        randomized,
+      });
+      setState({ questions: randomized, answeredCount: answeredIds.length });
+    },
+    [originalQuestions, questions]
+  );
+
+  return {
+    questions,
+    onAnswersFetched,
+    isInitialized: !!questions.length,
+    answeredCount,
+  };
+};
+
+const DUMMY_Q = {
+  id: 0,
+  data: {
+    themes_subject: "",
+    talent: "",
+    text: "",
+    ts_key: "",
+    img: { src: "" },
+  },
+};
+
 const useAssessment = () => {
+  const { questions: originalQuestions } = useQuestionsDict();
+  const { questions, onAnswersFetched, answeredCount } = useRandomizedQuestions(
+    { originalQuestions }
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
+  useEffect(() => {
+    setCurrentIndex(answeredCount);
+  }, [answeredCount]);
   const [scores, setScores] = useLocalStorage("assessment", {});
 
-  const answers = useAnswers({
-    onFetched: (assessment) => {
-      if (assessment.questionAnswered > 0) {
-        const scores = Object.fromEntries(
-          assessment.answers.map(({ answer, questionId }) => [
-            questionId,
-            answer,
-          ])
-        );
-        setScores(scores);
-      }
+  const { answersQuery, answerMutation, answersMutation } = useAnswers({
+    onFetched: (scores) => {
+      setScores(scores);
+      onAnswersFetched(scores);
+      // }
     },
   });
   const navigate = useNavigate();
@@ -277,26 +369,30 @@ const useAssessment = () => {
     onSuccess: handleLeave,
   });
 
-  const { questions } = useQuestionsDict();
-  const question = questions[currentIndex];
+  const question = questions[currentIndex] ?? DUMMY_Q;
 
   const saveAssessment = useCallback(() => {
     const entry = createAssessmentEntry({ questions, scores });
     mutate({ orderedTalents: entry.orderedTalents });
   }, [mutate, questions, scores]);
 
-  const score = {
-    value: scores[question.id],
-    onChange: useCallback(
-      ({ value }) => {
-        setScores((prev) => ({ ...prev, [question.id]: value }));
-      },
-      [question.id, setScores]
-    ),
-  };
+  const onPaginationChange = useCallback(
+    ({ value }) => {
+      setScores((prev) => ({ ...prev, [question.id]: value }));
+    },
+    [question.id, setScores]
+  );
+
+  const score = useMemo(
+    () => ({
+      value: scores[question.id],
+      onChange: onPaginationChange,
+    }),
+    [onPaginationChange, question.id, scores]
+  );
 
   const submitDisabled =
-    typeof score.value !== "number" || answers.answersQuery.isLoading;
+    typeof score.value !== "number" || answersQuery.isLoading;
 
   const pagination = {
     currentIndex,
@@ -321,19 +417,20 @@ const useAssessment = () => {
   const saveAnswer = useCallback(() => {
     const answer = { questionId: question.id, answer: score.value };
     console.log("nextWithSave next", answer);
-    answers.answerMutation.mutate(answer);
-  }, [answers.answerMutation, question.id, score.value]);
+    answerMutation.mutate(answer);
+  }, [answerMutation, question.id, score.value]);
 
   const nextWithSave = () => {
     if (handleNext === pagination.next) {
-      saveAnswer();
+      saveAnswer(); // TODO: onScoreChange - save answer on change, not next click
     }
     handleNext();
   };
   const handleSaveAndLeave = useCallback(() => {
-    if (typeof score.value === "number") saveAnswer();
+    answersMutation.mutate(scores);
+    // if (typeof score.value === "number") saveAnswer();
     handleLeave();
-  }, [handleLeave, saveAnswer, score.value]);
+  }, [answersMutation, handleLeave, scores]);
 
   console.log("[useAssessment.rndr]", {
     currentIndex,
@@ -351,6 +448,7 @@ const useAssessment = () => {
     ).length,
     nextWithSave,
     submitDisabled,
+    isLoading: answersQuery.isLoading,
   };
 };
 

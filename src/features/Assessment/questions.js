@@ -1,12 +1,9 @@
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
-const version = 0;
-
 const QUESTIONS_EN = [
   {
     id: 1,
-    version,
     data: {
       themes_subject: "Influencer/Impact",
       talent: "initiator",
@@ -17,7 +14,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 2,
-    version,
     data: {
       themes_subject: "Influencer/Impact",
       talent: "initiator",
@@ -28,7 +24,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 3,
-    version,
     data: {
       themes_subject: "Influencer/Impact",
       talent: "initiator",
@@ -39,7 +34,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 4,
-    version,
     data: {
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
@@ -50,7 +44,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 5,
-    version,
     data: {
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
@@ -61,7 +54,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 6,
-    version,
     data: {
       themes_subject: "Relationship/Emotion",
       talent: "flexible",
@@ -72,7 +64,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 7,
-    version,
     data: {
       themes_subject: "Thinker/Mind",
       talent: "analyser",
@@ -83,7 +74,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 8,
-    version,
     data: {
       themes_subject: "Thinker/Mind",
       talent: "analyser",
@@ -94,7 +84,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 9,
-    version,
     data: {
       themes_subject: "Thinker/Mind",
       talent: "analyser",
@@ -105,7 +94,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 10,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "believer",
@@ -116,7 +104,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 11,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "believer",
@@ -127,7 +114,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 12,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "believer",
@@ -138,7 +124,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 13,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "ideamaker",
@@ -149,7 +134,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 14,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "ideamaker",
@@ -160,7 +144,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 15,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "ideamaker",
@@ -171,7 +154,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 16,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "coach",
@@ -182,7 +164,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 17,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "coach",
@@ -193,7 +174,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 18,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "coach",
@@ -204,7 +184,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 19,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "leader",
@@ -215,7 +194,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 20,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "leader",
@@ -226,7 +204,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 21,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "leader",
@@ -237,7 +214,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 22,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "communicator",
@@ -248,7 +224,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 23,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "communicator",
@@ -259,7 +234,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 24,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "communicator",
@@ -270,7 +244,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 25,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "challenger",
@@ -281,7 +254,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 26,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "challenger",
@@ -292,7 +264,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 27,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "challenger",
@@ -303,7 +274,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 28,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "connector",
@@ -314,7 +284,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 29,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "connector",
@@ -325,7 +294,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 30,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "connector",
@@ -336,7 +304,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 31,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "empathizer",
@@ -347,7 +314,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 32,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "empathizer",
@@ -358,7 +324,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 33,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "empathizer",
@@ -369,7 +334,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 34,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "concentrated",
@@ -380,7 +344,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 35,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "concentrated",
@@ -391,7 +354,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 36,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "concentrated",
@@ -402,7 +364,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 37,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "loverOfOrder",
@@ -413,7 +374,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 38,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "loverOfOrder",
@@ -424,7 +384,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 39,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "loverOfOrder",
@@ -435,7 +394,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 40,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "selfDeveloper",
@@ -446,7 +404,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 41,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "selfDeveloper",
@@ -457,7 +414,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 42,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "selfDeveloper",
@@ -468,7 +424,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 43,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "positive",
@@ -479,7 +434,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 44,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "positive",
@@ -490,7 +444,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 45,
-    version,
     data: {
       themes_subject: "Relationship",
       talent: "positive",
@@ -501,7 +454,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 46,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "responsible",
@@ -512,7 +464,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 47,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "responsible",
@@ -523,7 +474,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 48,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "responsible",
@@ -534,7 +484,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 49,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "selfBeliever",
@@ -545,7 +494,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 50,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "selfBeliever",
@@ -556,7 +504,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 51,
-    version,
     data: {
       themes_subject: "Influencer",
       talent: "selfBeliever",
@@ -567,7 +514,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 52,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "solver",
@@ -578,7 +524,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 53,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "solver",
@@ -589,7 +534,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 54,
-    version,
     data: {
       themes_subject: "Execution",
       talent: "solver",
@@ -600,7 +544,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 55,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "strategist",
@@ -611,7 +554,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 56,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "strategist",
@@ -622,7 +564,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 57,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "strategist",
@@ -633,7 +574,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 58,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "intellectual",
@@ -644,7 +584,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 59,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "intellectual",
@@ -655,7 +594,6 @@ const QUESTIONS_EN = [
   },
   {
     id: 60,
-    version,
     data: {
       themes_subject: "Thinker",
       talent: "intellectual",
