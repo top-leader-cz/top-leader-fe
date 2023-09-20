@@ -988,26 +988,26 @@ const messages = defineMessages({
 // Chart Increasing
 
 const emojis = {
-  initiator: "🙋‍♂️",
-  flexible: "🤸",
   analyser: "📊",
   believer: "🔮",
-  ideamaker: "💡",
-  coach: "🧑‍🏫",
-  leader: "🥇",
-  communicator: "🗣",
   challenger: "🏋️",
+  coach: "🧑‍🏫",
+  communicator: "🗣",
+  concentrated: "🧘‍♀️",
   connector: "🤲",
   empathizer: "❤️",
-  concentrated: "🧘‍♀️",
+  flexible: "🤸",
+  ideamaker: "💡",
+  initiator: "🙋‍♂️",
+  intellectual: "🧑‍🎓",
+  leader: "🥇",
   loverOfOrder: "📐",
-  selfDeveloper: "",
   positive: "☀️",
   responsible: "🤝",
   selfBeliever: "💪",
+  selfDeveloper: "",
   solver: "🧩",
   strategist: "📈",
-  intellectual: "🧑‍🎓",
 };
 
 const talentsKeys = [

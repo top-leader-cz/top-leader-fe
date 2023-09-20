@@ -278,7 +278,7 @@ export function DashboardPage() {
           <P>
             <Msg id="dashboard.section-2.perex" />
           </P>
-          <Masonry columns={3} spacing={2} sx={{ mt: 3 }}>
+          <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
             <DashboardCardSession />
           </Masonry>
         </Box>

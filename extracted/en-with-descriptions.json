@@ -1506,6 +1506,15 @@
   "file-upload.primary": {
     "defaultMessage": "Click to upload"
   },
+  "general.message-from": {
+    "defaultMessage": "Message from {from}"
+  },
+  "general.new-message-from": {
+    "defaultMessage": "New message from {from}"
+  },
+  "general.notifications": {
+    "defaultMessage": "Notifications"
+  },
   "main-menu.items.coaches": {
     "defaultMessage": "Coaches"
   },
