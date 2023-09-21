@@ -32,7 +32,7 @@ export const messages = defineMessages({
   },
   "strengths.positives.title-last": {
     id: "strengths.positives.title-last",
-    defaultMessage: "What’s great about talent",
+    defaultMessage: "If these were your talents, then:",
   },
   "strengths.tips.title": {
     id: "strengths.tips.title",

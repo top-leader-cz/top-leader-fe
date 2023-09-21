@@ -1506,6 +1506,15 @@
   "file-upload.primary": {
     "defaultMessage": "Click to upload"
   },
+  "general.message-from": {
+    "defaultMessage": "Message from {from}"
+  },
+  "general.new-message-from": {
+    "defaultMessage": "New message from {from}"
+  },
+  "general.notifications": {
+    "defaultMessage": "Notifications"
+  },
   "main-menu.items.coaches": {
     "defaultMessage": "Coaches"
   },
@@ -1837,7 +1846,7 @@
     "defaultMessage": "What’s great about your talent"
   },
   "strengths.positives.title-last": {
-    "defaultMessage": "What’s great about talent"
+    "defaultMessage": "If these were your talents, then:"
   },
   "strengths.second.summary": {
     "defaultMessage": "\"Whilst the list of your Top 5 strengths shows you the areas where you have the greatest potential to use your natural talents, here you can see the next five stenghts that you should be also aware of. They might be a big help in your professional and private life journey.\""

@@ -3,11 +3,6 @@
   "coaches.coach.rate": "Rate",
   "coaches.coach.show-more": "Show more",
   "coaches.filter.rate.label": "Rate",
-  "dict.talents.positive.tips.1": "For some people it's hard to get back on track after falling off course, your positivity can help them get back on the right path.",
-  "dict.talents.positive.tips.2": "It's good that you are grateful for what you have, but don't be too satisfied as it can stop you from experiencing more deeply. Life has much more to give, so let's explore it.",
-  "dict.talents.positive.tips.3": "Try to avoid people who sow negativity, it can be draining for you to move them toward the positive and it might just be out of your control.",
-  "dict.talents.positive.tips.4": "The ability to dramatize things and fill actions with optimism will help you to excel in roles like leadership, sales, or teaching.",
-  "dict.talents.positive.tips.5": "Feel free to show appreciation of others and concrete on what actions you liked.",
   "dict.values.accountability.title": "Accountability (Responsibility, Commitment)",
   "dict.values.accuracy.title": "Accuracy (Being exact, Correct)",
   "dict.values.beauty.title": "Beauty (Prettiness, Aesthetics)",
@@ -37,6 +32,8 @@
   "dict.values.trust.title": "Trust (Respect, Dignity)",
   "dict.values.truth.title": "Truth (To be right)",
   "dict.values.work.title": "Work (Self-fulfillment)",
+  "general.message-from": "Message from {from}",
+  "general.new-message-from": "New message from {from}",
   "main-menu.items.messages": "Messages",
   "messages.aside.pick-coach": "Pick the coach",
   "messages.conversation.message.placeholder": "Type you message...",
@@ -47,6 +44,5 @@
   "settings.profile.field.fields.placeholder": "Select fields you work in",
   "settings.profile.field.languages.placeholder": "Select languages you speak",
   "settings.profile.field.publicProfile": "Public account",
-  "settings.profile.field.rate": "Rate",
-  "strengths.positives.title-last": "What’s great about talent"
+  "settings.profile.field.rate": "Rate"
 }

@@ -242,13 +242,13 @@ const I18nProvider = ({ children }) => {
 
   const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const userTz = useMemo(
-    () => user.timeZone || browserTz,
-    [browserTz, user.timeZone]
+    () => user.data?.timeZone || browserTz,
+    [browserTz, user.data?.timeZone]
   );
   // const [userTz, setUserTz] = useState(browserTz);
   // useEffect(() => {
-  //   if (user.timeZone) setUserTz(user.timeZone)
-  // }, [user.timeZone]);
+  //   if (user.data?.timeZone) setUserTz(user.data?.timeZone)
+  // }, [user.data?.timeZone]);
   const userTzMutation = useMutation({
     mutationFn: (timezone) =>
       authFetch({

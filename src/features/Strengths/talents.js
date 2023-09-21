@@ -984,29 +984,30 @@ const messages = defineMessages({
 //   ])
 // );
 
+// Deciduous Tree
+// Chart Increasing
+
 const emojis = {
   analyser: "📊",
-  ideamaker: "💡",
+  believer: "🔮",
+  challenger: "🏋️",
+  coach: "🧑‍🏫",
   communicator: "🗣",
+  concentrated: "🧘‍♀️",
+  connector: "🤲",
+  empathizer: "❤️",
+  flexible: "🤸",
+  ideamaker: "💡",
+  initiator: "🙋‍♂️",
+  intellectual: "🧑‍🎓",
+  leader: "🥇",
+  loverOfOrder: "📐",
+  positive: "☀️",
   responsible: "🤝",
+  selfBeliever: "💪",
+  selfDeveloper: "",
+  solver: "🧩",
   strategist: "📈",
-};
-
-const getPositivesLength = (key) => ({ initiator: 8 }[key] ?? 6);
-
-const translateTalent = (intl, key) => {
-  const getId = (prop) => `dict.talents.${key}.${prop}`;
-
-  return {
-    name: intl.formatMessage({ ...messages[getId("name")] }),
-    emoji: emojis[key],
-    positives: [...Array(getPositivesLength(key))].map((_, i) =>
-      intl.formatMessage({ ...messages[getId(`positives.${i + 1}`)] })
-    ),
-    tips: [...Array(5)].map((_, i) =>
-      intl.formatMessage({ ...messages[getId(`tips.${i + 1}`)] })
-    ),
-  };
 };
 
 const talentsKeys = [
@@ -1031,6 +1032,23 @@ const talentsKeys = [
   "strategist",
   "intellectual",
 ];
+
+const getPositivesLength = (key) => ({ initiator: 8 }[key] ?? 6);
+
+const translateTalent = (intl, key) => {
+  const getId = (prop) => `dict.talents.${key}.${prop}`;
+
+  return {
+    name: intl.formatMessage({ ...messages[getId("name")] }),
+    emoji: emojis[key],
+    positives: [...Array(getPositivesLength(key))].map((_, i) =>
+      intl.formatMessage({ ...messages[getId(`positives.${i + 1}`)] })
+    ),
+    tips: [...Array(5)].map((_, i) =>
+      intl.formatMessage({ ...messages[getId(`tips.${i + 1}`)] })
+    ),
+  };
+};
 
 export const useTalentsDict = () => {
   // const { language, setLanguage } = useContext(I18nContext);

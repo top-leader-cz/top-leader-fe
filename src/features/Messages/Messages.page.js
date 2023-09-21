@@ -2,42 +2,30 @@ import {
   Avatar,
   Box,
   Button,
-  Divider,
   List,
   ListItem,
   ListItemAvatar,
   ListItemButton,
   ListItemText,
-  Typography,
 } from "@mui/material";
-import { addDays, endOfDay, startOfDay } from "date-fns/fp";
-import { pipe } from "ramda";
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { useMutation, useQuery } from "react-query";
+import { RHFTextField } from "../../components/Forms";
 import { Header } from "../../components/Header";
 import { Layout, useRightMenu } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
+import { H2 } from "../../components/Typography";
+import { useAuth } from "../Authorization";
 import {
   CREATE_OFFSET,
   CoachInfo,
   TimeSlots,
   createSlot,
 } from "../Coaches/Coaches.page";
-import { img1 } from "../Settings/exampleImg";
 import { messages } from "./messages";
-import { H2, P } from "../../components/Typography";
-import { FormProvider, useForm } from "react-hook-form";
-import { RHFTextField } from "../../components/Forms";
-import { useMutation, useQuery } from "react-query";
-import { useAuth } from "../Authorization";
 
 const Name = ({
   firstName,
