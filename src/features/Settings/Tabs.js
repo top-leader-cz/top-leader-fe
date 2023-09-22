@@ -92,6 +92,7 @@ export const TLTabs = ({
       >
         {tabs.map((tab) => (
           <StyledTab
+            key={tab.label}
             label={tab.label}
             value={tab.key}
             {...a11yProps(tab.label)}

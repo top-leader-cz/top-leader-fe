@@ -1,9 +1,9 @@
 import { Button } from "@mui/material";
 import { useContext } from "react";
 import { I18nContext } from "../App";
-import { PRIMARY_BG_LIGHT } from "./InfoBox";
 import { ScrollableRightMenu } from "./ScrollableRightMenu";
 import { P } from "./Typography";
+import { primary25 } from "../theme";
 
 export const HistoryRightMenu = ({
   heading,
@@ -32,7 +32,7 @@ export const HistoryRightMenu = ({
             p: 2,
             flexFlow: "column nowrap",
             alignItems: "flex-start",
-            bgcolor: PRIMARY_BG_LIGHT,
+            bgcolor: primary25,
           }}
           color={history.isSelected(entry) ? "primary" : "secondary"}
           // variant={"contained"}

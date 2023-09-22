@@ -21,6 +21,7 @@ import { useContext, useEffect, useState } from "react";
 import { MainMenu } from "./MainMenu";
 import { Icon } from "./Icon";
 import { Header } from "./Header";
+import { gray50 } from "../theme";
 
 const drawerWidth = 256;
 
@@ -213,8 +214,7 @@ export const Layout = ({
       id="layout"
       sx={{
         display: "flex",
-        bgcolor: "#EAECF0",
-        // TODO: check sessions
+        bgcolor: gray50,
         minHeight: "100%",
       }}
     >
@@ -289,7 +289,7 @@ const LayoutExample = () => {
     <Box
       sx={{
         display: "flex",
-        bgcolor: "#EAECF0",
+        bgcolor: "#f9fafb",
       }}
     >
       <AppBar

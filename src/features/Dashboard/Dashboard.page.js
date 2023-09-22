@@ -149,6 +149,7 @@ const DashboardCard = ({
                   justifyContent: "flex-start",
                   m: 1,
                   pointerEvents: "none",
+                  bgcolor: "#F9F8FF",
                 }}
                 key={item.label}
                 {...item}
@@ -189,15 +190,15 @@ const DashboardCardAssessment = ({ selectedKeys = [] }) => {
 };
 
 const DashboardCardValues = ({ selectedKeys = [] }) => {
-  const { values } = useValuesDict();
+  const valuesDict = useValuesDict();
   const items = useMemo(
     () =>
       selectedKeys.map((key) => ({
-        label: [values[key]?.emoji ?? "⚓️", values[key]?.name || key]
+        label: [valuesDict[key]?.emoji ?? "⚓️", valuesDict[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [selectedKeys, values]
+    [selectedKeys, valuesDict]
   );
   const msg = useMsg();
 

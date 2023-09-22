@@ -1,11 +1,11 @@
 import { alpha, Avatar, Box } from "@mui/material";
 import { Icon } from "./Icon";
 import { H2 } from "./Typography";
+import { gray50, primary25 } from "../theme";
 
-export const PRIMARY_BG_LIGHT = (theme) =>
-  alpha(theme.palette.primary.main, 0.05);
-export const GRAY_BG_LIGHT = (theme) =>
-  alpha(theme.palette.action.selected, 0.05);
+// export const PRIMARY_BG_LIGHT = primary25;
+// export const GRAY_BG_LIGHT = (theme) =>
+//   alpha(theme.palette.action.selected, 0.05);
 
 export const InfoBox = ({
   heading,
@@ -33,7 +33,7 @@ export const InfoBox = ({
       sx={{
         p: 3,
         borderRadius: 0.5,
-        bgcolor: color === "primary" ? PRIMARY_BG_LIGHT : GRAY_BG_LIGHT,
+        bgcolor: color === "primary" ? primary25 : gray50,
         ...sx,
       }}
     >

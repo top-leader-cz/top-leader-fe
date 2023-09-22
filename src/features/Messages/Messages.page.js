@@ -236,6 +236,19 @@ const Message = ({ message, scrollIntoView }) => {
   );
 };
 
+export const useSendMessageMutation = () => {
+  const { authFetch } = useAuth();
+  const sendMutation = useMutation({
+    mutationFn: ({ userTo, messageData }) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/messages`,
+        data: { userTo, messageData },
+      }),
+  });
+  return sendMutation;
+};
+
 const Conversation = ({
   // coach,
   name,
@@ -266,14 +279,7 @@ const Conversation = ({
         // sort: ["string"], // TODO: sort enum
       }),
   });
-  const sendMutation = useMutation({
-    mutationFn: ({ userTo, messageData }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/messages`,
-        data: { userTo, messageData },
-      }),
-  });
+  const sendMutation = useSendMessageMutation();
 
   console.log("[Conversation.rndr]", {
     addressee,

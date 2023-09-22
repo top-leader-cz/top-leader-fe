@@ -1,6 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Box, Button, CardContent, Divider, Skeleton } from "@mui/material";
+import { Box, Button, CardContent, Divider } from "@mui/material";
 import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
@@ -8,13 +9,11 @@ import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
 import { routes } from "../../routes";
+import { useAuth } from "../Authorization";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
-import { useAuth } from "../Authorization";
-import { useQuery } from "react-query";
-import { QueryRenderer } from "../QM/QueryRenderer";
 
 const useStaticCallback = (fn) => {
   const fnRef = useRef(fn);
@@ -43,9 +42,6 @@ const useValuesHistoryQuery = () => {
   const { authFetch } = useAuth();
   return useQuery({
     queryKey: ["values"],
-    onSuccess: (data) => {
-      // console.log("q s", { data });
-    },
     queryFn: async () => authFetch({ url: "/api/latest/history/VALUES" }),
   });
 };
@@ -85,13 +81,10 @@ export function MyValuesPage() {
     }),
   });
 
-  // const history = useHistoryEntries({ storageKey: "values_history" });
-
   const navigate = useNavigate();
-  const { values } = useValuesDict();
+  const valuesDict = useValuesDict();
 
   console.log("[MyValues.rndr]", {
-    // history,
     query,
     sel,
   });
@@ -144,7 +137,7 @@ export function MyValuesPage() {
             success={() => (
               <ChipsCard
                 keys={sel.selected?.selectedKeys}
-                dict={values}
+                dict={valuesDict}
                 renderSummary={() => (
                   <CardContent>
                     <P>
