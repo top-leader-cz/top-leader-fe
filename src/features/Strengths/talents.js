@@ -1005,7 +1005,7 @@ const emojis = {
   positive: "☀️",
   responsible: "🤝",
   selfBeliever: "💪",
-  selfDeveloper: "",
+  selfDeveloper: "👷‍♂️",
   solver: "🧩",
   strategist: "📈",
 };
