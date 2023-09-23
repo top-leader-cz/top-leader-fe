@@ -5,7 +5,7 @@ import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { I18nContext } from "../../App";
 import { ChipsCard } from "../../components/ChipsCard";
-import { InfoBox, PRIMARY_BG_LIGHT } from "../../components/InfoBox";
+import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
@@ -16,6 +16,7 @@ import { useMakeSelectable } from "../Values/MyValues";
 import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
+import { primary25 } from "../../theme";
 
 const AssessmentRightMenu = ({
   history,
@@ -56,7 +57,7 @@ const AssessmentRightMenu = ({
               p: 2,
               flexFlow: "column nowrap",
               alignItems: "flex-start",
-              bgcolor: PRIMARY_BG_LIGHT,
+              bgcolor: primary25,
             }}
             color={
               entry.timestamp === selectedTimestamp ? "primary" : "secondary"

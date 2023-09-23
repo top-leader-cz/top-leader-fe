@@ -214,13 +214,12 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
   });
 
   const strengthsMutation = useMutation({
-    mutationFn: async ({ orderedTalents }) => {
+    mutationFn: async ({ orderedTalents }) =>
       authFetch({
         method: "POST",
         url: `/api/latest/user-info/strengths`,
         data: { data: orderedTalents },
-      });
-    },
+      }),
     onSuccess: () => {
       deleteAnswersMutation.mutate();
       fetchUser();

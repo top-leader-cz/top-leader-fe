@@ -1,5 +1,6 @@
 import { Card, CardContent, Chip, Divider, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
+import { primary25 } from "../theme";
 
 export const ChipsCard = ({
   keys = [],
@@ -22,7 +23,11 @@ export const ChipsCard = ({
             <Chip
               key={key}
               color={key === selectedKey ? "primary" : "default"}
-              sx={{ borderRadius: 1, justifyContent: "flex-start" }}
+              sx={{
+                borderRadius: 1,
+                justifyContent: "flex-start",
+                bgcolor: key === selectedKey ? "primary.main" : primary25,
+              }}
               label={[dict[key]?.emoji ?? "👤", dict[key]?.name || key]
                 .filter(Boolean)
                 .join(" ")}

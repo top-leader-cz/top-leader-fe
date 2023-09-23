@@ -16,7 +16,7 @@ import { messages } from "./messages";
 import { useValuesDict } from "./values";
 
 const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
-  const { values } = useValuesDict();
+  const valuesDict = useValuesDict();
 
   return (
     <ScrollableRightMenu
@@ -30,7 +30,7 @@ const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
       {selectedKeys
         .slice()
         .sort((a, b) => a.localeCompare(b))
-        .map((key) => values[key] || { name: key })
+        .map((key) => valuesDict[key] || { name: key })
         .map(({ name, description }) => (
           <InfoBox
             color="primary"
@@ -44,16 +44,8 @@ const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
   );
 };
 
-const createValuesEntry = ({ selectedKeys }) => {
-  return {
-    date: new Date().toISOString(),
-    timestamp: new Date().getTime(),
-    selectedKeys,
-  };
-};
-
 const useMyValues = () => {
-  const { values } = useValuesDict();
+  const valuesDict = useValuesDict();
   const { user, fetchUser, authFetch } = useAuth();
   const { selectedKeys, toggleItem } = useSelection({
     initialValue: user?.data?.values,
@@ -75,42 +67,26 @@ const useMyValues = () => {
     }
   );
 
-  console.log({ user });
-
   const navigate = useNavigate();
 
-  const save = useCallback(() => {
+  const handleSave = useCallback(() => {
     mutation.mutate({ selectedKeys });
     fetchUser();
-    // debugger;
-    // valuesHistory.push(createValuesEntry({ selectedKeys }));
     navigate(routes.dashboard);
-    // navigate(routes.myValues);
-  }, [navigate, selectedKeys]);
-  // }, [navigate, selectedKeys, valuesHistory]);
-
-  console.log("[useMyValues]", {});
+  }, [fetchUser, mutation, navigate, selectedKeys]);
 
   return {
-    save,
-    items: Object.entries(values).map(([key, value]) => ({
-      data: value,
-      key,
-      label: value.name,
-    })),
-    // [
-    //   { label: "Accountability", key: "accountability" },
-    //   { label: "Accuracy", key: "accuracy" },
-    // ],
+    handleSave,
+    valuesArr: Object.values(valuesDict),
     selectedKeys,
     toggleItem,
   };
 };
 
 export function SetValuesPage() {
-  const { items, selectedKeys, toggleItem, save } = useMyValues();
+  const { valuesArr, selectedKeys, toggleItem, handleSave } = useMyValues();
 
-  console.log("[SetValues.rndr]", { items, selectedKeys });
+  console.log("[SetValues.rndr]", { valuesArr, selectedKeys });
   return (
     <MsgProvider messages={messages}>
       <Layout
@@ -118,7 +94,7 @@ export function SetValuesPage() {
           <RightMenu
             selectedKeys={selectedKeys}
             saveDisabled={!selectedKeys.length}
-            onSave={save}
+            onSave={handleSave}
           />
         }
       >
@@ -153,12 +129,12 @@ export function SetValuesPage() {
         </Box>
 
         <Box sx={SelectableChip.wrapperSx}>
-          {items.map((item) => (
+          {valuesArr.map((value) => (
             <SelectableChip
-              key={item.label}
-              label={item.label}
-              selected={selectedKeys.includes(item.key)}
-              onClick={(e) => toggleItem(item)}
+              key={value.name}
+              label={value.name}
+              selected={selectedKeys.includes(value.key)}
+              onClick={() => toggleItem(value)}
             />
           ))}
         </Box>

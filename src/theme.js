@@ -2,6 +2,10 @@ import { alpha, createTheme } from "@mui/material/styles";
 import defaultTheme from "@mui/material/styles/defaultTheme";
 import { LinkBehavior } from "./components/LinkBehavior";
 
+export const primary25 = "#F9F8FF";
+export const gray50 = "#F9FAFB"; // previously in bg as #EAECF0
+export const gray200 = "#EAECF0";
+
 // A custom theme for this app
 const theme = createTheme({
   palette: {
@@ -84,7 +88,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           "&.Mui-selected.MuiListItemButton-root": {
-            backgroundColor: "#F9F8FF",
+            backgroundColor: primary25,
             ".MuiTypography-root,.MuiListItemIcon-root": {
               color: "#4720B7",
             },
@@ -106,7 +110,7 @@ const theme = createTheme({
           props: { variant: "selected" },
           style: {
             color: "#4720B7",
-            backgroundColor: "#F9F8FF",
+            backgroundColor: primary25,
             border: "1px solid #4720B7",
             padding: "16px",
             borderRadius: "10px",

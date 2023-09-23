@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 
 const onSubmitDefault = (data, e) => console.log("[onSubmit]", data, e);
@@ -8,14 +9,19 @@ export const RHForm = ({
   form: formProp,
   onSubmit = onSubmitDefault,
   onError = onErrorDefault,
+  sx = {},
   ...props
 }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const form = formProp ? formProp : useForm(props);
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit, onError)}>
+    <Box
+      component={"form"}
+      onSubmit={form.handleSubmit(onSubmit, onError)}
+      sx={sx}
+    >
       <FormProvider {...form}>{children}</FormProvider>
-    </form>
+    </Box>
   );
 };

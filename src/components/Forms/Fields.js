@@ -473,7 +473,7 @@ export const AutocompleteSelect = ({
           multiple={multiple}
           disableCloseOnSelect={disableCloseOnSelect}
           options={options}
-          // isOptionEqualToValue={
+          // isOptionEqualToValue={ // TODO: try to handle multiple
           //   disableIsOptionEqualToValue
           //     ? undefined
           //     : (option, value) => option.value === value

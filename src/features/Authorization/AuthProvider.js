@@ -68,7 +68,7 @@ export const Authority = {
 
 console.log({ qs });
 
-const qstr = (url, query) => {
+export const qstr = (url, query) => {
   if (!query) return url;
   const qStr = typeof query === "string" ? query : qs.stringify(query);
   return [url, qStr].filter(Boolean).join("?");
@@ -85,10 +85,14 @@ export function AuthProvider({ children }) {
       fetch(qstr(url, query), getInit({ method, data })).then(
         async (response) => {
           if (!response.ok) throwOnError(response);
-          if (type === FETCH_TYPE.JSON) return await response.json();
-          if (type === FETCH_TYPE.JSON_WITH_META)
-            return { response, json: await response.json() };
-          return { response };
+          try {
+            if (type === FETCH_TYPE.JSON) return await response.json();
+            if (type === FETCH_TYPE.JSON_WITH_META)
+              return { response, json: await response.json() };
+            return { response };
+          } catch (e) {
+            return { response };
+          }
         }
       ),
     []

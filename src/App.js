@@ -267,6 +267,7 @@ const I18nProvider = ({ children }) => {
   );
 
   const i18n = useI18n({ userTz, language });
+  console.log("[I18nProvider.rndr]", { language, userTz, i18n });
 
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
