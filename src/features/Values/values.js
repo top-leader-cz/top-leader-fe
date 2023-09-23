@@ -325,7 +325,7 @@ const messages = defineMessages({
 });
 
 const emojis = {
-  accountability: "🤝",
+  accountability: "🕘",
   accuracy: "📐",
   beauty: "🌸",
   creativity: "🎨",

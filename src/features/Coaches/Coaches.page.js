@@ -433,7 +433,10 @@ export function CoachesPageInner() {
         url: "/api/latest/coaches",
         data: getPayload({ filter }),
       }),
+    refetchOnWindowFocus: false,
   });
+
+  // console.log("[Coaches.page.rndr]", { filter });
 
   return (
     <Layout
@@ -490,10 +493,9 @@ export function CoachesPageInner() {
         }
       />
 
-      <Divider>Mocked users:</Divider>
-
+      {/* <Divider>Mocked users:</Divider> */}
       {/* {Array(25) */}
-      {Array(1)
+      {/* {Array(1)
         .fill(null)
         .map((_, i) => COACHES)
         .reduce((acc, v) => acc.concat(v), [])
@@ -513,7 +515,7 @@ export function CoachesPageInner() {
               MOCK_SLOT(4 + (i % 3), 11),
             ]}
           />
-        ))}
+        ))} */}
 
       <ContactModal
         coach={contactCoach}

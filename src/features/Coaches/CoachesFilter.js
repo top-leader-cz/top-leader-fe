@@ -7,16 +7,18 @@ import {
   Divider,
   InputAdornment,
   TextField,
+  Tooltip,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
-import { defaultLanguage } from "../../App";
+import { I18nContext, defaultLanguage } from "../../App";
+import { RHForm } from "../../components/Forms/Form";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
@@ -34,34 +36,57 @@ const ratesOptions = [
   { value: "$$$", label: "$$$" },
 ];
 
+const RATES = [
+  { label: "$", credits: 110 },
+  { label: "$$", credits: 165 },
+  { label: "$$$", credits: 275 },
+];
+
+const Rates = ({ msg, rates = RATES }) => {
+  return (
+    <>
+      <Box display="flex">
+        <Box>
+          {rates.map(({ label }) => (
+            <Box key={label}>{label}</Box>
+          ))}
+        </Box>
+        <Box>
+          {rates.map(({ credits }) => (
+            <Box key={credits}>
+              {" = "}
+              {msg("coaches.filter.rate.tooltip.credits-per-session", {
+                credits,
+              })}
+            </Box>
+          ))}
+        </Box>
+      </Box>
+      <Box textAlign="center">{msg("coaches.filter.rate.tooltip.info")}</Box>
+    </>
+  );
+};
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
+  const { language } = useContext(I18nContext);
   const msg = useMsg();
   const { fieldsOptions } = useFieldsDict();
   const methods = useForm({
     // mode: "all",
     defaultValues: filter,
   });
-  const onClearFilters = () => {
-    methods.setValue("languages", null);
-    methods.setValue("fields", null);
-    methods.setValue("experience", null);
-    methods.setValue("prices", null);
-  };
 
   const languages = methods.watch("languages");
   const fields = methods.watch("fields");
   const experience = methods.watch("experience");
   const prices = methods.watch("prices");
+  const search = methods.watch("search");
 
   const values = useMemo(
     () => ({ languages, fields, experience, prices }),
     [languages, fields, experience, prices]
   );
 
-  console.log(...color("pink", "[CoachesFilter]"), {
-    filter,
-    values,
-  });
+  // console.log(...color("pink", "[CoachesFilter]"), { filter, values, search, });
 
   const setFilterRef = useRef(setFilter);
   setFilterRef.current = setFilter;
@@ -69,19 +94,35 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
     setFilterRef.current((filter) => ({ ...filter, ...values }));
   }, [values]);
   const onSearch = useCallback(
-    (e) => {
-      const root = e.target.closest(".MuiInputBase-root");
-      const input = root?.querySelector("input");
-      const value = input?.value || "";
-
-      console.log("[onSearch]", { e, root, input, value });
-      setFilter((filter) => ({ ...filter, search: value }));
+    (searchStr = search) => {
+      // const root = e.target.closest(".MuiInputBase-root");
+      // const input = root?.querySelector("input");
+      // const value = input?.value || "";
+      console.log("onSearch", { searchStr, search });
+      setFilter((filter) => ({ ...filter, search: searchStr }));
     },
-    [setFilter]
+    [search, setFilter]
   );
+  const onClearFilters = () => {
+    console.log("RESETTING");
+    const initialValues = INITIAL_FILTER({ userLang: language });
+    methods.setValue("languages", initialValues.languages);
+    methods.setValue("fields", initialValues.fields);
+    methods.setValue("experience", initialValues.experience);
+    methods.setValue("prices", initialValues.prices);
+    methods.setValue("search", initialValues.search);
+
+    onSearch("");
+  };
 
   return (
-    <FormProvider {...methods}>
+    // <FormProvider {...methods}>
+    <RHForm
+      form={methods}
+      onSubmit={(values) =>
+        console.log("onSubmit", { values }) || onSearch(values.search)
+      }
+    >
       <Card sx={{ ...sx }}>
         <CardContent sx={{ "&:last-child": { pb: 2 } }}>
           <Box display="flex" flexDirection="row" gap={3}>
@@ -105,13 +146,18 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
               label={msg("coaches.filter.experience.label")}
               range={[1, 10]}
             />
-            <AutocompleteSelect
-              name="prices"
-              label={msg("coaches.filter.rate.label")}
-              options={ratesOptions}
-              multiple
-              disableCloseOnSelect
-            />
+            <Tooltip title={<Rates msg={msg} />} placement="top">
+              <div>
+                <AutocompleteSelect
+                  name="prices"
+                  label={msg("coaches.filter.rate.label")}
+                  // label={ <Tooltip title="rates"> {msg("coaches.filter.rate.label")} </Tooltip> } // NOT WORKING
+                  options={ratesOptions}
+                  multiple
+                  disableCloseOnSelect
+                />
+              </div>
+            </Tooltip>
 
             {/* <OutlinedField label="Test" /> */}
           </Box>
@@ -129,33 +175,42 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
         </CardContent>
       </Card>
       <Box display="flex" flexDirection="row">
-        <TextField
-          // disabled
-          sx={{ width: 360, "> .MuiInputBase-root": { bgcolor: "white" } }}
-          label=""
-          placeholder={msg("coaches.filter.search.placeholder")}
-          size="small"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Button
-                  onClick={onSearch}
-                  sx={{
-                    mr: -2,
-                    px: 1,
-                    minWidth: "auto",
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                  }}
-                  variant="contained"
-                >
-                  <Icon name="Search" />
-                </Button>
-              </InputAdornment>
-            ),
-          }}
+        <Controller
+          name={"search"}
+          // rules={{ minLength: 5 }}
+          render={({ field, fieldState, formState }) => (
+            <TextField
+              // disabled
+              autoFocus
+              sx={{ width: 360, "> .MuiInputBase-root": { bgcolor: "white" } }}
+              label=""
+              placeholder={msg("coaches.filter.search.placeholder")}
+              size="small"
+              {...field}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      // onClick={() => onSearch()}
+                      sx={{
+                        mr: -2,
+                        px: 1,
+                        minWidth: "auto",
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                      }}
+                      variant="contained"
+                      type="submit"
+                    >
+                      <Icon name="Search" />
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
         />
       </Box>
-    </FormProvider>
+    </RHForm>
   );
 };

@@ -131,10 +131,6 @@ const theme = createTheme({
   },
 });
 
-// export const COLOR = {
-//   primary: {},
-// };
-
 // console.log({ theme, defaultTheme });
 
 export default theme;

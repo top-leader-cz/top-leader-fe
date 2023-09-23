@@ -14,7 +14,7 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useSendMessageMutation } from "../Messages/queries";
 import { formatName } from "./Coaches.page";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 
 // {
 //     "username": "coach1@gmail.com",
@@ -28,7 +28,7 @@ import { useCallback } from "react";
 //     "rate": "100"
 // }
 
-const ContactForm = ({ onClose, coach }) => {
+const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
   const msg = useMsg();
   const {
     username,
@@ -65,7 +65,7 @@ const ContactForm = ({ onClose, coach }) => {
     console.log("[ContactModal.onError]", errors, e);
 
   return (
-    <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
+    <form onSubmit={methods.handleSubmit(onSubmit, onError)} ref={ref}>
       <Paper
         sx={{
           position: "absolute",
@@ -138,7 +138,7 @@ const ContactForm = ({ onClose, coach }) => {
       </Paper>
     </form>
   );
-};
+});
 
 const DEFAULT_VALUES = {
   subject: "",
