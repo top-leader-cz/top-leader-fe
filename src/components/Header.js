@@ -155,7 +155,7 @@ const Notifications = ({ tooltip = "Notifications" }) => {
       }),
   });
 
-  const notifications = (
+  const notifications =
     query.data?.content?.map(
       ({
         id,
@@ -171,8 +171,7 @@ const Notifications = ({ tooltip = "Notifications" }) => {
         unread: !read,
         createdAt,
       })
-    ) ?? []
-  ).concat(NOTIFICATIONS_MOCK);
+    ) ?? [];
 
   // : _notifications;
 

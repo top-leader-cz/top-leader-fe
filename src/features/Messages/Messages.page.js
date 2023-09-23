@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { RHFTextField } from "../../components/Forms";
 import { Header } from "../../components/Header";
 import { Layout, useRightMenu } from "../../components/Layout";
@@ -26,14 +26,7 @@ import {
   createSlot,
 } from "../Coaches/Coaches.page";
 import { messages } from "./messages";
-
-const Name = ({
-  firstName,
-  lastName,
-  fullName = `${firstName} ${lastName}`,
-}) => {
-  return <H2>{fullName}</H2>;
-};
+import { useSendMessageMutation } from "./queries";
 
 // https://mui.com/material-ui/react-list/
 const ContactList = ({ data = [], selectedKey = "1", onSelect }) => {
@@ -74,7 +67,7 @@ const ContactList = ({ data = [], selectedKey = "1", onSelect }) => {
               />
             </ListItemAvatar>
             <ListItemText
-              primary={<Name fullName={name} />}
+              primary={<H2>{name}</H2>}
               secondary={<span style={{ whiteSpace: "nowrap" }}>{desc}</span>}
               sx={{ width: "100%", overflow: "hidden" }}
             />
@@ -236,19 +229,6 @@ const Message = ({ message, scrollIntoView }) => {
   );
 };
 
-export const useSendMessageMutation = () => {
-  const { authFetch } = useAuth();
-  const sendMutation = useMutation({
-    mutationFn: ({ userTo, messageData }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/messages`,
-        data: { userTo, messageData },
-      }),
-  });
-  return sendMutation;
-};
-
 const Conversation = ({
   // coach,
   name,
@@ -311,7 +291,7 @@ const Conversation = ({
           src={avatarSrc}
           sx={{ width: 44, height: 44, mr: 1.5 }}
         />
-        <Name fullName={name} />
+        <H2>{name}</H2>
       </Box>
       <Box
         sx={{

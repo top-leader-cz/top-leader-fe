@@ -259,6 +259,9 @@ export const CoachInfo = ({
   );
 };
 
+export const formatName = ({ firstName, lastName }) =>
+  `${firstName} ${lastName}`;
+
 const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
   // eslint-disable-next-line no-unused-vars
   const {
@@ -267,7 +270,7 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     rate, // TODO
     firstName,
     lastName,
-    name = `${firstName} ${lastName}`,
+    name = formatName({ firstName, lastName }),
     role, // TODO: rm?
     experience,
     languages,
@@ -277,7 +280,7 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     imgSrc = photo, // TODO: rm
   } = coach;
 
-  console.log("[CoachCard.rndr]", name, { languages });
+  // console.log("[CoachCard.rndr]", name, { languages });
 
   return (
     // <Card sx={{ maxWidth: "100%", ...sx }}>
@@ -414,7 +417,6 @@ export function CoachesPageInner() {
   ];
 
   const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
-  console.log("[CoachesPage.rndr]", {});
 
   const TODAY = new Date();
   const MOCK_SLOT = CREATE_OFFSET(TODAY, (start) => createSlot({ start }));
@@ -514,7 +516,6 @@ export function CoachesPageInner() {
         ))}
 
       <ContactModal
-        // coach={COACHES[0]}
         coach={contactCoach}
         onClose={() => setContactCoach(null)}
       />
