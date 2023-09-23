@@ -22,6 +22,10 @@ import { messages as generalMessages } from "./messages";
 import { useQuery } from "react-query";
 import { useAuth } from "../features/Authorization";
 import { I18nContext } from "../App";
+import { routes } from "../routes";
+import { qstr } from "../features/Authorization/AuthProvider";
+import { generatePath } from "react-router-dom";
+import { LinkBehavior } from "./LinkBehavior";
 
 const defaultAvaratSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`;
 
@@ -56,6 +60,15 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
   const msg = useMsg({ dict: generalMessages });
   const { i18n } = useContext(I18nContext);
   const onSelect = useCallback((message) => {
+    // {
+    //   "message": {
+    //       "key": 3,
+    //       "from": "coach1@gmail.com",
+    //       "text": "[Test] Msg2",
+    //       "unread": true,
+    //       "createdAt": "2023-09-22T23:05:29.514224"
+    //   }
+    // }
     console.log("[onSelect]", { message });
   }, []);
 
@@ -91,7 +104,13 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
               <ListItemButton
                 role={undefined}
                 onClick={() => onSelect(message)}
+                component={LinkBehavior}
+                // href={generatePath(routes.messages, { u: message.from })} // swallows param when not defined in route as :param
+                // href={qstr(routes.messages, { u: message.from })}
+                href={routes.messages}
+                state={{ messagesFrom: message.from }}
                 dense
+                // disablePad
               >
                 <ListItemAvatar>
                   <Avatar
@@ -149,7 +168,7 @@ const Notifications = ({ tooltip = "Notifications" }) => {
         url: `/api/latest/notifications`,
         query: {
           page: 0,
-          size: 1000000,
+          size: 10000,
           // sort: ["string"],
         },
       }),
@@ -159,14 +178,14 @@ const Notifications = ({ tooltip = "Notifications" }) => {
     query.data?.content?.map(
       ({
         id,
-        username,
+        username, // current user
         type,
         read,
         createdAt,
         context: { type: ctxType, fromUser, message },
       }) => ({
         key: id,
-        from: username,
+        from: fromUser,
         text: message,
         unread: !read,
         createdAt,

@@ -68,7 +68,7 @@ export const Authority = {
 
 console.log({ qs });
 
-const qstr = (url, query) => {
+export const qstr = (url, query) => {
   if (!query) return url;
   const qStr = typeof query === "string" ? query : qs.stringify(query);
   return [url, qStr].filter(Boolean).join("?");

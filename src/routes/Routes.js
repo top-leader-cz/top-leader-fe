@@ -174,14 +174,14 @@ export const router = createHashRouter([
       //   path: routes.dev,
       //   element: <Dev />,
       // },
-      {
-        path: routes.muiDefaultApp,
-        element: <MuiDefaultApp />,
-      },
-      {
-        path: routes.craDefaultApp,
-        element: <CraDefaultApp />,
-      },
+      // {
+      //   path: routes.muiDefaultApp,
+      //   element: <MuiDefaultApp />,
+      // },
+      // {
+      //   path: routes.craDefaultApp,
+      //   element: <CraDefaultApp />,
+      // },
     ],
   },
 ]);

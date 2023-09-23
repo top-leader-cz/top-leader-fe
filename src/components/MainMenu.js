@@ -105,6 +105,7 @@ const LogoImg = ({ mobile }) => {
   );
 };
 
+// TODO: LinkBehavior -> NavLink:
 const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
   const match = useMatch(to ?? "");
 

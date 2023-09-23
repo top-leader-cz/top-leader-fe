@@ -58,7 +58,7 @@ const ContactForm = ({ onClose, coach }) => {
     console.log("[ContactModal.onSubmit]", { data, e, coach });
     return sendMutation.mutateAsync({
       userTo: username,
-      messageData: `[${subject}] ${message}`,
+      messageData: subject?.trim() ? `[${subject}] ${message}` : message,
     });
   };
   const onError = (errors, e) =>
