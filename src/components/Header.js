@@ -16,10 +16,10 @@ import {
 } from "@mui/material";
 import { H1, H2 } from "./Typography";
 import { Icon } from "./Icon";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useMsg } from "./Msg/Msg";
 import { messages as generalMessages } from "./messages";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { useAuth } from "../features/Authorization";
 import { I18nContext } from "../App";
 import { routes } from "../routes";
@@ -56,21 +56,40 @@ const NOTIFICATIONS_MOCK = [
     createdAt: "2023-09-18T22:00:36.838Z",
   },
 ];
-const NotificationsPopover = ({ notifications = [], sx = {} }) => {
+const NotificationsPopover = ({
+  notifications = [],
+  sx = {},
+  ...restProps
+}) => {
   const msg = useMsg({ dict: generalMessages });
   const { i18n } = useContext(I18nContext);
-  const onSelect = useCallback((message) => {
-    // {
-    //   "message": {
-    //       "key": 3,
-    //       "from": "coach1@gmail.com",
-    //       "text": "[Test] Msg2",
-    //       "unread": true,
-    //       "createdAt": "2023-09-22T23:05:29.514224"
-    //   }
-    // }
-    console.log("[onSelect]", { message });
-  }, []);
+  const { authFetch } = useAuth();
+  const { mutate: markAsRead } = useMutation({
+    mutationFn: async () =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/notifications/mark-as-read`,
+      }),
+  });
+
+  // run eff just once on close with current notifications
+  const nRef = useRef({ notifications, markAsRead });
+  nRef.current = { notifications, markAsRead };
+  useEffect(
+    () => () => {
+      const hasUnread = nRef.current.notifications?.some((n) => n.unread);
+      console.log("[NotificationsPopover.markAsRead]", {
+        hasUnread,
+        notifications: nRef.current.notifications,
+      });
+      if (hasUnread) {
+        nRef.current?.markAsRead();
+      }
+    },
+    []
+  );
+
+  console.log("[NotificationsPopover.rndr]", { restProps });
 
   return (
     <Card sx={{ mt: 1, width: "500px", ...sx }} elevation={0}>
@@ -82,6 +101,7 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
             // width: "100%",
             // maxWidth: 300,
             bgcolor: "background.paper",
+            p: 0,
           }}
         >
           {notifications.map((message, index, arr) => (
@@ -99,18 +119,15 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
               //   }
               disablePadding
               divider={index < arr.length - 1}
-              // onClick={() => onSelect(key)}
             >
               <ListItemButton
                 role={undefined}
-                onClick={() => onSelect(message)}
                 component={LinkBehavior}
                 // href={generatePath(routes.messages, { u: message.from })} // swallows param when not defined in route as :param
                 // href={qstr(routes.messages, { u: message.from })}
                 href={routes.messages}
                 state={{ messagesFrom: message.from }}
                 dense
-                // disablePad
               >
                 <ListItemAvatar>
                   <Avatar
@@ -133,7 +150,10 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
                   secondary={
                     <>
                       {message.text}
-                      <Box sx={{ textAlign: "right" }}>
+                      <Box
+                        component="span"
+                        sx={{ textAlign: "right", display: "block" }}
+                      >
                         {message.createdAt
                           ? `${i18n.formatDistanceToNow(
                               i18n.parseUTC(message.createdAt),
@@ -149,11 +169,6 @@ const NotificationsPopover = ({ notifications = [], sx = {} }) => {
             </ListItem>
           ))}
         </List>
-        {/* <Stack direction="column" spacing={1}>
-          {messages.map((message) => (
-            <pre>{JSON.stringify(message, null, 2)}</pre>
-          ))}
-        </Stack> */}
       </CardContent>
     </Card>
   );
@@ -169,7 +184,7 @@ const Notifications = ({ tooltip = "Notifications" }) => {
         query: {
           page: 0,
           size: 10000,
-          // sort: ["string"],
+          sort: "createdAt,asc",
         },
       }),
   });
@@ -191,8 +206,6 @@ const Notifications = ({ tooltip = "Notifications" }) => {
         createdAt,
       })
     ) ?? [];
-
-  // : _notifications;
 
   const [anchorEl, setAnchorEl] = useState(null);
 

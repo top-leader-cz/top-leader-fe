@@ -393,7 +393,7 @@ const SliderFieldInner = ({ id, label, min, max, onChange, value }) => {
         {label}
       </InputLabel>
       <StyledSlider
-        aria-label={`${label}`}
+        // aria-label={`${label}`}
         // valueLabelDisplay="auto"
         valueLabelDisplay="on"
         // components={{
@@ -406,7 +406,7 @@ const SliderFieldInner = ({ id, label, min, max, onChange, value }) => {
         min={min}
         max={max}
         sx={{ mt: 1 }}
-        getAriaLabel={() => "Temperature range"}
+        getAriaLabel={() => `${label}`}
         value={value || [min, max]}
         onChange={handleChange}
         getAriaValueText={valuetext}

@@ -341,8 +341,7 @@ const Conversation = ({
     queryFn: () =>
       authFetch({
         url: `/api/latest/messages/${addressee}`,
-        query: { page: 0, size: 1000 },
-        // sort: ["string"], // TODO: sort enum
+        query: { page: 0, size: 1000, sort: "createdAt,asc" },
       }).then((data) => {
         const maybeMessages = data.content?.map(
           ({

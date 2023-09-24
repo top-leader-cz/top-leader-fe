@@ -18,6 +18,14 @@ export const messages = defineMessages({
     id: "coaches.filter.rate.label",
     defaultMessage: "Rate",
   },
+  "coaches.filter.rate.tooltip.credits-per-session": {
+    id: "coaches.filter.rate.tooltip.credits-per-session",
+    defaultMessage: "{credits} credits per session",
+  },
+  "coaches.filter.rate.tooltip.info": {
+    id: "coaches.filter.rate.tooltip.info",
+    defaultMessage: "1 credit = 1 euro",
+  },
 
   "coaches.filter.clear-button": {
     id: "coaches.filter.clear-button",
