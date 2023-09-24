@@ -9,9 +9,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
+import { useLocation } from "react-router-dom";
 import { RHFTextField } from "../../components/Forms";
+import { RHForm } from "../../components/Forms/Form";
 import { Header } from "../../components/Header";
 import { Layout, useRightMenu } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -19,33 +21,30 @@ import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
 import { useAuth } from "../Authorization";
-import {
-  CREATE_OFFSET,
-  CoachInfo,
-  TimeSlots,
-  createSlot,
-} from "../Coaches/Coaches.page";
+import { AvailabilityCalendar } from "../Availability/AvailabilityCalendar";
+import { CoachInfo, useCoachAvailabilityQuery } from "../Coaches/Coaches.page";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useSendMessageMutation } from "./queries";
-import { useLocation } from "react-router-dom";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { RHForm } from "../../components/Forms/Form";
 
-const longTxt =
-  "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.";
-const shortTxt = "Lorem ipsum dolor sit";
+export const useCoachQuery = ({ username }) => {
+  const { authFetch } = useAuth();
+  // GET `/api/latest/coaches/${username}/availability`
+  // GET `/api/latest/coaches/${username}/photo`
 
-const TODAY = new Date();
-const MOCK_SLOT = CREATE_OFFSET(TODAY, (start) => createSlot({ start }));
-const SELECTED = null || {
-  // TODO: where to get? API /coaches + name (search)?
-  // name: "Ju Hele",
-  role: "",
-  experience: "7",
-  languages: ["cs"],
-  rate: "666",
-  bio: longTxt + shortTxt,
-  fields: ["life"],
+  return useQuery({
+    enabled: !!username,
+    queryKey: ["coach", username],
+    queryFn: () =>
+      authFetch({ url: `/api/latest/coaches/${username}` })
+        .then((data) => {
+          return data;
+        })
+        .catch((e) => {
+          console.log("TODO:401-coach", e);
+          throw e;
+        }),
+  });
 };
 
 const RightMenu = ({
@@ -53,6 +52,15 @@ const RightMenu = ({
   avatarSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`,
   msg,
 }) => {
+  const coachQuery = useCoachQuery({ username });
+  const coachAvailabilityQuery = useCoachAvailabilityQuery({ username });
+  console.log("[Messages.RightMenu.rndr]", { coachQuery });
+  const onAvailabilityClick = ({ coach, interval }) => {
+    console.log("onAvailabilityClick", { coach, interval });
+    // prettier-ignore
+    alert(`TODO: ${JSON.stringify( { interval, username: coach.username, email: coach.email }, null, 2 )}`);
+  };
+
   return (
     <ScrollableRightMenu
       // heading={msg("")}
@@ -73,32 +81,47 @@ const RightMenu = ({
           borderRadius={1}
           width={225}
           alignSelf={"center"}
-          src={avatarSrc}
+          src={`/api/latest/coaches/${username}/photo`}
+          // src={avatarSrc}
         />
       </Box>
-      <CoachInfo
-        coach={{
-          name: username,
-          role: SELECTED.role,
-          experience: SELECTED.experience,
-          languages: SELECTED.languages,
-          rate: SELECTED.rate,
-          bio: SELECTED.bio,
-          fields: SELECTED.fields,
-        }}
-        maxBioChars={2000}
-        sx={{ my: 3 }}
-      />
-      <TimeSlots
-        freeSlots={[
-          MOCK_SLOT(0, 9),
-          MOCK_SLOT(0, 10),
-          MOCK_SLOT(0, 11),
-          MOCK_SLOT(2, 10),
-          MOCK_SLOT(3, 9),
-          MOCK_SLOT(4, 11),
-        ]}
-        sx={{ flexShrink: 0 }}
+      <QueryRenderer
+        {...coachQuery}
+        loaderName="Block"
+        success={({ data: coach }) => (
+          <>
+            {" "}
+            <CoachInfo
+              coach={coach}
+              // coach={{
+              //   name: username,
+              //   role: SELECTED.role,
+              //   experience: SELECTED.experience,
+              //   languages: SELECTED.languages,
+              //   rate: SELECTED.rate,
+              //   bio: SELECTED.bio,
+              //   fields: SELECTED.fields,
+              // }}
+              maxBioChars={2000}
+              sx={{ my: 3 }}
+            />
+            <QueryRenderer
+              {...coachAvailabilityQuery}
+              loaderName="Block"
+              success={({ data: availabilities }) => (
+                <AvailabilityCalendar
+                  availabilitiesByDay={availabilities}
+                  sx={{ flexShrink: 0 }}
+                  onTimeslotClick={({ interval }) =>
+                    onAvailabilityClick({ coach, interval })
+                  }
+                  // coachName={coach.username}
+                  // onContact={() => onContact(coach)}
+                />
+              )}
+            />
+          </>
+        )}
       />
     </ScrollableRightMenu>
   );
@@ -144,7 +167,7 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
               <ListItemAvatar>
                 <Avatar
                   alt={username}
-                  src={avatarSrc || "/static/images/avatar/2.jpg"}
+                  src={`/api/latest/coaches/${username}/photo`}
                   sx={{ width: 44, height: 44 }}
                 />
               </ListItemAvatar>
@@ -183,80 +206,6 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
     </List>
   );
 };
-
-let id = 0;
-const MOCK_MESSAGES = [
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Rerum ea nulla odit quis et.",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non. Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et. Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.",
-  },
-  {
-    id: id++,
-    fromMe: true,
-    text: "Voluptas alias tempore ullam veritatis eos quidem omnis reprehenderit non.",
-  },
-  {
-    id: id++,
-    fromMe: false,
-    text: "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.",
-  },
-];
 
 const Message = ({ message, scrollIntoView }) => {
   const ref = useRef();
@@ -459,7 +408,7 @@ const Conversation = ({
       >
         <Avatar
           alt={addressee}
-          src={avatarSrc}
+          src={`/api/latest/coaches/${addressee}/photo`}
           sx={{ width: 44, height: 44, mr: 1.5 }}
         />
         <H2>{addressee}</H2>

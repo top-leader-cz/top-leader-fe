@@ -112,6 +112,15 @@ function renderResetLang({ error, resetErrorBoundary }) {
 export const UTC_DATE_FORMAT = "yyyy-MM-dd";
 export const API_TIME_FORMAT = "HH:mm:ss";
 
+export const parseUtcZoned = (userTz, utcStr) => {
+  // { zonedTimeToUtc, format }
+  // const date = dfnsfp.parseISO(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
+  const date = dfnsfp.parseISO(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
+  const zonedDate = tz.utcToZonedTime(date, userTz);
+
+  return zonedDate;
+};
+
 export const useStaticCallback = (callback) => {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
@@ -134,6 +143,7 @@ const useI18n = ({ userTz, language }) => {
         return formatWithOptions(
           {
             locale: currentLocale,
+            // timeZone? https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
           },
           formatStr,
           date
@@ -146,13 +156,9 @@ const useI18n = ({ userTz, language }) => {
     [currentLocale]
   );
 
-  const parseUTC = useCallback(
+  const _parseUTC = useCallback(
     (utcStr) => {
-      // { zonedTimeToUtc, format }
-      const date = new Date(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
-      const zonedDate = tz.utcToZonedTime(date, userTz);
-
-      return zonedDate;
+      return parseUtcZoned(userTz, utcStr);
     },
     [userTz]
   );
@@ -208,7 +214,7 @@ const useI18n = ({ userTz, language }) => {
       currentLocale,
       formatLocal,
       formatLocalMaybe,
-      parseUTC,
+      parseUTC: _parseUTC,
       parseDate,
       startOfWeek,
       formatDistanceToNow: _formatDistanceToNow,
@@ -219,13 +225,16 @@ const useI18n = ({ userTz, language }) => {
       currentLocale,
       formatLocal,
       formatLocalMaybe,
-      parseUTC,
+      _parseUTC,
       parseDate,
       startOfWeek,
     ]
   );
   return i18n;
 };
+
+export const getBrowserTz = () =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const I18nProvider = ({ children }) => {
   // let date = new Intl.DateTimeFormat(navigator.language).format(new Date());
@@ -251,7 +260,7 @@ const I18nProvider = ({ children }) => {
 
   const { authFetch, user, fetchUser } = useAuth();
 
-  const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const browserTz = getBrowserTz();
   const userTz = useMemo(
     () => user.data?.timeZone || browserTz,
     [browserTz, user.data?.timeZone]
