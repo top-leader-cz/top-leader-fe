@@ -11,17 +11,20 @@ import {
   addDays,
   endOfDay,
   format,
+  getDay,
   getHours,
   isWithinInterval,
+  setDay,
   setHours,
   setMinutes,
   setSeconds,
   startOfDay,
+  startOfWeek,
 } from "date-fns/fp";
 import { filter, identity, map, pipe } from "ramda";
 import { useContext, useState } from "react";
 import { useQuery } from "react-query";
-import { I18nContext } from "../../App";
+import { I18nContext, UTC_DATE_FORMAT } from "../../App";
 import { LANGUAGE_OPTIONS, getLabel } from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -36,6 +39,8 @@ import { useFieldsDict } from "../Settings/useFieldsDict";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
+import { DAY_NAMES, INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import { ErrorBoundary } from "react-error-boundary";
 
 export const createSlot = ({ start, duration = 60 }) => ({
   start,
@@ -72,6 +77,7 @@ export const CalendarDaySlots = ({
   slotSx,
 }) => {
   const { i18n } = useContext(I18nContext);
+
   const daySlots = Array(slotsCount)
     .fill(null)
     .map((_, index) => ({
@@ -79,6 +85,15 @@ export const CalendarDaySlots = ({
       hour: index + startHour,
       isFree: freeHours.includes(index + startHour),
     }));
+
+  // console.log("[CalendarDaySlots.rndr]", {
+  //   date,
+  //   slotsCount,
+  //   startHour,
+  //   freeHours,
+  //   daySlots,
+  // });
+
   return (
     <Box
       sx={{
@@ -112,17 +127,65 @@ export const CREATE_OFFSET =
       map
     )(date);
 
+export const offsetDate = (daysOffset, hour, date) =>
+  pipe(
+    startOfDay,
+    addDays(daysOffset),
+    setHours(hour),
+    setMinutes(0),
+    setSeconds(0),
+    map
+  )(date);
+
 const isWithinDay = (dayDate) =>
   isWithinInterval({ start: startOfDay(dayDate), end: endOfDay(dayDate) });
+
+// const indexToDayIndex = ()
+
+const parseHour = (time) => {
+  const str = (time || "").substring(0, 2);
+  const number = parseInt(str, 10);
+  // console.log({ str, number });
+  return number;
+};
 
 export const TimeSlots = ({
   // slotsRange = [],
   onContact,
-  freeSlots = [],
+  // freeSlots = [],
+  data: availabilities,
   sx,
 }) => {
   const TODAY = new Date();
-  const MOCK_OFFSET = CREATE_OFFSET(TODAY);
+  // const MOCK_SLOT = CREATE_OFFSET(TODAY, (start) => createSlot({ start }));
+  // const freeSlots = [
+  //   // MOCK_SLOT(0 + (index % 3), 9),
+  //   // MOCK_SLOT(0 + (index % 3), 10),
+  //   // MOCK_SLOT(0 + (index % 3), 11),
+  //   // MOCK_SLOT(2 + (index % 3), 10),
+  //   // MOCK_SLOT(3 + (index % 3), 9),
+  //   // MOCK_SLOT(4 + (index % 3), 11),
+  // ];
+
+  // const freeHours = ({ index }) =>
+  //   pipe(
+  //     map((slot) => slot.start),
+  //     filter(isWithinDay(addDays(index, TODAY))),
+  //     map(getHours)
+  //   )(freeSlots);
+  const daySlots = Array(VISIBLE_DAYS_COUNT)
+    .fill(null)
+    .map((_, index) => {
+      // const dayOffset = index + offset // (weekShift*7) // TODO
+      // const date = offsetDate(index, 0, TODAY);
+      const todayDayIndex = getDay(TODAY);
+      const dayIndex = (todayDayIndex + index) % 7;
+      const dayName = INDEX_TO_DAY[dayIndex];
+
+      const date = addDays(index, TODAY);
+
+      return { dayName, date };
+    });
 
   return (
     <Box
@@ -154,22 +217,63 @@ export const TimeSlots = ({
         overflow="auto"
         borderBottom="1px solid #EAECF0"
       >
-        {Array(VISIBLE_DAYS_COUNT)
-          .fill(null)
-          .map((_, i) => (
-            <CalendarDaySlots
-              key={i}
-              startHour={9}
-              slotsCount={8}
-              date={MOCK_OFFSET(i, 0)}
-              freeHours={pipe(
-                map((slot) => slot.start),
-                filter(isWithinDay(addDays(i, TODAY))),
-                map(getHours)
-              )(freeSlots)}
-              // freeHours={getDayFreeHours(freeSlots, addDays(i, TODAY))}
-            />
-          ))}
+        {daySlots.map(({ date, dayName }, index) => {
+          const freeHours = availabilities[dayName]?.map((slot) => {
+            // slot = {
+            //     "day": "MONDAY",
+            //     "date": "2023-09-24",
+            //     "timeFrom": "09:00:00",
+            //     "timeTo": "10:00:00",
+            //     "firstDayOfTheWeek": "2023-09-24"
+            // },
+            return parseHour(slot.timeFrom);
+          });
+          console.log({ freeHours });
+          // TODO
+          const { min, max } = Object.values(availabilities)
+            .reduce((acc, arr) => acc.concat(arr), [])
+            .reduce(
+              ({ min, max }, slot) => {
+                const startHour = parseHour(slot.timeFrom);
+                // const endHour = parseHour(slot.timeTo)
+                return {
+                  min: Math.min(min, startHour),
+                  max: Math.max(max, startHour),
+                };
+              },
+              { min: 12, max: 12 }
+            );
+          // alert(`{ min: ${min}, max: ${max} }`);
+
+          const startHour = min || 0;
+          const slotsCount = max - min + 1 || 8;
+
+          if (slotsCount < 0) debugger;
+
+          console.log("[TimeSlots.rndr]", {
+            min,
+            max,
+            startHour,
+            slotsCount,
+            availabilities,
+          });
+
+          return (
+            <ErrorBoundary
+              fallbackRender={(props) => {
+                return null;
+              }}
+            >
+              <CalendarDaySlots
+                key={dayName}
+                startHour={startHour}
+                slotsCount={slotsCount}
+                date={date}
+                freeHours={freeHours}
+              />
+            </ErrorBoundary>
+          );
+        })}
       </Box>
       {onContact && (
         <ControlsContainer sx={{ mt: 1 }}>
@@ -262,8 +366,7 @@ export const CoachInfo = ({
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`;
 
-const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
-  // eslint-disable-next-line no-unused-vars
+const CoachCard = ({ coach, onContact, sx = { mb: 3 }, index }) => {
   const {
     username,
     email,
@@ -276,20 +379,43 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     languages,
     bio,
     fields,
-    photo,
-    imgSrc = photo, // TODO: rm
   } = coach;
 
-  // console.log("[CoachCard.rndr]", name, { languages });
+  const { authFetch } = useAuth();
+  const availabilityQuery = useQuery({
+    queryKey: ["coaches", username],
+    queryFn: () => {
+      const startOfW = startOfWeek(new Date());
+      console.log({ startOfW });
+      const firstDayOfTheWeek = format(UTC_DATE_FORMAT, startOfW);
+      console.log({ startOfW, firstDayOfTheWeek });
+
+      return authFetch({
+        url: `/api/latest/coaches/${username}/availability`,
+        query: {
+          firstDayOfTheWeek,
+        },
+      });
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  console.log("[CoachCard.rndr]", name, {
+    coach,
+    availabilityQuery,
+  });
+
+  if (!availabilityQuery.data) return <QueryRenderer isLoading />;
 
   return (
-    // <Card sx={{ maxWidth: "100%", ...sx }}>
     <Card sx={{ ...sx }}>
       <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
         <CardMedia
           component="img"
           sx={{ width: 225, borderRadius: 0.6 }}
-          image={imgSrc}
+          image={`/api/latest/coaches/${username}/photo`}
           alt={name}
         />
         <CoachInfo
@@ -298,8 +424,8 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
           sx={{ maxWidth: "50%", flexGrow: 10, width: "150px" }}
         />
         <TimeSlots
-          // slotsRange={[startOfDay(TODAY), pipe(addDays(6), endOfDay)(TODAY)]}
-          freeSlots={freeSlots}
+          data={availabilityQuery.data}
+          // freeSlots={freeSlots}
           onContact={() => onContact(coach)}
           sx={{ flexShrink: 0 }}
         />
@@ -307,68 +433,6 @@ const CoachCard = ({ coach, freeSlots, onContact, sx = { mb: 3 } }) => {
     </Card>
   );
 };
-
-const COACHES = [
-  {
-    id: 1,
-    name: "Milan Vlcek",
-    role: "Associate Coach Certified - Issued by ICF",
-    experience: 7,
-    languages: ["en", "cs"],
-    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-    fields: [
-      "business",
-      "career",
-      "change",
-      "communication",
-      "confidence",
-      "conflict",
-      "diversity",
-      "entrepreneurship",
-      "executive",
-      "facilitation",
-      "fitness",
-      "health",
-      "leadership",
-      "life",
-      "management",
-      "mental_fitness",
-      "mentorship",
-      "negotiations",
-      "organizational_development",
-      "performance",
-      "relationships",
-      "sales",
-      "teams",
-      "time_management",
-      "transformations",
-      "wellbeing",
-      "women",
-    ],
-    imgSrc: `https://i.pravatar.cc/225?u=${"" + Math.random()}`,
-    // imgSrc: "https://i.pravatar.cc/225?img=1",
-  },
-  {
-    id: 2,
-    name: "Darnell Brekke",
-    role: "Associate Coach Certified - Issued by ICF",
-    experience: 2,
-    languages: ["en"],
-    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-    fields: ["business", "life"],
-    imgSrc: `https://i.pravatar.cc/225?u=${"" + Math.random()}`,
-  },
-  {
-    id: 3,
-    name: "Jenna Pagac",
-    role: "Associate Coach Certified - Issued by ICF",
-    experience: 3,
-    languages: ["en", "cs"],
-    bio: "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-    fields: ["business", "life"],
-    imgSrc: `https://i.pravatar.cc/225?u=${"" + Math.random()}`,
-  },
-];
 
 const getPayload = ({
   filter: {
@@ -397,6 +461,21 @@ const getPayload = ({
 export function CoachesPageInner() {
   const msg = useMsg();
   const { language } = useContext(I18nContext);
+  const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
+  const [contactCoach, setContactCoach] = useState(null);
+  const handleContact = (coach) => setContactCoach(coach);
+
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryKey: ["coaches", filter],
+    queryFn: () =>
+      authFetch({
+        method: "POST",
+        url: "/api/latest/coaches",
+        data: getPayload({ filter }),
+      }),
+    refetchOnWindowFocus: false,
+  });
 
   const EXPECT_ITEMS = [
     // {
@@ -415,26 +494,6 @@ export function CoachesPageInner() {
       text: msg("coaches.aside.items.3.text"),
     },
   ];
-
-  const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
-
-  const TODAY = new Date();
-  const MOCK_SLOT = CREATE_OFFSET(TODAY, (start) => createSlot({ start }));
-
-  const [contactCoach, setContactCoach] = useState(null);
-  const handleContact = (coach) => setContactCoach(coach);
-
-  const { authFetch } = useAuth();
-  const query = useQuery({
-    queryKey: ["coaches", filter],
-    queryFn: () =>
-      authFetch({
-        method: "POST",
-        url: "/api/latest/coaches",
-        data: getPayload({ filter }),
-      }),
-    refetchOnWindowFocus: false,
-  });
 
   // console.log("[Coaches.page.rndr]", { filter });
 
@@ -480,42 +539,11 @@ export function CoachesPageInner() {
               coach={coach}
               sx={{ my: 3 }}
               onContact={handleContact}
-              freeSlots={[
-                MOCK_SLOT(0 + (i % 3), 9),
-                MOCK_SLOT(0 + (i % 3), 10),
-                MOCK_SLOT(0 + (i % 3), 11),
-                MOCK_SLOT(2 + (i % 3), 10),
-                MOCK_SLOT(3 + (i % 3), 9),
-                MOCK_SLOT(4 + (i % 3), 11),
-              ]}
+              index={i}
             />
           ))
         }
       />
-
-      {/* <Divider>Mocked users:</Divider> */}
-      {/* {Array(25) */}
-      {/* {Array(1)
-        .fill(null)
-        .map((_, i) => COACHES)
-        .reduce((acc, v) => acc.concat(v), [])
-        // .filter(coachPredicate(filter))
-        .map((coach, i) => (
-          <CoachCard
-            key={coach.id + i}
-            coach={coach}
-            sx={{ my: 3 }}
-            onContact={handleContact}
-            freeSlots={[
-              MOCK_SLOT(0 + (i % 3), 9),
-              MOCK_SLOT(0 + (i % 3), 10),
-              MOCK_SLOT(0 + (i % 3), 11),
-              MOCK_SLOT(2 + (i % 3), 10),
-              MOCK_SLOT(3 + (i % 3), 9),
-              MOCK_SLOT(4 + (i % 3), 11),
-            ]}
-          />
-        ))} */}
 
       <ContactModal
         coach={contactCoach}

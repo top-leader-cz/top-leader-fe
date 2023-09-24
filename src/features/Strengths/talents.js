@@ -987,6 +987,9 @@ const messages = defineMessages({
 // Deciduous Tree
 // Chart Increasing
 
+// const heart = "❤️"; // black on win
+// export const heart = "♥️";
+export const heart = "\u2764\ufe0f";
 const emojis = {
   analyser: "📊",
   believer: "🔮",

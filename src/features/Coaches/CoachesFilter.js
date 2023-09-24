@@ -4,8 +4,10 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Divider,
   InputAdornment,
+  Stack,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -19,6 +21,9 @@ import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
 import { I18nContext, defaultLanguage } from "../../App";
 import { RHForm } from "../../components/Forms/Form";
+
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
@@ -66,6 +71,9 @@ const Rates = ({ msg, rates = RATES }) => {
     </>
   );
 };
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   const { language } = useContext(I18nContext);
   const msg = useMsg();
@@ -125,7 +133,8 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
     >
       <Card sx={{ ...sx }}>
         <CardContent sx={{ "&:last-child": { pb: 2 } }}>
-          <Box display="flex" flexDirection="row" gap={3}>
+          {/* <Box display="flex" flexDirection="row" gap={3}> */}
+          <Stack direction="row" spacing={2}>
             <AutocompleteSelect
               name="languages"
               label={msg("coaches.filter.language.label")}
@@ -154,13 +163,37 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
                   // label={ <Tooltip title="rates"> {msg("coaches.filter.rate.label")} </Tooltip> } // NOT WORKING
                   options={ratesOptions}
                   multiple
+                  // disablePortal
                   disableCloseOnSelect
+                  // renderOption={(props, option, { selected }) => (
+                  //   <li {...props}>
+                  //     <Checkbox
+                  //       icon={icon}
+                  //       checkedIcon={checkedIcon}
+                  //       style={{ marginRight: 8 }}
+                  //       checked={selected}
+                  //     />
+                  //     {option.label}
+                  //   </li>
+                  // )}
+                  // sx={{ maxHeight: "40px" }}
+                  // textFieldProps={{
+                  //   sx: {
+                  //     maxHeight: "40px",
+                  //     overflow: "hidden",
+                  //     "& .MuiInputBase-root": {
+                  //       maxHeight: "40px",
+                  //       overflow: "hidden",
+                  //     },
+                  //   },
+                  // }}
                 />
               </div>
             </Tooltip>
 
             {/* <OutlinedField label="Test" /> */}
-          </Box>
+          </Stack>
+          {/* </Box> */}
           <Divider sx={{ mt: 3, mb: 2 }} />
           <ControlsContainer>
             <Button

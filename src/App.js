@@ -1,6 +1,6 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider, useAuth } from "./features/Authorization/AuthProvider";
 
@@ -112,6 +112,12 @@ function renderResetLang({ error, resetErrorBoundary }) {
 export const UTC_DATE_FORMAT = "yyyy-MM-dd";
 export const API_TIME_FORMAT = "HH:mm:ss";
 
+export const useStaticCallback = (callback) => {
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+  return useCallback((...args) => callbackRef.current(...args), []);
+};
+
 const useI18n = ({ userTz, language }) => {
   const currentLocale = locales[language];
   if (!currentLocale) {
@@ -124,13 +130,18 @@ const useI18n = ({ userTz, language }) => {
   const formatLocal = useCallback(
     (date, formatStr = "PP") => {
       // console.log("[useI18n.formatLocal] TODO: UTC", { date, formatStr });
-      return formatWithOptions(
-        {
-          locale: currentLocale,
-        },
-        formatStr,
-        date
-      );
+      try {
+        return formatWithOptions(
+          {
+            locale: currentLocale,
+          },
+          formatStr,
+          date
+        );
+      } catch (e) {
+        console.error("[formatLocal]", { e, date, formatStr, currentLocale });
+        return "";
+      }
     },
     [currentLocale]
   );
@@ -258,6 +269,32 @@ const I18nProvider = ({ children }) => {
       }),
     onSuccess: () => fetchUser(),
   });
+
+  const shouldSaveUserTz =
+    user.data && !user.data.timeZone && browserTz && !userTzMutation.isLoading;
+  const saveUserTz = useStaticCallback(
+    () => browserTz && userTzMutation.mutate(browserTz)
+  );
+  useEffect(() => {
+    if (shouldSaveUserTz) {
+      console.log(
+        "%c[saveUserTz] initializing user tz (autosave)",
+        "color:coral",
+        { shouldSaveUserTz }
+      );
+      saveUserTz();
+    }
+  }, [saveUserTz, shouldSaveUserTz]);
+  const userTzWarning = Boolean(
+    user.data?.timeZone && browserTz && user.data?.timeZone !== browserTz
+  );
+  useEffect(() => {
+    // TODO: move Alert in Layout or inside IntlProvider, translate
+    if (userTzWarning)
+      alert(
+        "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
+      );
+  }, [userTzWarning]);
 
   const onReset = useCallback(
     ({ args }) => {

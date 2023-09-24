@@ -17,6 +17,8 @@ export const JourneyRightMenu = () => {
         alignItems: "center",
         minWidth: 0,
         overflow: "hidden",
+        textWrap: "wrap",
+        textAlign: "center",
         // alignItems: "stretch",
         // justifyContent: "space-between",
       }}

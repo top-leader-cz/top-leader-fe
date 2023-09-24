@@ -24,7 +24,7 @@ import { FieldLayout, FormRow } from "./FormRow";
 import { useResetForm } from "./ProfileSettings";
 import { WHITE_BG } from "./Settings.page";
 
-const INDEX_TO_DAY = [
+export const INDEX_TO_DAY = [
   "SUNDAY", // 0
   "MONDAY",
   "TUESDAY",
@@ -34,7 +34,7 @@ const INDEX_TO_DAY = [
   "SATURDAY",
 ];
 
-const DAY_NAMES = [
+export const DAY_NAMES = [
   "MONDAY",
   "TUESDAY",
   "WEDNESDAY",

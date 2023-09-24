@@ -105,6 +105,7 @@ export const GeneralSettings = () => {
           sx={{ mb: 3 }}
         >
           <AutocompleteSelect
+            disableClearable
             sx={WHITE_BG}
             name={FIELDS_GENERAL.language}
             options={LANGUAGE_OPTIONS}
@@ -121,13 +122,14 @@ export const GeneralSettings = () => {
           dividerBottom={true}
         >
           <AutocompleteSelect
+            disableClearable
             sx={WHITE_BG}
             name={FIELDS_GENERAL.timeZone}
             options={TIMEZONE_OPTIONS}
             // rules={{ required: true }}
-            placeholder="Select your timezone" // TODO: translations!
+            placeholder="" // TODO: translations? should be always populated
             onChange={(timeZone) => userTzMutation.mutate(timeZone)}
-            disbled={userTzMutation.isLoading}
+            disabled={userTzMutation.isLoading}
             // getValue={(field) => {
             //   console.log(
             //     "%c[PS.rndr.getValue]" + field.name,

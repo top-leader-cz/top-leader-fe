@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from "react";
@@ -83,14 +84,13 @@ const to = ({ photo, ...data }, { userLocale, userTz }) => {
 };
 
 const from = async ({ imageSrc, ...values }) => {
-  const file = imageSrc ? imageSrc?.[0] : undefined;
-  const photo = await getBase64(file);
-  console.log("from", { imageSrc, photo, file, ...values });
+  // const file = imageSrc ? imageSrc?.[0] : undefined;
+  // const photo = await getBase64(file);
+  // console.log("from", { imageSrc, photo, file, ...values });
+  console.log("from", { imageSrc, ...values });
 
   return {
     ...values,
-    photo,
-    // photo: [photo],
     experienceSince: values.experienceSince, // TODO
   };
 };
@@ -162,6 +162,35 @@ export const ProfileSettings = () => {
     },
   });
 
+  const [reloadPhotoToken, reloadPhoto] = useReducer((i) => i + 1, 0);
+  const postPhotoMutation = useMutation({
+    mutationFn: async ({ file }) => {
+      // const photo = await getBase64(file);
+      const formData = new FormData();
+      formData.append("image", file, file.name);
+      console.log("[postPhotoMutation]", { formData, file });
+
+      return authFetch({
+        method: "POST",
+        url: `/api/latest/coach-info/photo`,
+        data: formData,
+      });
+    },
+    onSuccess: () => {
+      console.log("[postPhotoMutation.onSuccess] reloading photo!!!");
+      reloadPhoto();
+    },
+  });
+
+  const handlePhotoUpload = (file) => {
+    console.log("[handlePhotoUpload]", { file });
+
+    if (file) {
+      console.log("[handlePhotoUpload] HAVE FILE", { file });
+      postPhotoMutation.mutate({ file });
+    }
+  };
+
   const { data } = initialValuesQuery;
   useEffect(() => {
     console.log("%c[PS.eff reset]", "color:lime", { data: data });
@@ -208,7 +237,8 @@ export const ProfileSettings = () => {
               width={225}
               alignSelf={"center"}
               // src={COACH.imageSrc}
-              src={img1}
+              // src={img1}
+              src={`/api/latest/coach-info/photo?${reloadPhotoToken}`}
             />
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
@@ -258,6 +288,7 @@ export const ProfileSettings = () => {
         form,
         i18n,
         msg,
+        reloadPhotoToken,
         saveDisabled,
         saveMutation.mutateAsync,
       ]
@@ -321,9 +352,9 @@ export const ProfileSettings = () => {
       <FormRow label={msg("settings.profile.field.photo")}>
         <FileUpload
           name={FIELDS.imageSrc}
-          // src={COACH.imageSrc}
-          src={img1}
+          src={`/api/latest/coach-info/photo`}
           secondaryText={msg("settings.profile.field.photo.limit")}
+          onChange={handlePhotoUpload}
         />
       </FormRow>
 
