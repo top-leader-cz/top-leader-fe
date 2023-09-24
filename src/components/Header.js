@@ -12,50 +12,20 @@ import {
   ListItemButton,
   ListItemText,
   Popover,
-  Stack,
 } from "@mui/material";
-import { H1, H2 } from "./Typography";
-import { Icon } from "./Icon";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useMsg } from "./Msg/Msg";
-import { messages as generalMessages } from "./messages";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "react-query";
-import { useAuth } from "../features/Authorization";
 import { I18nContext } from "../App";
+import { useAuth } from "../features/Authorization";
 import { routes } from "../routes";
-import { qstr } from "../features/Authorization/AuthProvider";
-import { generatePath } from "react-router-dom";
+import { Icon } from "./Icon";
 import { LinkBehavior } from "./LinkBehavior";
+import { useMsg } from "./Msg/Msg";
+import { H1, H2 } from "./Typography";
+import { messages as generalMessages } from "./messages";
 
 const defaultAvaratSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`;
 
-const longTxt =
-  "Et et officia laborum magnam sint perspiciatis alias. Ab similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.";
-const shortTxt = "Lorem ipsum dolor sit";
-const NOTIFICATIONS_MOCK = [
-  {
-    key: 0,
-    from: "Mockname",
-    text: shortTxt,
-    unread: true,
-    createdAt: "2023-09-18T22:00:36.838Z",
-    // createdAt: "2023-08-15T17:12:10.640453" // ?? previous api datetime format
-  },
-  {
-    key: 1,
-    from: "Mockname",
-    text: longTxt,
-    unread: false,
-    createdAt: "2023-09-18T22:00:36.838Z",
-  },
-  {
-    key: 2,
-    from: "Mockname",
-    text: "Hi hello lorem ipsum",
-    unread: false,
-    createdAt: "2023-09-18T22:00:36.838Z",
-  },
-];
 const NotificationsPopover = ({
   notifications = [],
   sx = {},
@@ -132,7 +102,7 @@ const NotificationsPopover = ({
                 <ListItemAvatar>
                   <Avatar
                     alt={message.from}
-                    src={message.avatarSrc || defaultAvaratSrc}
+                    src={`/api/latest/coaches/${message.from}/photo`}
                     sx={{ width: 44, height: 44 }}
                   />
                 </ListItemAvatar>

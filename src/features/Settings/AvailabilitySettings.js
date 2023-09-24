@@ -18,13 +18,13 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
-import { CREATE_OFFSET, CalendarDaySlots } from "../Coaches/Coaches.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { FieldLayout, FormRow } from "./FormRow";
 import { useResetForm } from "./ProfileSettings";
 import { WHITE_BG } from "./Settings.page";
+import { CREATE_OFFSET, TimeSlot } from "../Availability/AvailabilityCalendar";
 
-const INDEX_TO_DAY = [
+export const INDEX_TO_DAY = [
   "SUNDAY", // 0
   "MONDAY",
   "TUESDAY",
@@ -34,7 +34,7 @@ const INDEX_TO_DAY = [
   "SATURDAY",
 ];
 
-const DAY_NAMES = [
+export const DAY_NAMES = [
   "MONDAY",
   "TUESDAY",
   "WEDNESDAY",
@@ -273,6 +273,54 @@ const getRangeHours = ({ timeFrom, timeTo }) => {
     .fill(null)
     .map((_, i) => startHour + i);
   return hours;
+};
+
+export const CalendarDaySlots = ({
+  date,
+  slotsCount,
+  startHour,
+  freeHours = [],
+  sx = { flexDirection: "column" },
+  dateSx,
+  slotSx,
+}) => {
+  const { i18n } = useContext(I18nContext);
+
+  const daySlots = Array(slotsCount)
+    .fill(null)
+    .map((_, index) => ({
+      index,
+      hour: index + startHour,
+      isFree: freeHours.includes(index + startHour),
+    }));
+
+  // console.log("[CalendarDaySlots.rndr]", {
+  //   date,
+  //   slotsCount,
+  //   startHour,
+  //   freeHours,
+  //   daySlots,
+  // });
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "stretch",
+        textAlign: "center",
+        gap: 1,
+        width: "100%",
+        ...sx,
+      }}
+    >
+      <Box py={1} px={0.5} sx={dateSx}>
+        {i18n.formatLocal(date, "E d")}
+      </Box>
+      {daySlots.map(({ hour, isFree }) => (
+        <TimeSlot key={hour} hour={hour} isFree={isFree} sx={slotSx} />
+      ))}
+    </Box>
+  );
 };
 
 export const AvailabilitySettings = () => {

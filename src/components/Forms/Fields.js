@@ -15,14 +15,14 @@ import {
   DesktopDatePicker,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
 import { useContext } from "react";
-import { I18nContext } from "../../App";
+import { I18nContext, useStaticCallback } from "../../App";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -449,6 +449,11 @@ export const AutocompleteSelect = ({
   onChange,
   getValue = (f) => f.value,
   sx = {},
+  textFieldProps = {},
+  disablePortal,
+  AutocompleteComponent = Autocomplete,
+  TextFieldComponent = TextField,
+  disableClearable,
 }) => {
   const from = useMemo(
     () =>
@@ -462,8 +467,9 @@ export const AutocompleteSelect = ({
       name={name}
       rules={rules}
       render={({ field, fieldState }) => (
-        <Autocomplete
+        <AutocompleteComponent
           name={name}
+          disablePortal={disablePortal}
           autoHighlight
           fullWidth
           id={id}
@@ -472,6 +478,7 @@ export const AutocompleteSelect = ({
           sx={sx}
           multiple={multiple}
           disableCloseOnSelect={disableCloseOnSelect}
+          disableClearable={disableClearable}
           options={options}
           // isOptionEqualToValue={ // TODO: try to handle multiple
           //   disableIsOptionEqualToValue
@@ -504,7 +511,7 @@ export const AutocompleteSelect = ({
             //   field,
             //   params,
             // }) ||
-            <TextField
+            <TextFieldComponent
               {...params}
               label={label}
               placeholder={placeholder}
@@ -515,6 +522,7 @@ export const AutocompleteSelect = ({
                 ...params.inputProps, // should contain value, but after form init it is ""
                 // autocomplete: autoComplete,
                 autoComplete: autoComplete,
+                ...(textFieldProps.inputProps ?? {}),
                 // "aria-autocomplete": autoComplete, // default is "list"
                 // ...InputProps,
                 // value: field.value, // TODO: test
@@ -524,12 +532,7 @@ export const AutocompleteSelect = ({
               InputLabelProps={{
                 shrink: !!label,
               }}
-              sx={
-                {
-                  // mt: 1,
-                  // "label + .MuiOutlinedInput-root": { marginTop: 3 },
-                }
-              }
+              {...textFieldProps}
             />
           )}
           // inputValue={`${field.value}`}
@@ -692,11 +695,16 @@ export async function getBase64(file) {
 }
 
 // https://claritydev.net/blog/react-hook-form-multipart-form-data-file-uploads
-const FileUploadInner = ({ name, src, secondaryText }) => {
+const FileUploadInner = ({ name, src, secondaryText, onChange = () => {} }) => {
   const { register, watch } = useFormContext();
   const fileList = watch(name);
-  const file = fileList?.[0];
-  const fileSrc = file ? URL.createObjectURL(file) : src;
+  const fileMaybe = fileList?.[0];
+  const fileSrc = fileMaybe ? URL.createObjectURL(fileMaybe) : src;
+
+  const onChangeStatic = useStaticCallback(onChange);
+  useEffect(() => {
+    onChangeStatic(fileMaybe);
+  }, [fileMaybe, onChangeStatic]);
 
   console.log("FileUploadInner.rndr", { name, src, fileList, fileSrc });
   return (

@@ -1,12 +1,7 @@
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Backdrop, Box, CircularProgress } from "@mui/material";
 
-export const QueryRenderer = ({
-  children,
-  success = (query) =>
-    children?.(query) ||
-    children || <pre>{JSON.stringify(query.data, null, 2)}</pre>,
-  errored = (e) => <pre>{JSON.stringify(e, null, 2)}</pre>,
-  loading = () => (
+export const Loaders = {
+  Backdrop: () => (
     <Backdrop
       sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
       open
@@ -14,6 +9,22 @@ export const QueryRenderer = ({
       <CircularProgress color="inherit" />
     </Backdrop>
   ),
+  Block: () => (
+    <Box sx={{ display: "flex" }}>
+      <CircularProgress color="inherit" />
+    </Box>
+  ),
+  // INLINE
+};
+
+export const QueryRenderer = ({
+  children,
+  success = (query) =>
+    children?.(query) ||
+    children || <pre>{JSON.stringify(query.data, null, 2)}</pre>,
+  errored = (e) => <pre>{JSON.stringify(e, null, 2)}</pre>,
+  loaderName = "Backdrop",
+  loading = Loaders[loaderName],
   ...query
 }) => {
   if (query.data) return success(query);

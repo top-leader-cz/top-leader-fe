@@ -1,6 +1,7 @@
 import { fromPairs, map, pipe } from "ramda";
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
+import { heart } from "../Strengths/talents";
 
 const messages = defineMessages({
   "dict.values.accountability.name": {
@@ -333,7 +334,8 @@ const emojis = {
   fairness: "👨‍⚖️",
   family: "🏡",
   fitness: "🏋️",
-  health: "❤️",
+  health: heart,
+  // health: "❤️", // black on win
   helping: "🤲",
   honesty: "✊",
   independence: "🧑‍💻",
