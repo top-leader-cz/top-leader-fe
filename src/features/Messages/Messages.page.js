@@ -27,7 +27,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useSendMessageMutation } from "./queries";
 
-export const useCoachQuery = ({ username }) => {
+export const useCoachQuery = ({ username, onError, onSuccess }) => {
   const { authFetch } = useAuth();
   // GET `/api/latest/coaches/${username}/availability`
   // GET `/api/latest/coaches/${username}/photo`
@@ -35,24 +35,34 @@ export const useCoachQuery = ({ username }) => {
   return useQuery({
     enabled: !!username,
     queryKey: ["coach", username],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/coaches/${username}` })
-        .then((data) => {
-          return data;
-        })
-        .catch((e) => {
-          console.log("TODO:401-coach", e);
-          throw e;
-        }),
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
+    // .catch((e) => {
+    //   console.log("TODO:401-coach", e);
+    //   throw e;
+    //   // if (e?.response?.status === 404) return undefined;
+    // }),
+    onError,
+    onSuccess,
   });
 };
 
-const RightMenu = ({
-  username,
-  avatarSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`,
-  msg,
-}) => {
-  const coachQuery = useCoachQuery({ username });
+const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
+  const onError = useCallback(
+    (e) => {
+      if (e?.response?.status === 404) setRightOpen(false);
+    },
+    [setRightOpen]
+  );
+  const onSuccess = useCallback(
+    (e) => {
+      setRightOpen(true);
+    },
+    [setRightOpen]
+  );
+  const coachQuery = useCoachQuery({ username, onError, onSuccess });
   const coachAvailabilityQuery = useCoachAvailabilityQuery({ username });
   console.log("[Messages.RightMenu.rndr]", { coachQuery });
   const onAvailabilityClick = ({ coach, interval }) => {
@@ -60,51 +70,48 @@ const RightMenu = ({
     // prettier-ignore
     alert(`TODO: ${JSON.stringify( { interval, username: coach.username, email: coach.email }, null, 2 )}`);
   };
+  const profilePhotoSrc = `/api/latest/coaches/${username}/photo`;
 
   return (
     <ScrollableRightMenu
       // heading={msg("")}
-      buttonProps={{
-        children: msg("messages.aside.pick-coach"),
-        type: "submit",
-        //   disabled: saveDisabled,
-        onClick: (e) => {
-          console.log("Pick click");
-          // form.handleSubmit(saveMutation.mutateAsync, onError)(e);
-        },
-      }}
+      buttonProps={
+        !coachQuery.data
+          ? undefined
+          : {
+              children: msg("messages.aside.pick-coach"),
+              type: "submit",
+              //   disabled: saveDisabled,
+              onClick: (e) => {
+                console.log("Pick click");
+                // form.handleSubmit(saveMutation.mutateAsync, onError)(e);
+              },
+            }
+      }
       sx={{ whiteSpace: "normal" }}
     >
-      <Box width="100%" align="left" mt={3}>
-        <Box
-          component="img"
-          borderRadius={1}
-          width={225}
-          alignSelf={"center"}
-          src={`/api/latest/coaches/${username}/photo`}
-          // src={avatarSrc}
-        />
-      </Box>
       <QueryRenderer
         {...coachQuery}
         loaderName="Block"
+        errored={(e) => {
+          // console.log("coachQuery.errored.rndr", { e })
+          return null;
+        }}
         success={({ data: coach }) => (
           <>
-            {" "}
-            <CoachInfo
-              coach={coach}
-              // coach={{
-              //   name: username,
-              //   role: SELECTED.role,
-              //   experience: SELECTED.experience,
-              //   languages: SELECTED.languages,
-              //   rate: SELECTED.rate,
-              //   bio: SELECTED.bio,
-              //   fields: SELECTED.fields,
-              // }}
-              maxBioChars={2000}
-              sx={{ my: 3 }}
-            />
+            <Box width="100%" align="left" mt={3}>
+              {/* <object data="https://placehold.co/400x400?text=Incognito" type="image/png" > */}
+              <Box
+                component="img"
+                borderRadius={1}
+                width={225}
+                alignSelf={"center"}
+                src={profilePhotoSrc}
+                alt={`${username}`}
+              />
+              {/* </object> */}
+            </Box>
+            <CoachInfo coach={coach} maxBioChars={2000} sx={{ my: 3 }} />
             <QueryRenderer
               {...coachAvailabilityQuery}
               loaderName="Block"
@@ -576,13 +583,15 @@ function MessagesPageInner() {
   });
 
   useRightMenu(
-    useMemo(
-      () =>
+    useCallback(
+      ({ rightOpen, setRightOpen }) =>
         selectedUsername && (
           <RightMenu
             username={selectedUsername}
-            avatarSrc={selectedConversation?.avatarSrc}
+            // avatarSrc={selectedConversation?.avatarSrc}
             msg={msg}
+            rightOpen={rightOpen}
+            setRightOpen={setRightOpen}
           />
         ),
       [msg, selectedConversation?.avatarSrc, selectedUsername]

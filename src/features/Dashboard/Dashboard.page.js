@@ -243,7 +243,8 @@ const DashboardCardSession = () => {
 };
 
 export function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isCoach } = useAuth();
+  const username = user.data.username;
   console.log("[Dashboard.rndr]", { user });
 
   return (
@@ -252,10 +253,8 @@ export function DashboardPage() {
         rightMenuContent={<JourneyRightMenu />}
         header={{
           withNotifications: true,
-          avatarSrc: "https://i.pravatar.cc/44",
-          heading: (
-            <Msg id="dashboard.header" values={{ user: user.data.username }} />
-          ),
+          avatarSrc: isCoach && `/api/latest/coaches/${username}/photo`,
+          heading: <Msg id="dashboard.header" values={{ user: username }} />,
         }}
       >
         <Box>

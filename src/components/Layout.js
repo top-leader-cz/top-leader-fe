@@ -99,21 +99,21 @@ const SideMenu = ({ children, width, anchor, toggleMobile, open }) => {
 export const RightMenuContext = createContext();
 
 const update =
-  ({ id, element }) =>
+  ({ id, render }) =>
   (prev) => {
     const index = prev.findIndex((item) => item.id === id);
     let newStack;
-    if (!element) {
+    if (!render) {
       // console.log("%cUPDATE STACK", "color:pink;", "REMOVE");
       newStack = prev.filter((item) => item.id !== id);
-    } else if (index < 0 && element) {
+    } else if (index < 0 && render) {
       // console.log("%cUPDATE STACK", "color:pink;", "ADD");
-      newStack = [...prev, { id, element }];
+      newStack = [...prev, { id, render }];
     } else {
       // console.log("%cUPDATE STACK", "color:pink;", "UPDATE");
       newStack = [...prev];
-      newStack[index] = { id, element };
-      // newStack = [...prev].splice(index, 0, { id, element });
+      newStack[index] = { id, render };
+      // newStack = [...prev].splice(index, 0, { id, render });
     }
     return newStack;
   };
@@ -122,7 +122,7 @@ export const RightMenuProvider = ({ children }) => {
   const [stack, setStack] = useState([]);
   const context = useMemo(
     () => ({
-      updateStack: ({ id, element }) => setStack(update({ id, element })),
+      updateStack: ({ id, render }) => setStack(update({ id, render })),
       stack,
     }),
     [stack]
@@ -138,7 +138,7 @@ export const RightMenuProvider = ({ children }) => {
 
 let counter = 0;
 
-export const useRightMenu = (element) => {
+export const useRightMenu = (elementOrFn) => {
   const [id] = useState(() => counter++);
   const { updateStack } = useContext(RightMenuContext);
 
@@ -146,14 +146,20 @@ export const useRightMenu = (element) => {
   updateStackRef.current = updateStack;
 
   useEffect(() => {
+    const render =
+      typeof elementOrFn === "function"
+        ? elementOrFn
+        : elementOrFn
+        ? () => elementOrFn
+        : undefined;
     // console.log("%c[useRightMenu.eff]", "color:coral;", { id, element });
-    updateStackRef.current({ id, element });
-  }, [element, id]);
+    updateStackRef.current({ id, render });
+  }, [elementOrFn, id]);
 
   useEffect(
     () => () => {
       // console.log("%c[useRightMenu.eff cleanup]", "color:coral;", { id });
-      updateStackRef.current({ id, element: null });
+      updateStackRef.current({ id, render: null });
     },
     [id]
   );
@@ -201,10 +207,14 @@ export const Layout = ({
   }, []);
 
   const { stack } = useContext(RightMenuContext);
-  const rightMenuContent = useMemo(
-    () => rightMenuContentProp || stack[stack.length - 1]?.element,
-    [rightMenuContentProp, stack]
-  );
+  const rightMenuContent = useMemo(() => {
+    // const propMenu = typeof rightMenuContentProp === "function" ? rightMenuContentProp({}) : rightMenuContentProp
+    const lastStackItem = stack[stack.length - 1];
+    return (
+      rightMenuContentProp ||
+      lastStackItem?.render?.({ rightOpen, setRightOpen })
+    );
+  }, [rightMenuContentProp, rightOpen, stack]);
   const leftWidth = leftOpen ? 256 : 88;
   const rightWidth = rightOpen ? (downLg ? 300 : 392) : 12;
   // console.log("[Layout.rndr]", { stack, rightMenuContent });

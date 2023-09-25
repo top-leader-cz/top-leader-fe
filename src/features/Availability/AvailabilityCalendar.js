@@ -29,11 +29,6 @@ import { I18nContext, getBrowserTz, parseUtcZoned } from "../../App";
 import { Msg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 
-export const createSlot = ({ start, duration = 60 }) => ({
-  start,
-  // duration,
-});
-
 const HEADER_FORMAT = "d MMM";
 const VISIBLE_DAYS_COUNT = 7;
 
@@ -215,7 +210,9 @@ const CalendarDaySlots = ({
       </Box>
       {slots.map(({ hour, isFree, interval }) => (
         <TimeSlot
-          onClick={onTimeslotClick && (() => onTimeslotClick({ interval }))}
+          onClick={
+            interval && onTimeslotClick && (() => onTimeslotClick({ interval }))
+          }
           key={hour}
           hour={hour}
           isFree={isFree}
