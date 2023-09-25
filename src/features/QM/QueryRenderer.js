@@ -10,7 +10,15 @@ export const Loaders = {
     </Backdrop>
   ),
   Block: () => (
-    <Box sx={{ display: "flex" }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        my: 2,
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
       <CircularProgress color="inherit" />
     </Box>
   ),
