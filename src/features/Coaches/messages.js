@@ -56,6 +56,10 @@ export const messages = defineMessages({
     id: "coaches.coach.contact",
     defaultMessage: "Contact",
   },
+  "coaches.coach.pick": {
+    id: "coaches.coach.pick",
+    defaultMessage: "Pick the Coach",
+  },
 
   "coaches.contact.title": {
     id: "coaches.contact.title",

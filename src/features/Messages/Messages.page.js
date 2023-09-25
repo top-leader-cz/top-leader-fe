@@ -588,13 +588,12 @@ function MessagesPageInner() {
         selectedUsername && (
           <RightMenu
             username={selectedUsername}
-            // avatarSrc={selectedConversation?.avatarSrc}
             msg={msg}
             rightOpen={rightOpen}
             setRightOpen={setRightOpen}
           />
         ),
-      [msg, selectedConversation?.avatarSrc, selectedUsername]
+      [msg, selectedUsername]
     )
   );
 

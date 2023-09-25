@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { I18nContext, UTC_DATE_FORMAT } from "../../App";
+import { I18nContext } from "../../App";
 import { ActionSteps, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -26,6 +26,7 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
+import { UTC_DATE_FORMAT } from "../../utils/date";
 
 const IconTile = ({ iconName, caption, text }) => {
   return (

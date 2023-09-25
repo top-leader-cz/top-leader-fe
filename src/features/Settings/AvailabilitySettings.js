@@ -5,7 +5,7 @@ import { getTimezoneOffset } from "date-fns-tz";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { API_TIME_FORMAT, I18nContext, UTC_DATE_FORMAT } from "../../App";
+import { I18nContext } from "../../App";
 import {
   B,
   CheckboxField,
@@ -23,6 +23,7 @@ import { FieldLayout, FormRow } from "./FormRow";
 import { useResetForm } from "./ProfileSettings";
 import { WHITE_BG } from "./Settings.page";
 import { CREATE_OFFSET, TimeSlot } from "../Availability/AvailabilityCalendar";
+import { API_TIME_FORMAT, UTC_DATE_FORMAT } from "../../utils/date";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -173,10 +174,10 @@ const getAvailabilities = ({ formValues, i18n, userTz }) => {
     .map(({ dayName, range }) => {
       const [from, to] = range || [];
       // const utc = [zonedTimeToUtc(from, userTz), zonedTimeToUtc(to, userTz)];
-      // const utcF = utc.map((d) => format(d, i18n.uiFormats.apiTimeFormat));
+      // const utcF = utc.map((d) => format(d, API_TIME_FORMAT));
       // Same as utcF:
-      const timeFrom = format(from, i18n.uiFormats.apiTimeFormat);
-      const timeTo = format(to, i18n.uiFormats.apiTimeFormat);
+      const timeFrom = format(from, API_TIME_FORMAT);
+      const timeTo = format(to, API_TIME_FORMAT);
 
       // console.log("%c[getAvailabilities]" + dayName, "color:magenta", { range, utc, utcF, timeFrom, timeTo, });
       // debugger;
@@ -199,10 +200,7 @@ const from = ({ values, i18n, userTz }) => {
     ...(recurring
       ? {}
       : {
-          firstDayOfTheWeek: i18n.formatLocal(
-            i18n.startOfWeek(from), // TODO: Dan
-            UTC_DATE_FORMAT
-          ),
+          firstDayOfTheWeek: i18n.getFirstDayOfTheWeek(from),
         }), // TODO: timezone needed, startOfWeek affected by tz
   };
 

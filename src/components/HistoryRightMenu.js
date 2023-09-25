@@ -38,7 +38,7 @@ export const HistoryRightMenu = ({
           // variant={"contained"}
         >
           {i18n.formatLocal(
-            i18n.parseUTC(entry.date),
+            i18n.parseUTCLocal(entry.date),
             "Pp"
             // i18n.uiFormats.inputDateFormat
           )}

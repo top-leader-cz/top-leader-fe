@@ -35,6 +35,12 @@ import { formatWithOptions, startOfWeekWithOptions } from "date-fns/fp";
 import * as dfnsfp from "date-fns/fp";
 import { formatDistanceToNow, isValid, parse } from "date-fns";
 import * as tz from "date-fns-tz";
+import {
+  API_TIME_FORMAT,
+  UTC_DATE_FORMAT,
+  formatISOZoned,
+  parseUTCZoned,
+} from "./utils/date";
 
 window.dfnsfp = dfnsfp;
 
@@ -109,18 +115,6 @@ function renderResetLang({ error, resetErrorBoundary }) {
   );
 }
 
-export const UTC_DATE_FORMAT = "yyyy-MM-dd";
-export const API_TIME_FORMAT = "HH:mm:ss";
-
-export const parseUtcZoned = (userTz, utcStr) => {
-  // { zonedTimeToUtc, format }
-  // const date = dfnsfp.parseISO(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
-  const date = dfnsfp.parseISO(utcStr.endsWith("Z") ? utcStr : utcStr + "Z");
-  const zonedDate = tz.utcToZonedTime(date, userTz);
-
-  return zonedDate;
-};
-
 export const useStaticCallback = (callback) => {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
@@ -132,9 +126,17 @@ const useI18n = ({ userTz, language }) => {
   if (!currentLocale) {
     throw new Error("Unsupported locale language: " + language);
   }
-  // const formats = useMemo(() => {
-  //   return { dateShort: currentLocale.formatLong.date({ width: "short" }) };
-  // }, [currentLocale]);
+
+  const parseDate = useCallback((input, referenceDate = new Date()) => {
+    return parse(input, UTC_DATE_FORMAT, referenceDate);
+  }, []);
+
+  const parseUTCLocal = useCallback(
+    (utcStr) => {
+      return parseUTCZoned(userTz, utcStr);
+    },
+    [userTz]
+  );
 
   const formatLocal = useCallback(
     (date, formatStr = "PP") => {
@@ -156,46 +158,49 @@ const useI18n = ({ userTz, language }) => {
     [currentLocale]
   );
 
-  const _parseUTC = useCallback(
-    (utcStr) => {
-      return parseUtcZoned(userTz, utcStr);
+  const zonedToUtcLocal = useCallback(
+    (localDate) => {
+      console.log({ userTz });
+      return tz.zonedTimeToUtc(localDate, userTz);
     },
     [userTz]
+  );
+
+  const formatUtcLocal = useCallback(
+    (localDate) => {
+      // TODO: to utc?
+      const str = formatLocal(localDate, UTC_DATE_FORMAT);
+
+      console.log("[formatUtcLocal]", { userTz, localDate, str });
+
+      return str;
+    },
+    [formatLocal, userTz]
   );
 
   const formatLocalMaybe = useCallback(
     (maybeDate, formatStr = "PP", defaultStr = "") => {
       const valid = isValid(maybeDate);
-
-      console.log("formatLocalMaybe", {
-        maybeDate,
-        formatStr,
-        defaultStr,
-        valid,
-      });
-
+      // console.log("formatLocalMaybe", { maybeDate, formatStr, defaultStr, valid, });
       return !valid ? defaultStr : formatLocal(maybeDate, formatStr);
     },
     [formatLocal]
   );
 
-  const startOfWeek = useCallback(
-    (...args) => {
-      // console.log("[useI18n.startOfWeek] TODO: UTC", { args });
+  const startOfWeekLocal = useCallback(
+    (date) => {
+      // console.log("[useI18n.startOfWeekLocal] TODO: UTC", { args });
       return startOfWeekWithOptions(
         {
           locale: currentLocale,
         },
-        ...args
+        date
       );
     },
     [currentLocale]
   );
 
-  const parseDate = useCallback((input, referenceDate = new Date()) => {
-    return parse(input, UTC_DATE_FORMAT, referenceDate);
-  }, []);
-  const _formatDistanceToNow = useCallback(
+  const formatDistanceToNowLocal = useCallback(
     (date, options = {}) => {
       return formatDistanceToNow(date, { ...options, locale: currentLocale });
     },
@@ -205,29 +210,38 @@ const useI18n = ({ userTz, language }) => {
   const i18n = useMemo(
     () => ({
       // TODO: https://date-fns.org/v2.29.3/docs/I18n
+      currentLocale,
       uiFormats: {
         inputDateFormat: currentLocale.formatLong.date({ width: "short" }),
         inputTimeFormat: currentLocale.formatLong.time({ width: "short" }),
         apiDateFormat: UTC_DATE_FORMAT,
         apiTimeFormat: API_TIME_FORMAT,
       },
-      currentLocale,
       formatLocal,
       formatLocalMaybe,
-      parseUTC: _parseUTC,
+      formatUtcLocal,
+      parseUTCLocal,
       parseDate,
-      startOfWeek,
-      formatDistanceToNow: _formatDistanceToNow,
+      formatDistanceToNow: formatDistanceToNowLocal,
+      zonedToUtcLocal,
       weekStartsOn: currentLocale.options.weekStartsOn,
+      startOfWeekLocal,
+      getFirstDayOfTheWeekLocal: (date = new Date()) =>
+        i18n.formatLocal(
+          startOfWeekLocal(date), // TODO: Dan
+          UTC_DATE_FORMAT
+        ),
     }),
     [
-      _formatDistanceToNow,
       currentLocale,
       formatLocal,
       formatLocalMaybe,
-      _parseUTC,
+      parseUTCLocal,
+      formatUtcLocal,
+      zonedToUtcLocal,
       parseDate,
-      startOfWeek,
+      formatDistanceToNowLocal,
+      startOfWeekLocal,
     ]
   );
   return i18n;

@@ -125,8 +125,8 @@ const NotificationsPopover = ({
                         sx={{ textAlign: "right", display: "block" }}
                       >
                         {message.createdAt
-                          ? `${i18n.formatDistanceToNow(
-                              i18n.parseUTC(message.createdAt),
+                          ? `${i18n.formatDistanceToNowLocal(
+                              i18n.parseUTCLocal(message.createdAt),
                               { addSuffix: true }
                             )}`
                           : ""}
