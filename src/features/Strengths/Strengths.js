@@ -64,7 +64,7 @@ const AssessmentRightMenu = ({
             }
             // variant={"contained"}
           >
-            {i18n.formatLocal(i18n.parseUTC(entry.date), "Pp")}
+            {i18n.formatLocal(i18n.parseUTCLocal(entry.date), "Pp")}
             <br />
             <P>{entry.status}</P>
           </Button>

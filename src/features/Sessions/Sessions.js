@@ -85,7 +85,7 @@ const SessionCard = ({
   const { areas } = useAreasDict();
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
-  const parsed = i18n.parseUTC(date);
+  const parsed = i18n.parseUTCLocal(date);
   const formattedDate = i18n.formatLocalMaybe(parsed, "Pp");
 
   // console.log("[SC.rndr]", {

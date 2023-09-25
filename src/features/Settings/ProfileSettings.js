@@ -247,7 +247,7 @@ export const ProfileSettings = () => {
             {msg("settings.profile.field.experience")}
             {": "}
             {COACH.experienceSince
-              ? `${i18n.formatDistanceToNow(
+              ? `${i18n.formatDistanceToNowLocal(
                   i18n.parseDate(COACH.experienceSince)
                 )}`
               : ""}

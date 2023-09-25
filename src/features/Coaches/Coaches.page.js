@@ -7,11 +7,11 @@ import {
   Chip,
   Divider,
 } from "@mui/material";
-import { format, startOfWeek } from "date-fns/fp";
+import { format, getDay, getHours, startOfWeek } from "date-fns/fp";
 import { filter } from "ramda";
-import { useContext, useState } from "react";
-import { useQuery } from "react-query";
-import { I18nContext, UTC_DATE_FORMAT } from "../../App";
+import { useCallback, useContext, useState } from "react";
+import { useMutation, useQuery } from "react-query";
+import { I18nContext } from "../../App";
 import { LANGUAGE_OPTIONS, getLabel } from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -26,6 +26,8 @@ import { useFieldsDict } from "../Settings/useFieldsDict";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
+import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import { UTC_DATE_FORMAT, getFirstDayOfTheWeek } from "../../utils/date";
 
 export const ShowMore = ({
   text = "",
@@ -111,10 +113,7 @@ export const useCoachAvailabilityQuery = ({ username }) => {
     enabled: !!username,
     queryKey: ["coaches", username, "availability"],
     queryFn: () => {
-      const startOfW = startOfWeek(new Date());
-      console.log({ startOfW });
-      const firstDayOfTheWeek = format(UTC_DATE_FORMAT, startOfW);
-      console.log({ startOfW, firstDayOfTheWeek });
+      const firstDayOfTheWeek = getFirstDayOfTheWeek();
 
       return authFetch({
         url: `/api/latest/coaches/${username}/availability`,
@@ -136,7 +135,8 @@ const CoachCard = ({
   coach,
   onContact,
   sx = { mb: 3 },
-  onAvailabilityClick,
+  // onPickCoach,
+  // onAvailabilityClick,
 }) => {
   const {
     username,
@@ -152,12 +152,26 @@ const CoachCard = ({
     fields,
   } = coach;
 
+  const { authFetch } = useAuth();
   const availabilityQuery = useCoachAvailabilityQuery({ username });
+  const pickCoachMutation = useMutation({
+    mutationFn: async (coach) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/coach`,
+        data: { coach: coach.username },
+      }),
+  });
+  const handlePickCoach = useCallback(() => {
+    console.log("handlePickCoach", { coach });
+    pickCoachMutation.mutate(coach);
+  }, [coach, pickCoachMutation]);
 
   console.log("[CoachCard.rndr]", name, {
     coach,
     availabilityQuery,
   });
+  const handleContact = useCallback(() => onContact(coach), [coach, onContact]);
 
   return (
     <Card sx={{ ...sx }}>
@@ -179,11 +193,10 @@ const CoachCard = ({
           success={({ data }) => (
             <AvailabilityCalendar
               availabilitiesByDay={data}
-              coachName={coach.username}
-              onContact={() => onContact(coach)}
-              onTimeslotClick={({ interval }) =>
-                onAvailabilityClick({ coach, interval })
-              }
+              coach={coach}
+              onContact={handleContact}
+              onPick={handlePickCoach}
+              pickPending={pickCoachMutation.isLoading}
               sx={{ flexShrink: 0 }}
             />
           )}
@@ -222,14 +235,11 @@ export function CoachesPageInner() {
   const { language } = useContext(I18nContext);
   const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
   const [contactCoach, setContactCoach] = useState(null);
-  const handleContact = (coach) => setContactCoach(coach);
-  const handleAvailabilityClick = ({ coach, interval }) => {
-    console.log("handleAvailabilityClick", { coach, interval });
-    // prettier-ignore
-    alert(`TODO: ${JSON.stringify( { interval, username: coach.username, email: coach.email }, null, 2 )}`);
-  };
 
   const { authFetch } = useAuth();
+
+  const handleContact = useCallback((coach) => setContactCoach(coach), []);
+
   const query = useQuery({
     queryKey: ["coaches", filter],
     queryFn: () =>
@@ -302,7 +312,6 @@ export function CoachesPageInner() {
               key={coach.username}
               coach={coach}
               onContact={handleContact}
-              onAvailabilityClick={handleAvailabilityClick}
               sx={{ my: 3 }}
             />
           ))

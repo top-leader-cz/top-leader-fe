@@ -3,9 +3,12 @@ import {
   addDays,
   endOfDay,
   format,
+  formatISO,
+  getDay,
   getHours,
   getSeconds,
   isWithinInterval,
+  parseISO,
   set,
   setHours,
   setMinutes,
@@ -14,20 +17,30 @@ import {
   subSeconds,
 } from "date-fns/fp";
 import {
+  endsWith,
   filter,
   flatten,
   identity,
+  ifElse,
   map,
   pipe,
   reduce,
+  replace,
+  tap,
   times,
   values,
 } from "ramda";
-import { useContext, useMemo } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { I18nContext, getBrowserTz, parseUtcZoned } from "../../App";
+import { useMutation } from "react-query";
+import { I18nContext, getBrowserTz } from "../../App";
 import { Msg } from "../../components/Msg/Msg";
+import { useAuth } from "../Authorization";
 import { ControlsContainer } from "../Sessions/steps/Controls";
+import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import { ConfirmModal } from "../Modal/ConfirmModal";
+import { getFirstDayOfTheWeek, parseUTCZoned } from "../../utils/date";
+import { LoadingButton } from "@mui/lab";
 
 const HEADER_FORMAT = "d MMM";
 const VISIBLE_DAYS_COUNT = 7;
@@ -66,12 +79,12 @@ export const TimeSlot = ({ hour, isFree, onClick, sx = {} }) => {
 };
 
 const parseSlotDateTime = (date, time, tz) => {
-  const utcDate = parseUtcZoned(tz, `${date}T${time}`);
+  const utcDate = parseUTCZoned(tz, `${date}T${time}`);
   // console.log("[parseSlotDateTime]", { date, time, tz });
   return utcDate;
 };
 const parseSlot =
-  (userTz = getBrowserTz()) =>
+  (userTz) =>
   ({ date, timeFrom, timeTo }) => {
     // {
     //     "day": "MONDAY",
@@ -141,7 +154,7 @@ const isIntervalWithin =
     }
     return startWithin;
   };
-// TODO: tests :)
+// TODO: move to query and add tests :)
 const parseAvailabilities = ({
   userTz,
   parentInterval,
@@ -246,16 +259,92 @@ const parseStartHour = ({ timeFrom, date }) => {
 
 const createIndicies = times(identity);
 
+const plog =
+  (...args) =>
+  (data) =>
+    console.log(...args, data) || data;
+
+const rmT = replace(/T?$/, "");
+const toUtcFix = pipe(
+  tap(plog("toUTC 0")),
+  formatISO,
+  tap(plog("toUTC before")),
+  rmT,
+  tap(plog("toUTC after"))
+);
+
+const padLeft = (char = "0", num) => {
+  const str = `${num}`;
+  return str.padStart(2, char);
+};
 export const AvailabilityCalendar = ({
   availabilitiesByDay,
-  onTimeslotClick,
   onContact,
+  onPick,
+  pickPending,
   visibleDaysCount = VISIBLE_DAYS_COUNT,
   sx,
   today: todayProp,
-  coachName = "",
+  coachUsername = "",
+  coach: coachProp,
 }) => {
+  const coach = coachProp || { username: coachUsername }; // TODO: use coach instead of coachUsername everywhere
   const { i18n, userTz } = useContext(I18nContext);
+  const [pickSlot, setPickSlot] = useState();
+
+  const { authFetch } = useAuth();
+  const pickSlotMutation = useMutation({
+    onSuccess: () => {
+      setPickSlot();
+    },
+    mutationFn: async ({ interval }) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/coaches/${coach.username}/schedule`,
+        data: (() => {
+          // Clicked on "12:00 +02:00" === 10:00 UTC (DST - letni cas)
+          const startDateTime = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
+          const utc = i18n.zonedToUtcLocal(startDateTime);
+          const dateTimeStr = formatISO(startDateTime); // "2023-09-26T12:00:00+02:00"
+          const dateTimeStrLocal = i18n.formatUtcLocal(startDateTime); // "2023-09-26",
+          const firstDayOfTheWeek = getFirstDayOfTheWeek(); // "firstDayOfTheWeek": "2023-09-24",
+          const firstDayOfTheWeekLocal = i18n.getFirstDayOfTheWeekLocal(); // "firstDayOfTheWeekLocal": "2023-09-25",
+          const day = INDEX_TO_DAY[getDay(startDateTime)]; // 0 - Sun
+          // const dayFOWLocal =
+          //   INDEX_TO_DAY[getDay(i18n.startOfWeekLocal(startDateTime))];
+
+          const data = {
+            // interval: map(toUtcFix, interval),
+            firstDayOfTheWeek: firstDayOfTheWeekLocal,
+            day,
+            time: `${padLeft("0", getHours(startDateTime))}:00:00`,
+            // time: { hour: getHours(startDateTime), minute: 0, second: 0, nano: 0, },
+          };
+
+          console.log("%c[pickSlotMutation]", "color:blue", {
+            data,
+            interval,
+            startDateTime,
+            dateTimeStr,
+            dateTimeStrLocal,
+            firstDayOfTheWeek,
+            firstDayOfTheWeekLocal,
+            utc, // "utc": "2023-09-26T10:00:00.000Z",
+            utcStr: formatISO(utc), // "utcStr": "2023-09-26T12:00:00+02:00",
+            utcStrLocal: i18n.formatUtcLocal(utc), // "utcStrLocal": "2023-09-26"
+          });
+          return data;
+        })(),
+      }),
+  });
+  // const confirmModal =  // TODO
+  const onTimeslotClick = useCallback(
+    ({ interval }) => {
+      setPickSlot({ interval, coach });
+      // return pickSlotMutation.mutate({ interval });
+    },
+    [coach]
+  );
 
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
   const offsetDays = 0; // TODO: back/forward week
@@ -300,12 +389,17 @@ export const AvailabilityCalendar = ({
     [availabilityIntervals, calendarInterval.start, visibleDaysCount]
   );
 
-  console.log("%c[AvailabilityCalendar.rndr]", "color:deeppink", coachName, {
-    availabilitiesByDay,
-    availabilityIntervals,
-    calendarInterval,
-    daysArr,
-  });
+  console.log(
+    "%c[AvailabilityCalendar.rndr]",
+    "color:deeppink",
+    coach.username,
+    {
+      availabilitiesByDay,
+      availabilityIntervals,
+      calendarInterval,
+      daysArr,
+    }
+  );
 
   return (
     <Box
@@ -355,12 +449,52 @@ export const AvailabilityCalendar = ({
           </ErrorBoundary>
         ))}
       </Box>
-      {onContact && (
-        <ControlsContainer sx={{ mt: 1 }}>
-          <Button variant="contained" onClick={() => onContact()}>
-            <Msg id="coaches.coach.contact" />
-          </Button>
-        </ControlsContainer>
+      <ConfirmModal
+        open={!!pickSlot}
+        onClose={() => setPickSlot()}
+        iconName="RocketLaunch"
+        title={`Confirm reservation ${i18n.formatLocalMaybe(
+          pickSlot?.interval?.start,
+          "PPPPpppp"
+        )}`}
+        desc={`By booking this time slot tou are confirming if want to proceed coaching sessions with ${coach?.firstName} ${coach.lastName}.`}
+        buttons={[
+          {
+            variant: "outlined",
+            type: "button",
+            children: "Cancel",
+            onClick: () => setPickSlot(),
+          },
+          {
+            variant: "contained",
+            type: "button",
+            children: "Confirm",
+            disabled: pickSlotMutation.isLoading,
+            loading: pickSlotMutation.isLoading,
+            onClick: () => pickSlotMutation.mutate(pickSlot),
+          },
+        ]}
+        sx={{ width: "800px" }}
+      />
+      {(onContact || onPick) && (
+        <>
+          <ControlsContainer sx={{ mt: 1 }}>
+            {onPick && (
+              <LoadingButton
+                variant="outlined"
+                onClick={onPick}
+                loading={pickPending}
+              >
+                <Msg id="coaches.coach.pick" />
+              </LoadingButton>
+            )}
+            {onContact && (
+              <Button variant="contained" onClick={onContact}>
+                <Msg id="coaches.coach.contact" />
+              </Button>
+            )}
+          </ControlsContainer>
+        </>
       )}
     </Box>
   );
