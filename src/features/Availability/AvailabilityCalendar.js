@@ -40,6 +40,7 @@ import { ControlsContainer } from "../Sessions/steps/Controls";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { getFirstDayOfTheWeek, parseUTCZoned } from "../../utils/date";
+import { LoadingButton } from "@mui/lab";
 
 const HEADER_FORMAT = "d MMM";
 const VISIBLE_DAYS_COUNT = 7;
@@ -448,17 +449,44 @@ export const AvailabilityCalendar = ({
           </ErrorBoundary>
         ))}
       </Box>
+      <ConfirmModal
+        open={!!pickSlot}
+        onClose={() => setPickSlot()}
+        iconName="RocketLaunch"
+        title={`Confirm reservation ${i18n.formatLocalMaybe(
+          pickSlot?.interval?.start,
+          "PPPPpppp"
+        )}`}
+        desc={`By booking this time slot tou are confirming if want to proceed coaching sessions with ${coach?.firstName} ${coach.lastName}.`}
+        buttons={[
+          {
+            variant: "outlined",
+            type: "button",
+            children: "Cancel",
+            onClick: () => setPickSlot(),
+          },
+          {
+            variant: "contained",
+            type: "button",
+            children: "Confirm",
+            disabled: pickSlotMutation.isLoading,
+            loading: pickSlotMutation.isLoading,
+            onClick: () => pickSlotMutation.mutate(pickSlot),
+          },
+        ]}
+        sx={{ width: "800px" }}
+      />
       {(onContact || onPick) && (
         <>
           <ControlsContainer sx={{ mt: 1 }}>
             {onPick && (
-              <Button
+              <LoadingButton
                 variant="outlined"
                 onClick={onPick}
-                disabled={pickPending}
+                loading={pickPending}
               >
                 <Msg id="coaches.coach.pick" />
-              </Button>
+              </LoadingButton>
             )}
             {onContact && (
               <Button variant="contained" onClick={onContact}>
@@ -466,32 +494,6 @@ export const AvailabilityCalendar = ({
               </Button>
             )}
           </ControlsContainer>
-          <ConfirmModal
-            open={!!pickSlot}
-            onClose={() => setPickSlot()}
-            iconName="RocketLaunch"
-            title={`Confirm reservation ${i18n.formatLocalMaybe(
-              pickSlot?.interval?.start,
-              "PPPPpppp"
-            )}`}
-            desc={`By booking this time slot tou are confirming if want to proceed coaching sessions with ${coach?.firstName} ${coach.lastName}.`}
-            buttons={[
-              {
-                variant: "outlined",
-                type: "button",
-                children: "Cancel",
-                onClick: () => setPickSlot(),
-              },
-              {
-                variant: "contained",
-                type: "button",
-                children: "Confirm",
-                loading: pickSlotMutation.isLoading,
-                onClick: () => pickSlotMutation.mutate(pickSlot),
-              },
-            ]}
-            sx={{ width: "800px" }}
-          />
         </>
       )}
     </Box>

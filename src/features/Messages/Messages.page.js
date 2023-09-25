@@ -117,6 +117,7 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
               loaderName="Block"
               success={({ data: availabilities }) => (
                 <AvailabilityCalendar
+                  coach={coach}
                   availabilitiesByDay={availabilities}
                   sx={{ flexShrink: 0 }}
                   onTimeslotClick={({ interval }) =>
