@@ -128,6 +128,24 @@ export const useCoachAvailabilityQuery = ({ username }) => {
   });
 };
 
+export const usePickCoach = ({ coach }) => {
+  const { authFetch } = useAuth();
+  const pickCoachMutation = useMutation({
+    mutationFn: async () =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/coach`,
+        data: { coach: coach.username }, // throw without coach
+      }),
+  });
+
+  return {
+    mutation: pickCoachMutation,
+    onPick: coach ? pickCoachMutation.mutate : undefined,
+    pickPending: pickCoachMutation.isLoading,
+  };
+};
+
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`;
 
@@ -152,26 +170,14 @@ const CoachCard = ({
     fields,
   } = coach;
 
-  const { authFetch } = useAuth();
   const availabilityQuery = useCoachAvailabilityQuery({ username });
-  const pickCoachMutation = useMutation({
-    mutationFn: async (coach) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user-info/coach`,
-        data: { coach: coach.username },
-      }),
-  });
-  const handlePickCoach = useCallback(() => {
-    console.log("handlePickCoach", { coach });
-    pickCoachMutation.mutate(coach);
-  }, [coach, pickCoachMutation]);
+  const pickCoach = usePickCoach({ coach });
+  const handleContact = useCallback(() => onContact(coach), [coach, onContact]);
 
   console.log("[CoachCard.rndr]", name, {
     coach,
     availabilityQuery,
   });
-  const handleContact = useCallback(() => onContact(coach), [coach, onContact]);
 
   return (
     <Card sx={{ ...sx }}>
@@ -195,8 +201,8 @@ const CoachCard = ({
               availabilitiesByDay={data}
               coach={coach}
               onContact={handleContact}
-              onPick={handlePickCoach}
-              pickPending={pickCoachMutation.isLoading}
+              onPick={pickCoach.onPick}
+              pickPending={pickCoach.pickPending}
               sx={{ flexShrink: 0 }}
             />
           )}

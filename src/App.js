@@ -127,6 +127,36 @@ const useI18n = ({ userTz, language }) => {
     throw new Error("Unsupported locale language: " + language);
   }
 
+  const zonedToUtcLocal = useCallback(
+    (localDate) => {
+      try {
+        console.log("[zonedToUtcLocal]", {
+          localDate,
+          localDateString: localDate.toString(),
+          userTz,
+          currentLocale,
+        });
+        const resultUtc = tz.zonedTimeToUtc(
+          localDate,
+          // tz.utcToZonedTime(localDate, userTz),
+          userTz,
+          { locale: currentLocale }
+        );
+
+        return resultUtc;
+      } catch (e) {
+        console.error("[zonedToUtcLocal]", {
+          localDate,
+          userTz,
+          currentLocale,
+          e,
+        });
+        throw e;
+      }
+    },
+    [currentLocale, userTz]
+  );
+
   const parseDate = useCallback((input, referenceDate = new Date()) => {
     return parse(input, UTC_DATE_FORMAT, referenceDate);
   }, []);
@@ -142,7 +172,7 @@ const useI18n = ({ userTz, language }) => {
     (date, formatStr = "PP") => {
       // console.log("[useI18n.formatLocal] TODO: UTC", { date, formatStr });
       try {
-        return formatWithOptions(
+        const resultStr = formatWithOptions(
           {
             locale: currentLocale,
             // timeZone? https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
@@ -150,6 +180,8 @@ const useI18n = ({ userTz, language }) => {
           formatStr,
           date
         );
+        console.log("[formatLocal]", { date, formatStr, currentLocale });
+        return resultStr;
       } catch (e) {
         console.error("[formatLocal]", { e, date, formatStr, currentLocale });
         return "";
@@ -158,24 +190,37 @@ const useI18n = ({ userTz, language }) => {
     [currentLocale]
   );
 
-  const zonedToUtcLocal = useCallback(
-    (localDate) => {
-      console.log({ userTz });
-      return tz.zonedTimeToUtc(localDate, userTz);
-    },
-    [userTz]
-  );
-
   const formatUtcLocal = useCallback(
-    (localDate) => {
-      // TODO: to utc?
-      const str = formatLocal(localDate, UTC_DATE_FORMAT);
+    (localDate, formatStr = "Pp") => {
+      try {
+        const utcDate = zonedToUtcLocal(localDate);
+        console.log("[formatUtcLocal] 0", {
+          userTz,
+          localDate,
+          formatStr,
+          utcDate,
+        });
+        // const resultStr = tz.formatInTimeZone(localDate, "UTC", formatStr);
+        const resultStr = formatLocal(utcDate, formatStr);
+        console.log("[formatUtcLocal] 1", {
+          userTz,
+          localDate,
+          formatStr,
+          utcDate,
+          resultStr,
+        });
 
-      console.log("[formatUtcLocal]", { userTz, localDate, str });
-
-      return str;
+        return resultStr;
+      } catch (e) {
+        console.error("[formatUtcLocal]", {
+          localDate,
+          userTz,
+          e,
+        });
+        throw e;
+      }
     },
-    [formatLocal, userTz]
+    [formatLocal, userTz, zonedToUtcLocal]
   );
 
   const formatLocalMaybe = useCallback(

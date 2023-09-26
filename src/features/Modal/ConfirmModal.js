@@ -62,8 +62,8 @@ export const ConfirmModal = ({
         <Divider flexItem />
         {buttons && (
           <Box display="flex" flexDirection="row" gap={3}>
-            {buttons.map((button) => (
-              <Button key={JSON.stringify(button)} fullWidth {...button} />
+            {buttons.map(({ Component = Button, ...button }) => (
+              <Component key={JSON.stringify(button)} fullWidth {...button} />
             ))}
           </Box>
         )}

@@ -78,11 +78,6 @@ export const TimeSlot = ({ hour, isFree, onClick, sx = {} }) => {
   );
 };
 
-const parseSlotDateTime = (date, time, tz) => {
-  const utcDate = parseUTCZoned(tz, `${date}T${time}`);
-  // console.log("[parseSlotDateTime]", { date, time, tz });
-  return utcDate;
-};
 const parseSlot =
   (userTz) =>
   ({ date, timeFrom, timeTo }) => {
@@ -93,8 +88,10 @@ const parseSlot =
     //     "timeTo": "10:00:00",
     //     "firstDayOfTheWeek": "2023-09-24"
     // },
-    const start = parseSlotDateTime(date, timeFrom, userTz);
-    const end = parseSlotDateTime(date, timeTo, userTz);
+    // const start = parseSlotDateTime(date, timeFrom, userTz);
+    // const end = parseSlotDateTime(date, timeTo, userTz);
+    const start = parseUTCZoned(userTz, `${date}T${timeFrom}`);
+    const end = parseUTCZoned(userTz, `${date}T${timeTo}`);
 
     return { start, end };
   };
@@ -278,6 +275,7 @@ const padLeft = (char = "0", num) => {
   return str.padStart(2, char);
 };
 export const AvailabilityCalendar = ({
+  coach,
   availabilitiesByDay,
   onContact,
   onPick,
@@ -285,10 +283,7 @@ export const AvailabilityCalendar = ({
   visibleDaysCount = VISIBLE_DAYS_COUNT,
   sx,
   today: todayProp,
-  coachUsername = "",
-  coach: coachProp,
 }) => {
-  const coach = coachProp || { username: coachUsername }; // TODO: use coach instead of coachUsername everywhere
   const { i18n, userTz } = useContext(I18nContext);
   const [pickSlot, setPickSlot] = useState();
 
@@ -303,36 +298,57 @@ export const AvailabilityCalendar = ({
         url: `/api/latest/coaches/${coach.username}/schedule`,
         data: (() => {
           // Clicked on "12:00 +02:00" === 10:00 UTC (DST - letni cas)
-          const startDateTime = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
-          const utc = i18n.zonedToUtcLocal(startDateTime);
-          const dateTimeStr = formatISO(startDateTime); // "2023-09-26T12:00:00+02:00"
-          const dateTimeStrLocal = i18n.formatUtcLocal(startDateTime); // "2023-09-26",
+          const localStart = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
+          const utc = i18n.zonedToUtcLocal(localStart); // "utc": "2023-09-26T10:00:00.000Z",
           const firstDayOfTheWeek = getFirstDayOfTheWeek(); // "firstDayOfTheWeek": "2023-09-24",
           const firstDayOfTheWeekLocal = i18n.getFirstDayOfTheWeekLocal(); // "firstDayOfTheWeekLocal": "2023-09-25",
-          const day = INDEX_TO_DAY[getDay(startDateTime)]; // 0 - Sun
-          // const dayFOWLocal =
-          //   INDEX_TO_DAY[getDay(i18n.startOfWeekLocal(startDateTime))];
+          const day = INDEX_TO_DAY[getDay(localStart)]; // 0 - Sun
+          // const dayFOWLocal = INDEX_TO_DAY[getDay(i18n.startOfWeekLocal(localStart))];
+          const utcHours = getHours(utc);
 
           const data = {
             // interval: map(toUtcFix, interval),
             firstDayOfTheWeek: firstDayOfTheWeekLocal,
             day,
-            time: `${padLeft("0", getHours(startDateTime))}:00:00`,
-            // time: { hour: getHours(startDateTime), minute: 0, second: 0, nano: 0, },
+            time: `${padLeft("0", utcHours)}:00:00`,
+            // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
           };
 
           console.log("%c[pickSlotMutation]", "color:blue", {
-            data,
-            interval,
-            startDateTime,
-            dateTimeStr,
-            dateTimeStrLocal,
-            firstDayOfTheWeek,
-            firstDayOfTheWeekLocal,
-            utc, // "utc": "2023-09-26T10:00:00.000Z",
-            utcStr: formatISO(utc), // "utcStr": "2023-09-26T12:00:00+02:00",
-            utcStrLocal: i18n.formatUtcLocal(utc), // "utcStrLocal": "2023-09-26"
+            IO: {
+              interval,
+              data,
+            },
+            computed: {
+              localStart,
+              utc, // "utc": "2023-09-26T10:00:00.000Z",
+              utcISO: formatISO(utc), // "utcStr": "2023-09-26T12:00:00+02:00",
+              localISO: formatISO(localStart), // "2023-09-26T12:00:00+02:00"
+              firstDayOfTheWeek,
+              firstDayOfTheWeekLocal,
+              utcISOString: utc.toISOString(), //
+              utcString: utc.toString(), //
+            },
+            hours: {
+              getHours: {
+                utc: getHours(utc),
+                localStart: getHours(localStart),
+              },
+              format: {
+                utc: format("kk", utc),
+                localStart: format("kk", localStart),
+              },
+              formatLocal: {
+                utc: i18n.formatLocal(utc, "kk"), //
+                localStart: i18n.formatLocal(localStart, "kk"), //
+              },
+              formatUtcLocal: {
+                utc: i18n.formatUtcLocal(utc, "kk"), //
+                localStart: i18n.formatUtcLocal(localStart, "kk"), //
+              },
+            },
           });
+          debugger;
           return data;
         })(),
       }),
@@ -361,7 +377,7 @@ export const AvailabilityCalendar = ({
       parseAvailabilities({
         userTz,
         parentInterval: calendarInterval,
-        overlapping: "throw", // TODO: true
+        overlapping: "throw", // TODO: true and move to useCoachAvailabilityQuery
       })(availabilitiesByDay),
     [availabilitiesByDay, calendarInterval, userTz]
   );
@@ -466,6 +482,7 @@ export const AvailabilityCalendar = ({
             onClick: () => setPickSlot(),
           },
           {
+            component: LoadingButton,
             variant: "contained",
             type: "button",
             children: "Confirm",
