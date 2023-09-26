@@ -1,7 +1,7 @@
+import * as qs from "qs";
 import { createContext, useCallback, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
-import * as qs from "qs";
 
 export const AuthContext = createContext(null);
 
@@ -137,7 +137,7 @@ export function AuthProvider({ children }) {
     isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
   };
 
-  console.log("[AP.rndr]", value);
+  // console.log("[AP.rndr]", value);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

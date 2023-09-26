@@ -5,7 +5,7 @@ import { getTimezoneOffset } from "date-fns-tz";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { I18nContext } from "../../App";
+
 import {
   B,
   CheckboxField,
@@ -22,8 +22,14 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { FieldLayout, FormRow } from "./FormRow";
 import { useResetForm } from "./ProfileSettings";
 import { WHITE_BG } from "./Settings.page";
-import { CREATE_OFFSET, TimeSlot } from "../Availability/AvailabilityCalendar";
-import { API_TIME_FORMAT, UTC_DATE_FORMAT } from "../../utils/date";
+import { CREATE_OFFSET } from "../Availability/AvailabilityCalendar";
+import {
+  API_TIME_FORMAT,
+  UTC_DATE_FORMAT,
+  getFirstDayOfTheWeek,
+} from "../I18n/utils/date";
+import { I18nContext } from "../I18n/I18nProvider";
+import { TimeSlot } from "../Availability/CalendarDaySlots";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -193,15 +199,15 @@ const getAvailabilities = ({ formValues, i18n, userTz }) => {
   return Object.fromEntries(availabilities);
 };
 
-const from = ({ values, i18n, userTz }) => {
+const getPayload = ({ values, i18n, userTz }) => {
   const { recurring, recurrenceRange: [from, to] = [], ...rest } = values;
   const payload = {
     availabilities: getAvailabilities({ formValues: rest, i18n, userTz }),
     ...(recurring
       ? {}
       : {
-          firstDayOfTheWeek: i18n.getFirstDayOfTheWeek(from),
-        }), // TODO: timezone needed, startOfWeek affected by tz
+          firstDayOfTheWeek: getFirstDayOfTheWeek(from),
+        }),
   };
 
   return payload;
@@ -390,7 +396,7 @@ export const AvailabilitySettings = () => {
       const type = recurring
         ? AVAILABILITY_TYPE.RECURRING
         : AVAILABILITY_TYPE.NON_RECURRING;
-      const payload = from({ values, i18n, userTz });
+      const payload = getPayload({ values, i18n, userTz });
 
       console.log("%cMUTATION", "color:lime", { values, type, payload });
       // debugger;

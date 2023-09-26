@@ -1,6 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, CardContent, Divider } from "@mui/material";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
@@ -9,18 +9,12 @@ import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
-
-const useStaticCallback = (fn) => {
-  const fnRef = useRef(fn);
-  fnRef.current = fn;
-
-  return useCallback((...args) => fnRef.current?.(...args), []);
-};
 
 // {
 //     "id": 1,

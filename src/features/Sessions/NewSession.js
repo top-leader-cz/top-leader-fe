@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { I18nContext } from "../../App";
+
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -20,7 +20,8 @@ import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
-import { UTC_DATE_FORMAT } from "../../utils/date";
+import { UTC_DATE_FORMAT } from "../I18n/utils/date";
+import { I18nContext } from "../I18n/I18nProvider";
 
 export const StepperRightMenu = ({
   heading,

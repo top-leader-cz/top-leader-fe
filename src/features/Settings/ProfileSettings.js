@@ -6,7 +6,6 @@ import {
   useEffect,
   useMemo,
   useReducer,
-  useRef,
   useState,
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -22,7 +21,6 @@ import {
   DatePickerField,
   FileUpload,
   SwitchField,
-  getBase64,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
 import { Msg } from "../../components/Msg";
@@ -30,19 +28,17 @@ import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
+import { I18nContext } from "../I18n/I18nProvider";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { I18nContext } from "../../App";
-import { messages as coachesMessages } from "../Coaches/messages";
 import { useFieldsDict } from "./useFieldsDict";
-import { img1 } from "./exampleImg";
 
 const FIELDS = {
   firstName: "firstName",
   lastName: "lastName",
   email: "email",
-  imageSrc: "imageSrc", // "photo": [ "string" ],
+  imageSrc: "imageSrc", // TODO: extract "upload component" and "upload form field"
   bio: "bio",
   languages: "languages",
   fields: "fields",
@@ -56,7 +52,6 @@ const _COACH = {
   [FIELDS.firstName]: "Darnell",
   [FIELDS.lastName]: "Brekke",
   [FIELDS.email]: "darnell.brekke@gmail.com",
-  [FIELDS.imageSrc]: `https://i.pravatar.cc/225?u=${Math.random()}`, // TODO: upload form field
   [FIELDS.bio]:
     "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
   [FIELDS.languages]: [
@@ -73,22 +68,17 @@ const _COACH = {
   [FIELDS.publicProfile]: false,
 };
 
-const to = ({ photo, ...data }, { userLocale, userTz }) => {
+const to = (data, { userLocale, userTz }) => {
   return {
     ...data,
     rate: data.rate || "",
     experienceSince: data.experienceSince, // TODO: utc
     languages: data.languages?.length ? data.languages : [userLocale],
-    imageSrc: photo?.[0],
   };
 };
 
 const from = async ({ imageSrc, ...values }) => {
-  // const file = imageSrc ? imageSrc?.[0] : undefined;
-  // const photo = await getBase64(file);
-  // console.log("from", { imageSrc, photo, file, ...values });
-  console.log("from", { imageSrc, ...values });
-
+  console.log("from", { imageSrc, ...values }); // TODO: extract "upload component" and "upload form field"
   return {
     ...values,
     experienceSince: values.experienceSince, // TODO
@@ -148,9 +138,6 @@ export const ProfileSettings = () => {
   const saveMutation = useMutation({
     mutationFn: async (values) =>
       console.log("[save start]", { values, payload: await from(values) }) ||
-      (() => {
-        // debugger;
-      })() ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
@@ -177,16 +164,13 @@ export const ProfileSettings = () => {
       });
     },
     onSuccess: () => {
-      console.log("[postPhotoMutation.onSuccess] reloading photo!!!");
       reloadPhoto();
     },
   });
 
   const handlePhotoUpload = (file) => {
     console.log("[handlePhotoUpload]", { file });
-
     if (file) {
-      console.log("[handlePhotoUpload] HAVE FILE", { file });
       postPhotoMutation.mutate({ file });
     }
   };
@@ -209,8 +193,6 @@ export const ProfileSettings = () => {
     experienceSince: form.watch("experienceSince"),
   });
 
-  const onSubmit = (data, e) =>
-    console.log("[ProfileSettings.onSubmit]", data, e);
   const onError = (errors, e) =>
     console.log("[ProfileSettings.onError]", errors, e);
 
@@ -236,8 +218,6 @@ export const ProfileSettings = () => {
               borderRadius={1}
               width={225}
               alignSelf={"center"}
-              // src={COACH.imageSrc}
-              // src={img1}
               src={`/api/latest/coach-info/photo?${reloadPhotoToken}`}
             />
           </Box>

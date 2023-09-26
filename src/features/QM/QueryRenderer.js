@@ -14,9 +14,11 @@ export const Loaders = {
       sx={{
         display: "flex",
         justifyContent: "center",
-        my: 2,
+        my: 1,
         alignItems: "center",
         height: "100%",
+        width: "100%",
+        color: "primary.main",
       }}
     >
       <CircularProgress color="inherit" />

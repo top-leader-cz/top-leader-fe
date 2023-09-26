@@ -10,8 +10,8 @@ import {
 import { format, getDay, getHours, startOfWeek } from "date-fns/fp";
 import { filter } from "ramda";
 import { useCallback, useContext, useState } from "react";
-import { useMutation, useQuery } from "react-query";
-import { I18nContext } from "../../App";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+
 import { LANGUAGE_OPTIONS, getLabel } from "../../components/Forms";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -27,7 +27,8 @@ import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ContactModal } from "./ContactModal";
 import { messages } from "./messages";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
-import { UTC_DATE_FORMAT, getFirstDayOfTheWeek } from "../../utils/date";
+import { UTC_DATE_FORMAT, getFirstDayOfTheWeek } from "../I18n/utils/date";
+import { I18nContext } from "../I18n/I18nProvider";
 
 export const ShowMore = ({
   text = "",
@@ -129,7 +130,8 @@ export const useCoachAvailabilityQuery = ({ username }) => {
 };
 
 export const usePickCoach = ({ coach }) => {
-  const { authFetch } = useAuth();
+  const { authFetch, fetchUser } = useAuth();
+  // const queryClient = useQueryClient();
   const pickCoachMutation = useMutation({
     mutationFn: async () =>
       authFetch({
@@ -137,6 +139,10 @@ export const usePickCoach = ({ coach }) => {
         url: `/api/latest/user-info/coach`,
         data: { coach: coach.username }, // throw without coach
       }),
+    onSuccess: () => {
+      fetchUser();
+      // queryClient.invalidateQueries({ queryKey: ["user-info"] });
+    },
   });
 
   return {

@@ -1,9 +1,9 @@
 import { Button } from "@mui/material";
 import { useContext } from "react";
-import { I18nContext } from "../App";
+import { I18nContext } from "../features/I18n/I18nProvider";
+import { primary25 } from "../theme";
 import { ScrollableRightMenu } from "./ScrollableRightMenu";
 import { P } from "./Typography";
-import { primary25 } from "../theme";
 
 export const HistoryRightMenu = ({
   heading,

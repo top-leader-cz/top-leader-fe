@@ -9,8 +9,6 @@ import {
   redirect,
   useNavigation,
 } from "react-router-dom";
-import CraDefaultApp from "../examples/cra-app/App";
-import MuiDefaultApp from "../examples/mui/ExampleApp";
 import { AssessmentPage } from "../features/Assessment";
 import {
   AuthRedirect,
@@ -21,16 +19,15 @@ import {
 import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
 import { GetFeedbackPage } from "../features/Feedback/GetFeedback.page";
+import { MessagesPage } from "../features/Messages/Messages.page";
 import { NewSessionPage, SessionsPage } from "../features/Sessions";
 import { EditSessionPage } from "../features/Sessions/EditSession.page";
 import { SettingsPage } from "../features/Settings/Settings.page";
 import { StrengthsPage } from "../features/Strengths";
+import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
-// import { Dev } from "./Dev";
 import ErrorPage from "./ErrorPage";
-import { TeamPage } from "../features/Team/Team.page";
-import { MessagesPage } from "../features/Messages/Messages.page";
 
 const GlobalSpinner = () => {
   return (

@@ -15,16 +15,15 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "react-query";
-import { I18nContext } from "../App";
 import { useAuth } from "../features/Authorization";
+
 import { routes } from "../routes";
 import { Icon } from "./Icon";
 import { LinkBehavior } from "./LinkBehavior";
 import { useMsg } from "./Msg/Msg";
 import { H1, H2 } from "./Typography";
 import { messages as generalMessages } from "./messages";
-
-const defaultAvaratSrc = `https://i.pravatar.cc/200?u=${"" + Math.random()}`;
+import { I18nContext } from "../features/I18n/I18nProvider";
 
 const NotificationsPopover = ({
   notifications = [],

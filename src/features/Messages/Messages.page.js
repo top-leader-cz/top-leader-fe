@@ -55,7 +55,6 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
     onError: when(errIs(404), () => setRightOpen(false)),
     onSuccess: (e) => setRightOpen(true),
   });
-  const coachAvailabilityQuery = useCoachAvailabilityQuery({ username });
   const pickCoach = usePickCoach({ coach: coachQuery.data });
   const profilePhotoSrc = `/api/latest/coaches/${username}/photo`;
 
@@ -96,17 +95,7 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
               {/* </object> */}
             </Box>
             <CoachInfo coach={coach} maxBioChars={2000} sx={{ my: 3 }} />
-            <QueryRenderer
-              {...coachAvailabilityQuery}
-              loaderName="Block"
-              success={({ data: availabilities }) => (
-                <AvailabilityCalendar
-                  coach={coach}
-                  availabilitiesByDay={availabilities}
-                  sx={{ flexShrink: 0 }}
-                />
-              )}
-            />
+            <AvailabilityCalendar coach={coach} sx={{ flexShrink: 0 }} />
           </>
         )}
       />
