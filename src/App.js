@@ -222,7 +222,7 @@ const useI18n = ({ userTz, language }) => {
       formatUtcLocal,
       parseUTCLocal,
       parseDate,
-      formatDistanceToNow: formatDistanceToNowLocal,
+      formatDistanceToNowLocal,
       zonedToUtcLocal,
       weekStartsOn: currentLocale.options.weekStartsOn,
       startOfWeekLocal,
