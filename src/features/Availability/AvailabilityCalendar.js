@@ -14,7 +14,7 @@ import { filter, identity, pipe, reduce, times } from "ramda";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { Msg } from "../../components/Msg/Msg";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
 import { fixEnd } from "../I18n/utils/date";
@@ -28,6 +28,7 @@ import {
   usePickSlotMutation,
 } from "./api";
 import { Icon } from "../../components/Icon";
+import { defineMessage, defineMessages } from "react-intl";
 
 const HEADER_FORMAT = "d MMM";
 const VISIBLE_DAYS_COUNT = 7;
@@ -75,6 +76,7 @@ export const AvailabilityCalendar = ({
   sx,
   today: todayProp,
 }) => {
+  const msg = useMsg({ dict: messages });
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
   const [offsetDays, setOffsetDays] = useState(0);
   const calendarInterval = useMemo(
@@ -180,8 +182,8 @@ export const AvailabilityCalendar = ({
             justifyContent: "center",
           }}
         >
-          {format(HEADER_FORMAT, calendarInterval.start)} -{" "}
-          {format(HEADER_FORMAT, calendarInterval.end)}
+          {i18n.formatLocal(calendarInterval.start, HEADER_FORMAT)} -{" "}
+          {i18n.formatLocal(calendarInterval.end, HEADER_FORMAT)}
         </Box>
         <IconButton
           variant="outlined"
@@ -255,11 +257,12 @@ export const AvailabilityCalendar = ({
         open={!!pickSlot}
         onClose={() => setPickSlot()}
         iconName="RocketLaunch"
-        title={`Confirm reservation ${i18n.formatLocalMaybe(
-          pickSlot?.interval?.start,
-          "PPPPpppp"
-        )}`}
-        desc={`By booking this time slot tou are confirming if want to proceed coaching sessions with ${coach?.firstName} ${coach.lastName}.`}
+        title={msg("availability-calendar.confirm-reservation.title", {
+          date: i18n.formatLocalMaybe(pickSlot?.interval?.start, "PPPPpppp"),
+        })}
+        desc={msg("availability-calendar.confirm-reservation.desc", {
+          name: `${coach?.firstName} ${coach.lastName}`,
+        })}
         buttons={[
           {
             variant: "outlined",
@@ -288,7 +291,7 @@ export const AvailabilityCalendar = ({
                 onClick={onPick}
                 loading={pickPending}
               >
-                <Msg id="coaches.coach.pick" />
+                {msg("coaches.coach.pick")}
               </LoadingButton>
             )}
             {onContact && (
@@ -302,3 +305,19 @@ export const AvailabilityCalendar = ({
     </Box>
   );
 };
+
+export const messages = defineMessages({
+  "availability-calendar.confirm-reservation.title": {
+    id: "availability-calendar.confirm-reservation.title",
+    defaultMessage: "Confirm reservation {date}",
+  },
+  "availability-calendar.confirm-reservation.desc": {
+    id: "availability-calendar.confirm-reservation.desc",
+    defaultMessage:
+      "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}.",
+  },
+  "coaches.coach.pick": {
+    id: "coaches.coach.pick",
+    defaultMessage: "Pick the Coach",
+  },
+});

@@ -157,9 +157,9 @@ export const formatName = ({ firstName, lastName }) =>
 
 const CoachCard = ({
   coach,
-  onContact,
+  withContact,
   sx = { mb: 3 },
-  // onPickCoach,
+  hidePickCoach = false,
   // onAvailabilityClick,
 }) => {
   const {
@@ -175,10 +175,11 @@ const CoachCard = ({
     bio,
     fields,
   } = coach;
+  const [contactCoach, setContactCoach] = useState(null);
+  const handleContact = useCallback(() => setContactCoach(coach), [coach]);
 
   const availabilityQuery = useCoachAvailabilityQuery({ username });
   const pickCoach = usePickCoach({ coach });
-  const handleContact = useCallback(() => onContact(coach), [coach, onContact]);
 
   console.log("[CoachCard.rndr]", name, {
     coach,
@@ -186,35 +187,41 @@ const CoachCard = ({
   });
 
   return (
-    <Card sx={{ ...sx }}>
-      <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
-        <CardMedia
-          component="img"
-          sx={{ width: 225, borderRadius: 0.6 }}
-          image={`/api/latest/coaches/${username}/photo`}
-          alt={name}
-        />
-        <CoachInfo
-          coach={{ name, role, experience, languages, rate, bio, fields }}
-          maxBioChars={50}
-          sx={{ maxWidth: "50%", flexGrow: 10, width: "150px" }}
-        />
-        <QueryRenderer
-          {...availabilityQuery}
-          loaderName="Block"
-          success={({ data }) => (
-            <AvailabilityCalendar
-              availabilitiesByDay={data}
-              coach={coach}
-              onContact={handleContact}
-              onPick={pickCoach.onPick}
-              pickPending={pickCoach.pickPending}
-              sx={{ flexShrink: 0 }}
-            />
-          )}
-        />
-      </CardContent>
-    </Card>
+    <>
+      <Card sx={{ ...sx }}>
+        <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
+          <CardMedia
+            component="img"
+            sx={{ width: 225, borderRadius: 0.6 }}
+            image={`/api/latest/coaches/${username}/photo`}
+            alt={name}
+          />
+          <CoachInfo
+            coach={{ name, role, experience, languages, rate, bio, fields }}
+            maxBioChars={50}
+            sx={{ maxWidth: "50%", flexGrow: 10, width: "150px" }}
+          />
+          <QueryRenderer
+            {...availabilityQuery}
+            loaderName="Block"
+            success={({ data }) => (
+              <AvailabilityCalendar
+                availabilitiesByDay={data}
+                coach={coach}
+                onContact={withContact && handleContact}
+                onPick={!hidePickCoach && pickCoach.onPick}
+                pickPending={pickCoach.pickPending}
+                sx={{ flexShrink: 0 }}
+              />
+            )}
+          />
+        </CardContent>
+      </Card>
+      <ContactModal
+        coach={contactCoach}
+        onClose={() => setContactCoach(null)}
+      />
+    </>
   );
 };
 
@@ -246,13 +253,9 @@ export function CoachesPageInner() {
   const msg = useMsg();
   const { language } = useContext(I18nContext);
   const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
-  const [contactCoach, setContactCoach] = useState(null);
 
   const { authFetch } = useAuth();
-
-  const handleContact = useCallback((coach) => setContactCoach(coach), []);
-
-  const query = useQuery({
+  const coachesQuery = useQuery({
     queryKey: ["coaches", filter],
     queryFn: () =>
       authFetch({
@@ -317,31 +320,103 @@ export function CoachesPageInner() {
       <CoachesFilter filter={filter} setFilter={setFilter} />
 
       <QueryRenderer
-        {...query}
+        {...coachesQuery}
         success={({ data: { content = [] } }) =>
           content.map((coach, i) => (
             <CoachCard
               key={coach.username}
               coach={coach}
-              onContact={handleContact}
+              withContact
               sx={{ my: 3 }}
             />
           ))
         }
       />
-
-      <ContactModal
-        coach={contactCoach}
-        onClose={() => setContactCoach(null)}
-      />
     </Layout>
   );
 }
 
+const YourCoachPageInner = ({ username }) => {
+  const msg = useMsg();
+  const { authFetch } = useAuth();
+  const yourCoachQuery = useQuery({
+    queryKey: ["coaches", filter],
+    queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
+    // refetchOnWindowFocus: false,
+  });
+  const EXPECT_ITEMS = [
+    // {
+    //   heading: msg("coaches.aside.items.1.heading"),
+    //   iconName: "CreditCard",
+    //   text: msg("coaches.aside.items.1.text"),
+    // },
+    {
+      heading: msg("coaches.aside.items.2.heading"),
+      iconName: "Star",
+      text: msg("coaches.aside.items.2.text"),
+    },
+    {
+      heading: msg("coaches.aside.items.3.heading"),
+      iconName: "Lock",
+      text: msg("coaches.aside.items.3.text"),
+    },
+  ];
+  // const yourCoachQuery = useQuery({ queryKey: [""] });
+
+  return (
+    <Layout
+      rightMenuContent={
+        <ScrollableRightMenu heading={<Msg id="coaches.aside.title" />}>
+          {EXPECT_ITEMS.map(({ heading, iconName, text }) => (
+            <InfoBox
+              key={heading}
+              heading={heading}
+              iconName={iconName}
+              color="primary"
+              sx={{ p: 2, mb: 3, borderRadius: "6px" }}
+            >
+              <P>{text}</P>
+            </InfoBox>
+          ))}
+        </ScrollableRightMenu>
+      }
+    >
+      <Box mt={4} mb={3}>
+        <Box
+          display="flex"
+          flexWrap="nowrap"
+          alignItems="center"
+          flexDirection="row"
+        >
+          <H1>
+            <Msg id="coaches.heading" />
+          </H1>
+        </Box>
+        <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
+      </Box>
+
+      <QueryRenderer
+        {...yourCoachQuery}
+        success={({ data: coach }) => (
+          <CoachCard coach={coach} withContact sx={{ my: 3 }} />
+        )}
+      />
+    </Layout>
+  );
+};
+
 export function CoachesPage() {
+  // const { user } = useAuth();
+  const user = { data: {} }; // TODO: flip
+  console.log("[CoachesPage]", { user });
+
   return (
     <MsgProvider messages={messages}>
-      <CoachesPageInner />
+      {user.data.coach ? (
+        <YourCoachPageInner username={user.data.coach} />
+      ) : (
+        <CoachesPageInner />
+      )}
     </MsgProvider>
   );
 }

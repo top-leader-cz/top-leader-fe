@@ -125,7 +125,7 @@ const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
 };
 
 export const MainMenu = ({ open }) => {
-  const auth = useAuth();
+  const { signout, isHR } = useAuth();
   const mobile = !open;
 
   return (
@@ -170,12 +170,14 @@ export const MainMenu = ({ open }) => {
               icon={<ForumOutlined />}
               to={routes.getFeedback}
             />
-            <ListItemLink
-              mobile={mobile}
-              text={<Msg id="main-menu.items.team" />}
-              icon={<People />}
-              to={routes.team}
-            />
+            {isHR ? (
+              <ListItemLink
+                mobile={mobile}
+                text={<Msg id="main-menu.items.team" />}
+                icon={<People />}
+                to={routes.team}
+              />
+            ) : null}
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.messages" />}
@@ -202,7 +204,7 @@ export const MainMenu = ({ open }) => {
             text={<Msg id="main-menu.items.logout" />}
             icon={<LogoutOutlined />}
             onClick={() => {
-              auth.signout();
+              signout();
               // auth.signout(() => navigate("/"));
             }}
             // to={routes.signIn}

@@ -50,6 +50,7 @@ export const useCoachQuery = ({ username, onError, onSuccess }) => {
 const errIs = curryN(2, (statusCode, e) => e?.response?.status === statusCode);
 
 const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
+  const { user } = useAuth();
   const coachQuery = useCoachQuery({
     username,
     onError: when(errIs(404), () => setRightOpen(false)),
@@ -57,12 +58,14 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
   });
   const pickCoach = usePickCoach({ coach: coachQuery.data });
   const profilePhotoSrc = `/api/latest/coaches/${username}/photo`;
+  const canPickCoach = user.data.coach !== username;
 
   console.log("[Messages.RightMenu.rndr]", { coachQuery });
 
   return (
     <ScrollableRightMenu
       buttonProps={
+        canPickCoach &&
         pickCoach.onPick && {
           children: msg("messages.aside.pick-coach"),
           type: "button",

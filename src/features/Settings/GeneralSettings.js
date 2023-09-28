@@ -33,7 +33,7 @@ const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 const formatTimezone = (tz) => `${tz} (${tzf("z", tz)}) ${tzf("O", tz)}`; // | ${tzf("zzzz", tz)}`;
 
 const timeZones = Intl.supportedValuesOf("timeZone");
-const TIMEZONE_OPTIONS = timeZones.map((value) => ({
+export const TIMEZONE_OPTIONS = timeZones.map((value) => ({
   value,
   label: formatTimezone(value),
 }));

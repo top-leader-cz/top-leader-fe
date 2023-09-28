@@ -1,5 +1,8 @@
 {
+  "availability-calendar.confirm-reservation.desc": "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}.",
+  "availability-calendar.confirm-reservation.title": "Confirm reservation {date}",
   "coaches.aside.items.1.heading": "€100",
+  "coaches.coach.pick": "Pick the Coach",
   "coaches.coach.rate": "Rate",
   "coaches.coach.show-more": "Show more",
   "coaches.filter.rate.label": "Rate",
@@ -17,5 +20,8 @@
   "settings.profile.field.fields.placeholder": "Select fields you work in",
   "settings.profile.field.languages.placeholder": "Select languages you speak",
   "settings.profile.field.publicProfile": "Public account",
-  "settings.profile.field.rate": "Rate"
+  "settings.profile.field.rate": "Rate",
+  "team.credit.add-member.modal.desc": "Esse distinctio delectus omnis sint est mollitia.",
+  "team.credit.add-member.modal.title": "Add new member",
+  "team.credit.add-member.submit": "Send invite"
 }

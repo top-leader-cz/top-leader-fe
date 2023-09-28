@@ -30,6 +30,7 @@ import {
   Search,
   Star,
   Storage,
+  GroupAdd,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -64,6 +65,7 @@ const Icons = {
   Search,
   Star,
   Storage,
+  GroupAdd,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

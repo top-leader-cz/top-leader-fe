@@ -64,6 +64,8 @@ export const FETCH_TYPE = {
 export const Authority = {
   COACH: "COACH",
   USER: "USER",
+  ADMIN: "ADMIN",
+  HR: "HR",
 };
 
 console.log({ qs });
@@ -135,6 +137,7 @@ export function AuthProvider({ children }) {
       queryClient.invalidateQueries("user-info"); // TODO: rm?
     },
     isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
+    isHR: userQuery.data?.userRoles?.includes(Authority.HR),
   };
 
   // console.log("[AP.rndr]", value);

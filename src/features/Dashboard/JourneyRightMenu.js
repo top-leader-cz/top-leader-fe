@@ -1,7 +1,8 @@
-import { Avatar, Button, Icon, Paper } from "@mui/material";
+import { Avatar, Button, Paper } from "@mui/material";
 import { Msg } from "../../components/Msg";
 import { H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
+import { Icon } from "../../components/Icon";
 
 export const JourneyRightMenu = () => {
   return (
@@ -26,8 +27,10 @@ export const JourneyRightMenu = () => {
       <H2 sx={{ alignSelf: "flex-start" }}>
         <Msg id={"dashboard.rightmenu.title"} />
       </H2>
-      <Avatar variant="circular" sx={{ my: 5 }}>
-        <Icon />
+      <Avatar sx={{ bgcolor: "#F9FAFB", width: 100, height: 100, my: 5 }}>
+        <Avatar sx={{ bgcolor: "#EAECF0", width: 60, height: 60 }}>
+          <Icon name={"RocketLaunch"} sx={{ color: "#667085" }} />
+        </Avatar>
       </Avatar>
       <H2 sx={{ mb: 1 }}>
         <Msg id="dashboard.rightmenu.upcoming.title.empty" />
