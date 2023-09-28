@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
   Divider,
   InputAdornment,
   Stack,
@@ -12,18 +11,18 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
+import { RHForm } from "../../components/Forms/Form";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
-import { I18nContext, defaultLanguage } from "../../App";
-import { RHForm } from "../../components/Forms/Form";
 
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import { I18nContext, defaultLanguage } from "../I18n/I18nProvider";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 

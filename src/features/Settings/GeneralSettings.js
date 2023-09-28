@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { I18nContext } from "../../App";
+
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
   AutocompleteSelect,
@@ -16,6 +16,7 @@ import { WHITE_BG } from "./Settings.page";
 import { useMutation } from "react-query";
 import { useAuth } from "../Authorization";
 import { format } from "date-fns-tz";
+import { I18nContext } from "../I18n/I18nProvider";
 
 const FIELDS_GENERAL = {
   language: "language",
@@ -32,7 +33,7 @@ const tzf = (f, tz) => format(new Date(), f, { timeZone: tz });
 const formatTimezone = (tz) => `${tz} (${tzf("z", tz)}) ${tzf("O", tz)}`; // | ${tzf("zzzz", tz)}`;
 
 const timeZones = Intl.supportedValuesOf("timeZone");
-const TIMEZONE_OPTIONS = timeZones.map((value) => ({
+export const TIMEZONE_OPTIONS = timeZones.map((value) => ({
   value,
   label: formatTimezone(value),
 }));

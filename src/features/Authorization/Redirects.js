@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { routes } from "../../routes";
 import { useAuth } from "./";
 import { useEffect, useState } from "react";
+import { routes } from "../../routes";
 
 export const AuthRedirect = () => {
   let auth = useAuth();

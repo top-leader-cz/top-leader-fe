@@ -3,7 +3,7 @@ import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
 import React, { useContext } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { I18nContext } from "../../App";
+
 import { ChipsCard } from "../../components/ChipsCard";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
@@ -17,6 +17,7 @@ import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
 import { primary25 } from "../../theme";
+import { I18nContext } from "../I18n/I18nProvider";
 
 const AssessmentRightMenu = ({
   history,

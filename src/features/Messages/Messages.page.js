@@ -8,6 +8,7 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
+import { curryN, when } from "ramda";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useQueryClient } from "react-query";
@@ -22,15 +23,17 @@ import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { AvailabilityCalendar } from "../Availability/AvailabilityCalendar";
-import { CoachInfo, useCoachAvailabilityQuery } from "../Coaches/Coaches.page";
+import {
+  CoachInfo,
+  useCoachAvailabilityQuery,
+  usePickCoach,
+} from "../Coaches/Coaches.page";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useSendMessageMutation } from "./queries";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
   const { authFetch } = useAuth();
-  // GET `/api/latest/coaches/${username}/availability`
-  // GET `/api/latest/coaches/${username}/photo`
 
   return useQuery({
     enabled: !!username,
@@ -39,54 +42,37 @@ export const useCoachQuery = ({ username, onError, onSuccess }) => {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
-    // .catch((e) => {
-    //   console.log("TODO:401-coach", e);
-    //   throw e;
-    //   // if (e?.response?.status === 404) return undefined;
-    // }),
     onError,
     onSuccess,
   });
 };
 
+const errIs = curryN(2, (statusCode, e) => e?.response?.status === statusCode);
+
 const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
-  const onError = useCallback(
-    (e) => {
-      if (e?.response?.status === 404) setRightOpen(false);
-    },
-    [setRightOpen]
-  );
-  const onSuccess = useCallback(
-    (e) => {
-      setRightOpen(true);
-    },
-    [setRightOpen]
-  );
-  const coachQuery = useCoachQuery({ username, onError, onSuccess });
-  const coachAvailabilityQuery = useCoachAvailabilityQuery({ username });
-  console.log("[Messages.RightMenu.rndr]", { coachQuery });
-  const onAvailabilityClick = ({ coach, interval }) => {
-    console.log("onAvailabilityClick", { coach, interval });
-    // prettier-ignore
-    alert(`TODO: ${JSON.stringify( { interval, username: coach.username, email: coach.email }, null, 2 )}`);
-  };
+  const { user } = useAuth();
+  const coachQuery = useCoachQuery({
+    username,
+    onError: when(errIs(404), () => setRightOpen(false)),
+    onSuccess: (e) => setRightOpen(true),
+  });
+  const pickCoach = usePickCoach({ coach: coachQuery.data });
   const profilePhotoSrc = `/api/latest/coaches/${username}/photo`;
+  const canPickCoach = user.data.coach !== username;
+
+  console.log("[Messages.RightMenu.rndr]", { coachQuery });
 
   return (
     <ScrollableRightMenu
-      // heading={msg("")}
       buttonProps={
-        !coachQuery.data
-          ? undefined
-          : {
-              children: msg("messages.aside.pick-coach"),
-              type: "submit",
-              //   disabled: saveDisabled,
-              onClick: (e) => {
-                console.log("Pick click");
-                // form.handleSubmit(saveMutation.mutateAsync, onError)(e);
-              },
-            }
+        canPickCoach &&
+        pickCoach.onPick && {
+          children: msg("messages.aside.pick-coach"),
+          type: "button",
+          variant: "outlined",
+          disabled: pickCoach.pickPending,
+          onClick: pickCoach.onPick,
+        }
       }
       sx={{ whiteSpace: "normal" }}
     >
@@ -112,22 +98,7 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
               {/* </object> */}
             </Box>
             <CoachInfo coach={coach} maxBioChars={2000} sx={{ my: 3 }} />
-            <QueryRenderer
-              {...coachAvailabilityQuery}
-              loaderName="Block"
-              success={({ data: availabilities }) => (
-                <AvailabilityCalendar
-                  coach={coach}
-                  availabilitiesByDay={availabilities}
-                  sx={{ flexShrink: 0 }}
-                  onTimeslotClick={({ interval }) =>
-                    onAvailabilityClick({ coach, interval })
-                  }
-                  // coachName={coach.username}
-                  // onContact={() => onContact(coach)}
-                />
-              )}
-            />
+            <AvailabilityCalendar coach={coach} sx={{ flexShrink: 0 }} />
           </>
         )}
       />
@@ -153,19 +124,14 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
         ({ username, lastMessage, avatarSrc, time, unreadMessageCount }) => (
           <ListItem
             key={username}
+            disablePadding
             alignItems="flex-start"
             sx={{
               bgcolor:
                 username === selectedUsername ? "#F9F8FF" : "transparent",
               cursor: "pointer",
             }}
-            //   secondaryAction={
-            //     <IconButton edge="end" aria-label="comments">
-            //       <CommentIcon />
-            //     </IconButton>
-            //   }
-            disablePadding
-            // onClick={() => onSelect(username)}
+            // secondaryAction={ <IconButton edge="end" aria-label="comments"> <CommentIcon /> </IconButton> }
           >
             <ListItemButton
               role={undefined}

@@ -5,7 +5,7 @@ import { getTimezoneOffset } from "date-fns-tz";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { I18nContext } from "../../App";
+
 import {
   B,
   CheckboxField,
@@ -22,8 +22,14 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { FieldLayout, FormRow } from "./FormRow";
 import { useResetForm } from "./ProfileSettings";
 import { WHITE_BG } from "./Settings.page";
-import { CREATE_OFFSET, TimeSlot } from "../Availability/AvailabilityCalendar";
-import { API_TIME_FORMAT, UTC_DATE_FORMAT } from "../../utils/date";
+import { CREATE_OFFSET } from "../Availability/AvailabilityCalendar";
+import {
+  API_TIME_FORMAT,
+  UTC_DATE_FORMAT,
+  getFirstDayOfTheWeek,
+} from "../I18n/utils/date";
+import { I18nContext } from "../I18n/I18nProvider";
+import { TimeSlot } from "../Availability/CalendarDaySlots";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -193,15 +199,15 @@ const getAvailabilities = ({ formValues, i18n, userTz }) => {
   return Object.fromEntries(availabilities);
 };
 
-const from = ({ values, i18n, userTz }) => {
+const getPayload = ({ values, i18n, userTz }) => {
   const { recurring, recurrenceRange: [from, to] = [], ...rest } = values;
   const payload = {
     availabilities: getAvailabilities({ formValues: rest, i18n, userTz }),
     ...(recurring
       ? {}
       : {
-          firstDayOfTheWeek: i18n.getFirstDayOfTheWeek(from),
-        }), // TODO: timezone needed, startOfWeek affected by tz
+          firstDayOfTheWeek: getFirstDayOfTheWeek(from),
+        }),
   };
 
   return payload;
@@ -270,6 +276,15 @@ const getRangeHours = ({ timeFrom, timeTo }) => {
   const hours = Array(hoursCount)
     .fill(null)
     .map((_, i) => startHour + i);
+
+  console.log("[getRangeHours]", {
+    hours,
+    hoursCount,
+    timeFrom,
+    timeTo,
+    startHour,
+    endHour,
+  });
   return hours;
 };
 
@@ -347,6 +362,7 @@ export const AvailabilitySettings = () => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
   const availabilityType = AVAILABILITY_TYPE.RECURRING; // TODO
+  // const availabilityType = useFormContext().watch("recurring") ? AVAILABILITY_TYPE.RECURRING : AVAILABILITY_TYPE.NON_RECURRING;
   const availabilityQuery = useQuery({
     queryKey: ["coach-availability", availabilityType],
     queryFn: () =>
@@ -390,7 +406,7 @@ export const AvailabilitySettings = () => {
       const type = recurring
         ? AVAILABILITY_TYPE.RECURRING
         : AVAILABILITY_TYPE.NON_RECURRING;
-      const payload = from({ values, i18n, userTz });
+      const payload = getPayload({ values, i18n, userTz });
 
       console.log("%cMUTATION", "color:lime", { values, type, payload });
       // debugger;
@@ -443,6 +459,7 @@ export const AvailabilitySettings = () => {
           return [...acc, ...rangeHours];
         }, []);
         // const freeHours = [9, 10, 11, 13, 14, 16];
+        console.log("[previewDays]", dayName, { freeHours, ranges, date });
 
         return {
           date,
@@ -452,6 +469,7 @@ export const AvailabilitySettings = () => {
 
     return rows;
   }, [availabilityQuery.data]);
+
   const [firstHour, lastHour] = previewDays.reduce(
     (acc, { date, freeHours }) => {
       const sorted = [...(freeHours ?? [])].sort((a, b) => a - b);
@@ -470,6 +488,13 @@ export const AvailabilitySettings = () => {
 
   // firstDay + 3 days -> month
   const rightMenuSubtitle = i18n.formatLocal(previewDays[3].date, "LLLL");
+
+  console.log("[AvailabilitySettings.rndr]", {
+    firstHour,
+    lastHour,
+    slotsCount,
+    previewDays,
+  });
 
   useRightMenu(
     useMemo(
@@ -497,7 +522,12 @@ export const AvailabilitySettings = () => {
             >
               {previewDays.map(({ date, freeHours }, i) => (
                 <CalendarDaySlots
-                  sx={{ flexDirection: "row", alignItems: "center", gap: 2 }}
+                  sx={{
+                    flexDirection: "row",
+                    // flexWrap: "wrap",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
                   dateSx={{ minWidth: "40px", p: 0 }}
                   // slotSx={{ width: "60px" }}
                   key={i}

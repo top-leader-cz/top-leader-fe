@@ -4,6 +4,8 @@ import {
   Adjust,
   ArrowBack,
   ArrowForward,
+  ChevronLeft,
+  ChevronRight,
   BarChart,
   Close,
   CloudUploadOutlined,
@@ -28,6 +30,7 @@ import {
   Search,
   Star,
   Storage,
+  GroupAdd,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -36,6 +39,8 @@ const Icons = {
   Adjust,
   ArrowBack,
   ArrowForward,
+  ChevronLeft,
+  ChevronRight,
   BarChart,
   Close,
   CloudUploadOutlined,
@@ -60,6 +65,7 @@ const Icons = {
   Search,
   Star,
   Storage,
+  GroupAdd,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

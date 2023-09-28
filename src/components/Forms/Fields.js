@@ -10,19 +10,19 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import { alpha, Box, styled } from "@mui/system";
+import { Box, alpha, styled } from "@mui/system";
 import {
   DesktopDatePicker,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
+import { I18nContext } from "../../features/I18n/I18nProvider";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
-import { useContext } from "react";
-import { I18nContext, useStaticCallback } from "../../App";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -735,13 +735,9 @@ const FileUploadInner = ({ name, src, secondaryText, onChange = () => {} }) => {
         <input
           hidden
           accept="image/*"
-          // multiple
           type="file"
           name={name}
-          {...register(name, {
-            required: "Picture is required",
-          })}
-          // onChange={onChange}
+          {...register(name)}
         />
         <Avatar
           variant="circular"

@@ -10,7 +10,7 @@ import { useContext } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useQuery } from "react-query";
 import { Navigate, generatePath, useNavigate } from "react-router-dom";
-import { I18nContext } from "../../App";
+
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
 import { Icon } from "../../components/Icon";
@@ -25,6 +25,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { useAreasDict } from "./areas";
 import { messages } from "./messages";
+import { I18nContext } from "../I18n/I18nProvider";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (

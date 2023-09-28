@@ -1,7 +1,7 @@
+import * as qs from "qs";
 import { createContext, useCallback, useContext } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
-import * as qs from "qs";
 
 export const AuthContext = createContext(null);
 
@@ -64,6 +64,8 @@ export const FETCH_TYPE = {
 export const Authority = {
   COACH: "COACH",
   USER: "USER",
+  ADMIN: "ADMIN",
+  HR: "HR",
 };
 
 console.log({ qs });
@@ -135,9 +137,10 @@ export function AuthProvider({ children }) {
       queryClient.invalidateQueries("user-info"); // TODO: rm?
     },
     isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
+    isHR: userQuery.data?.userRoles?.includes(Authority.HR),
   };
 
-  console.log("[AP.rndr]", value);
+  // console.log("[AP.rndr]", value);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

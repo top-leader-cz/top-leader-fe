@@ -9,12 +9,12 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
+import { Icon } from "../../components/Icon";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { useAuth } from "./";
+import { P } from "../../components/Typography";
 import { messages } from "./messages";
-import { H2, P } from "../../components/Typography";
-import { Icon } from "../../components/Icon";
+import { useAuth } from "./AuthProvider";
 
 const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";

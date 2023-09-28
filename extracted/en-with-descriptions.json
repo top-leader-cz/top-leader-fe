@@ -68,6 +68,12 @@
   "auth.unauthorized.title": {
     "defaultMessage": "Welcome to TopLeader"
   },
+  "availability-calendar.confirm-reservation.desc": {
+    "defaultMessage": "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}."
+  },
+  "availability-calendar.confirm-reservation.title": {
+    "defaultMessage": "Confirm reservation {date}"
+  },
   "coaches.aside.items.1.heading": {
     "defaultMessage": "€100"
   },
@@ -97,6 +103,9 @@
   },
   "coaches.coach.languages": {
     "defaultMessage": "Languages"
+  },
+  "coaches.coach.pick": {
+    "defaultMessage": "Pick the Coach"
   },
   "coaches.coach.rate": {
     "defaultMessage": "Rate"
@@ -1775,6 +1784,15 @@
   },
   "strengths.tips.title": {
     "defaultMessage": "💡 Tips for action"
+  },
+  "team.credit.add-member.modal.desc": {
+    "defaultMessage": "Esse distinctio delectus omnis sint est mollitia."
+  },
+  "team.credit.add-member.modal.title": {
+    "defaultMessage": "Add new member"
+  },
+  "team.credit.add-member.submit": {
+    "defaultMessage": "Send invite"
   },
   "team.credit.topup": {
     "defaultMessage": "Top up credit"

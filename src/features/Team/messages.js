@@ -57,4 +57,16 @@ export const messages = defineMessages({
     id: "team.credit.topup-modal.submit",
     defaultMessage: "Request credit top up",
   },
+  "team.credit.add-member.submit": {
+    id: "team.credit.add-member.submit",
+    defaultMessage: "Send invite",
+  },
+  "team.credit.add-member.modal.title": {
+    id: "team.credit.add-member.modal.title",
+    defaultMessage: "Add new member",
+  },
+  "team.credit.add-member.modal.desc": {
+    id: "team.credit.add-member.modal.desc",
+    defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
+  },
 });
