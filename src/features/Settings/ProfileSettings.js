@@ -20,6 +20,7 @@ import {
   BareInputField,
   DatePickerField,
   FileUpload,
+  StyledOutlinedInput,
   SwitchField,
 } from "../../components/Forms/Fields";
 import { useRightMenu } from "../../components/Layout";
@@ -42,7 +43,7 @@ const FIELDS = {
   bio: "bio",
   languages: "languages",
   fields: "fields",
-  // certificates: "certificates", // rm
+  certificates: "certificates",
   experienceSince: "experienceSince",
   publicProfile: "publicProfile",
   rate: "rate",
@@ -62,11 +63,17 @@ const _COACH = {
   // https://attacomsian.com/blog/javascript-current-timezone
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions
   [FIELDS.fields]: ["business", "life"],
-  // [FIELDS.certificates]: "Associate Coach Certified - Issued by ICF",
+  [FIELDS.certificates]: undefined, // "Associate Coach Certified - Issued by ICF",
   [FIELDS.experienceSince]: new Date(Date.now() - 7 * 24 * 3600 * 1000),
   [FIELDS.rate]: "",
   [FIELDS.publicProfile]: false,
 };
+
+const certificatesOptions = [
+  { value: "$", label: "ICF ACC / EMCC EIA Practitioner" },
+  { value: "$$", label: "ICF PCC / EMCC EIA Senior Practitioner" },
+  { value: "$$$", label: "ICF MCC / EMCC EIA Master Practitioner" },
+];
 
 const to = (data, { userLocale, userTz }) => {
   return {
@@ -77,10 +84,11 @@ const to = (data, { userLocale, userTz }) => {
   };
 };
 
-const from = async ({ imageSrc, ...values }) => {
+const from = async ({ imageSrc, rate, certificates, ...values }) => {
   console.log("from", { imageSrc, ...values }); // TODO: extract "upload component" and "upload form field"
   return {
     ...values,
+    rate: certificates,
     experienceSince: values.experienceSince, // TODO
   };
 };
@@ -121,6 +129,7 @@ export const ProfileSettings = () => {
       [language]
     ),
   });
+  const certificates = form.watch("certificates");
 
   const initialValuesQuery = useQuery({
     queryKey: ["coach-info"], // TODO?
@@ -222,7 +231,7 @@ export const ProfileSettings = () => {
             />
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
-          {/* <P mt={1}>{COACH.certificates}</P> */}
+          {/* <P mt={1}>{COACH.certificates}</P> TODO */}
           <P mt={1}>
             {msg("settings.profile.field.experience")}
             {": "}
@@ -395,8 +404,29 @@ export const ProfileSettings = () => {
         />
       </FormRow>
 
+      <FormRow
+        label={msg("settings.profile.field.certificates")}
+        name={FIELDS.certificates}
+      >
+        <AutocompleteSelect
+          sx={WHITE_BG}
+          name={FIELDS.certificates}
+          options={certificatesOptions}
+          placeholder={msg("settings.profile.field.certificates.placeholder")}
+        />
+      </FormRow>
+
       <FormRow label={msg("settings.profile.field.rate")} name={FIELDS.rate}>
-        <BareInputField name={FIELDS.rate} />
+        {/* <BareInputField disabled name={FIELDS.rate} /> */}
+        <Box width="100%" position="relative">
+          <StyledOutlinedInput
+            disabled
+            name="rate"
+            value={certificates}
+            fullWidth
+            size="small"
+          />
+        </Box>
       </FormRow>
     </FormProvider>
   );

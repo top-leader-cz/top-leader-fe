@@ -3,6 +3,7 @@ import { Typography } from "@mui/material";
 
 export const H1 = (props) => <Typography variant="h1" {...props} />;
 export const H2 = (props) => <Typography variant="h2" {...props} />;
+export const H3 = (props) => <Typography variant="h3" {...props} />;
 export const P = ({ emphasized, sx, ...props }) => {
   const localSx = emphasized
     ? {

@@ -46,6 +46,13 @@ const theme = createTheme({
       lineHeight: 1.21,
       letterSpacing: "0em",
     },
+    h3: {
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#101828", // gray/900
+      lineHeight: 1.21,
+      letterSpacing: "0em",
+    },
     body1: {
       fontSize: 14,
       fontWeight: 400,

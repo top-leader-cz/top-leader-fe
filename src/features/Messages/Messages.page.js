@@ -23,14 +23,11 @@ import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { AvailabilityCalendar } from "../Availability/AvailabilityCalendar";
-import {
-  CoachInfo,
-  useCoachAvailabilityQuery,
-  usePickCoach,
-} from "../Coaches/Coaches.page";
+import { CoachInfo } from "../Coaches/CoachCard";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useSendMessageMutation } from "./queries";
+import { usePickCoach } from "../Coaches/api";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
   const { authFetch } = useAuth();

@@ -626,7 +626,7 @@ const getError = (error, rules) =>
   error?.message ||
   [error?.type, rules?.[error?.type]].filter(Boolean).join(": ");
 
-const StyledOutlinedInput = styled(OutlinedInput)({
+export const StyledOutlinedInput = styled(OutlinedInput)({
   backgroundColor: "white",
 });
 

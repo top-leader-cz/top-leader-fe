@@ -1,27 +1,23 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { format } from "date-fns";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useMutation, useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2 } from "../../components/Typography";
 import { routes } from "../../routes";
-import { useAuth } from "../Authorization";
+import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { SessionStepCard } from "./SessionStepCard";
 import { VerticalStepper } from "./VerticalStepper";
+import { useUserSessionMutation, useUserSessionQuery } from "./api";
 import { messages } from "./messages";
 import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
-import { UTC_DATE_FORMAT } from "../I18n/utils/date";
-import { I18nContext } from "../I18n/I18nProvider";
 
 export const StepperRightMenu = ({
   heading,
@@ -162,20 +158,7 @@ function NewSessionPageInner() {
     [setData]
   );
 
-  const { authFetch } = useAuth();
-  const query = useQuery({
-    queryKey: ["user-sessions"],
-    queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
-    cacheTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
-    // onSuccess: (data) => {
-    //   console.log("[onSuccess]", { data });
-    //   setData(data);
-    // },
-  });
+  const query = useUserSessionQuery();
 
   const activeStepIndexRef = useRef(activeStepIndex);
   activeStepIndexRef.current = activeStepIndex;
@@ -186,29 +169,7 @@ function NewSessionPageInner() {
       // reinit(query.data);
     }
   }, [query.data, reinit]);
-  const mutation = useMutation({
-    mutationFn: ({ actionSteps = [], ...data }) => {
-      console.log("%cMUTATION", "color:lime", { actionSteps, ...data });
-      return authFetch({
-        method: "POST",
-        url: "/api/latest/user-sessions",
-        data: {
-          ...data,
-          actionSteps: actionSteps.map(({ label, date }) => {
-            const formattedDate = format(date, UTC_DATE_FORMAT);
-            console.log("mapStep", { date, formattedDate });
-            return {
-              label,
-              date: formattedDate,
-            };
-          }),
-        },
-      });
-      // .then((arg) => {
-      //   debugger;
-      //   return arg;
-      // });
-    },
+  const mutation = useUserSessionMutation({
     onSuccess: (data) => {
       // TODO: not called sometimes!
       console.log("mutation.onSuccess", data);

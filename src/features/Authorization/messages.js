@@ -25,6 +25,10 @@ export const messages = defineMessages({
     id: "auth.login.password.label",
     defaultMessage: "Password",
   },
+  "auth.login.password-confirm.label": {
+    id: "auth.login.password-confirm.label",
+    defaultMessage: "Confirm password",
+  },
   "auth.login.validation.invalid-credentials": {
     id: "auth.login.validation.invalid-credentials",
     defaultMessage: "Invalid credentials",

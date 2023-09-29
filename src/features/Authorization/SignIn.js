@@ -19,25 +19,11 @@ import { useAuth } from "./AuthProvider";
 const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";
 
-export function SignInPage() {
-  const { signin, loginMutation } = useAuth();
-  const msg = useMsg({ dict: messages });
-  const form = useForm({
-    defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
-  });
-  const handleSubmit = ({ email, password }, e) => {
-    console.log("[Login submit]", { username: email, password });
-    return signin({ username: email, password });
-    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
-  };
-
-  const disabled = loginMutation.isLoading;
-  const errorMsg = loginMutation.error
-    ? msg("auth.login.validation.invalid-credentials")
-    : "";
-
-  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
-
+export const WelcomeScreenTemplate = ({
+  perex = <Msg id="auth.unauthorized.perex" />,
+  children,
+  containerSx = {},
+}) => {
   return (
     <MsgProvider messages={messages}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -60,6 +46,7 @@ export function SignInPage() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              ...containerSx,
             }}
           >
             <Avatar
@@ -79,9 +66,11 @@ export function SignInPage() {
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
               Please enter your details
             </Typography> */}
-            <Typography variant="body1" mt={1} mb={4}>
-              <Msg id="auth.unauthorized.perex" />
-            </Typography>
+            {perex && (
+              <Typography variant="body1" mt={1} mb={4} textAlign="center">
+                {perex}
+              </Typography>
+            )}
 
             {/* <Box
               component="form"
@@ -89,117 +78,7 @@ export function SignInPage() {
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
             > */}
-            <RHForm form={form} onSubmit={handleSubmit}>
-              <RHFTextField
-                debug={{ msg: "email", color: "crimson" }}
-                margin="normal"
-                required
-                rules={{
-                  required: {
-                    value: true,
-                    message: <Msg id="auth.login.email.validation.required" />,
-                  },
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: <Msg id="auth.login.email.validation.pattern" />,
-                  },
-                }}
-                fullWidth
-                id="email"
-                label={<Msg id="auth.login.email.label" />}
-                name="email"
-                autoComplete="email"
-                autoFocus
-              />
-              <RHFTextField
-                margin="normal"
-                required
-                rules={{ required: "Required" }}
-                fullWidth
-                name="password"
-                label={<Msg id="auth.login.password.label" />}
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                error={!!errorMsg}
-                helperText={errorMsg}
-              />
-
-              {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
-              <Button
-                fullWidth
-                variant="text"
-                sx={{
-                  width: "auto",
-                  float: "right",
-                  // justifyContent: "flex-end"
-                }}
-              >
-                <Msg id="auth.login.forgot" />
-              </Button>
-              {/* <Link href="#" variant="body2">
-                Forgot password
-              </Link> */}
-              <Button
-                type="submit"
-                disabled={disabled}
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 3 }}
-                // href={routes.dashboard}
-              >
-                <Msg id="auth.login.login" />
-              </Button>
-              <Divider />
-              <Button
-                type="button"
-                disabled={disabled}
-                fullWidth
-                variant="outlined"
-                sx={{ mt: 3 }}
-                startIcon={
-                  <Avatar
-                    sx={{ width: 20, height: 20 }}
-                    variant="square"
-                    src={"google-small.png"}
-                  />
-                }
-              >
-                <Msg id="auth.login.google" />
-              </Button>
-              <Button
-                type="button"
-                disabled={disabled}
-                fullWidth
-                variant="outlined"
-                sx={{ mt: 3, mb: 3 }}
-                startIcon={
-                  <Avatar
-                    sx={{ width: 20, height: 20 }}
-                    variant="square"
-                    src={"microsoft-small.png"}
-                  />
-                }
-              >
-                <Msg id="auth.login.microsoft" />
-              </Button>
-              {/* <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </Grid>
-              </Grid> */}
-              {/* <Copyright sx={{ mt: 5 }} /> */}
-            </RHForm>
+            {children}
             {/* </Box> */}
           </Box>
           <Box sx={{ position: "absolute", right: "24px", bottom: "24px" }}>
@@ -239,4 +118,209 @@ export function SignInPage() {
       </Grid>
     </MsgProvider>
   );
+};
+
+export function SignInPage() {
+  const { signin, loginMutation } = useAuth();
+  const msg = useMsg({ dict: messages });
+  const form = useForm({
+    defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
+  });
+  const handleSubmit = ({ email, password }, e) => {
+    console.log("[Login submit]", { username: email, password });
+    return signin({ username: email, password });
+    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
+  };
+
+  const disabled = loginMutation.isLoading;
+  const errorMsg = loginMutation.error
+    ? msg("auth.login.validation.invalid-credentials")
+    : "";
+
+  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
+
+  return (
+    <WelcomeScreenTemplate>
+      <RHForm form={form} onSubmit={handleSubmit}>
+        <RHFTextField
+          debug={{ msg: "email", color: "crimson" }}
+          margin="normal"
+          required
+          rules={{
+            required: {
+              value: true,
+              message: <Msg id="auth.login.email.validation.required" />,
+            },
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: <Msg id="auth.login.email.validation.pattern" />,
+            },
+          }}
+          fullWidth
+          id="email"
+          label={<Msg id="auth.login.email.label" />}
+          name="email"
+          autoComplete="email"
+          autoFocus
+        />
+        <RHFTextField
+          margin="normal"
+          required
+          rules={{ required: "Required" }}
+          fullWidth
+          name="password"
+          label={<Msg id="auth.login.password.label" />}
+          type="password"
+          id="password"
+          autoComplete="current-password"
+          error={!!errorMsg}
+          helperText={errorMsg}
+        />
+
+        {/* <FormControlLabel
+                control={<Checkbox value="remember" color="primary" />}
+                label="Remember me"
+              /> */}
+        <Button
+          fullWidth
+          variant="text"
+          sx={{
+            width: "auto",
+            float: "right",
+            // justifyContent: "flex-end"
+          }}
+        >
+          <Msg id="auth.login.forgot" />
+        </Button>
+        {/* <Link href="#" variant="body2">
+                Forgot password
+              </Link> */}
+        <Button
+          type="submit"
+          disabled={disabled}
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 3 }}
+          // href={routes.dashboard}
+        >
+          <Msg id="auth.login.login" />
+        </Button>
+        <Divider />
+        <Button
+          type="button"
+          disabled={disabled}
+          fullWidth
+          variant="outlined"
+          sx={{ mt: 3 }}
+          startIcon={
+            <Avatar
+              sx={{ width: 20, height: 20 }}
+              variant="square"
+              src={"google-small.png"}
+            />
+          }
+        >
+          <Msg id="auth.login.google" />
+        </Button>
+        <Button
+          type="button"
+          disabled={disabled}
+          fullWidth
+          variant="outlined"
+          sx={{ mt: 3, mb: 3 }}
+          startIcon={
+            <Avatar
+              sx={{ width: 20, height: 20 }}
+              variant="square"
+              src={"microsoft-small.png"}
+            />
+          }
+        >
+          <Msg id="auth.login.microsoft" />
+        </Button>
+        {/* <Grid container>
+                <Grid item xs>
+                  <Link href="#" variant="body2">
+                    Forgot password?
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="#" variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+                </Grid>
+              </Grid> */}
+        {/* <Copyright sx={{ mt: 5 }} /> */}
+      </RHForm>
+    </WelcomeScreenTemplate>
+  );
 }
+
+export const ResetPasswordPage = () => {
+  const { loginMutation } = useAuth();
+  const msg = useMsg({ dict: messages });
+  const form = useForm({
+    defaultValues: { password: "", passwordConfirm: "" },
+  });
+  const handleSubmit = ({ email, password }, e) => {
+    console.log("[Login submit]", { username: email, password });
+    alert("TODO");
+    throw new Error("TODO");
+    // return signin({ username: email, password });
+    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
+  };
+
+  const disabled = true;
+  const errorMsg = loginMutation.error
+    ? msg("auth.login.validation.invalid-credentials")
+    : "";
+
+  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
+
+  return (
+    <WelcomeScreenTemplate
+      perex={
+        "You’ve been invited to join TopLeader. Please set a password to complete the registration" // TODO: translation
+      }
+      containerSx={{ mt: 14 }}
+    >
+      <RHForm form={form} onSubmit={handleSubmit}>
+        <RHFTextField
+          margin="normal"
+          required
+          rules={{ required: "Required" }}
+          fullWidth
+          name="password"
+          label={<Msg id="auth.login.password.label" />}
+          type="password"
+          id="password"
+          autoComplete="password"
+          error={!!errorMsg}
+          helperText={errorMsg}
+          disabled={disabled}
+        />
+        <RHFTextField
+          margin="normal"
+          required
+          rules={{ required: "Required" }}
+          fullWidth
+          name="passwordConfirm"
+          label={<Msg id="auth.login.password-confirm.label" />}
+          type="password"
+          id="password"
+          autoComplete="password"
+          disabled={disabled}
+        />
+        <Button
+          type="submit"
+          disabled={disabled}
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 3 }}
+        >
+          <Msg id="auth.login.login" />
+        </Button>
+      </RHForm>
+    </WelcomeScreenTemplate>
+  );
+};
