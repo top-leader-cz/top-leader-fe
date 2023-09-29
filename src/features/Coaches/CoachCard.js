@@ -1,6 +1,6 @@
 import { Box, Button, Card, CardContent, CardMedia, Chip } from "@mui/material";
 import { useCallback, useState } from "react";
-import { LANGUAGE_OPTIONS, getLabel } from "../../components/Forms";
+import { getCoachLanguagesOptions, getLabel } from "../../components/Forms";
 import { useMsg } from "../../components/Msg/Msg";
 import { H1, P } from "../../components/Typography";
 import { AvailabilityCalendar } from "../Availability/AvailabilityCalendar";
@@ -54,7 +54,7 @@ export const CoachInfo = ({
       <P gutterBottom>
         {msg("coaches.coach.languages")}
         {": "}
-        {languages.map(getLabel(LANGUAGE_OPTIONS)).join(", ")}
+        {languages.map(getLabel(getCoachLanguagesOptions())).join(", ")}
       </P>
       <P gutterBottom>
         {msg("coaches.coach.rate")}

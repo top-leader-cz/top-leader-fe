@@ -12,6 +12,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import {
   LANGUAGE_OPTIONS,
+  getCoachLanguagesOptions,
   getLabel,
   renderLanguageOption,
 } from "../../components/Forms";
@@ -78,7 +79,7 @@ const certificatesOptions = [
 const to = (data, { userLocale, userTz }) => {
   return {
     ...data,
-    rate: data.rate || "",
+    certificates: data.rate || undefined,
     experienceSince: data.experienceSince, // TODO: utc
     languages: data.languages?.length ? data.languages : [userLocale],
   };
@@ -89,6 +90,7 @@ const from = async ({ imageSrc, rate, certificates, ...values }) => {
   return {
     ...values,
     rate: certificates,
+    // certificates,
     experienceSince: values.experienceSince, // TODO
   };
 };
@@ -197,6 +199,7 @@ export const ProfileSettings = () => {
     initialValuesQuery,
     form,
     saveMutation,
+    COACH,
     isJustLoaderDisplayed,
     language,
     experienceSince: form.watch("experienceSince"),
@@ -231,7 +234,9 @@ export const ProfileSettings = () => {
             />
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
-          {/* <P mt={1}>{COACH.certificates}</P> TODO */}
+          {COACH.certificates && (
+            <P mt={1}>{getLabel(certificatesOptions)(COACH.certificates)}</P>
+          )}
           <P mt={1}>
             {msg("settings.profile.field.experience")}
             {": "}
@@ -246,7 +251,7 @@ export const ProfileSettings = () => {
             {": "}
             {[]
               .concat(COACH.languages)
-              .map(getLabel(LANGUAGE_OPTIONS))
+              .map(getLabel(getCoachLanguagesOptions()))
               .join(", ")}
           </P>
           <P my={3} color="black">
@@ -268,6 +273,7 @@ export const ProfileSettings = () => {
       ),
       [
         COACH.bio,
+        COACH.certificates,
         COACH.experienceSince,
         COACH.fields,
         COACH.firstName,
@@ -365,8 +371,8 @@ export const ProfileSettings = () => {
           disableCloseOnSelect
           sx={WHITE_BG}
           name={FIELDS.languages}
-          options={LANGUAGE_OPTIONS}
-          renderOption={renderLanguageOption}
+          options={getCoachLanguagesOptions()}
+          // renderOption={renderLanguageOption}
           placeholder={msg("settings.profile.field.languages.placeholder")}
         />
       </FormRow>

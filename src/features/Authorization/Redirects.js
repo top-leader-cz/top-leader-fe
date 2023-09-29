@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./";
 import { useEffect, useState } from "react";
 import { routes } from "../../routes";
+import { intersection } from "ramda";
 
 export const AuthRedirect = () => {
   let auth = useAuth();
@@ -14,17 +15,20 @@ export const AuthRedirect = () => {
   }
 };
 
-export function RequireAuth({ children }) {
+export const RequireAuth = ({ children, requireUserRoles = [] }) => {
   const auth = useAuth();
   const location = useLocation();
-  console.log("[RequireAuth]", !auth.isLoggedIn ? " REDIRECTING" : "", {
-    auth,
-  });
+
   const [lastUsername, setLastUsername] = useState("");
   const username = auth.user?.data?.username;
   useEffect(() => {
     if (username) setLastUsername(username);
   }, [username]);
+
+  console.log("[RequireAuth]", !auth.isLoggedIn ? " REDIRECTING" : "", {
+    auth,
+    location,
+  });
 
   if (!auth.isLoggedIn) {
     // Redirect them to the /login page, but save the current location they were
@@ -40,21 +44,42 @@ export function RequireAuth({ children }) {
     );
   }
 
-  return children;
-}
+  if (requireUserRoles.length) {
+    if (
+      intersection(auth.user.data?.userRoles, requireUserRoles).length !==
+      requireUserRoles.length
+    )
+      return <Navigate to={routes.dashboard} replace />;
+  }
 
-export function ForbidAuth({ children }) {
+  return children;
+};
+
+const getAuthorizedLocationRedirect = ({ locationState, currentUsername }) => {
+  const isSavedPathValid = true; // TODO: discuss
+  // const isSavedPathValid = locationState.lastUsername === currentUsername;
+  const savedPathname = isSavedPathValid ? locationState.from?.pathname : "";
+
+  return savedPathname || routes.dashboard;
+};
+
+export const ForbidAuth = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
-  console.log("[ForbidAuth]", auth.isLoggedIn ? " REDIRECTING" : "", { auth });
+
+  console.log("[ForbidAuth]", auth.isLoggedIn ? " REDIRECTING" : "", {
+    auth,
+    location,
+  });
 
   if (auth.isLoggedIn) {
-    const to =
-      (location.state?.lastUsername === auth.user.data.username // depends on GlobalLoader
-        ? location.state?.from?.pathname
-        : "") || routes.dashboard;
+    const to = getAuthorizedLocationRedirect({
+      locationState: location.state || {},
+      currentUsername: auth.user.data.username, // depends on GlobalLoader
+    });
+
     return <Navigate to={to} state={{ from: location }} replace />;
   }
 
   return children;
-}
+};

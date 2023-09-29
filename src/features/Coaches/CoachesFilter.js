@@ -12,7 +12,11 @@ import {
 } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
+import {
+  LANGUAGE_OPTIONS,
+  getCoachLanguagesOptions,
+  renderLanguageOption,
+} from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { RHForm } from "../../components/Forms/Form";
 import { Icon } from "../../components/Icon";
@@ -137,8 +141,8 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <AutocompleteSelect
               name="languages"
               label={msg("coaches.filter.language.label")}
-              options={LANGUAGE_OPTIONS}
-              renderOption={renderLanguageOption}
+              options={getCoachLanguagesOptions()}
+              // renderOption={renderLanguageOption}
               multiple
               disableCloseOnSelect
             />

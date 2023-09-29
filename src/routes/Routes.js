@@ -16,6 +16,8 @@ import {
   RequireAuth,
   SignInPage,
 } from "../features/Authorization";
+import { Authority } from "../features/Authorization/AuthProvider";
+import { ResetPasswordPage } from "../features/Authorization/ResetPasswordPage";
 import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
 import { GetFeedbackPage } from "../features/Feedback/GetFeedback.page";
@@ -28,7 +30,6 @@ import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
-import { ResetPasswordPage } from "../features/Authorization/SignIn";
 
 const GlobalSpinner = () => {
   return (
@@ -48,6 +49,8 @@ const Root = ({ children, ...props }) => {
     </>
   );
 };
+
+const HR_AUTHORITIES = [Authority.HR];
 
 export const router = createHashRouter([
   {
@@ -163,7 +166,7 @@ export const router = createHashRouter([
       {
         path: routes.team,
         element: (
-          <RequireAuth>
+          <RequireAuth requireUserRoles={HR_AUTHORITIES}>
             <TeamPage />
           </RequireAuth>
         ),

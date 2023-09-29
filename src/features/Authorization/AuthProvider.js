@@ -42,6 +42,14 @@ const _login = ({ authFetch, username, password }) =>
     })(),
   });
 
+const _resetPass = ({ authFetch, password, token }) =>
+  authFetch({
+    type: FETCH_TYPE.FORMDATA,
+    method: "POST",
+    url: `/set-password/${token}`,
+    data: { password },
+  });
+
 const _fetchUser = ({ authFetch }) =>
   authFetch({ url: "/api/latest/user-info" });
 
@@ -100,20 +108,6 @@ export function AuthProvider({ children }) {
     []
   );
 
-  const signin = ({ username, password }) => {
-    loginMutation.mutate({ username, password });
-  };
-
-  const signout = () => {
-    queryClient.removeQueries();
-    setIsLoggedIn(false); // TODO: check
-  };
-
-  const loginMutation = useMutation({
-    mutationFn: (fields) => _login({ authFetch, ...fields }),
-    onSuccess: () => setIsLoggedIn(true),
-  });
-
   const userQuery = useQuery({
     queryKey: ["user-info"],
     queryFn: () => _fetchUser({ authFetch }),
@@ -126,11 +120,25 @@ export function AuthProvider({ children }) {
     },
   });
 
+  const loginMutation = useMutation({
+    mutationFn: (fields) => _login({ authFetch, ...fields }),
+    onSuccess: () => setIsLoggedIn(true),
+  });
+  const resetPasswordMutation = useMutation({
+    mutationFn: (fields) => _resetPass({ authFetch, ...fields }),
+    onSuccess: () => setIsLoggedIn(true),
+  });
+
+  const signout = () => {
+    queryClient.removeQueries();
+    setIsLoggedIn(false); // TODO: check
+  };
+
   const value = {
     isLoggedIn,
     loginMutation,
+    resetPasswordMutation,
     user: userQuery,
-    signin,
     signout,
     authFetch,
     fetchUser: () => {
