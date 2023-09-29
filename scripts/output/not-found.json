@@ -1,4 +1,6 @@
 {
+  "assessment.unfinished.desc": "You have an unfinished assessment. Do you want to continue taking the assessment or start the new one?",
+  "auth.login.password-confirm.label": "Confirm password",
   "availability-calendar.confirm-reservation.desc": "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}.",
   "availability-calendar.confirm-reservation.title": "Confirm reservation {date}",
   "coaches.aside.items.1.heading": "€100",
@@ -8,6 +10,7 @@
   "coaches.filter.rate.label": "Rate",
   "coaches.filter.rate.tooltip.credits-per-session": "{credits} credits per session",
   "coaches.filter.rate.tooltip.info": "1 credit = 1 euro",
+  "dashboard.cards.sessions.title.filled": "My areas of development",
   "general.message-from": "Message from {from}",
   "general.new-message-from": "New message from {from}",
   "main-menu.items.messages": "Messages",
@@ -17,6 +20,7 @@
   "sessions.edit.steps.align.adjust": "No, I would like to adjust",
   "sessions.edit.steps.reflect.hints.1": "What have you learned when aiming to that action step?",
   "settings.general.field.newPasswordConfirm.error-match": "Password confirm must match",
+  "settings.profile.field.certificates.placeholder": "Enter certificate",
   "settings.profile.field.fields.placeholder": "Select fields you work in",
   "settings.profile.field.languages.placeholder": "Select languages you speak",
   "settings.profile.field.publicProfile": "Public account",

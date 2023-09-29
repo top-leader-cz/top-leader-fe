@@ -1,6 +1,6 @@
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
-import { Box, Button, Divider, Paper, Typography } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Box, Button, Divider } from "@mui/material";
+import { groupBy, sort } from "ramda";
 import React, {
   useCallback,
   useEffect,
@@ -8,21 +8,26 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
-import { H1, H2, P } from "../../components/Typography";
-import { useQuestionsDict } from "./questions";
-import { routes } from "../../routes";
-import { useHistoryEntries } from "../../hooks/useHistoryEntries";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { ProgressStats } from "../../components/ProgressStats";
-import { Score } from "../../components/Score";
 import { Msg, MsgProvider } from "../../components/Msg";
-import { messages } from "./messages";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { Score } from "../../components/Score";
+import { H1, H2, P } from "../../components/Typography";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
-import { groupBy, sort } from "ramda";
-import { pipeP } from "composable-fetch";
+import { AssessmentRightMenu } from "./AssessmentRightMenu";
+import {
+  useAnswerMutation,
+  useAnswersMutation,
+  useAnswersQuery,
+  useDeleteAnswersMutation,
+} from "./api";
+import { messages } from "./messages";
+import { useQuestionsDict } from "./questions";
+import { ConfirmModal } from "../Modal/ConfirmModal";
+import { useMsg } from "../../components/Msg/Msg";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -45,119 +50,6 @@ const AssessmentProgress = ({ currentIndex, totalCount, sx = {} }) => {
         {currentQuestion !== totalCount && <ProgressItem value={totalCount} />}
       </P>
     </Box>
-  );
-};
-
-const PROGRESS_PROPS = {
-  size: 220,
-  thickness: 4,
-};
-
-function CircularProgressWithLabel({ value, sx = {} }) {
-  return (
-    <Box sx={{ position: "relative", display: "inline-flex", ...sx }}>
-      <CircularProgress
-        variant="determinate"
-        sx={{
-          color: (theme) =>
-            theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
-        }}
-        {...PROGRESS_PROPS}
-        value={100}
-      />
-      <CircularProgress
-        variant="determinate"
-        // disableShrink
-        sx={{
-          position: "absolute",
-          left: 0,
-          // color: (theme) =>
-          //   theme.palette.mode === "light" ? "#1a90ff" : "#308fe8",
-          // animationDuration: "550ms",
-          // [`& .${circularProgressClasses.circle}`]: {
-          //   strokeLinecap: "round",
-          // },
-        }}
-        value={value}
-        {...PROGRESS_PROPS}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexFlow: "column nowrap",
-        }}
-      >
-        <Typography variant="caption" component="div" color="text.secondary">
-          <Msg id="assessment.menu.progress" />
-        </Typography>
-        <Typography variant="h1" component="div">{`${Math.round(
-          value
-        )}%`}</Typography>
-      </Box>
-    </Box>
-  );
-}
-
-const AssessmentRightMenu = ({
-  currentIndex,
-  saveDisabled,
-  totalCount,
-  responsesCount,
-  onSave,
-}) => {
-  return (
-    <Paper
-      square
-      sx={{
-        px: 3,
-        py: 4,
-        height: "100vh",
-        display: "flex",
-        flexFlow: "column nowrap",
-        justifyContent: "space-between",
-      }}
-    >
-      <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
-        <H2>
-          <Msg id="assessment.menu.title" />
-        </H2>
-        <CircularProgressWithLabel
-          value={(100 * responsesCount) / totalCount}
-          sx={{ alignSelf: "center", my: 7.5 }}
-        />
-        <ProgressStats
-          items={[
-            {
-              key: 0,
-              label: <Msg id="assessment.menu.questions" />,
-              value: totalCount,
-            },
-            {
-              key: 1,
-              label: <Msg id="assessment.menu.responses" />,
-              value: responsesCount,
-            },
-          ]}
-        />
-      </Box>
-      {onSave && (
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={onSave}
-          disabled={saveDisabled}
-        >
-          <Msg id="assessment.menu.save" />
-        </Button>
-      )}
-    </Paper>
   );
 };
 
@@ -230,70 +122,13 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
   return strengthsMutation;
 };
 
-const useAnswers = ({ onFetched } = {}) => {
-  const { authFetch } = useAuth();
-  // TODO: do not invalidate on blur/focus
-  const answersQuery = useQuery({
-    queryKey: ["assessment"],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/user-assessments` }).then((assessment) => {
-        /* json: {"questionAnswered":1,"answers":[{"questionId":1,"answer":7}]} */
-        // if (assessment.questionAnswered > 0) {
-        const scores = Object.fromEntries(
-          assessment.answers?.map(({ answer, questionId }) => [
-            questionId,
-            answer,
-          ]) ?? []
-        );
-        return scores;
-      }),
-    onSuccess: (scores) => {
-      console.log("[answersQuery.success]", { scores });
-      onFetched(scores);
-    },
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  const answerMutation = useMutation({
-    mutationFn: async ({ questionId, answer }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user-assessments/${questionId}`,
-        data: { answer },
-      }),
-  });
-
-  const answersMutation = useMutation({
-    mutationFn: async (scores) => {
-      console.log("answersMutation", { scores });
-      // const diff = // TODO: fetch current state, diff, modify
-      const posts = Object.entries(scores).map(
-        ([questionId, answer]) =>
-          () =>
-            authFetch({
-              method: "POST",
-              url: `/api/latest/user-assessments/${questionId}`,
-              data: { answer },
-            })
-      );
-      return pipeP(...posts)();
-    },
-  });
-
-  return {
-    answersQuery,
-    answerMutation,
-    answersMutation,
-  };
-};
-
 const shuffle = sort(() => Math.random() - 0.5);
 
 // It looks better for the user when questions are in different order for each assessment
 const useRandomizedQuestions = ({ originalQuestions }) => {
   const [state, setState] = useState({ questions: [], answeredCount: 0 });
   const { questions, answeredCount } = state;
-  const onAnswersFetched = useCallback(
+  const initializeQuestions = useCallback(
     (scores) => {
       if (questions.length) {
         throw new Error("useRandomizedQuestions initialized twice!"); // TODO
@@ -324,7 +159,7 @@ const useRandomizedQuestions = ({ originalQuestions }) => {
 
   return {
     questions,
-    onAnswersFetched,
+    initializeQuestions,
     isInitialized: !!questions.length,
     answeredCount,
   };
@@ -343,22 +178,44 @@ const DUMMY_Q = {
 
 const useAssessment = () => {
   const { questions: originalQuestions } = useQuestionsDict();
-  const { questions, onAnswersFetched, answeredCount } = useRandomizedQuestions(
-    { originalQuestions }
-  );
+  const { questions, initializeQuestions, answeredCount, isInitialized } =
+    useRandomizedQuestions({ originalQuestions });
   const [currentIndex, setCurrentIndex] = useState(0);
   useEffect(() => {
     setCurrentIndex(answeredCount);
   }, [answeredCount]);
   const [scores, setScores] = useLocalStorage("assessment", {});
 
-  const { answersQuery, answerMutation, answersMutation } = useAnswers({
-    onFetched: (scores) => {
+  const [unfinishedAssessment, setUnfinishedAssessment] = useState();
+  const initializeAssessment = useCallback(
+    (scores) => {
       setScores(scores);
-      onAnswersFetched(scores);
-      // }
+      initializeQuestions(scores);
+    },
+    [initializeQuestions, setScores]
+  );
+  const deleteMutation = useDeleteAnswersMutation();
+  const handleContinueUnfinished = useCallback(() => {
+    initializeAssessment(unfinishedAssessment);
+    setUnfinishedAssessment();
+  }, [initializeAssessment, unfinishedAssessment]);
+  const handleDiscard = useCallback(() => {
+    initializeAssessment({});
+    deleteMutation.mutate();
+    setUnfinishedAssessment();
+  }, [deleteMutation, initializeAssessment]);
+
+  const answersQuery = useAnswersQuery({
+    onSuccess: (scores) => {
+      if (Object.values(scores ?? {}).length) {
+        setUnfinishedAssessment(scores);
+      } else {
+        initializeQuestions({});
+      }
     },
   });
+  const answerMutation = useAnswerMutation({});
+  const answersMutation = useAnswersMutation({});
   const navigate = useNavigate();
   const handleLeave = useCallback(() => {
     setScores({});
@@ -448,10 +305,17 @@ const useAssessment = () => {
     nextWithSave,
     submitDisabled,
     isLoading: answersQuery.isLoading,
+    isInitialized,
+    unfinished: {
+      handleContinueUnfinished,
+      unfinishedAssessment,
+      handleDiscard,
+    },
   };
 };
 
 function Assessment() {
+  const msg = useMsg({ dict: messages });
   const {
     pagination,
     question,
@@ -460,6 +324,12 @@ function Assessment() {
     handleSaveAndLeave,
     nextWithSave,
     submitDisabled,
+    isInitialized,
+    unfinished: {
+      handleContinueUnfinished,
+      unfinishedAssessment,
+      handleDiscard,
+    },
   } = useAssessment();
 
   const handleNextRef = useRef(nextWithSave);
@@ -488,13 +358,15 @@ function Assessment() {
     <MsgProvider messages={messages}>
       <Layout
         rightMenuContent={
-          <AssessmentRightMenu
-            // saveDisabled={responsesCount !== pagination.totalCount}
-            currentIndex={pagination.currentIndex}
-            totalCount={pagination.totalCount}
-            responsesCount={responsesCount}
-            onSave={handleSaveAndLeave}
-          />
+          !isInitialized ? null : (
+            <AssessmentRightMenu
+              // saveDisabled={responsesCount !== pagination.totalCount}
+              currentIndex={pagination.currentIndex}
+              totalCount={pagination.totalCount}
+              responsesCount={responsesCount}
+              onSave={handleSaveAndLeave}
+            />
+          )
         }
       >
         <Box mt={4} mb={3}>
@@ -513,60 +385,87 @@ function Assessment() {
           </Box>
           <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
         </Box>
-        <AssessmentProgress
-          sx={{ my: 4 }}
-          currentIndex={pagination.currentIndex}
-          totalCount={pagination.totalCount}
-        />
-        <H1 my={7.5} minHeight={"4rem"} align="center">
-          {question.text}
-        </H1>
-        <Box width="100%" align="center">
-          <Box
-            component="img"
-            borderRadius={2}
-            width={500}
-            alignSelf={"center"}
-            src={question.img.src}
-          />
-        </Box>
-        <Score
-          sx={{ my: 12.5 }}
-          value={score.value}
-          onChange={score.onChange}
-        />
-        {/* <ButtonGroup></ButtonGroup> */}
-        <Box
-          display={"flex"}
-          flexFlow="row nowrap"
-          justifyContent={"center"}
-          mt={8}
-        >
-          <Button
-            sx={{ mx: 4 }}
-            variant="outlined"
-            disabled={pagination.currentIndex <= 0}
-            onClick={pagination.back}
-            startIcon={<ArrowBack />}
-          >
-            <Msg id="assessment.button.back" />
-          </Button>
-          <Button
-            type="submit"
-            sx={{ mx: 4 }}
-            variant="contained"
-            disabled={submitDisabled}
-            onClick={nextWithSave}
-            endIcon={<ArrowForward />}
-          >
-            {pagination.currentIndex >= pagination.totalCount - 1 ? (
-              <Msg id="assessment.button.save" />
-            ) : (
-              <Msg id="assessment.button.next" />
-            )}
-          </Button>
-        </Box>
+
+        {isInitialized && (
+          <>
+            <AssessmentProgress
+              sx={{ my: 4 }}
+              currentIndex={pagination.currentIndex}
+              totalCount={pagination.totalCount}
+            />
+            <H1 my={7.5} minHeight={"4rem"} align="center">
+              {question.text}
+            </H1>
+            <Box width="100%" align="center">
+              <Box
+                component="img"
+                borderRadius={2}
+                width={500}
+                alignSelf={"center"}
+                src={question.img.src}
+              />
+            </Box>
+            <Score
+              sx={{ my: 12.5 }}
+              value={score.value}
+              onChange={score.onChange}
+            />
+            {/* <ButtonGroup></ButtonGroup> */}
+            <Box
+              display={"flex"}
+              flexFlow="row nowrap"
+              justifyContent={"center"}
+              mt={8}
+            >
+              <Button
+                sx={{ mx: 4 }}
+                variant="outlined"
+                disabled={pagination.currentIndex <= 0}
+                onClick={pagination.back}
+                startIcon={<ArrowBack />}
+              >
+                <Msg id="assessment.button.back" />
+              </Button>
+              <Button
+                type="submit"
+                sx={{ mx: 4 }}
+                variant="contained"
+                disabled={submitDisabled}
+                onClick={nextWithSave}
+                endIcon={<ArrowForward />}
+              >
+                {pagination.currentIndex >= pagination.totalCount - 1 ? (
+                  <Msg id="assessment.button.save" />
+                ) : (
+                  <Msg id="assessment.button.next" />
+                )}
+              </Button>
+            </Box>
+          </>
+        )}
       </Layout>
+      <ConfirmModal
+        open={!!unfinishedAssessment}
+        onClose={handleContinueUnfinished}
+        iconName="RocketLaunch"
+        title={msg("assessment.unfinished.title")}
+        desc={msg("assessment.unfinished.desc")}
+        buttons={[
+          {
+            variant: "outlined",
+            type: "button",
+            children: msg("assessment.unfinished.discard"),
+            onClick: handleDiscard,
+          },
+          {
+            variant: "contained",
+            type: "button",
+            children: msg("assessment.unfinished.continue"),
+            onClick: handleContinueUnfinished,
+          },
+        ]}
+        sx={{ width: "800px" }}
+      />
     </MsgProvider>
   );
 }
