@@ -37,4 +37,21 @@ export const messages = defineMessages({
     id: "assessment.menu.save",
     defaultMessage: "Save assessment",
   },
+  "assessment.unfinished.title": {
+    id: "assessment.unfinished.title",
+    defaultMessage: "Unfinished assessment",
+  },
+  "assessment.unfinished.desc": {
+    id: "assessment.unfinished.desc",
+    defaultMessage:
+      "You have an unfinished assessment. Do you want to continue taking the assessment or start the new one?",
+  },
+  "assessment.unfinished.discard": {
+    id: "assessment.unfinished.discard",
+    defaultMessage: "Start new",
+  },
+  "assessment.unfinished.continue": {
+    id: "assessment.unfinished.continue",
+    defaultMessage: "Continue",
+  },
 });
