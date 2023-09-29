@@ -1,134 +1,28 @@
 import { Divider } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
-import { Icon } from "../../components/Icon";
-import { Msg, MsgProvider } from "../../components/Msg";
+import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { P } from "../../components/Typography";
-import { messages } from "./messages";
 import { useAuth } from "./AuthProvider";
-
-const EMAIL = "support@topleader.io";
-const EMAIL_SUBJECT = "SignIn";
-
-export const WelcomeScreenTemplate = ({
-  perex = <Msg id="auth.unauthorized.perex" />,
-  children,
-  containerSx = {},
-}) => {
-  return (
-    <MsgProvider messages={messages}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={6}
-          component={Paper}
-          elevation={6}
-          square
-          sx={{ position: "relative" }}
-        >
-          <Box
-            sx={{
-              my: 8,
-              mx: "25%",
-              // width: "33%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              ...containerSx,
-            }}
-          >
-            <Avatar
-              sx={{
-                width: 64,
-                height: 64,
-                // bgcolor: "secondary.main",
-              }}
-              variant="rounded"
-              src={"/logo-min.png"}
-            >
-              {/* <LockOutlinedIcon /> */}
-            </Avatar>
-            <Typography variant="h1" mt={3}>
-              <Msg id="auth.unauthorized.title" />
-            </Typography>
-            {/* <Typography variant="subtitle2" mt={1} mb={5}>
-              Please enter your details
-            </Typography> */}
-            {perex && (
-              <Typography variant="body1" mt={1} mb={4} textAlign="center">
-                {perex}
-              </Typography>
-            )}
-
-            {/* <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 1 }}
-            > */}
-            {children}
-            {/* </Box> */}
-          </Box>
-          <Box sx={{ position: "absolute", right: "24px", bottom: "24px" }}>
-            <P
-              component="a"
-              href={`mailto:${EMAIL}?subject=${EMAIL_SUBJECT}`}
-              target="_blank"
-              sx={{
-                color: "#475467",
-                fontWeight: 500,
-                textDecoration: "none",
-                display: "inline-flex",
-              }}
-            >
-              <Icon name="MailOutline" sx={{ fontSize: "16px" }} />
-              &nbsp;{EMAIL}
-            </P>
-          </Box>
-        </Grid>
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={6}
-          sx={{
-            // backgroundImage: "url(https://source.unsplash.com/random)",
-            backgroundImage: "url(/image1.png)",
-            backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-      </Grid>
-    </MsgProvider>
-  );
-};
+import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
+import { messages } from "./messages";
 
 export function SignInPage() {
-  const { signin, loginMutation } = useAuth();
+  const { loginMutation } = useAuth();
   const msg = useMsg({ dict: messages });
   const form = useForm({
     defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
   });
   const handleSubmit = ({ email, password }, e) => {
     console.log("[Login submit]", { username: email, password });
-    return signin({ username: email, password });
+    return loginMutation.mutate({
+      username: email,
+      password,
+    });
     // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
   };
 
@@ -255,72 +149,3 @@ export function SignInPage() {
     </WelcomeScreenTemplate>
   );
 }
-
-export const ResetPasswordPage = () => {
-  const { loginMutation } = useAuth();
-  const msg = useMsg({ dict: messages });
-  const form = useForm({
-    defaultValues: { password: "", passwordConfirm: "" },
-  });
-  const handleSubmit = ({ email, password }, e) => {
-    console.log("[Login submit]", { username: email, password });
-    alert("TODO");
-    throw new Error("TODO");
-    // return signin({ username: email, password });
-    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
-  };
-
-  const disabled = true;
-  const errorMsg = loginMutation.error
-    ? msg("auth.login.validation.invalid-credentials")
-    : "";
-
-  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
-
-  return (
-    <WelcomeScreenTemplate
-      perex={
-        "You’ve been invited to join TopLeader. Please set a password to complete the registration" // TODO: translation
-      }
-      containerSx={{ mt: 14 }}
-    >
-      <RHForm form={form} onSubmit={handleSubmit}>
-        <RHFTextField
-          margin="normal"
-          required
-          rules={{ required: "Required" }}
-          fullWidth
-          name="password"
-          label={<Msg id="auth.login.password.label" />}
-          type="password"
-          id="password"
-          autoComplete="password"
-          error={!!errorMsg}
-          helperText={errorMsg}
-          disabled={disabled}
-        />
-        <RHFTextField
-          margin="normal"
-          required
-          rules={{ required: "Required" }}
-          fullWidth
-          name="passwordConfirm"
-          label={<Msg id="auth.login.password-confirm.label" />}
-          type="password"
-          id="password"
-          autoComplete="password"
-          disabled={disabled}
-        />
-        <Button
-          type="submit"
-          disabled={disabled}
-          fullWidth
-          variant="contained"
-          sx={{ mt: 3, mb: 3 }}
-        >
-          <Msg id="auth.login.login" />
-        </Button>
-      </RHForm>
-    </WelcomeScreenTemplate>
-  );
-};

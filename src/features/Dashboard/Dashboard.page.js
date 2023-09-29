@@ -151,6 +151,11 @@ const DashboardCard = ({
                   m: 1,
                   pointerEvents: "none",
                   bgcolor: "#F9F8FF",
+                  height: "auto",
+                  p: 1,
+                  "& .MuiChip-label": {
+                    textWrap: "wrap",
+                  },
                 }}
                 key={item.label}
                 {...item}
