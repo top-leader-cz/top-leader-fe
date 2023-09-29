@@ -28,6 +28,7 @@ import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
+import { ResetPasswordPage } from "../features/Authorization/SignIn";
 
 const GlobalSpinner = () => {
   return (
@@ -60,6 +61,14 @@ export const router = createHashRouter([
         element: (
           <ForbidAuth>
             <SignInPage />
+          </ForbidAuth>
+        ),
+      },
+      {
+        path: routes.setPassword,
+        element: (
+          <ForbidAuth>
+            <ResetPasswordPage />
           </ForbidAuth>
         ),
       },

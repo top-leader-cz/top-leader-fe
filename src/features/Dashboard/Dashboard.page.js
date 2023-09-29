@@ -20,8 +20,9 @@ import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
-import { JourneyRightMenu } from "./JourneyRightMenu";
+import { JourneyRightMenu, JourneyRightMenu_ } from "./JourneyRightMenu";
 import { messages } from "./messages";
+import { useAreas } from "../Sessions/steps/AreaStep";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -207,7 +208,7 @@ const DashboardCardValues = ({ selectedKeys = [] }) => {
       title={
         items.length
           ? msg("dashboard.cards.values.title.filled")
-          : msg("dashboard.cards.values.title.filled")
+          : msg("dashboard.cards.values.title.empty")
       }
       href={items.length ? routes.myValues : routes.setValues}
       items={items}
@@ -229,14 +230,25 @@ const DashboardCardFeedback = () => {
   );
 };
 
-const DashboardCardSession = () => {
+const DashboardCardSession = ({ selectedKeys = [] }) => {
   const msg = useMsg();
+  const selectedAreas = useAreas({
+    valueArr: selectedKeys,
+  });
+  const items = useMemo(
+    () => selectedAreas.map(({ label }) => ({ label, key: label })),
+    [selectedAreas]
+  );
 
   return (
     <DashboardCard
-      title={msg("dashboard.cards.sessions.title.empty")}
+      title={
+        items.length
+          ? msg("dashboard.cards.sessions.title.filled")
+          : msg("dashboard.cards.sessions.title.empty")
+      }
       href={routes.newSession}
-      items={undefined}
+      items={items}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#66C61C" }}
     />
   );
@@ -250,7 +262,7 @@ export function DashboardPage() {
   return (
     <MsgProvider messages={messages}>
       <Layout
-        rightMenuContent={<JourneyRightMenu />}
+        rightMenuContent={<JourneyRightMenu user={user} />}
         header={{
           withNotifications: true,
           avatarSrc: isCoach && `/api/latest/coaches/${username}/photo`,
@@ -279,7 +291,7 @@ export function DashboardPage() {
             <Msg id="dashboard.section-2.perex" />
           </P>
           <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-            <DashboardCardSession />
+            <DashboardCardSession selectedKeys={user.data.areaOfDevelopment} />
           </Masonry>
         </Box>
       </Layout>

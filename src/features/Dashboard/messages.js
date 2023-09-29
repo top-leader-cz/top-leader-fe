@@ -47,6 +47,10 @@ export const messages = defineMessages({
     id: "dashboard.cards.sessions.title.empty",
     defaultMessage: "Set area for my development",
   },
+  "dashboard.cards.sessions.title.filled": {
+    id: "dashboard.cards.sessions.title.filled",
+    defaultMessage: "My areas of development",
+  },
   "dashboard.section-2.heading": {
     id: "dashboard.section-2.heading",
     defaultMessage: "Who to become",
@@ -70,5 +74,21 @@ export const messages = defineMessages({
   "dashboard.rightmenu.upcoming.start": {
     id: "dashboard.rightmenu.upcoming.start",
     defaultMessage: "Start Session",
+  },
+  "dashboard.rightmenu.actions.heading": {
+    id: "dashboard.rightmenu.actions.heading",
+    defaultMessage: "Actions",
+  },
+  "dashboard.rightmenu.actions.title.empty": {
+    id: "dashboard.rightmenu.actions.title.empty",
+    defaultMessage: "No actions set",
+  },
+  "dashboard.rightmenu.actions.perex.empty": {
+    id: "dashboard.rightmenu.actions.perex.empty",
+    defaultMessage: "Once you set a goal, actions will apear here",
+  },
+  "dashboard.rightmenu.actions.set-area": {
+    id: "dashboard.rightmenu.actions.set-area",
+    defaultMessage: "Set area for my development",
   },
 });

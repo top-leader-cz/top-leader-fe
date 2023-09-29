@@ -3,7 +3,6 @@ import { Box, Button, IconButton } from "@mui/material";
 import {
   addDays,
   endOfDay,
-  format,
   getHours,
   setHours,
   setMinutes,
@@ -14,6 +13,8 @@ import { filter, identity, pipe, reduce, times } from "ramda";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
+import { defineMessages } from "react-intl";
+import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -27,19 +28,17 @@ import {
   useCoachAvailabilityQuery,
   usePickSlotMutation,
 } from "./api";
-import { Icon } from "../../components/Icon";
-import { defineMessage, defineMessages } from "react-intl";
 
 const HEADER_FORMAT = "d MMM";
 const VISIBLE_DAYS_COUNT = 7;
 
-const computeSlotParams = pipe(
+const computeSlotStats = pipe(
   reduce(
     ({ lowestHour, highestHour }, interval) => {
       const startHour = getHours(interval.start);
       const endHour = getHours(fixEnd(interval.end));
       if (startHour !== endHour)
-        console.log("[computeSlotParams] interval longer than 1 hour", {
+        console.log("[computeSlotStats] interval longer than 1 hour", {
           interval,
         });
       return {
@@ -129,7 +128,7 @@ export const AvailabilityCalendar = ({
   // const { daysArr, slotsCount, firstHour } = useMemo(() => {
   //   if (!availabilityIntervalsMaybe) return {};
   //   const availabilityIntervals = availabilityIntervalsMaybe;
-  //   const { slotsCount, firstHour } = computeSlotParams(availabilityIntervals);
+  //   const { slotsCount, firstHour } = computeSlotStats(availabilityIntervals);
   //   const daysArr = createIndicies(visibleDaysCount).map((index) => {
   //     const date = addDays(index, calendarInterval.start);
   //     const dayInterval = { start: startOfDay(date), end: endOfDay(date) };
@@ -209,7 +208,7 @@ export const AvailabilityCalendar = ({
             console.log({ availabilityIntervals });
             // debugger;
             if (!Array.isArray(availabilityIntervals)) return null;
-            const { slotsCount, firstHour } = computeSlotParams(
+            const { slotsCount, firstHour } = computeSlotStats(
               availabilityIntervals
             );
             const daysArr = times(identity, visibleDaysCount).map((index) => {

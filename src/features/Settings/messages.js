@@ -74,6 +74,10 @@ export const messages = defineMessages({
     id: "settings.profile.field.certificates",
     defaultMessage: "Certificates",
   },
+  "settings.profile.field.certificates.placeholder": {
+    id: "settings.profile.field.certificates.placeholder",
+    defaultMessage: "Enter certificate",
+  },
   "settings.profile.field.experience": {
     id: "settings.profile.field.experience",
     defaultMessage: "Coaching experience",

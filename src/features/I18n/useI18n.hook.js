@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import * as dffp from "date-fns/fp";
+import * as df from "date-fns";
 import * as tz from "date-fns-tz";
 import { API_TIME_FORMAT, UTC_DATE_FORMAT, parseUTCZoned } from "./utils/date";
 import { formatDistanceToNow } from "date-fns";
@@ -153,6 +154,38 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
     },
     [locale]
   );
+  const translateTokenLocal = useCallback(
+    (token) => {
+      // (date, referenceDate, options = {}) => {
+      const formatStr = locale.formatRelative("today");
+      const [_, translation] = formatStr?.match?.(/^[^']*'([^'].*)'/) ?? [];
+
+      return translation || token;
+    },
+    [locale]
+  );
+  const formatRelativeLocal = useCallback(
+    (date, referenceDate = new Date(), options = {}) => {
+      // const oLocale = {
+      //   ...locale,
+      //   formatRelative: (token, date) =>
+      //     console.log(">>>>>>>>>>>>", { token }) ||
+      //     locale.formatRelative(token),
+      // };
+
+      return df.formatRelative(date, referenceDate, {
+        ...options,
+        locale,
+        // locale: oLocale,
+      });
+      return dffp.formatRelativeWithOptions(
+        { ...options, locale },
+        referenceDate,
+        date
+      );
+    },
+    [locale]
+  );
 
   const i18n = useMemo(
     () => ({
@@ -170,6 +203,8 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       parseUTCLocal,
       parseDate,
       formatDistanceToNowLocal,
+      translateTokenLocal,
+      formatRelativeLocal,
       zonedToUtcLocal,
       weekStartsOn: locale.options.weekStartsOn,
       startOfWeekLocal,
@@ -183,6 +218,8 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       zonedToUtcLocal,
       parseDate,
       formatDistanceToNowLocal,
+      translateTokenLocal,
+      formatRelativeLocal,
       startOfWeekLocal,
     ]
   );

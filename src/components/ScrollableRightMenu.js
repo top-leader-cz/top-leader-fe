@@ -18,6 +18,7 @@ export const ScrollableRightMenu = ({
         flexDirection: "column",
         flexWrap: "nowrap",
         justifyContent: "space-between",
+        textWrap: "wrap",
         ...sx,
       }}
     >

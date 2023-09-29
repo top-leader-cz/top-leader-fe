@@ -1,5 +1,6 @@
 export const routes = {
   signIn: "/sign-in",
+  setPassword: "/set-password/:token",
   dashboard: "/dashboard",
   assessment: "/assessment",
   strengths: "/strengths",

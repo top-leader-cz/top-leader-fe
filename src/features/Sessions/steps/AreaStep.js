@@ -1,13 +1,41 @@
 import { ArrowForward } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Msg } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 import { SelectableChip } from "../../../components/SelectableChip";
 import { SessionStepCard } from "../SessionStepCard";
 import { useAreasDict } from "../areas";
 
-const useAreas = ({ value }) => {
+export const useAreas = ({ valueArr }) => {
+  const { areas: areasDict } = useAreasDict();
+  const areasArr = Object.entries(areasDict).map(([key, value]) => ({
+    key,
+    label: value.label,
+  }));
+
+  const mapped = useMemo(
+    () =>
+      valueArr.map((value) => {
+        const areaMaybe = areasArr.find((area) => area.key === value);
+        const isCustomArea = !areaMaybe;
+        const customAreaMaybe = isCustomArea ? value : undefined;
+
+        return {
+          isCustomArea,
+          areaMaybe,
+          customAreaMaybe,
+          areaLabelMaybe: areaMaybe?.label,
+          areasArr,
+          label: areaMaybe?.label || customAreaMaybe,
+        };
+      }),
+    [areasArr, valueArr]
+  );
+  return mapped;
+};
+
+const useArea = ({ valueArr, value = valueArr?.length ? valueArr[0] : "" }) => {
   const { areas: areasDict } = useAreasDict();
   const areasArr = Object.entries(areasDict).map(([key, value]) => ({
     key,
@@ -36,7 +64,7 @@ export const AreaStep = ({
 }) => {
   const valueArr = data[keyName];
   const value = valueArr?.length ? valueArr[0] : "";
-  const { areasArr, isCustomArea, areaMaybe, customAreaMaybe } = useAreas({
+  const { areasArr, isCustomArea, areaMaybe, customAreaMaybe } = useArea({
     value,
   });
 

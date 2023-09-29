@@ -1,10 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
-import { format } from "date-fns";
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
-import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-
 import { ActionSteps, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -13,11 +10,12 @@ import { useMsg } from "../../components/Msg/Msg";
 import { Todos } from "../../components/Todos";
 import { H1, H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
-import { useAuth } from "../Authorization";
+import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { FocusedList } from "./FocusedList";
 import { StepperRightMenu, useSteps } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
+import { useUserReflectionMutation, useUserSessionQuery } from "./api";
 import { useAreasDict } from "./areas";
 import { messages } from "./messages";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
@@ -26,8 +24,6 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
-import { UTC_DATE_FORMAT } from "../I18n/utils/date";
-import { I18nContext } from "../I18n/I18nProvider";
 
 const IconTile = ({ iconName, caption, text }) => {
   return (
@@ -336,40 +332,13 @@ function EditSessionPageInner() {
     },
   });
 
-  const { authFetch } = useAuth();
-  const sessionQuery = useQuery({
-    queryKey: ["user-sessions"],
-    queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
-    cacheTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
+  const sessionQuery = useUserSessionQuery({});
   const reflectionQuery = {}; // TODO
 
   const activeStepIndexRef = useRef(activeStepIndex);
   activeStepIndexRef.current = activeStepIndex;
 
-  const mutation = useMutation({
-    /* { "reflection": "string", "newActionSteps": [ { "label": "string", "date": "2023-08-29" } ], "checked": [ 0 ] } */
-    mutationFn: ({ actionSteps = [], ...data }) => {
-      console.log("%cMUTATION", "color:lime", { actionSteps, ...data });
-      return authFetch({
-        method: "POST",
-        url: "/api/latest/user-sessions-reflection",
-        data: {
-          ...data,
-          newActionSteps: actionSteps.map(({ label, date }) => {
-            const formattedDate = format(date, UTC_DATE_FORMAT);
-            console.log("mapStep", { date, formattedDate });
-            return {
-              label,
-              date: formattedDate,
-            };
-          }),
-        },
-      });
-    },
+  const mutation = useUserReflectionMutation({
     onSuccess: useCallback((data) => {
       // TODO: not called sometimes!
       console.log("mutation.onSuccess", data);
