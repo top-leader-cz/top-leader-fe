@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Divider,
+  FormControlLabel,
   IconButton,
   Modal,
   Paper,
@@ -11,6 +12,7 @@ import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AutocompleteSelect,
+  CheckboxField,
   LANGUAGE_OPTIONS,
   RHFTextField,
   renderLanguageOption,
@@ -36,8 +38,9 @@ export const AddMemberModal = ({ onClose, open }) => {
       lastName: "",
       username: "",
       authorities: ["USER"],
-      locale: [language],
+      locale: language?.substring(0, 2) ?? "en",
       timeZone: userTz,
+      isAuthorized: true,
     },
   });
   const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
@@ -135,6 +138,10 @@ export const AddMemberModal = ({ onClose, open }) => {
               name={"timeZone"}
               options={TIMEZONE_OPTIONS}
               placeholder="Timezone" // TODO: translations? should be always populated
+            />
+            <FormControlLabel
+              control={<CheckboxField name="isAuthorized" />}
+              label="isAuthorized"
             />
 
             <Divider flexItem sx={{ mt: 3 }} />

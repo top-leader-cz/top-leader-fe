@@ -42,9 +42,9 @@ export const useCreateUserMutation = (params = {}) => {
             lastName: values.lastName,
             username: values.username,
             authorities: values.authorities,
-            locale: values.locale, //?.substring(0, 2),
+            locale: values.locale?.substring?.(0, 2) ?? "en",
             timeZone: values.timeZone,
-            status: "AUTHORIZED",
+            status: values.isAuthorized ? "AUTHORIZED" : "PENDING",
           };
         })(),
       }),

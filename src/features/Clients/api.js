@@ -30,6 +30,7 @@ export const useClientsQuery = ({ ...queryParams } = {}) => {
 export const useUpcomingSessionsQuery = (params = {}) => {
   const { authFetch } = useAuth();
   return useQuery({
+    retry: false,
     queryKey: ["coach-info", "upcoming-sessions"],
     queryFn: () =>
       authFetch({ url: `/api/latest/coach-info/upcoming-sessions` }),

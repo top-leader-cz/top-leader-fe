@@ -187,6 +187,13 @@ const CoachUpcomingSessions = ({ data }) => {
 const CoachSessionsCard = ({}) => {
   const { i18n } = useContext(I18nContext);
   const upcomingSessionsQuery = useUpcomingSessionsQuery();
+  const emptySessions = (
+    <EmptyActionCardContent
+      iconName="RocketLaunch"
+      title={<Msg id="dashboard.rightmenu.upcoming.title.empty" />}
+      perex={<Msg id="dashboard.rightmenu.upcoming.perex.empty" />}
+    />
+  );
 
   return (
     <ActionCard
@@ -207,15 +214,10 @@ const CoachSessionsCard = ({}) => {
     >
       <QueryRenderer
         {...upcomingSessionsQuery}
+        loaderName="Block"
+        errored={() => emptySessions}
         success={({ data }) => {
-          if (!data?.length)
-            return (
-              <EmptyActionCardContent
-                iconName="RocketLaunch"
-                title={<Msg id="dashboard.rightmenu.upcoming.title.empty" />}
-                perex={<Msg id="dashboard.rightmenu.upcoming.perex.empty" />}
-              />
-            );
+          if (!data?.length) return emptySessions;
           else return <CoachUpcomingSessions data={data} />;
         }}
       />
