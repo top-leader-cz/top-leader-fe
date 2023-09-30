@@ -23,14 +23,14 @@ const messages = defineMessages({
 });
 
 export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
+  const msg = useMsg();
   const methods = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control: control || methods?.control,
     name,
     rules,
   });
-  const msg = useMsg();
-  // <Box component={"ol"}>
+
   return (
     <Box sx={{ ...sx }}>
       {fields.map((field, i) => (
@@ -48,10 +48,20 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
             control={control}
             name={`${name}.${i}.label`}
             placeholder={msg("action-steps.label.placeholder")}
-            rules={{ required: true }}
+            rules={{ required: "Required" }}
             size="small"
             autoFocus
-            sx={{ mx: 1, minWidth: { lg: 320 } }}
+            sx={{
+              mx: 1,
+              mb: 0.5,
+              minWidth: { lg: 320 },
+              "& .MuiFormHelperText-root.Mui-error": {
+                height: 0,
+                position: "relative",
+                mt: 0,
+                textAlign: "right",
+              },
+            }}
           />
           <P sx={{ ml: 4, mr: 2 }}>
             <Msg id="action-steps.due-date.label" />

@@ -201,7 +201,6 @@ function Sessions() {
   );
 
   if (!sel.all?.length && !!sessionsQuery.data)
-    // TODO: test properly, sometimes redirects when there are sessions
     return <Navigate to={routes.newSession} replace />;
 
   return <QueryRenderer {...sessionsQuery} success={renderSuccess} />;

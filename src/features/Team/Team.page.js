@@ -1,14 +1,11 @@
+import { Add } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
   Card,
-  CardContent,
   CardHeader,
   Divider,
-  IconButton,
-  Modal,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -18,271 +15,20 @@ import {
   styled,
   tableCellClasses,
 } from "@mui/material";
+import { useState } from "react";
+import { useQuery } from "react-query";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { messages } from "./messages";
-import { H1, H2, P } from "../../components/Typography";
-import { Add } from "@mui/icons-material";
-import { useContext, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import {
-  AutocompleteSelect,
-  LANGUAGE_OPTIONS,
-  RHFTextField,
-  renderLanguageOption,
-} from "../../components/Forms";
-import { Icon } from "../../components/Icon";
-import { useMutation, useQuery } from "react-query";
+import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { Authority } from "../Authorization/AuthProvider";
-import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
-import { I18nContext } from "../I18n/I18nProvider";
+import { CreditTopUpModal } from "./CreditTopUpModal";
+import { messages } from "./messages";
+import { AddMemberModal } from "./AddMemberModal";
 
-export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
-  const msg = useMsg();
-
-  const methods = useForm({
-    mode: "onSubmit",
-    // mode: "all",¯
-    defaultValues: {},
-  });
-  const onSubmit = (data, e) => console.log("[modal.onSubmit]", data, e);
-  const onError = (errors, e) => console.log("[modal.onError]", errors, e);
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
-        <Paper
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", md: "500px" },
-            bgcolor: "background.paper",
-            borderRadius: "6px",
-            p: 3,
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            // border: "2px solid #000",
-            // boxShadow: 24,
-          }}
-        >
-          <FormProvider {...methods}>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Avatar sx={{ bgcolor: "#F9FAFB", width: 48, height: 48 }}>
-                <Avatar sx={{ bgcolor: "#EAECF0", width: 36, height: 36 }}>
-                  <Icon name="Storage" sx={{ color: "#667085" }} />
-                </Avatar>
-              </Avatar>
-              <IconButton onClick={onClose}>
-                <Icon name="Close" sx={{ color: "#667085" }} />
-              </IconButton>
-            </Box>
-            <H2 id="modal-modal-title">
-              <Msg id="team.credit.topup-modal.title" />
-              {/* <Msg id="coaches.contact.title" /> */}
-            </H2>
-            <P id="modal-modal-description">
-              <Msg id="team.credit.topup-modal.desc" />
-              {/* <Msg id="coaches.contact.perex" /> */}
-            </P>
-            {/* <OutlinedField label="Subject" /> */}
-            <RHFTextField
-              name="amount"
-              rules={{ required: true, minLength: 3 }}
-              label={"Amount of credits (1 credit = 1$)"}
-              //   label={msg("coaches.contact.subject.label")}
-              autoFocus
-              size="small"
-              fullWidth
-            />
-
-            <Divider flexItem sx={{ mt: 3 }} />
-            <Box display="flex" flexDirection="row" gap={3}>
-              <Button fullWidth variant="outlined" onClick={() => onClose()}>
-                <Msg id="coaches.contact.button.cancel" />
-              </Button>
-              <Button fullWidth variant="contained" type="submit">
-                <Msg id="team.credit.topup-modal.submit" />
-                {/* <Msg id="coaches.contact.button.send" /> */}
-              </Button>
-            </Box>
-          </FormProvider>
-        </Paper>
-      </form>
-    </Modal>
-  );
-};
-
-const useCreateUserMutation = () => {
-  const { authFetch, fetchUser } = useAuth();
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user`,
-        data: (() => {
-          console.log("[useCreateUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-            authorities: values.authorities,
-            locale: values.locale, //?.substring(0, 2),
-            timeZone: values.timeZone,
-            status: "AUTHORIZED",
-          };
-        })(),
-      }),
-  });
-};
-
-export const AddMemberModal = ({ onClose, open }) => {
-  const msg = useMsg();
-  const addUserMutation = useCreateUserMutation();
-  const { userTz, language } = useContext(I18nContext);
-
-  const methods = useForm({
-    mode: "onSubmit",
-    // mode: "all",¯
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      username: "",
-      authorities: ["USER"],
-      locale: [language],
-      timeZone: userTz,
-    },
-  });
-  const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
-  const onError = (errors, e) => console.log("[modal.onError]", errors, e);
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="add-member-modal-title"
-      aria-describedby="add-member-modal-description"
-    >
-      <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
-        <Paper
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: "90%", md: "500px" },
-            bgcolor: "background.paper",
-            borderRadius: "6px",
-            p: 3,
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            // border: "2px solid #000",
-            // boxShadow: 24,
-          }}
-        >
-          <FormProvider {...methods}>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Avatar sx={{ bgcolor: "#F9FAFB", width: 48, height: 48 }}>
-                <Avatar sx={{ bgcolor: "#EAECF0", width: 36, height: 36 }}>
-                  <Icon name="GroupAdd" sx={{ color: "#667085" }} />
-                </Avatar>
-              </Avatar>
-              <IconButton onClick={onClose}>
-                <Icon name="Close" sx={{ color: "#667085" }} />
-              </IconButton>
-            </Box>
-            <H2 id="add-member-modal-title">
-              <Msg id="team.credit.add-member.modal.title" />
-            </H2>
-            <P id="add-member-modal-description">
-              <Msg id="team.credit.add-member.modal.desc" />
-            </P>
-            <RHFTextField
-              name="firstName"
-              rules={{ required: true, minLength: 2 }}
-              label={"Name"}
-              placeholder="Name"
-              autoFocus
-              size="small"
-              fullWidth
-            />
-            <RHFTextField
-              name="lastName"
-              rules={{ required: true, minLength: 2 }}
-              label=""
-              placeholder="Surname"
-              autoFocus
-              size="small"
-              fullWidth
-            />
-            <RHFTextField
-              name="username"
-              rules={{ required: true, minLength: 2 }}
-              label=""
-              placeholder="Email"
-              autoFocus
-              size="small"
-              fullWidth
-            />
-
-            <AutocompleteSelect
-              multiple
-              disableCloseOnSelect
-              name={"authorities"}
-              options={Object.values(Authority).map((value) => ({
-                value,
-                label: value,
-              }))}
-              placeholder={"Authorities"}
-            />
-            <AutocompleteSelect
-              disableClearable
-              name={"locale"}
-              options={LANGUAGE_OPTIONS}
-              renderOption={renderLanguageOption}
-              placeholder="Select languages"
-            />
-            <AutocompleteSelect
-              disableClearable
-              name={"timeZone"}
-              options={TIMEZONE_OPTIONS}
-              placeholder="Timezone" // TODO: translations? should be always populated
-            />
-
-            <Divider flexItem sx={{ mt: 3 }} />
-            <Box display="flex" flexDirection="row" gap={3}>
-              <Button fullWidth variant="outlined" onClick={() => onClose()}>
-                <Msg id="coaches.contact.button.cancel" />
-              </Button>
-              <Button
-                fullWidth
-                variant="contained"
-                type="submit"
-                disabled={addUserMutation.isLoading}
-              >
-                <Msg id="team.credit.add-member.submit" />
-              </Button>
-            </Box>
-          </FormProvider>
-        </Paper>
-      </form>
-    </Modal>
-  );
-};
-
-const SlotChip = ({ children, sx }) => {
+export const SlotChip = ({ children, sx }) => {
   return (
     <Box
       borderRadius="6px"
@@ -354,7 +100,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const Cell = ({ children, name, sub, avatar = !!name, align, ...props }) => {
+export const TLCell = ({
+  children,
+  name,
+  sub,
+  avatar = !!name,
+  align,
+  ...props
+}) => {
   return (
     <StyledTableCell {...props}>
       <Box display="flex" flexDirection="row" flexWrap="nowrap">
@@ -385,24 +138,10 @@ const Cell = ({ children, name, sub, avatar = !!name, align, ...props }) => {
 
 const useHrUsersQuery = () => {
   const { authFetch } = useAuth();
-  /*
-[
-  {
-    "username": "string",
-    "coach": "string",
-    "credit": 0,
-    "requestedCredit": 0,
-    "state": "AUTHORIZED"
-  }
-]
-  */
-
   return useQuery({
     queryKey: ["hr-users"],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/hr-users` }).catch(() => ({ rows })),
+    queryFn: () => authFetch({ url: `/api/latest/hr-users` }),
     select: (data) => {
-      if (data.rows) return data.rows;
       return data.map((user) => {
         //  {
         //   username: "string",
@@ -423,6 +162,58 @@ const useHrUsersQuery = () => {
   });
 };
 
+export const TLLoadableTable = ({ query, columns = [], key = "username" }) => {
+  return (
+    <TableContainer component={Box}>
+      <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            {columns.map(({ label, key }) => (
+              <TLCell key={key}>{label}</TLCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          <QueryRenderer
+            {...query}
+            success={({ data }) =>
+              data.map((row) => (
+                <StyledTableRow
+                  key={row[key]}
+                  //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  {columns.map((column) => column.render(row))}
+                </StyledTableRow>
+              ))
+            }
+          />
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+export const TLTableWithHeader = ({
+  title,
+  subheader,
+  action,
+  columns,
+  query,
+}) => {
+  return (
+    <Card>
+      <CardHeader
+        disableTypography
+        title={title}
+        subheader={subheader}
+        action={action}
+      />
+      <Divider />
+      <TLLoadableTable columns={columns} query={query} />
+    </Card>
+  );
+};
+
 function TeamPageInner() {
   const [topUpSelected, setTopUpSelected] = useState(false);
   const [addMemberVisible, setAddMemberVisible] = useState(false);
@@ -430,119 +221,81 @@ function TeamPageInner() {
 
   const hrUsersQuery = useHrUsersQuery();
 
+  const columns = [
+    {
+      label: msg("team.members.table.col.name"),
+      key: "name",
+      render: (row) => (
+        <TLCell component="th" scope="row" name={row.name} sub={row.username} />
+      ),
+    },
+    {
+      label: msg("team.members.table.col.coach"),
+      key: "coach",
+      render: (row) => <TLCell name={row.coach} />,
+    },
+    {
+      label: msg("team.members.table.col.paid"),
+      key: "paid",
+      render: (row) => <TLCell align="right">{row.creditPaid}</TLCell>,
+    },
+    {
+      label: msg("team.members.table.col.remaining"),
+      key: "remaining",
+      render: (row) => <TLCell align="right">{row.creditRemaining}</TLCell>,
+    },
+    {
+      label: msg("team.members.table.col.action"),
+      key: "action",
+      render: (row) => (
+        <TLCell>
+          <Button variant="outlined" onClick={() => setTopUpSelected(row)}>
+            {msg("team.credit.topup")}
+          </Button>
+        </TLCell>
+      ),
+    },
+  ];
+
   console.log("[Team->Credits.page]", { hrUsersQuery });
 
   return (
     <Layout>
       <Header text={msg("team.heading")} />
-      <Card>
-        <CardHeader
-          disableTypography
-          title={
-            <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
-              <H2>
-                <Msg id="team.members.title" />
-              </H2>
-              <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
-                <Msg
-                  id="team.members.title.count.badge"
-                  values={{ count: rows.length }}
-                />
-              </SlotChip>
-            </Box>
-          }
-          subheader={
-            <P mt={1.5}>
-              <Msg id="team.members.sub" />
-            </P>
-          }
-          action={
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              aria-label="add member"
-              onClick={() => {
-                setAddMemberVisible(true);
-              }}
-            >
-              <Msg id="team.members.add" />
-            </Button>
-          }
-        />
-
-        <Divider />
-
-        <TableContainer component={Box}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <Cell>
-                  <Msg id="team.members.table.col.name" />
-                </Cell>
-                <Cell>
-                  <Msg id="team.members.table.col.coach" />
-                </Cell>
-                <Cell>
-                  <Msg id="team.members.table.col.paid" />
-                </Cell>
-                <Cell>
-                  <Msg id="team.members.table.col.remaining" />
-                </Cell>
-                <Cell>
-                  <Msg id="team.members.table.col.action" />
-                </Cell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <QueryRenderer
-                {...hrUsersQuery}
-                success={({ data: users }) =>
-                  console.log({ users }) ||
-                  users.map((row) => (
-                    <StyledTableRow
-                      key={row.username}
-                      //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <Cell
-                        component="th"
-                        scope="row"
-                        name={row.name}
-                        sub={row.username}
-                      />
-                      <Cell name={row.coach} />
-                      <Cell align="right">{row.creditPaid}</Cell>
-                      <Cell align="right">{row.creditRemaining}</Cell>
-                      <Cell>
-                        <Button
-                          variant="outlined"
-                          onClick={() => setTopUpSelected(row)}
-                        >
-                          <Msg id="team.credit.topup" />
-                        </Button>
-                      </Cell>
-                    </StyledTableRow>
-                  ))
-                }
+      <TLTableWithHeader
+        title={
+          <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
+            <H2>
+              <Msg id="team.members.title" />
+            </H2>
+            <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
+              <Msg
+                id="team.members.title.count.badge"
+                values={{ count: hrUsersQuery.data?.length }}
               />
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* <CardContent
-          sx={{
-            display: "flex",
-            // gap: 3, p: 3
-          }}
-        >
-          <Box display="flex" flexDirection="column" maxWidth={"50%"}>
-            <H1 gutterBottom>
-              Team members{" "}
-              <SlotChip sx={{ display: "inline-flex" }}>6 members</SlotChip>
-            </H1>
-            <P gutterBottom>Manage your team members here</P>
+            </SlotChip>
           </Box>
-        </CardContent> */}
-      </Card>
+        }
+        subheader={
+          <P mt={1.5}>
+            <Msg id="team.members.sub" />
+          </P>
+        }
+        columns={columns}
+        query={hrUsersQuery}
+        action={
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            aria-label="add member"
+            onClick={() => {
+              setAddMemberVisible(true);
+            }}
+          >
+            <Msg id="team.members.add" />
+          </Button>
+        }
+      />
       <CreditTopUpModal
         selected={topUpSelected}
         onClose={() => setTopUpSelected(null)}

@@ -1,5 +1,15 @@
 import { ArrowBack } from "@mui/icons-material";
-import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  InputLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ActionSteps, RHFTextField } from "../../components/Forms";
@@ -7,7 +17,6 @@ import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { Todos } from "../../components/Todos";
 import { H1, H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -142,6 +151,47 @@ const exampleTodos = [
   { id: 3, label: "Qui voluptates sint facilis impedit et ea quia deleniti." },
 ];
 
+const userInputSx = { my: 3, p: 3, bgcolor: "#FCFCFD" };
+
+export const SessionTodos = ({ actionSteps = [], withoutControls }) => {
+  const msg = useMsg();
+  const [allChecked, setAllChecked] = useState();
+  const onCheckAll = useCallback(() => {
+    setAllChecked((v) => !v);
+  }, []);
+
+  return (
+    <Stack sx={{ ...userInputSx }}>
+      {actionSteps.map(
+        ({ id, label, date = "2023-09-06", checked = false }) => (
+          <FormControlLabel
+            key={id}
+            control={<Checkbox defaultChecked={checked} />}
+            label={label}
+          />
+        )
+      )}
+      {!withoutControls && (
+        <>
+          <Divider sx={{ my: 2, opacity: 0.4 }} />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+          >
+            <Checkbox id="allChecked" sx={{ py: 0 }} checked={allChecked} />
+            <InputLabel htmlFor="allChecked" onClick={onCheckAll}>
+              {msg("sessions.edit.steps.reflect.mark-all-as-completed")}
+            </InputLabel>
+          </Box>
+        </>
+      )}
+    </Stack>
+  );
+};
+
 const reflectionKeyName = "reflection";
 const ReflectStep = ({
   step,
@@ -164,11 +214,14 @@ const ReflectStep = ({
       }),
     [msg]
   );
+  console.log("[ReflectStep.rndr]", { previousActionSteps });
 
   return (
     <FormStepCard {...{ step, stepper, data, setData, handleNext, handleBack }}>
-      <Todos items={previousActionSteps} keyProp="id" />
-      <P my={2}>{motivationOrReflection}</P>
+      <SessionTodos actionSteps={previousActionSteps} />
+      <Box sx={{ ...userInputSx }}>
+        <P>{motivationOrReflection}</P>
+      </Box>
       <FocusedList items={hints} />
       <RHFTextField
         name={reflectionKeyName}
@@ -195,6 +248,7 @@ const SetActionStepsStep = ({
   setData,
   handleNext,
   handleBack,
+  previousActionSteps = [],
 }) => {
   return (
     <FormStepCard
@@ -218,9 +272,9 @@ const SetActionStepsStep = ({
         />
       )}
     >
-      <Todos items={exampleTodos} keyProp="id" />
+      <SessionTodos actionSteps={previousActionSteps} withoutControls />
+      {/* <Todos items={exampleTodos} keyProp="id" /> */}
       <P my={2}></P>
-
       <ActionSteps
         name={setActionStepsKeyName}
         rules={{ required: true, minLength: 1 }}
@@ -274,6 +328,15 @@ function EditSessionPageInner() {
       perex: msg("sessions.edit.steps.setaction.perex"),
     },
   ];
+  const goalHints = useMemo(
+    () =>
+      getTranslatedList({
+        tsKey: "sessions.new.steps.goal.focusedlist",
+        msg,
+        startIndex: 1,
+      }),
+    [msg]
+  );
   const ADJUST_STEPS = [
     {
       StepComponent: AreaStep,
@@ -292,12 +355,7 @@ function EditSessionPageInner() {
       iconName: "Adjust",
       heading: msg("sessions.new.steps.goal.heading"),
       perex: msg("sessions.new.steps.goal.perex"),
-      focusedList: [
-        msg("sessions.new.steps.goal.focusedlist.1"),
-        "TODO",
-        "TODO",
-        "TODO",
-      ],
+      focusedList: goalHints,
     },
   ];
   const [adjust, setAdjust] = useState(false);

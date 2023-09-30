@@ -152,6 +152,10 @@ export const messages = defineMessages({
     id: "sessions.edit.steps.reflect.perex",
     defaultMessage: "Here are the actions you set last time",
   },
+  "sessions.edit.steps.reflect.mark-all-as-completed": {
+    id: "sessions.edit.steps.reflect.mark-all-as-completed",
+    defaultMessage: "Mark all as completed",
+  },
   "sessions.edit.steps.reflect.hints.1": {
     id: "sessions.edit.steps.reflect.hints.1",
     defaultMessage: "What have you learned when aiming to that action step?",
