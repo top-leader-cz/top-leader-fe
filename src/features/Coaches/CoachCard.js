@@ -87,7 +87,7 @@ export const CoachInfo = ({
 };
 
 export const formatName = ({ firstName, lastName }) =>
-  `${firstName} ${lastName}`;
+  `${firstName} ${lastName}`.trim();
 
 export const CoachCard = ({
   coach,

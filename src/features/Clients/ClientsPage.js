@@ -1,129 +1,109 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
-import { useState } from "react";
-import { defineMessages } from "react-intl";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { LoadingButton } from "@mui/lab";
+import { Box, Button, Typography } from "@mui/material";
+import { useCallback, useContext, useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
+import { LinkBehavior } from "../../components/LinkBehavior";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { SlotChip, TLCell, TLTableWithHeader } from "../Team/Team.page";
-import { useAuth } from "../Authorization";
-import { LinkBehavior } from "../../components/LinkBehavior";
 import { routes } from "../../routes";
 import { ConfirmModal } from "../Modal/ConfirmModal";
-import { LoadingButton } from "@mui/lab";
+import {
+  SlotChip,
+  StyledTableCell,
+  StyledTableRow,
+  TLCell,
+  TLTableWithHeader,
+} from "../Team/Team.page";
+import {
+  useClientsQuery,
+  useDeclineMutation,
+  useUpcomingSessionsQuery,
+} from "./api";
+import { clientsMessages } from "./messages";
+import { formatName } from "../Coaches/CoachCard";
+import { I18nContext } from "../I18n/I18nProvider";
+import { QueryRenderer } from "../QM/QueryRenderer";
+import { gray50 } from "../../theme";
 
-const messages = defineMessages({
-  "clients.heading": {
-    id: "clients.heading",
-    defaultMessage: "Clients",
-  },
-  "clients.title": {
-    id: "clients.title",
-    defaultMessage: "Clients",
-  },
-  "clients.title.count.badge": {
-    id: "clients.title.count.badge",
-    defaultMessage: "{count} Clients",
-  },
-  "clients.sub": {
-    id: "clients.sub",
-    defaultMessage: "Here you can see the list of your current clients",
-  },
-  "clients.add": {
-    id: "clients.add",
-    defaultMessage: "Add member",
-  },
-  "clients.table.col.name": {
-    id: "clients.table.col.name",
-    defaultMessage: "Name",
-  },
-  "clients.table.col.lastSession": {
-    id: "clients.table.col.lastSession",
-    defaultMessage: "Last session",
-  },
-  "clients.table.col.nextSession": {
-    id: "clients.table.col.nextSession",
-    defaultMessage: "Next session",
-  },
-  "clients.table.col.action": {
-    id: "clients.table.col.action",
-    defaultMessage: "Action",
-  },
-  "clients.table.action.contact": {
-    id: "clients.table.action.contact",
-    defaultMessage: "Contact client",
-  },
-  "clients.table.action.decline": {
-    id: "clients.table.action.decline",
-    defaultMessage: "Decline client",
-  },
-  "clients.decline.title": {
-    id: "clients.decline.title",
-    defaultMessage: "Are you sure you want to decline {name}?",
-  },
-  "clients.decline.yes": {
-    id: "clients.decline.yes",
-    defaultMessage: "Yes, decline",
-  },
-  "clients.decline.no": {
-    id: "clients.decline.no",
-    defaultMessage: "No, cancel",
-  },
-});
+export const gray500 = "#667085";
+export const gray900 = "#101828";
 
-const useClientsQuery = ({ ...queryParams } = {}) => {
-  const { authFetch } = useAuth();
-  return useQuery({
-    queryKey: ["coach-clients"],
-    queryFn: () => authFetch({ url: `/api/latest/coach-clients` }),
-    select: (data) => {
-      return data.map((user) => {
-        //  {
-        // "username": "slavik.dan12@gmail.com",
-        // "firstName": "",
-        // "lastName": "",
-        // "lastSession": "2023-09-26T14:00:00",
-        // "nextSession": "2023-10-02T09:00:00"
-        // };
-        return {
-          name: `${user?.firstName} ${user?.lastName}`,
-          username: user.username,
-          lastSession: user.lastSession,
-          nextSession: user.nextSession,
-        };
-      });
-    },
-    ...queryParams,
-  });
+const ScheduledSession = ({ time, name, username }) => {
+  const { i18n } = useContext(I18nContext);
+  const parsed = i18n.parseUTCLocal(time);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        py: 2,
+        gap: 2,
+        borderBottom: `1px solid #EAECF0`,
+        "&:last-child": { borderBottom: 0 },
+      }}
+    >
+      <Box display="flex" gap={1}>
+        <P sx={{ fontSize: 18, color: gray900, fontWeight: 600 }}>
+          {i18n.formatLocal(parsed, "PP")}
+        </P>
+        <P sx={{ fontSize: 18, color: gray500, fontWeight: 400 }}>
+          {i18n.formatLocal(parsed, "ccc")}
+        </P>
+      </Box>
+      <Box display="flex" gap={1}>
+        <P sx={{ fontSize: 18, color: gray900, fontWeight: 600 }}>
+          {i18n.formatLocal(parsed, "pppp")}
+        </P>
+        <P sx={{ fontSize: 18, color: gray900, fontWeight: 400 }}>
+          {name || username}
+        </P>
+      </Box>
+    </Box>
+  );
 };
 
-export const useDeclineMutation = (mutationParams = {}) => {
-  const { authFetch, fetchUser } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ username }) =>
-      authFetch({
-        method: "DELETE",
-        url: `/api/latest/coach-clients/${username}`,
-      }),
-    ...mutationParams,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(["coach-clients"]); // TODO: test
-      mutationParams?.onSuccess?.(data);
-    },
-  });
+const ScheduledSessionsTableRow = ({
+  data,
+  columns,
+  colSpan = columns.length,
+  name,
+}) => {
+  const msg = useMsg({ dict: clientsMessages });
+  return (
+    <StyledTableRow
+      sx={{ bgcolor: gray50 }}
+      //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+    >
+      <StyledTableCell colSpan={colSpan} variant="default">
+        <H2 sx={{ fontSize: "16px" }}>
+          {name
+            ? msg("clients.upcoming.with-name", { name })
+            : msg("clients.upcoming.all-sessions")}
+        </H2>
+        {data.map(({ username, firstName, lastName, time }) => (
+          <ScheduledSession
+            key={time + username}
+            name={formatName({ firstName, lastName })}
+            username={username}
+            time={time}
+          />
+        ))}
+      </StyledTableCell>
+    </StyledTableRow>
+  );
 };
 
 function ClientsPageInner() {
   const [addMemberVisible, setAddMemberVisible] = useState();
   const [declineMemberVisible, setDeclineMemberVisible] = useState();
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: clientsMessages });
 
   const query = useClientsQuery({});
+  const upcomingSessionsQuery = useUpcomingSessionsQuery();
   const declineMutation = useDeclineMutation({
     onSuccess: () => {
       setDeclineMemberVisible();
@@ -177,6 +157,31 @@ function ClientsPageInner() {
       ),
     },
   ];
+  const expandedRowRender = useCallback(
+    ({ row, columns }) => {
+      if (!upcomingSessionsQuery.data) return null;
+      // const rowData = upcomingSessionsQuery.data;
+      const rowData = upcomingSessionsQuery.data.filter(
+        ({ username }) => username === row.username
+      );
+      return (
+        <ScheduledSessionsTableRow
+          data={rowData}
+          columns={columns}
+          name={row.username}
+        />
+      );
+      return rowData.map(({ username, firstName, lastName, time }) => (
+        <ScheduledSession
+          name={formatName({ firstName, lastName })}
+          username={username}
+          time={time}
+        />
+      ));
+      return <pre>{JSON.stringify(rowData, null, 2)}</pre>;
+    },
+    [upcomingSessionsQuery.data]
+  );
 
   console.log("[Clients.page]", { query });
 
@@ -184,6 +189,15 @@ function ClientsPageInner() {
     <Layout>
       <Header text={msg("clients.heading")} />
       <TLTableWithHeader
+        headerBefore={
+          <QueryRenderer
+            {...upcomingSessionsQuery}
+            success={({ data }) => (
+              <ScheduledSessionsTableRow data={data} columns={columns} />
+            )}
+          />
+        }
+        expandedRowRender={expandedRowRender}
         title={
           <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
             <H2>
@@ -255,7 +269,7 @@ function ClientsPageInner() {
 
 export function ClientsPage() {
   return (
-    <MsgProvider messages={messages}>
+    <MsgProvider messages={clientsMessages}>
       <ClientsPageInner />
     </MsgProvider>
   );

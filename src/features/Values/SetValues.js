@@ -62,7 +62,7 @@ const useMyValues = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("values");
+        queryClient.invalidateQueries({ queryKey: ["values"] });
       },
     }
   );

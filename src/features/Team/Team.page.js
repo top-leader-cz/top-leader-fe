@@ -15,18 +15,17 @@ import {
   styled,
   tableCellClasses,
 } from "@mui/material";
-import { useState } from "react";
-import { useQuery } from "react-query";
+import { Fragment, useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { CreditTopUpModal } from "./CreditTopUpModal";
-import { messages } from "./messages";
 import { AddMemberModal } from "./AddMemberModal";
+import { CreditTopUpModal } from "./CreditTopUpModal";
+import { useHrUsersQuery } from "./api";
+import { messages } from "./messages";
 
 export const SlotChip = ({ children, sx }) => {
   return (
@@ -57,23 +56,11 @@ const rows = [
     creditPaid: 1200,
     creditRemaining: 1000,
   },
-  {
-    name: "Verna Bergstrom",
-    email: "verna.bergstorm@gmail.com",
-    coach: "Frank Bogisich",
-    creditPaid: 1200,
-    creditRemaining: 800,
-  },
-  {
-    name: "Marjorie Ortiz",
-    email: "marjorie.ortiz@gmail.com",
-    coach: "Gerardo Feil",
-    creditPaid: 1200,
-    creditRemaining: 1000,
-  },
 ];
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+export const StyledTableCell = styled(TableCell, {
+  shouldForwardProp: (prop) => prop !== "variant",
+})(({ theme, variant = "emphasized" }) => ({
   borderRight: "1px solid #EAECF0",
   paddingTop: "12px",
   paddingBottom: "12px",
@@ -84,16 +71,22 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
     fontWeight: 500,
   },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 16,
-    fontWeight: 600,
-  },
+  [`&.${tableCellClasses.body}`]:
+    variant === "lighter"
+      ? {}
+      : variant === "emphasized"
+      ? {
+          fontSize: 16,
+          fontWeight: 600,
+        }
+      : {},
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    // backgroundColor: theme.palette.action.hover,
   },
+  backgroundColor: "white",
   // hide last border
   "&:last-child td, &:last-child th": {
     // border: 0,
@@ -136,36 +129,19 @@ export const TLCell = ({
   );
 };
 
-const useHrUsersQuery = () => {
-  const { authFetch } = useAuth();
-  return useQuery({
-    queryKey: ["hr-users"],
-    queryFn: () => authFetch({ url: `/api/latest/hr-users` }),
-    select: (data) => {
-      return data.map((user) => {
-        //  {
-        //   username: "string",
-        //   coach: "string",
-        //   credit: 0,
-        //   requestedCredit: 0,
-        //   state: "AUTHORIZED",
-        // };
-        return {
-          name: user.username, // TODO
-          username: user.username,
-          coach: user.coach,
-          creditPaid: user.requestedCredit,
-          creditRemaining: user.credit,
-        };
-      });
-    },
-  });
-};
-
-export const TLLoadableTable = ({ query, columns = [], key = "username" }) => {
+// TODO: extract to components
+export const TLLoadableTable = ({
+  query,
+  columns = [],
+  key = "username",
+  expandedRowRender,
+  bodyBefore,
+  headerBefore,
+}) => {
   return (
     <TableContainer component={Box}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableHead>{headerBefore}</TableHead>
         <TableHead>
           <TableRow>
             {columns.map(({ label, key }) => (
@@ -174,17 +150,35 @@ export const TLLoadableTable = ({ query, columns = [], key = "username" }) => {
           </TableRow>
         </TableHead>
         <TableBody>
+          {bodyBefore}
           <QueryRenderer
             {...query}
             success={({ data }) =>
-              data.map((row) => (
-                <StyledTableRow
-                  key={row[key]}
-                  //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  {columns.map((column) => column.render(row))}
-                </StyledTableRow>
-              ))
+              data.map((row) => {
+                const expandedEl = expandedRowRender?.({ row, columns });
+
+                if (!expandedEl)
+                  return (
+                    <StyledTableRow
+                      key={row[key]}
+                      //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      {columns.map((column) => column.render(row))}
+                    </StyledTableRow>
+                  );
+
+                return (
+                  <Fragment key={row[key]}>
+                    <StyledTableRow
+                    //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      {columns.map((column) => column.render(row))}
+                    </StyledTableRow>
+
+                    {expandedEl}
+                  </Fragment>
+                );
+              })
             }
           />
         </TableBody>
@@ -199,6 +193,9 @@ export const TLTableWithHeader = ({
   action,
   columns,
   query,
+  expandedRowRender,
+  bodyBefore,
+  headerBefore,
 }) => {
   return (
     <Card>
@@ -209,7 +206,13 @@ export const TLTableWithHeader = ({
         action={action}
       />
       <Divider />
-      <TLLoadableTable columns={columns} query={query} />
+      <TLLoadableTable
+        columns={columns}
+        query={query}
+        expandedRowRender={expandedRowRender}
+        bodyBefore={bodyBefore}
+        headerBefore={headerBefore}
+      />
     </Card>
   );
 };

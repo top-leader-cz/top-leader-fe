@@ -12,16 +12,27 @@ import { RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
+import { useCreditRequestMutation } from "./api";
 
 export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
   const msg = useMsg();
+  const mutation = useCreditRequestMutation({
+    onSuccess: () => {
+      onClose();
+    },
+  });
 
   const methods = useForm({
     mode: "onSubmit",
     // mode: "all",¯
     defaultValues: {},
   });
-  const onSubmit = (data, e) => console.log("[modal.onSubmit]", data, e);
+  console.log({ selected });
+  const onSubmit = (values, e) =>
+    mutation.mutateAsync({
+      username: selected?.username,
+      credit: values.credit,
+    });
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
   return (
@@ -70,9 +81,9 @@ export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
             </P>
             {/* <OutlinedField label="Subject" /> */}
             <RHFTextField
-              name="amount"
+              name="credit"
               rules={{ required: true, minLength: 3 }}
-              label={"Amount of credits (1 credit = 1$)"}
+              label={<Msg id="team.credit.topup-modal.amount.label" />}
               //   label={msg("coaches.contact.subject.label")}
               autoFocus
               size="small"
@@ -84,7 +95,12 @@ export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
               <Button fullWidth variant="outlined" onClick={() => onClose()}>
                 <Msg id="coaches.contact.button.cancel" />
               </Button>
-              <Button fullWidth variant="contained" type="submit">
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                disabled={mutation.isLoading}
+              >
                 <Msg id="team.credit.topup-modal.submit" />
                 {/* <Msg id="coaches.contact.button.send" /> */}
               </Button>

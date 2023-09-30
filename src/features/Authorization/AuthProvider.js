@@ -131,7 +131,7 @@ export function AuthProvider({ children }) {
 
   const signout = () => {
     queryClient.removeQueries();
-    setIsLoggedIn(false); // TODO: check
+    setIsLoggedIn(false);
   };
 
   const value = {
@@ -142,7 +142,7 @@ export function AuthProvider({ children }) {
     signout,
     authFetch,
     fetchUser: () => {
-      queryClient.invalidateQueries("user-info"); // TODO: rm?
+      queryClient.invalidateQueries({ queryKey: ["user-info"] });
     },
     isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
     isHR: userQuery.data?.userRoles?.includes(Authority.HR),

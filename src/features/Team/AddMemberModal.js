@@ -3,15 +3,16 @@ import {
   Box,
   Button,
   Divider,
+  FormControlLabel,
   IconButton,
   Modal,
   Paper,
 } from "@mui/material";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
 import {
   AutocompleteSelect,
+  CheckboxField,
   LANGUAGE_OPTIONS,
   RHFTextField,
   renderLanguageOption,
@@ -19,33 +20,10 @@ import {
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { useAuth } from "../Authorization";
 import { Authority } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
-
-const useCreateUserMutation = () => {
-  const { authFetch, fetchUser } = useAuth();
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user`,
-        data: (() => {
-          console.log("[useCreateUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-            authorities: values.authorities,
-            locale: values.locale, //?.substring(0, 2),
-            timeZone: values.timeZone,
-            status: "AUTHORIZED",
-          };
-        })(),
-      }),
-  });
-};
+import { useCreateUserMutation } from "./api";
 
 export const AddMemberModal = ({ onClose, open }) => {
   const msg = useMsg();
@@ -60,8 +38,9 @@ export const AddMemberModal = ({ onClose, open }) => {
       lastName: "",
       username: "",
       authorities: ["USER"],
-      locale: [language],
+      locale: language?.substring(0, 2) ?? "en",
       timeZone: userTz,
+      isAuthorized: true,
     },
   });
   const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
@@ -159,6 +138,10 @@ export const AddMemberModal = ({ onClose, open }) => {
               name={"timeZone"}
               options={TIMEZONE_OPTIONS}
               placeholder="Timezone" // TODO: translations? should be always populated
+            />
+            <FormControlLabel
+              control={<CheckboxField name="isAuthorized" />}
+              label="isAuthorized"
             />
 
             <Divider flexItem sx={{ mt: 3 }} />
