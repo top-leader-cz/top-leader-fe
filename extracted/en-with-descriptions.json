@@ -89,6 +89,48 @@
   "availability-calendar.confirm-reservation.title": {
     "defaultMessage": "Confirm reservation {date}"
   },
+  "clients.add": {
+    "defaultMessage": "Add member"
+  },
+  "clients.decline.no": {
+    "defaultMessage": "No, cancel"
+  },
+  "clients.decline.title": {
+    "defaultMessage": "Are you sure you want to decline {name}?"
+  },
+  "clients.decline.yes": {
+    "defaultMessage": "Yes, decline"
+  },
+  "clients.heading": {
+    "defaultMessage": "Clients"
+  },
+  "clients.sub": {
+    "defaultMessage": "Here you can see the list of your current clients"
+  },
+  "clients.table.action.contact": {
+    "defaultMessage": "Contact client"
+  },
+  "clients.table.action.decline": {
+    "defaultMessage": "Decline client"
+  },
+  "clients.table.col.action": {
+    "defaultMessage": "Action"
+  },
+  "clients.table.col.lastSession": {
+    "defaultMessage": "Last session"
+  },
+  "clients.table.col.name": {
+    "defaultMessage": "Name"
+  },
+  "clients.table.col.nextSession": {
+    "defaultMessage": "Next session"
+  },
+  "clients.title": {
+    "defaultMessage": "Clients"
+  },
+  "clients.title.count.badge": {
+    "defaultMessage": "{count} Clients"
+  },
   "coaches.aside.items.1.heading": {
     "defaultMessage": "€100"
   },
@@ -1475,6 +1517,9 @@
   },
   "general.notifications": {
     "defaultMessage": "Notifications"
+  },
+  "main-menu.items.clients": {
+    "defaultMessage": "Clients"
   },
   "main-menu.items.coaches": {
     "defaultMessage": "Coaches"

@@ -582,6 +582,7 @@
   "settings.availability.heading": "Availability",
   "settings.tabs.availability.label": "Availability",
   "settings.profile.perex": "Update your info here",
+  "clients.table.col.name": "Name",
   "settings.profile.field.name": "Name",
   "team.members.table.col.name": "Name",
   "auth.login.email.label": "Email",
@@ -628,5 +629,7 @@
   "feedback.tabs.results.label": "Results",
   "feedback.aside.text": "Feedback on my leadership skills",
   "feedback.aside.perex": "Below you can see the overview of your current form.",
-  "feedback.aside.collected": "Responses collected"
+  "feedback.aside.collected": "Responses collected",
+  "clients.add": "Add member",
+  "clients.table.col.action": "Action"
 }

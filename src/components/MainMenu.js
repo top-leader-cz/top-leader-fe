@@ -50,6 +50,10 @@ const messages = defineMessages({
     id: "main-menu.items.team",
     defaultMessage: "Team",
   },
+  "main-menu.items.clients": {
+    id: "main-menu.items.clients",
+    defaultMessage: "Clients",
+  },
   "main-menu.items.messages": {
     id: "main-menu.items.messages",
     defaultMessage: "Messages",
@@ -125,7 +129,7 @@ const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
 };
 
 export const MainMenu = ({ open }) => {
-  const { signout, isHR } = useAuth();
+  const { signout, isHR, isCoach } = useAuth();
   const mobile = !open;
 
   return (
@@ -176,6 +180,14 @@ export const MainMenu = ({ open }) => {
                 text={<Msg id="main-menu.items.team" />}
                 icon={<People />}
                 to={routes.team}
+              />
+            ) : null}
+            {isCoach ? (
+              <ListItemLink
+                mobile={mobile}
+                text={<Msg id="main-menu.items.clients" />}
+                icon={<People />}
+                to={routes.clients}
               />
             ) : null}
             <ListItemLink

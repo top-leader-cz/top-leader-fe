@@ -46,8 +46,8 @@ export const RequireAuth = ({ children, requireUserRoles = [] }) => {
 
   if (requireUserRoles.length) {
     if (
-      intersection(auth.user.data?.userRoles, requireUserRoles).length !==
-      requireUserRoles.length
+      // intersection(auth.user.data?.userRoles, requireUserRoles).length !== requireUserRoles.length
+      intersection(auth.user.data?.userRoles, requireUserRoles).length < 1
     )
       return <Navigate to={routes.dashboard} replace />;
   }

@@ -582,6 +582,7 @@
   "settings.availability.heading": "Dostupnost",
   "settings.tabs.availability.label": "Dostupnost",
   "settings.profile.perex": "Aktualizujte své informace zde",
+  "clients.table.col.name": "Jméno",
   "settings.profile.field.name": "Jméno",
   "team.members.table.col.name": "Jméno",
   "auth.login.email.label": "E-mail",
@@ -628,5 +629,7 @@
   "feedback.tabs.results.label": "Výsledky",
   "feedback.aside.text": "Zpětná vazba na moje dovednosti leadershipu",
   "feedback.aside.perex": "Níže můžete vidět přehled Vašeho aktuálního formuláře.",
-  "feedback.aside.collected": "Shromážděné odpovědi"
+  "feedback.aside.collected": "Shromážděné odpovědi",
+  "clients.add": "Doplnit člena",
+  "clients.table.col.action": "Aktivita"
 }
