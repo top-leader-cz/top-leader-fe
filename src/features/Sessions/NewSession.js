@@ -1,6 +1,13 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -18,6 +25,7 @@ import { ActionStepsStep } from "./steps/ActionStepsStep";
 import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
+import { getTranslatedList } from "./EditSession.page";
 
 export const StepperRightMenu = ({
   heading,
@@ -87,6 +95,24 @@ function NewSessionPageInner() {
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
 
+  const goalHints = useMemo(
+    () =>
+      getTranslatedList({
+        tsKey: "sessions.new.steps.goal.focusedlist",
+        msg,
+        startIndex: 1,
+      }),
+    [msg]
+  );
+  const motivationHints = useMemo(
+    () =>
+      getTranslatedList({
+        tsKey: "sessions.new.steps.motivation.focusedlist",
+        msg,
+        startIndex: 1,
+      }),
+    [msg]
+  );
   const STEPS = [
     {
       StepComponent: AreaStep,
@@ -103,12 +129,7 @@ function NewSessionPageInner() {
       iconName: "Adjust",
       heading: msg("sessions.new.steps.goal.heading"),
       perex: msg("sessions.new.steps.goal.perex"),
-      focusedList: [
-        msg("sessions.new.steps.goal.focusedlist.1"),
-        "TODO",
-        "TODO",
-        "TODO",
-      ],
+      focusedList: goalHints,
     },
     {
       StepComponent: MotivationStep,
@@ -117,13 +138,7 @@ function NewSessionPageInner() {
       iconName: "RocketLaunch",
       heading: msg("sessions.new.steps.motivation.heading"),
       perex: msg("sessions.new.steps.motivation.perex"),
-      focusedList: [
-        "TODO",
-        "TODO",
-        "TODO",
-        // "How do you feel when you excel in it?",
-        // "How can your strenghts help you to achieve excellence in that?",
-      ],
+      focusedList: motivationHints,
     },
     {
       StepComponent: ActionStepsStep,

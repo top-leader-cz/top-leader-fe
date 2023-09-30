@@ -1464,6 +1464,9 @@
   "file-upload.primary": {
     "defaultMessage": "Click to upload"
   },
+  "focused-list.show-another-question": {
+    "defaultMessage": "Show another question"
+  },
   "general.message-from": {
     "defaultMessage": "Message from {from}"
   },
@@ -1518,6 +1521,9 @@
   "score.min": {
     "defaultMessage": "Not me at all"
   },
+  "session.step-card.step": {
+    "defaultMessage": "Step {current}/{total}"
+  },
   "sessions.aside.start-button": {
     "defaultMessage": "Start new session"
   },
@@ -1565,6 +1571,9 @@
   },
   "sessions.edit.steps.reflect.label": {
     "defaultMessage": "Reflect"
+  },
+  "sessions.edit.steps.reflect.mark-all-as-completed": {
+    "defaultMessage": "Mark all as completed"
   },
   "sessions.edit.steps.reflect.perex": {
     "defaultMessage": "Here are the actions you set last time"
