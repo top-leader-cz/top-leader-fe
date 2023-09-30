@@ -27,6 +27,43 @@ export const useClientsQuery = ({ ...queryParams } = {}) => {
   });
 };
 
+export const useUpcomingSessionsQuery = (params = {}) => {
+  const { authFetch } = useAuth();
+  return useQuery({
+    queryKey: ["coach-info", "upcoming-sessions"],
+    queryFn: () =>
+      authFetch({ url: `/api/latest/coach-info/upcoming-sessions` }),
+    select: (data) => {
+      return data.map((user) => {
+        /*
+        [
+    {
+        "username": "slavik.dan12@gmail.com",
+        "firstName": "",
+        "lastName": "",
+        "time": "2023-10-02T09:00:00"
+    },
+    {
+        "username": "coach1@gmail.com",
+        "firstName": "",
+        "lastName": "",
+        "time": "2023-10-02T10:00:00"
+    }
+]
+        */
+        //  [{
+        // "username": "string",
+        // "firstName": "string",
+        // "lastName": "string",
+        // "time": "2023-09-30T17:55:22.338Z"
+        // }]
+        return user;
+      });
+    },
+    ...params,
+  });
+};
+
 export const useDeclineMutation = (mutationParams = {}) => {
   const { authFetch, fetchUser } = useAuth();
   const queryClient = useQueryClient();

@@ -27,26 +27,6 @@ export const useHrUsersQuery = (params = {}) => {
     ...params,
   });
 };
-export const useUpcomingSessionsQuery = (params = {}) => {
-  const { authFetch } = useAuth();
-  return useQuery({
-    queryKey: ["coach-info", "upcoming-sessions"],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/coach-info/upcoming-sessions` }),
-    select: (data) => {
-      return data.map((user) => {
-        //  [{
-        // "username": "string",
-        // "firstName": "string",
-        // "lastName": "string",
-        // "time": "2023-09-30T17:55:22.338Z"
-        // }]
-        return user;
-      });
-    },
-    ...params,
-  });
-};
 
 export const useCreateUserMutation = (params = {}) => {
   const { authFetch, fetchUser } = useAuth();

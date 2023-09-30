@@ -57,4 +57,12 @@ export const clientsMessages = defineMessages({
     id: "clients.decline.no",
     defaultMessage: "No, cancel",
   },
+  "clients.upcoming.all-sessions": {
+    id: "clients.upcoming.all-sessions",
+    defaultMessage: "All upcoming sessions",
+  },
+  "clients.upcoming.with-name": {
+    id: "clients.upcoming.with-name",
+    defaultMessage: "Upcoming sessions with {name}",
+  },
 });

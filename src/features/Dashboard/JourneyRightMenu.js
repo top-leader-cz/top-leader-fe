@@ -11,6 +11,9 @@ import { useAuth } from "../Authorization";
 import { useUserSessionQuery } from "../Sessions/api";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { Todos } from "../../components/Todos";
+import { useUpcomingSessionsQuery } from "../Clients/api";
+import { formatName } from "../Coaches/CoachCard";
+import { gray500, gray900 } from "../Clients/ClientsPage";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -109,33 +112,124 @@ const Actions = ({ areaOfDevelopment, ...props }) => {
   );
 };
 
-const SessionsActionCard = ({ ...rest }) => {
+const ScheduledDay = ({ time, name, username }) => {
   const { i18n } = useContext(I18nContext);
+  const parsed = i18n.parseUTCLocal(time);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        py: 1,
+        gap: 2,
+        borderBottom: `1px solid #EAECF0`,
+        // "&:last-child": { borderBottom: 0 },
+      }}
+    >
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
+          {i18n.formatLocal(parsed, "ccc")}
+        </P>
+        <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
+          {i18n.formatLocal(parsed, "d")}
+        </P>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
+          {name || username}
+        </P>
+        <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
+          {i18n.formatLocal(parsed, "p")}
+        </P>
+      </Box>
+
+      {/* <Box display="flex" gap={1}>
+       
+      </Box>
+      <Box display="flex" gap={1}>
+        <P sx={{ fontSize: 18, color: gray900, fontWeight: 600 }}>
+          {i18n.formatLocal(parsed, "pppp")}
+        </P>
+        <P sx={{ fontSize: 18, color: gray900, fontWeight: 400 }}>
+          {name || username}
+        </P>
+      </Box> */}
+    </Box>
+  );
+};
+
+const CoachUpcomingSessions = ({ data }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        py: 2.5,
+        height: "300px",
+        overflow: "scroll",
+      }}
+    >
+      {data.map(({ username, firstName, lastName, time }) => (
+        <ScheduledDay
+          key={time + username}
+          name={formatName({ firstName, lastName })}
+          username={username}
+          time={time}
+        />
+      ))}
+    </Box>
+  );
+};
+
+const CoachSessionsCard = ({}) => {
+  const { i18n } = useContext(I18nContext);
+  const upcomingSessionsQuery = useUpcomingSessionsQuery();
+
+  return (
+    <ActionCard
+      heading={`${i18n.formatRelativeLocal(new Date())}, ${i18n.formatLocal(
+        new Date(),
+        "PP"
+      )}`}
+      // heading={i18n.translateTokenLocal("today")}
+      // heading={i18n.formatLocal(new Date(), "")}
+      button={
+        !upcomingSessionsQuery.isLoading &&
+        !upcomingSessionsQuery.data?.length && {
+          variant: "contained",
+          href: routes.newSession,
+          children: <Msg id="dashboard.rightmenu.upcoming.start" />,
+        }
+      }
+    >
+      <QueryRenderer
+        {...upcomingSessionsQuery}
+        success={({ data }) => {
+          if (!data?.length)
+            return (
+              <EmptyActionCardContent
+                iconName="RocketLaunch"
+                title={<Msg id="dashboard.rightmenu.upcoming.title.empty" />}
+                perex={<Msg id="dashboard.rightmenu.upcoming.perex.empty" />}
+              />
+            );
+          else return <CoachUpcomingSessions data={data} />;
+        }}
+      />
+    </ActionCard>
+  );
+};
+
+const SessionsActionCard = ({ ...rest }) => {
   const { user } = useAuth();
   const areaOfDevelopment = user.data.areaOfDevelopment || [];
 
   return (
     <Box {...rest}>
-      <ActionCard
-        heading={`${i18n.formatRelativeLocal(new Date())}, ${i18n.formatLocal(
-          new Date(),
-          "PP"
-        )}`}
-        // heading={i18n.translateTokenLocal("today")}
-        // heading={i18n.formatLocal(new Date(), "")}
-        button={{
-          variant: "contained",
-          href: routes.newSession,
-          children: <Msg id="dashboard.rightmenu.upcoming.start" />,
-        }}
-      >
-        <EmptyActionCardContent
-          iconName="RocketLaunch"
-          title={<Msg id="dashboard.rightmenu.upcoming.title.empty" />}
-          perex={<Msg id="dashboard.rightmenu.upcoming.perex.empty" />}
-        />
-      </ActionCard>
-
+      <CoachSessionsCard />
       <ActionCard
         heading={<Msg id="dashboard.rightmenu.actions.heading" />}
         button={{
