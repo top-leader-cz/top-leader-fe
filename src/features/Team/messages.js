@@ -11,7 +11,7 @@ export const messages = defineMessages({
   },
   "team.members.title.count.badge": {
     id: "team.members.title.count.badge",
-    defaultMessage: "{count} members",
+    defaultMessage: `{count, plural, =0 {No Members} =1 {# Member} other {# Members} }`,
   },
   "team.members.sub": {
     id: "team.members.sub",
@@ -52,6 +52,10 @@ export const messages = defineMessages({
   "team.credit.topup-modal.desc": {
     id: "team.credit.topup-modal.desc",
     defaultMessage: "Enter the amount of credits you want to top up.",
+  },
+  "team.credit.topup-modal.amount.label": {
+    id: "team.credit.topup-modal.amount.label",
+    defaultMessage: "Amount of credits (1 credit = 1$)",
   },
   "team.credit.topup-modal.submit": {
     id: "team.credit.topup-modal.submit",

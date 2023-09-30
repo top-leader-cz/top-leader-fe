@@ -101,7 +101,7 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries("assessment");
+      queryClient.invalidateQueries({ queryKey: ["assessment"] });
     },
   });
 
@@ -115,7 +115,7 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
     onSuccess: () => {
       deleteAnswersMutation.mutate();
       fetchUser();
-      queryClient.invalidateQueries("strengths");
+      queryClient.invalidateQueries({ queryKey: ["strengths"] });
       onSuccess?.();
     },
   });

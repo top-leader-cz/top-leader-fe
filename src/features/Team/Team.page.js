@@ -27,6 +27,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { CreditTopUpModal } from "./CreditTopUpModal";
 import { messages } from "./messages";
 import { AddMemberModal } from "./AddMemberModal";
+import { useHrUsersQuery, useUpcomingSessionsQuery } from "./api";
 
 export const SlotChip = ({ children, sx }) => {
   return (
@@ -134,32 +135,6 @@ export const TLCell = ({
       </Box>
     </StyledTableCell>
   );
-};
-
-const useHrUsersQuery = () => {
-  const { authFetch } = useAuth();
-  return useQuery({
-    queryKey: ["hr-users"],
-    queryFn: () => authFetch({ url: `/api/latest/hr-users` }),
-    select: (data) => {
-      return data.map((user) => {
-        //  {
-        //   username: "string",
-        //   coach: "string",
-        //   credit: 0,
-        //   requestedCredit: 0,
-        //   state: "AUTHORIZED",
-        // };
-        return {
-          name: user.username, // TODO
-          username: user.username,
-          coach: user.coach,
-          creditPaid: user.requestedCredit,
-          creditRemaining: user.credit,
-        };
-      });
-    },
-  });
 };
 
 export const TLLoadableTable = ({ query, columns = [], key = "username" }) => {

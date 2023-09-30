@@ -1,127 +1,23 @@
 import { Add } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
 import { Box, Button } from "@mui/material";
 import { useState } from "react";
-import { defineMessages } from "react-intl";
-import { useMutation, useQuery, useQueryClient } from "react-query";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
+import { LinkBehavior } from "../../components/LinkBehavior";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { SlotChip, TLCell, TLTableWithHeader } from "../Team/Team.page";
-import { useAuth } from "../Authorization";
-import { LinkBehavior } from "../../components/LinkBehavior";
 import { routes } from "../../routes";
 import { ConfirmModal } from "../Modal/ConfirmModal";
-import { LoadingButton } from "@mui/lab";
-
-const messages = defineMessages({
-  "clients.heading": {
-    id: "clients.heading",
-    defaultMessage: "Clients",
-  },
-  "clients.title": {
-    id: "clients.title",
-    defaultMessage: "Clients",
-  },
-  "clients.title.count.badge": {
-    id: "clients.title.count.badge",
-    defaultMessage: "{count} Clients",
-  },
-  "clients.sub": {
-    id: "clients.sub",
-    defaultMessage: "Here you can see the list of your current clients",
-  },
-  "clients.add": {
-    id: "clients.add",
-    defaultMessage: "Add member",
-  },
-  "clients.table.col.name": {
-    id: "clients.table.col.name",
-    defaultMessage: "Name",
-  },
-  "clients.table.col.lastSession": {
-    id: "clients.table.col.lastSession",
-    defaultMessage: "Last session",
-  },
-  "clients.table.col.nextSession": {
-    id: "clients.table.col.nextSession",
-    defaultMessage: "Next session",
-  },
-  "clients.table.col.action": {
-    id: "clients.table.col.action",
-    defaultMessage: "Action",
-  },
-  "clients.table.action.contact": {
-    id: "clients.table.action.contact",
-    defaultMessage: "Contact client",
-  },
-  "clients.table.action.decline": {
-    id: "clients.table.action.decline",
-    defaultMessage: "Decline client",
-  },
-  "clients.decline.title": {
-    id: "clients.decline.title",
-    defaultMessage: "Are you sure you want to decline {name}?",
-  },
-  "clients.decline.yes": {
-    id: "clients.decline.yes",
-    defaultMessage: "Yes, decline",
-  },
-  "clients.decline.no": {
-    id: "clients.decline.no",
-    defaultMessage: "No, cancel",
-  },
-});
-
-const useClientsQuery = ({ ...queryParams } = {}) => {
-  const { authFetch } = useAuth();
-  return useQuery({
-    queryKey: ["coach-clients"],
-    queryFn: () => authFetch({ url: `/api/latest/coach-clients` }),
-    select: (data) => {
-      return data.map((user) => {
-        //  {
-        // "username": "slavik.dan12@gmail.com",
-        // "firstName": "",
-        // "lastName": "",
-        // "lastSession": "2023-09-26T14:00:00",
-        // "nextSession": "2023-10-02T09:00:00"
-        // };
-        return {
-          name: `${user?.firstName} ${user?.lastName}`,
-          username: user.username,
-          lastSession: user.lastSession,
-          nextSession: user.nextSession,
-        };
-      });
-    },
-    ...queryParams,
-  });
-};
-
-export const useDeclineMutation = (mutationParams = {}) => {
-  const { authFetch, fetchUser } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ username }) =>
-      authFetch({
-        method: "DELETE",
-        url: `/api/latest/coach-clients/${username}`,
-      }),
-    ...mutationParams,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(["coach-clients"]); // TODO: test
-      mutationParams?.onSuccess?.(data);
-    },
-  });
-};
+import { SlotChip, TLCell, TLTableWithHeader } from "../Team/Team.page";
+import { useClientsQuery, useDeclineMutation } from "./api";
+import { clientsMessages } from "./messages";
 
 function ClientsPageInner() {
   const [addMemberVisible, setAddMemberVisible] = useState();
   const [declineMemberVisible, setDeclineMemberVisible] = useState();
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: clientsMessages });
 
   const query = useClientsQuery({});
   const declineMutation = useDeclineMutation({
@@ -255,7 +151,7 @@ function ClientsPageInner() {
 
 export function ClientsPage() {
   return (
-    <MsgProvider messages={messages}>
+    <MsgProvider messages={clientsMessages}>
       <ClientsPageInner />
     </MsgProvider>
   );

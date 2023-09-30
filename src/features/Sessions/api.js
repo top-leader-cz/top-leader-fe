@@ -51,7 +51,8 @@ export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
       // });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["user-sessions"], ["user-info"]);
+      queryClient.invalidateQueries({ queryKey: ["user-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-info"] });
       onSuccess?.(data);
       return data;
     },
@@ -84,7 +85,8 @@ export const useUserReflectionMutation = ({ onSuccess, ...rest } = {}) => {
       });
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["user-sessions"], ["user-info"]);
+      queryClient.invalidateQueries({ queryKey: ["user-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["user-info"] });
       onSuccess?.(data);
       return data;
     },
