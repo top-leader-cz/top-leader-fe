@@ -1,7 +1,8 @@
 import * as qs from "qs";
-import { createContext, useCallback, useContext } from "react";
+import { createContext, useCallback, useContext, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 export const AuthContext = createContext(null);
 
@@ -157,7 +158,35 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-const useMyQuery = ({ fetchDef, ...rest }) => {
-  const { authFetch } = {}; // TODO
-  return useQuery({ ...rest });
+const noop = () => {};
+
+// TODO: fix onSuccess and onError in react-query 5
+// https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
+// https://github.com/TanStack/query/discussions/5279
+export const useMyQuery = ({
+  fetchDef,
+  onSuccess,
+  onError,
+  queryFn,
+  ...rest
+}) => {
+  const { authFetch } = useAuth();
+  const query = useQuery({
+    queryFn: queryFn ?? (() => authFetch(fetchDef)),
+    ...rest,
+  });
+
+  const data = query.data;
+  const sCurrent = useStaticCallback(onSuccess ?? noop);
+  useEffect(() => {
+    if (data) sCurrent(data);
+  }, [data, sCurrent]);
+
+  const error = query.error;
+  const eCurrent = useStaticCallback(onError ?? noop);
+  useEffect(() => {
+    if (error) eCurrent(error);
+  }, [error, eCurrent]);
+
+  return query;
 };

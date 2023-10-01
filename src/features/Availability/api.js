@@ -4,13 +4,15 @@ import {
   flatten,
   identity,
   map,
+  path,
   pipe,
+  prop,
   replace,
   tap,
   values,
 } from "ramda";
-import { useCallback, useContext } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useCallback, useContext, useMemo } from "react";
+import { useMutation, useQueries, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
 import {
@@ -111,7 +113,7 @@ export const fetchAvailabilityWeekIntervals = ({
   );
 };
 
-export const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
+const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
   const { authFetch } = useAuth();
   const { i18n, userTz } = useContext(I18nContext);
   const firstDaysOfTheWeek = getWeekStarts({
@@ -131,6 +133,7 @@ export const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
     queryFn: async () => {
       const intervalPromises = firstDaysOfTheWeek.map((firstDayOfTheWeek) =>
         fetchAvailabilityWeekIntervals({
+          // Changed
           authFetch,
           username,
           firstDayOfTheWeek,
@@ -163,52 +166,136 @@ export const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
 };
 
 // TODO: split into useQueries for better caching
-// const useCoachAvailabilityIntervals = ({ username, calendarInterval }) => {
-//   const { authFetch } = useAuth();
-//   const { i18n, userTz } = useContext(I18nContext);
+export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+  const { authFetch } = useAuth();
+  const { i18n, userTz } = useContext(I18nContext);
+  const firstDaysOfTheWeek = getWeekStarts({
+    calendarInterval,
+    userTz,
+    weekStartsOn: 1,
+  });
 
-//   const { allFetched, datas, isLoading, errorsArr } = useQueries({
-// const ws = getWeekStarts({ calendarInterval })
-//     queries: ws.map((weekStart) => ({
-//       retry: false,
-//       refetchOnWindowFocus: false,
-//       refetchOnReconnect: false,
-//       enabled: !!username,
-//       queryKey: ["coaches", username, "availability"],
-//       queryFn: () =>
-//         fetchAvailabilityWeekIntervals({
-//           authFetch,
-//           username,
-//           firstDayOfTheWeek,
-//           userTz,
-//         }),
-//     })),
-//     combine: (results) => {
-//       return {
-//         allFetched: results.every((query) => query.data),
-//         datas: results.map((result) => result.data),
-//         isLoading: results.some((result) => result.isLoading),
-//         errorsArr: results.map((result) => result.error).filter(Boolean),
-//       };
-//     },
-//   });
+  const queries = useQueries({
+    queries: firstDaysOfTheWeek.map((firstDayOfTheWeek) => ({
+      retry: false,
+      refetchOnWindowFocus: false,
+      // refetchOnReconnect: false,
+      enabled: !!username,
+      queryKey: [
+        "coaches",
+        username,
+        "availability",
+        { userTz, firstDayOfTheWeek }, // calendarInterval
+      ],
+      queryFn: async () => ({
+        params: { userTz, firstDayOfTheWeek, username, calendarInterval },
+        weekData: await fetchAvailabilityWeekIntervals({
+          authFetch,
+          username,
+          firstDayOfTheWeek,
+          userTz,
+        }),
+      }),
+    })),
+    combine: (queries) => {
+      // react-router > v5, TODO: useMyQuery
+      console.log(">>> COMBINE", { queries });
+      return queries;
+      const mapped = pipe(
+        map(path(["data", "weekData"])),
+        filter(Boolean),
+        flatten
+      )(queries);
+      const intervalsMaybe =
+        mapped.length === queries.length ? mapped : undefined;
 
-//   return useMemo(() => {
-//     const availabilityIntervals = allFetched
-//       ? pipe(
-//           flatten,
-//           filter(
-//             isIntervalWithin({
-//               parentInterval: calendarInterval,
-//               overlapping: "throw",
-//             })
-//           ),
-//           identity
-//         )(datas)
-//       : [];
-//     return { allFetched, availabilityIntervals, isLoading, errorsArr }; // TODO: error handling
-//   }, [allFetched, calendarInterval, datas, errorsArr, isLoading]);
-// };
+      return {
+        queries,
+        intervalsMaybe,
+        composedQuery: {
+          data: intervalsMaybe,
+          error: queries.find(({ error }) => error),
+          isLoading: queries.some(({ isLoading }) => isLoading),
+        },
+      };
+      // return {
+      //   allFetched: queries.every((query) => query.data),
+      //   datas: queries.map((result) => result.data),
+      //   isLoading: queries.some((result) => result.isLoading),
+      //   errorsArr: queries.map((result) => result.error).filter(Boolean),
+      // };
+    },
+  });
+
+  const composedQueries = useMemo(() => {
+    const mapped = pipe(
+      map(path(["data", "weekData"])),
+      tap((data) => console.log({ data }))
+    )(queries);
+    const fulfilled = filter(Boolean, mapped);
+    const allIntervalsMaybe =
+      fulfilled.length === queries.length ? flatten(fulfilled) : undefined;
+    const someIntervalsMaybe = fulfilled.length ? flatten(fulfilled) : [];
+
+    return {
+      queries,
+      composedQuery: {
+        data: allIntervalsMaybe,
+        error: queries.find(({ error }) => error),
+        isLoading: queries.some(({ isLoading }) => isLoading),
+      },
+      optimisticQuery: {
+        data: someIntervalsMaybe,
+        error: queries.find(({ error }) => error),
+        isLoading: queries.some(({ isLoading }) => isLoading),
+      },
+    };
+  }, [queries]);
+
+  console.log({ composedQueries });
+
+  return composedQueries;
+
+  // return useMemo(() => {
+  //   const availabilityIntervals = allFetched
+  //     ? pipe(
+  //         flatten,
+  //         filter(
+  //           isIntervalWithin({
+  //             parentInterval: calendarInterval,
+  //             overlapping: "throw",
+  //           })
+  //         ),
+  //         identity
+  //       )(datas)
+  //     : [];
+  //   return { allFetched, availabilityIntervals, isLoading, errorsArr }; // TODO: error handling
+  // }, [allFetched, calendarInterval, datas, errorsArr, isLoading]);
+};
+
+export const getIsDayLoading = ({ queries, dayInterval, userTz }) => {
+  const firstDaysOfTheWeek = getWeekStarts({
+    calendarInterval: dayInterval,
+    userTz,
+    weekStartsOn: 1,
+  });
+  // const dayQueries = queries.filter((query) => {
+  //   // const fetchInterval =
+  // });
+  // firstDaysOfTheWeek - one Monday in Europe/Prague can be split in two week starts in UTC
+  const allFetched = firstDaysOfTheWeek.every((dayName) =>
+    queries.find((query) => dayName === query.data?.params?.firstDayOfTheWeek)
+  );
+  // if (dayInterval.end.getDay() === 1)
+  //   console.log("%cgetIsDayLoading", "color:blue", {
+  //     allFetched,
+  //     firstDaysOfTheWeek,
+  //     queries,
+  //     dayInterval,
+  //     userTz,
+  //   });
+  return !allFetched;
+};
 
 const plog =
   (...args) =>

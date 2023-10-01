@@ -52,20 +52,18 @@ const useMyValues = () => {
   });
 
   const queryClient = useQueryClient();
-  const mutation = useMutation(
-    async ({ selectedKeys }) => {
+  const mutation = useMutation({
+    mutationFn: async ({ selectedKeys }) => {
       authFetch({
         method: "POST",
         url: `/api/latest/user-info/values`,
         data: { data: selectedKeys },
       });
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["values"] });
-      },
-    }
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["values"] });
+    },
+  });
 
   const navigate = useNavigate();
 
