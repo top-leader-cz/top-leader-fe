@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import { getHours, isWithinInterval, set } from "date-fns/fp";
 import { useContext } from "react";
 
@@ -6,7 +6,7 @@ import { I18nContext } from "../I18n/I18nProvider";
 import { identity, times } from "ramda";
 import { fixIntEnd } from "../I18n/utils/date";
 
-export const TimeSlot = ({ hour, isFree, onClick, sx = {} }) => {
+export const TimeSlot = ({ hour, isLoading, isFree, onClick, sx = {} }) => {
   return (
     <Box
       key={hour}
@@ -19,7 +19,7 @@ export const TimeSlot = ({ hour, isFree, onClick, sx = {} }) => {
       sx={{ cursor: onClick ? "pointer" : "default", ...sx }}
       onClick={onClick}
     >
-      {isFree ? `${hour}:00` : "-"}
+      {isLoading ? <Skeleton /> : isFree ? `${hour}:00` : "-"}
     </Box>
   );
 };
@@ -33,6 +33,7 @@ export const CalendarDaySlots = ({
   sx = { flexDirection: "column" },
   dateSx,
   slotSx,
+  isLoading,
 }) => {
   const { i18n } = useContext(I18nContext);
 
@@ -81,12 +82,16 @@ export const CalendarDaySlots = ({
       {slots.map(({ hour, isFree, interval }) => (
         <TimeSlot
           onClick={
-            interval && onTimeslotClick && (() => onTimeslotClick({ interval }))
+            interval &&
+            onTimeslotClick &&
+            !isLoading &&
+            (() => onTimeslotClick({ interval }))
           }
           key={hour}
           hour={hour}
           isFree={isFree}
           sx={slotSx}
+          isLoading={isLoading}
         />
       ))}
     </Box>

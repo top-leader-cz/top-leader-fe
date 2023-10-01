@@ -1,3 +1,4 @@
+import { parseUTCZoned } from "./date";
 import { getWeekStarts } from "./getWeekStarts";
 
 // CZ DST
@@ -29,12 +30,76 @@ const cases = [
     },
     output: ["2023-09-25-00:00:00"],
   },
+  {
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T03:00:00.000Z"), // // 1. Sun
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T03:59:59.999Z"), // 2. Mon
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: true,
+    },
+    output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
+  },
+  {
+    // 3
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T22:00:00.000Z"), //
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T21:59:59.999Z"), //
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: true,
+    },
+    output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
+  },
+  {
+    // 3
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"), //
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T01:59:59.999Z"), //
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: true,
+    },
+    output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
+  },
+  {
+    // 3
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"), //
+        end: parseUTCZoned(TZS["0200"], "2023-10-01T23:59:59.999Z"), //
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: true,
+    },
+    output: ["2023-09-25-00:00:00"],
+  },
+  {
+    // 3
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-02T00:30:00.000Z"), //
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T00:59:59.999Z"), //
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: true,
+    },
+    output: ["2023-10-02-00:00:00"],
+  },
 ];
 
 // console.log("getWeekStarts", JSON.stringify(cases, null, 2));
 
 it("getWeekStarts", () => {
-  cases.map(({ input, output }) => {
-    return expect(getWeekStarts(input)).toEqual(output);
+  cases.map(({ input, output }, index) => {
+    return expect([getWeekStarts(input), index]).toEqual([output, index]);
   });
 });

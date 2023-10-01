@@ -419,7 +419,7 @@ export const AvailabilitySettings = () => {
     onSuccess: useCallback(
       (data) => {
         console.log("mutation.onSuccess", data);
-        queryClient.removeQueries("coach-availability");
+        queryClient.removeQueries({ queryKey: "coach-availability" });
         // setFinished(true);
       },
       [queryClient]

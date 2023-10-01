@@ -28,17 +28,19 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useSendMessageMutation } from "./queries";
 import { usePickCoach } from "../Coaches/api";
+import { useMyQuery } from "../Authorization/AuthProvider";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
   const { authFetch } = useAuth();
 
-  return useQuery({
+  return useMyQuery({
     enabled: !!username,
     queryKey: ["coach", username],
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
+    fetchDef: { url: `/api/latest/coaches/${username}` },
+    // queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
     onError,
     onSuccess,
   });
@@ -51,7 +53,7 @@ const RightMenu = ({ username, msg, rightOpen, setRightOpen }) => {
   const coachQuery = useCoachQuery({
     username,
     onError: when(errIs(404), () => setRightOpen(false)),
-    onSuccess: (e) => setRightOpen(true),
+    onSuccess: () => setRightOpen(true),
   });
   const pickCoach = usePickCoach({ coach: coachQuery.data });
   const profilePhotoSrc = `/api/latest/coaches/${username}/photo`;
@@ -471,7 +473,8 @@ const useConversations = () => {
         queryKey: ["messages"],
         exact: true,
       });
-      queryClient.setQueryData(["messages"], (old) => {
+      queryClient.setQueryData(["messages"], (old, ...rest) => {
+        if (!old) console.error("TODO: investigate", { old, rest });
         const index = old.findIndex((c) => c.username === addressee);
         const updateCandidateMaybe = index >= 0 ? old[index] : undefined;
         if (

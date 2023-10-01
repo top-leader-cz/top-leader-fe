@@ -24,8 +24,9 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { CalendarDaySlots } from "./CalendarDaySlots";
 import {
+  getIsDayLoading,
   isIntervalWithin,
-  useCoachAvailabilityQuery,
+  useAvailabilityQueries,
   usePickSlotMutation,
 } from "./api";
 
@@ -49,7 +50,7 @@ const computeSlotStats = pipe(
     { lowestHour: 12, highestHour: 12 }
   ),
   ({ lowestHour, highestHour }) => ({
-    slotsCount: highestHour - lowestHour + 1 || 3,
+    slotsCount: Math.max(highestHour - lowestHour + 1, 3),
     firstHour: lowestHour || 9,
   })
 );
@@ -94,9 +95,13 @@ export const AvailabilityCalendar = ({
     setOffsetDays((d) => d - 1);
   }, []);
 
-  const { i18n } = useContext(I18nContext);
+  const { i18n, userTz } = useContext(I18nContext);
   const [pickSlot, setPickSlot] = useState();
-  const coachAvailabilityQuery = useCoachAvailabilityQuery({
+  // const coachAvailabilityQuery = useCoachAvailabilityQuery({
+  //   username: coach?.username,
+  //   calendarInterval,
+  // });
+  const { _composedQuery, optimisticQuery, queries } = useAvailabilityQueries({
     username: coach?.username,
     calendarInterval,
   });
@@ -142,7 +147,12 @@ export const AvailabilityCalendar = ({
     "%c[AvailabilityCalendar.rndr]",
     "color:deeppink",
     coach.username,
-    { calendarInterval, coachAvailabilityQuery }
+    {
+      calendarInterval,
+      // coachAvailabilityQuery,
+      // composedQuery,
+      optimisticQuery,
+    }
   );
 
   return (
@@ -202,7 +212,7 @@ export const AvailabilityCalendar = ({
         borderBottom="1px solid #EAECF0"
       >
         <QueryRenderer
-          {...coachAvailabilityQuery}
+          {...optimisticQuery}
           loaderName="Block"
           success={({ data: availabilityIntervals }) => {
             console.log({ availabilityIntervals });
@@ -211,7 +221,7 @@ export const AvailabilityCalendar = ({
             const { slotsCount, firstHour } = computeSlotStats(
               availabilityIntervals
             );
-            const daysArr = times(identity, visibleDaysCount).map((index) => {
+            return times(identity, visibleDaysCount).map((index) => {
               const date = addDays(index, calendarInterval.start);
               const dayInterval = {
                 start: startOfDay(date),
@@ -225,30 +235,31 @@ export const AvailabilityCalendar = ({
                 availabilityIntervals
               );
 
-              return {
-                index,
-                date,
-                dayIntervals,
-              };
-            });
+              const isLoading = getIsDayLoading({
+                queries,
+                dayInterval,
+                userTz,
+              });
 
-            return daysArr.map(({ date, dayIntervals }) => (
-              <ErrorBoundary
-                key={date.toISOString()}
-                fallbackRender={(props) => {
-                  return null;
-                }}
-              >
-                <CalendarDaySlots
+              return (
+                <ErrorBoundary
                   key={date.toISOString()}
-                  date={date}
-                  slotsCount={slotsCount}
-                  firstHour={firstHour}
-                  dayIntervals={dayIntervals}
-                  onTimeslotClick={onTimeslotClick}
-                />
-              </ErrorBoundary>
-            ));
+                  fallbackRender={(props) => {
+                    return null;
+                  }}
+                >
+                  <CalendarDaySlots
+                    key={date.toISOString()}
+                    date={date}
+                    slotsCount={slotsCount}
+                    firstHour={firstHour}
+                    dayIntervals={dayIntervals}
+                    onTimeslotClick={onTimeslotClick}
+                    isLoading={isLoading}
+                  />
+                </ErrorBoundary>
+              );
+            });
           }}
         />
       </Box>
