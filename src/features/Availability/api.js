@@ -1,6 +1,24 @@
-import { formatISO, getDay, isWithinInterval } from "date-fns/fp";
 import {
+  addDays,
+  addHours,
+  addMilliseconds,
+  eachWeekOfInterval,
+  eachWeekOfIntervalWithOptions,
+  endOfWeekWithOptions,
+  formatISO,
+  getDay,
+  isWithinInterval,
+  parseISO,
+  startOfDay,
+  startOfWeek,
+  startOfWeekWithOptions,
+} from "date-fns/fp";
+import {
+  always,
+  applySpec,
+  curryN,
   filter,
+  find,
   flatten,
   identity,
   map,
@@ -11,7 +29,7 @@ import {
   tap,
   values,
 } from "ramda";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -22,6 +40,8 @@ import {
 } from "../I18n/utils/date";
 import { getWeekStarts } from "../I18n/utils/getWeekStarts";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import { pipeP } from "composable-fetch";
+import { formatInTimeZone } from "date-fns-tz/fp";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -52,28 +72,25 @@ export const isIntervalWithin =
     const startWithin = isWithinInterval(parentInterval, interval.start);
     const endWithin = isWithinInterval(parentInterval, fixEnd(interval.end));
     if (startWithin !== endWithin) {
-      handleIntervalOverlapping({ overlapping, interval, parentInterval });
+      return handleIntervalOverlapping({
+        overlapping,
+        interval,
+        parentInterval,
+      });
     }
     return startWithin;
   };
 
-const parseSlot =
-  (userTz) =>
-  ({ date, timeFrom, timeTo }) => {
-    // {
-    //     "day": "MONDAY",
-    //     "date": "2023-09-24",
-    //     "timeFrom": "09:00:00",
-    //     "timeTo": "10:00:00",
-    //     "firstDayOfTheWeek": "2023-09-24"
-    // },
-    // const start = parseSlotDateTime(date, timeFrom, userTz);
-    // const end = parseSlotDateTime(date, timeTo, userTz);
-    const start = parseUTCZoned(userTz, `${date}T${timeFrom}`);
-    const end = fixEnd(parseUTCZoned(userTz, `${date}T${timeTo}`));
+const parseSlot = (userTz) => (dateStr) => {
+  // const start = parseSlotDateTime(date, timeFrom, userTz);
+  // const end = parseSlotDateTime(date, timeTo, userTz);
 
-    return { start, end };
-  };
+  // TODO: double check
+  const start = parseUTCZoned(userTz, dateStr);
+  const end = fixEnd(addHours(1, parseUTCZoned(userTz)));
+
+  return { start, end };
+};
 
 // TODO: move to query and add tests :)
 const parseAvailabilities = ({
@@ -82,148 +99,123 @@ const parseAvailabilities = ({
   overlapping = "throw",
 }) =>
   pipe(
-    values,
-    flatten,
+    // values,
+    // flatten,
     map(parseSlot(userTz)),
     parentInterval
       ? filter(isIntervalWithin({ parentInterval, overlapping }))
       : identity
   );
 
+// const fetchFrameKeyToParams_ = ({ userTz }) => pipe(
+//     parseISO,
+//     applySpec({
+//       from: pipe( startOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz) ),
+//       to: pipe( endOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz) ), }) );
+// const getFetchFrameKeys_ = ({ calendarInterval, userTz }) => { return getWeekStarts({ calendarInterval, userTz, weekStartsOn: 1, UTC: false, ISO: true, }); };
+
+const fetchFrameKeyToParams = ({ userTz }) =>
+  pipe(
+    parseISO,
+    applySpec({
+      from: pipe(startOfDay, formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz)),
+      to: pipe(
+        startOfDay,
+        addDays(7),
+        addMilliseconds(-1),
+        formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz)
+      ),
+    })
+  );
+
+const getFetchFrameKeys = ({ calendarInterval, userTz }) => {
+  const now = startOfDay(new Date());
+  const floatingWeekKeys = pipe(
+    eachWeekOfIntervalWithOptions({ weekStartsOn: getDay(now) }),
+    map(formatISO)
+  )(calendarInterval);
+  return floatingWeekKeys;
+};
+
 export const fetchAvailabilityWeekIntervals = ({
   authFetch,
   username,
-  firstDayOfTheWeek,
+  fetchFrameKey,
   userTz,
 }) => {
-  // const inner = startOfWeekWithOptions(weekDate, { weekStartsOn: 1 });
-  // debugger; // TODO: not working
-
-  return authFetch({
-    url: `/api/latest/coaches/${username}/availability`,
-    query: {
-      firstDayOfTheWeek,
-    },
-  }).then(
-    parseAvailabilities({
-      userTz,
-      // parentInterval: calendarInterval,
-      // overlapping: "throw", // TODO: true and move to useCoachAvailabilityIntervals
-    })
-  );
+  return pipeP(
+    fetchFrameKeyToParams({ userTz }),
+    // ({ from, to }) => authFetch({
+    //     url: `/api/latest/coaches/${username}/availability`,
+    //     query: { username, from, to, }, }),
+    applySpec({
+      url: always(`/api/latest/coaches/${username}/availability`),
+      query: { username: always(username), from: prop("from"), to: prop("to") },
+    }),
+    authFetch,
+    parseAvailabilities({ userTz })
+  )(fetchFrameKey);
 };
 
-const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
+const joinResults = pipe(flatten);
+
+// const isFetched = (interval, intervals) => {
+//   const startIntervalMaybe = pipe(
+//     find((int) => isWithinInterval(interval.start, int))
+//   )(intervals);
+//   const endIntervalMaybe = pipe(
+//     find((int) => isWithinInterval(interval.end, int))
+//   )(intervals);
+
+//   if (startIntervalMaybe === endIntervalMaybe) return true;
+//   if (startIntervalMaybe === endIntervalMaybe) return true;
+// };
+
+// const updateWindows = curryN(2, (interval, intervals) => {});
+
+export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+  // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
+  // useEffect(() => {
+  //   if (!isFetched(calendarInterval, fetchWindows)) {
+  //     setFetchWindows(updateWindows(calendarInterval));
+  //   }
+  // }, []);
+  // const query = useQuery();
+
   const { authFetch } = useAuth();
   const { i18n, userTz } = useContext(I18nContext);
-  const firstDaysOfTheWeek = getWeekStarts({
-    calendarInterval,
-    userTz,
-    weekStartsOn: 1,
-  });
+  const fetchFrameKeys = getFetchFrameKeys({ calendarInterval, userTz });
+  // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
+  console.log(".....", { calendarInterval, fetchFrameKeys });
 
-  return useQuery({
+  const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
+    retry: false,
+    refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
     enabled: !!username,
     queryKey: [
       "coaches",
       username,
       "availability",
-      { userTz, firstDaysOfTheWeek }, // calendarInterval
+      { userTz, fetchFrameKey }, // calendarInterval
     ],
-    queryFn: async () => {
-      const intervalPromises = firstDaysOfTheWeek.map((firstDayOfTheWeek) =>
-        fetchAvailabilityWeekIntervals({
-          // Changed
-          authFetch,
-          username,
-          firstDayOfTheWeek,
-          userTz,
-        })
-      );
-      const resolved = await Promise.all(intervalPromises);
-      const intervals = pipe(
-        flatten
-        // filter(
-        //   isIntervalWithin({
-        //     parentInterval: calendarInterval,
-        //     overlapping: "throw",
-        //   })
-        // )
-      )(resolved);
-      console.log("[useCoachAvailabilityQuery]", {
-        firstDaysOfTheWeek,
-        intervals,
-        resolved,
-      });
-      // debugger;
-
-      return intervals;
-    },
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-};
-
-// TODO: split into useQueries for better caching
-export const useAvailabilityQueries = ({ username, calendarInterval }) => {
-  const { authFetch } = useAuth();
-  const { i18n, userTz } = useContext(I18nContext);
-  const firstDaysOfTheWeek = getWeekStarts({
-    calendarInterval,
-    userTz,
-    weekStartsOn: 1,
-  });
+    queryFn: async () => ({
+      params: { userTz, fetchFrameKey, username, calendarInterval },
+      weekData: await fetchAvailabilityWeekIntervals({
+        authFetch,
+        username,
+        fetchFrameKey,
+        userTz,
+      }),
+    }),
+  }));
 
   const queries = useQueries({
-    queries: firstDaysOfTheWeek.map((firstDayOfTheWeek) => ({
-      retry: false,
-      refetchOnWindowFocus: false,
-      // refetchOnReconnect: false,
-      enabled: !!username,
-      queryKey: [
-        "coaches",
-        username,
-        "availability",
-        { userTz, firstDayOfTheWeek }, // calendarInterval
-      ],
-      queryFn: async () => ({
-        params: { userTz, firstDayOfTheWeek, username, calendarInterval },
-        weekData: await fetchAvailabilityWeekIntervals({
-          authFetch,
-          username,
-          firstDayOfTheWeek,
-          userTz,
-        }),
-      }),
-    })),
+    queries: queryDefs,
     combine: (queries) => {
       // react-router > v5, TODO: useMyQuery
-      console.log(">>> COMBINE", { queries });
+      console.log(">>> COMBINE WORKS", { queries });
       return queries;
-      const mapped = pipe(
-        map(path(["data", "weekData"])),
-        filter(Boolean),
-        flatten
-      )(queries);
-      const intervalsMaybe =
-        mapped.length === queries.length ? mapped : undefined;
-
-      return {
-        queries,
-        intervalsMaybe,
-        composedQuery: {
-          data: intervalsMaybe,
-          error: queries.find(({ error }) => error),
-          isLoading: queries.some(({ isLoading }) => isLoading),
-        },
-      };
-      // return {
-      //   allFetched: queries.every((query) => query.data),
-      //   datas: queries.map((result) => result.data),
-      //   isLoading: queries.some((result) => result.isLoading),
-      //   errorsArr: queries.map((result) => result.error).filter(Boolean),
-      // };
     },
   });
 
@@ -234,8 +226,8 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     )(queries);
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
-      fulfilled.length === queries.length ? flatten(fulfilled) : undefined;
-    const someIntervalsMaybe = fulfilled.length ? flatten(fulfilled) : [];
+      fulfilled.length === queries.length ? joinResults(fulfilled) : undefined;
+    const someIntervalsMaybe = fulfilled.length ? joinResults(fulfilled) : [];
 
     return {
       queries,
@@ -255,41 +247,24 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
   console.log({ composedQueries });
 
   return composedQueries;
-
-  // return useMemo(() => {
-  //   const availabilityIntervals = allFetched
-  //     ? pipe(
-  //         flatten,
-  //         filter(
-  //           isIntervalWithin({
-  //             parentInterval: calendarInterval,
-  //             overlapping: "throw",
-  //           })
-  //         ),
-  //         identity
-  //       )(datas)
-  //     : [];
-  //   return { allFetched, availabilityIntervals, isLoading, errorsArr }; // TODO: error handling
-  // }, [allFetched, calendarInterval, datas, errorsArr, isLoading]);
 };
 
 export const getIsDayLoading = ({ queries, dayInterval, userTz }) => {
-  const firstDaysOfTheWeek = getWeekStarts({
+  const fetchFrameKeys = getFetchFrameKeys({
     calendarInterval: dayInterval,
     userTz,
-    weekStartsOn: 1,
   });
   // const dayQueries = queries.filter((query) => {
   //   // const fetchInterval =
   // });
   // firstDaysOfTheWeek - one Monday in Europe/Prague can be split in two week starts in UTC
-  const allFetched = firstDaysOfTheWeek.every((dayName) =>
-    queries.find((query) => dayName === query.data?.params?.firstDayOfTheWeek)
+  const allFetched = fetchFrameKeys.every((dayName) =>
+    queries.find((query) => dayName === query.data?.params?.fetchFrameKey)
   );
   // if (dayInterval.end.getDay() === 1)
   //   console.log("%cgetIsDayLoading", "color:blue", {
   //     allFetched,
-  //     firstDaysOfTheWeek,
+  //     fetchFrameKeys,
   //     queries,
   //     dayInterval,
   //     userTz,
