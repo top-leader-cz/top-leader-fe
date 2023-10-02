@@ -9,6 +9,7 @@ import {
   addMilliseconds,
   eachWeekOfIntervalWithOptions,
   format,
+  formatISO,
 } from "date-fns/fp";
 import { getFirstDayOfTheWeek } from "./date";
 
@@ -27,6 +28,7 @@ export const getWeekStarts = ({
   formatStr = "yyyy-MM-dd",
   weekStartsOn = 1,
   UTC = true, // TODO: test
+  ISO = false,
 }) => {
   const tzOffsetMs = getTimezoneOffset(userTz, calendarInterval.start); // / (1000 * 60); // 120
   // TODO
@@ -45,7 +47,11 @@ export const getWeekStarts = ({
     // calendarInterval
     UTC ? utcInterval : calendarInterval
   ).map((date) =>
-    UTC ? formatInTimeZone(date, userTz, formatStr) : format(formatStr, date)
+    UTC
+      ? formatInTimeZone(date, userTz, formatStr)
+      : ISO
+      ? formatISO(date)
+      : format(formatStr, date)
   );
 
   console.log({

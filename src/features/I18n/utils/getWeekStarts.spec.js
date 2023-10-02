@@ -33,7 +33,20 @@ const cases = [
   {
     input: {
       calendarInterval: {
-        start: parseUTCZoned(TZS["0200"], "2023-10-01T03:00:00.000Z"), // // 1. Sun
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T22:00:00.000Z"), // 1. Sun
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T21:59:59.999Z"),
+      },
+      userTz: TZS["0200"],
+      formatStr,
+      UTC: false,
+    },
+    output: ["2023-10-02-00:00:00"],
+  },
+
+  {
+    input: {
+      calendarInterval: {
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T03:00:00.000Z"), // 1. Sun
         end: parseUTCZoned(TZS["0200"], "2023-10-02T03:59:59.999Z"), // 2. Mon
       },
       userTz: TZS["0200"],
@@ -43,11 +56,10 @@ const cases = [
     output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
   },
   {
-    // 3
     input: {
       calendarInterval: {
-        start: parseUTCZoned(TZS["0200"], "2023-10-01T22:00:00.000Z"), //
-        end: parseUTCZoned(TZS["0200"], "2023-10-02T21:59:59.999Z"), //
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T22:00:00.000Z"),
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T21:59:59.999Z"),
       },
       userTz: TZS["0200"],
       formatStr,
@@ -56,11 +68,10 @@ const cases = [
     output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
   },
   {
-    // 3
     input: {
       calendarInterval: {
-        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"), //
-        end: parseUTCZoned(TZS["0200"], "2023-10-02T01:59:59.999Z"), //
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"),
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T01:59:59.999Z"),
       },
       userTz: TZS["0200"],
       formatStr,
@@ -69,11 +80,10 @@ const cases = [
     output: ["2023-09-25-00:00:00", "2023-10-02-00:00:00"],
   },
   {
-    // 3
     input: {
       calendarInterval: {
-        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"), //
-        end: parseUTCZoned(TZS["0200"], "2023-10-01T23:59:59.999Z"), //
+        start: parseUTCZoned(TZS["0200"], "2023-10-01T23:30:00.000Z"),
+        end: parseUTCZoned(TZS["0200"], "2023-10-01T23:59:59.999Z"),
       },
       userTz: TZS["0200"],
       formatStr,
@@ -82,11 +92,10 @@ const cases = [
     output: ["2023-09-25-00:00:00"],
   },
   {
-    // 3
     input: {
       calendarInterval: {
-        start: parseUTCZoned(TZS["0200"], "2023-10-02T00:30:00.000Z"), //
-        end: parseUTCZoned(TZS["0200"], "2023-10-02T00:59:59.999Z"), //
+        start: parseUTCZoned(TZS["0200"], "2023-10-02T00:30:00.000Z"),
+        end: parseUTCZoned(TZS["0200"], "2023-10-02T00:59:59.999Z"),
       },
       userTz: TZS["0200"],
       formatStr,

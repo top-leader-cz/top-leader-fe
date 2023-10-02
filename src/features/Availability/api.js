@@ -1,6 +1,20 @@
-import { formatISO, getDay, isWithinInterval } from "date-fns/fp";
 import {
+  addDays,
+  addHours,
+  endOfWeekWithOptions,
+  formatISO,
+  getDay,
+  isWithinInterval,
+  parseISO,
+  startOfWeek,
+  startOfWeekWithOptions,
+} from "date-fns/fp";
+import {
+  always,
+  applySpec,
+  curryN,
   filter,
+  find,
   flatten,
   identity,
   map,
@@ -11,7 +25,7 @@ import {
   tap,
   values,
 } from "ramda";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueries, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -22,6 +36,7 @@ import {
 } from "../I18n/utils/date";
 import { getWeekStarts } from "../I18n/utils/getWeekStarts";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import { pipeP } from "composable-fetch";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -52,28 +67,23 @@ export const isIntervalWithin =
     const startWithin = isWithinInterval(parentInterval, interval.start);
     const endWithin = isWithinInterval(parentInterval, fixEnd(interval.end));
     if (startWithin !== endWithin) {
-      handleIntervalOverlapping({ overlapping, interval, parentInterval });
+      return handleIntervalOverlapping({
+        overlapping,
+        interval,
+        parentInterval,
+      });
     }
     return startWithin;
   };
 
-const parseSlot =
-  (userTz) =>
-  ({ date, timeFrom, timeTo }) => {
-    // {
-    //     "day": "MONDAY",
-    //     "date": "2023-09-24",
-    //     "timeFrom": "09:00:00",
-    //     "timeTo": "10:00:00",
-    //     "firstDayOfTheWeek": "2023-09-24"
-    // },
-    // const start = parseSlotDateTime(date, timeFrom, userTz);
-    // const end = parseSlotDateTime(date, timeTo, userTz);
-    const start = parseUTCZoned(userTz, `${date}T${timeFrom}`);
-    const end = fixEnd(parseUTCZoned(userTz, `${date}T${timeTo}`));
+const parseSlot = (userTz) => (dateStr) => {
+  // const start = parseSlotDateTime(date, timeFrom, userTz);
+  // const end = parseSlotDateTime(date, timeTo, userTz);
+  const start = parseUTCZoned(userTz, dateStr);
+  const end = fixEnd(addHours(1, parseUTCZoned(userTz)));
 
-    return { start, end };
-  };
+  return { start, end };
+};
 
 // TODO: move to query and add tests :)
 const parseAvailabilities = ({
@@ -82,8 +92,8 @@ const parseAvailabilities = ({
   overlapping = "throw",
 }) =>
   pipe(
-    values,
-    flatten,
+    // values,
+    // flatten,
     map(parseSlot(userTz)),
     parentInterval
       ? filter(isIntervalWithin({ parentInterval, overlapping }))
@@ -96,21 +106,22 @@ export const fetchAvailabilityWeekIntervals = ({
   firstDayOfTheWeek,
   userTz,
 }) => {
-  // const inner = startOfWeekWithOptions(weekDate, { weekStartsOn: 1 });
-  // debugger; // TODO: not working
-
-  return authFetch({
-    url: `/api/latest/coaches/${username}/availability`,
-    query: {
-      firstDayOfTheWeek,
-    },
-  }).then(
-    parseAvailabilities({
-      userTz,
-      // parentInterval: calendarInterval,
-      // overlapping: "throw", // TODO: true and move to useCoachAvailabilityIntervals
-    })
-  );
+  return pipeP(
+    parseISO,
+    applySpec({
+      from: startOfWeekWithOptions({ weekStartsOn: 1 }),
+      to: endOfWeekWithOptions({ weekStartsOn: 1 }),
+    }),
+    // ({ from, to }) => authFetch({
+    //     url: `/api/latest/coaches/${username}/availability`,
+    //     query: { username, from, to, }, }),
+    applySpec({
+      url: always(`/api/latest/coaches/${username}/availability`),
+      query: { username: always(username), from: prop("from"), to: prop("to") },
+    }),
+    authFetch,
+    parseAvailabilities({ userTz })
+  )(firstDayOfTheWeek);
 };
 
 const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
@@ -165,8 +176,9 @@ const useCoachAvailabilityQuery = ({ username, calendarInterval }) => {
   });
 };
 
-// TODO: split into useQueries for better caching
-export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+const joinResults = pipe(flatten);
+
+export const useAvailabilityQueries_ = ({ username, calendarInterval }) => {
   const { authFetch } = useAuth();
   const { i18n, userTz } = useContext(I18nContext);
   const firstDaysOfTheWeek = getWeekStarts({
@@ -174,7 +186,6 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     userTz,
     weekStartsOn: 1,
   });
-
   const queries = useQueries({
     queries: firstDaysOfTheWeek.map((firstDayOfTheWeek) => ({
       retry: false,
@@ -234,6 +245,123 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     )(queries);
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
+      fulfilled.length === queries.length ? joinResults(fulfilled) : undefined;
+    const someIntervalsMaybe = fulfilled.length ? joinResults(fulfilled) : [];
+
+    return {
+      queries,
+      composedQuery: {
+        data: allIntervalsMaybe,
+        error: queries.find(({ error }) => error),
+        isLoading: queries.some(({ isLoading }) => isLoading),
+      },
+      optimisticQuery: {
+        data: someIntervalsMaybe,
+        error: queries.find(({ error }) => error),
+        isLoading: queries.some(({ isLoading }) => isLoading),
+      },
+    };
+  }, [queries]);
+
+  console.log({ composedQueries });
+
+  return composedQueries;
+};
+
+// const isFetched = (interval, intervals) => {
+//   const startIntervalMaybe = pipe(
+//     find((int) => isWithinInterval(interval.start, int))
+//   )(intervals);
+//   const endIntervalMaybe = pipe(
+//     find((int) => isWithinInterval(interval.end, int))
+//   )(intervals);
+
+//   if (startIntervalMaybe === endIntervalMaybe) return true;
+//   if (startIntervalMaybe === endIntervalMaybe) return true;
+// };
+
+// const updateWindows = curryN(2, (interval, intervals) => {});
+
+export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+  // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
+  // useEffect(() => {
+  //   if (!isFetched(calendarInterval, fetchWindows)) {
+  //     setFetchWindows(updateWindows(calendarInterval));
+  //   }
+  // }, []);
+  // const query = useQuery();
+
+  const { authFetch } = useAuth();
+  const { i18n, userTz } = useContext(I18nContext);
+  const firstDaysOfTheWeek = getWeekStarts({
+    calendarInterval,
+    userTz,
+    weekStartsOn: 1,
+    UTC: false,
+    ISO: true,
+  });
+
+  const queryDefs = firstDaysOfTheWeek.map((firstDayOfTheWeek) => ({
+    retry: false,
+    refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
+    enabled: !!username,
+    queryKey: [
+      "coaches",
+      username,
+      "availability",
+      { userTz, firstDayOfTheWeek }, // calendarInterval
+    ],
+    queryFn: async () => ({
+      params: { userTz, firstDayOfTheWeek, username, calendarInterval },
+      weekData: await fetchAvailabilityWeekIntervals({
+        authFetch,
+        username,
+        firstDayOfTheWeek,
+        userTz,
+      }),
+    }),
+  }));
+
+  const queries = useQueries({
+    queries: queryDefs,
+    combine: (queries) => {
+      // react-router > v5, TODO: useMyQuery
+      console.log(">>> COMBINE", { queries });
+      return queries;
+      const mapped = pipe(
+        map(path(["data", "weekData"])),
+        filter(Boolean),
+        flatten
+      )(queries);
+      const intervalsMaybe =
+        mapped.length === queries.length ? mapped : undefined;
+
+      return {
+        queries,
+        intervalsMaybe,
+        composedQuery: {
+          data: intervalsMaybe,
+          error: queries.find(({ error }) => error),
+          isLoading: queries.some(({ isLoading }) => isLoading),
+        },
+      };
+      // return {
+      //   allFetched: queries.every((query) => query.data),
+      //   datas: queries.map((result) => result.data),
+      //   isLoading: queries.some((result) => result.isLoading),
+      //   errorsArr: queries.map((result) => result.error).filter(Boolean),
+      // };
+    },
+  });
+
+  const composedQueries = useMemo(() => {
+    const mapped = pipe(
+      map(path(["data", "weekData"])),
+      tap((data) => console.log({ data }))
+    )(queries);
+    const fulfilled = filter(Boolean, mapped);
+    const allIntervalsMaybe =
       fulfilled.length === queries.length ? flatten(fulfilled) : undefined;
     const someIntervalsMaybe = fulfilled.length ? flatten(fulfilled) : [];
 
@@ -255,22 +383,6 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
   console.log({ composedQueries });
 
   return composedQueries;
-
-  // return useMemo(() => {
-  //   const availabilityIntervals = allFetched
-  //     ? pipe(
-  //         flatten,
-  //         filter(
-  //           isIntervalWithin({
-  //             parentInterval: calendarInterval,
-  //             overlapping: "throw",
-  //           })
-  //         ),
-  //         identity
-  //       )(datas)
-  //     : [];
-  //   return { allFetched, availabilityIntervals, isLoading, errorsArr }; // TODO: error handling
-  // }, [allFetched, calendarInterval, datas, errorsArr, isLoading]);
 };
 
 export const getIsDayLoading = ({ queries, dayInterval, userTz }) => {
