@@ -227,19 +227,20 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
       fulfilled.length === queries.length ? joinResults(fulfilled) : undefined;
-    const someIntervalsMaybe = fulfilled.length ? joinResults(fulfilled) : [];
+    const someIntervals = fulfilled.length ? joinResults(fulfilled) : [];
 
     return {
       queries,
-      composedQuery: {
+      allResultsQuery: {
         data: allIntervalsMaybe,
         error: queries.find(({ error }) => error),
         isLoading: queries.some(({ isLoading }) => isLoading),
       },
-      optimisticQuery: {
-        data: someIntervalsMaybe,
+      someResultsQuery: {
+        data: someIntervals,
         error: queries.find(({ error }) => error),
-        isLoading: queries.some(({ isLoading }) => isLoading),
+        isLoading:
+          queries.length && queries.every(({ isLoading }) => isLoading),
       },
     };
   }, [queries]);

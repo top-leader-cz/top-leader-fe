@@ -30,6 +30,7 @@ import {
 } from "../I18n/utils/date";
 import { I18nContext } from "../I18n/I18nProvider";
 import { TimeSlot } from "../Availability/CalendarDaySlots";
+import { useMyQuery } from "../Authorization/AuthProvider";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -143,8 +144,8 @@ export const FIELDS_AVAILABILITY = {
 const MOCK_RANGE = [new Date(2022, 0, 0, 9, 0), new Date(2022, 0, 0, 17, 0)];
 
 const AVAILABILITY_TYPE = {
-  RECURRING: "RECURRING",
-  NON_RECURRING: "NON_RECURRING",
+  RECURRING: "recurring",
+  NON_RECURRING: "non-recurring",
   ALL: "ALL",
 };
 /*
@@ -363,10 +364,9 @@ export const AvailabilitySettings = () => {
   const queryClient = useQueryClient();
   const availabilityType = AVAILABILITY_TYPE.RECURRING; // TODO
   // const availabilityType = useFormContext().watch("recurring") ? AVAILABILITY_TYPE.RECURRING : AVAILABILITY_TYPE.NON_RECURRING;
-  const availabilityQuery = useQuery({
+  const recurringAvailabilityQuery = useMyQuery({
     queryKey: ["coach-availability", availabilityType],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/coach-availability/${availabilityType}` }),
+    fetchDef: { url: `/api/latest/coach-availability/${availabilityType}` },
     // When empty:
     // Request URL: http://localhost:3000/api/latest/coach-availability/ALL
     // Request Method: GET
@@ -377,12 +377,15 @@ export const AvailabilitySettings = () => {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  const availabilityQuery2 = useQuery({
+  const nonRecurringAvailabilityQuery = useMyQuery({
     queryKey: ["coach-availability", AVAILABILITY_TYPE.NON_RECURRING],
-    queryFn: () =>
-      authFetch({
-        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
-      }),
+    fetchDef: {
+      url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
+      query: {
+        from: "2023-08-14T00:00:00",
+        to: "2023-08-16T00:00:00",
+      },
+    },
     // When empty:
     // Request URL: http://localhost:3000/api/latest/coach-availability/ALL
     // Request Method: GET
@@ -394,7 +397,7 @@ export const AvailabilitySettings = () => {
     refetchOnReconnect: false,
   });
 
-  const { data } = availabilityQuery;
+  const { data } = recurringAvailabilityQuery;
   useEffect(() => {
     console.log("%c[eff reset]", "color:lime", { data });
     if (data) resetForm(data);
@@ -428,11 +431,11 @@ export const AvailabilitySettings = () => {
 
   const saveDisabled = availabilityMutation.isLoading; // || !!query.error;
 
-  const isJustLoaderDisplayed = !availabilityQuery.data || resetting;
+  const isJustLoaderDisplayed = !recurringAvailabilityQuery.data || resetting;
 
   console.log("[AvailabilitySettings.rndr]", {
     availabilityType,
-    availabilityQuery,
+    recurringAvailabilityQuery,
     availabilityMutation,
     form,
     i18n,
@@ -451,7 +454,7 @@ export const AvailabilitySettings = () => {
         const date = CREATE_OFFSET(new Date())(i, 0);
         const dayIndex = getDay(date); // 0 - Sun
         const dayName = INDEX_TO_DAY[dayIndex];
-        const ranges = availabilityQuery.data?.[dayName] ?? [];
+        const ranges = recurringAvailabilityQuery.data?.[dayName] ?? [];
         // const { day, date: _date, timeFrom, timeTo, recurring } = ranges?.[0] || {}; // TODO
         const freeHours = ranges.reduce((acc, range) => {
           const { day, date: _date, timeFrom, timeTo, recurring } = range;
@@ -468,7 +471,7 @@ export const AvailabilitySettings = () => {
       });
 
     return rows;
-  }, [availabilityQuery.data]);
+  }, [recurringAvailabilityQuery.data]);
 
   const [firstHour, lastHour] = previewDays.reduce(
     (acc, { date, freeHours }) => {
@@ -513,7 +516,7 @@ export const AvailabilitySettings = () => {
         >
           <B>{rightMenuSubtitle}</B>
           <Divider sx={{ my: 2 }} />
-          {!availabilityQuery.data ? null : (
+          {!recurringAvailabilityQuery.data ? null : (
             <Box
               display="flex"
               flexDirection="column"
@@ -544,7 +547,7 @@ export const AvailabilitySettings = () => {
       ),
       [
         availabilityMutation.mutateAsync,
-        availabilityQuery.data,
+        recurringAvailabilityQuery.data,
         firstHour,
         form,
         msg,
@@ -595,10 +598,10 @@ export const AvailabilitySettings = () => {
   //   )
   // );
 
-  if (availabilityQuery.error)
+  if (recurringAvailabilityQuery.error)
     return (
       <QueryRenderer
-        error={availabilityQuery.error}
+        error={recurringAvailabilityQuery.error}
         errored={() => <Alert severity="error">Fetch failed</Alert>}
       />
     );

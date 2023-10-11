@@ -101,7 +101,7 @@ export const AvailabilityCalendar = ({
   //   username: coach?.username,
   //   calendarInterval,
   // });
-  const { _composedQuery, optimisticQuery, queries } = useAvailabilityQueries({
+  const { someResultsQuery, queries } = useAvailabilityQueries({
     username: coach?.username,
     calendarInterval,
   });
@@ -151,7 +151,7 @@ export const AvailabilityCalendar = ({
       calendarInterval,
       // coachAvailabilityQuery,
       // composedQuery,
-      optimisticQuery,
+      someResultsQuery,
     }
   );
 
@@ -212,7 +212,7 @@ export const AvailabilityCalendar = ({
         borderBottom="1px solid #EAECF0"
       >
         <QueryRenderer
-          {...optimisticQuery}
+          {...someResultsQuery}
           loaderName="Block"
           success={({ data: availabilityIntervals }) => {
             console.log({ availabilityIntervals });
