@@ -146,7 +146,6 @@ const MOCK_RANGE = [new Date(2022, 0, 0, 9, 0), new Date(2022, 0, 0, 17, 0)];
 const AVAILABILITY_TYPE = {
   RECURRING: "recurring",
   NON_RECURRING: "non-recurring",
-  ALL: "ALL",
 };
 /*
 { RECURRING
@@ -382,6 +381,7 @@ export const AvailabilitySettings = () => {
     fetchDef: {
       url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
       query: {
+        // TODO
         from: "2023-08-14T00:00:00",
         to: "2023-08-16T00:00:00",
       },
@@ -403,19 +403,15 @@ export const AvailabilitySettings = () => {
     if (data) resetForm(data);
   }, [data, resetForm]);
 
-  const availabilityMutation = useMutation({
+  const recurringAvailabilityMutation = useMutation({
     mutationFn: (values) => {
-      const { recurring } = values;
-      const type = recurring
-        ? AVAILABILITY_TYPE.RECURRING
-        : AVAILABILITY_TYPE.NON_RECURRING;
       const payload = getPayload({ values, i18n, userTz });
 
-      console.log("%cMUTATION", "color:lime", { values, type, payload });
-      // debugger;
+      console.log("%cMUTATION", "color:lime", { values, payload });
+      debugger;
       return authFetch({
         method: "POST",
-        url: `/api/latest/coach-availability/${type}`,
+        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.RECURRING}`,
         data: payload,
       });
     },
@@ -429,14 +425,14 @@ export const AvailabilitySettings = () => {
     ),
   });
 
-  const saveDisabled = availabilityMutation.isLoading; // || !!query.error;
+  const saveDisabled = recurringAvailabilityMutation.isLoading; // || !!query.error;
 
   const isJustLoaderDisplayed = !recurringAvailabilityQuery.data || resetting;
 
   console.log("[AvailabilitySettings.rndr]", {
     availabilityType,
     recurringAvailabilityQuery,
-    availabilityMutation,
+    recurringAvailabilityMutation,
     form,
     i18n,
   });
@@ -510,7 +506,10 @@ export const AvailabilitySettings = () => {
             disabled: saveDisabled,
             onClick: (e) => {
               console.log("Save click");
-              form.handleSubmit(availabilityMutation.mutateAsync, onError)(e);
+              form.handleSubmit(
+                recurringAvailabilityMutation.mutateAsync,
+                onError
+              )(e);
             },
           }}
         >
@@ -546,7 +545,7 @@ export const AvailabilitySettings = () => {
         </ScrollableRightMenu>
       ),
       [
-        availabilityMutation.mutateAsync,
+        recurringAvailabilityMutation.mutateAsync,
         recurringAvailabilityQuery.data,
         firstHour,
         form,
@@ -569,7 +568,7 @@ export const AvailabilitySettings = () => {
   //           disabled: saveDisabled,
   //           onClick: (e) => {
   //             console.log("Save click");
-  //             form.handleSubmit(availabilityMutation.mutateAsync, onError)(e);
+  //             form.handleSubmit(recurringAvailabilityMutation.mutateAsync, onError)(e);
   //           },
   //         }}
   //       >
@@ -594,7 +593,7 @@ export const AvailabilitySettings = () => {
   //         </Box>
   //       </ScrollableRightMenu>
   //     ),
-  //     [availabilityMutation.mutateAsync, form, msg, saveDisabled]
+  //     [recurringAvailabilityMutation.mutateAsync, form, msg, saveDisabled]
   //   )
   // );
 

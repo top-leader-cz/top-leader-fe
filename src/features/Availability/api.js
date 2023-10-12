@@ -1,24 +1,20 @@
+import { pipeP } from "composable-fetch";
+import { formatInTimeZone } from "date-fns-tz/fp";
 import {
   addDays,
   addHours,
   addMilliseconds,
-  eachWeekOfInterval,
   eachWeekOfIntervalWithOptions,
-  endOfWeekWithOptions,
   formatISO,
   getDay,
   isWithinInterval,
   parseISO,
   startOfDay,
-  startOfWeek,
-  startOfWeekWithOptions,
 } from "date-fns/fp";
 import {
   always,
   applySpec,
-  curryN,
   filter,
-  find,
   flatten,
   identity,
   map,
@@ -27,10 +23,9 @@ import {
   prop,
   replace,
   tap,
-  values,
 } from "ramda";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useMutation, useQueries, useQuery, useQueryClient } from "react-query";
+import { useContext, useMemo } from "react";
+import { useMutation, useQueries, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
 import {
@@ -38,10 +33,7 @@ import {
   getFirstDayOfTheWeek,
   parseUTCZoned,
 } from "../I18n/utils/date";
-import { getWeekStarts } from "../I18n/utils/getWeekStarts";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
-import { pipeP } from "composable-fetch";
-import { formatInTimeZone } from "date-fns-tz/fp";
 
 const handleIntervalOverlapping = ({
   overlapping,

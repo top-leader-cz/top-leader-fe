@@ -1,5 +1,3 @@
-import { Divider } from "@mui/material";
-import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -99,7 +97,7 @@ export function SignInPage() {
         >
           <Msg id="auth.login.login" />
         </Button>
-        <Divider />
+        {/* <Divider />
         <Button
           type="button"
           disabled={disabled}
@@ -131,7 +129,7 @@ export function SignInPage() {
           }
         >
           <Msg id="auth.login.microsoft" />
-        </Button>
+        </Button> */}
         {/* <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">
