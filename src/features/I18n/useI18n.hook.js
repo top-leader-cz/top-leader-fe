@@ -5,60 +5,11 @@ import * as tz from "date-fns-tz";
 import { API_TIME_FORMAT, UTC_DATE_FORMAT, parseUTCZoned } from "./utils/date";
 import { formatDistanceToNow } from "date-fns";
 
-// const localizeFn =
-
 // do not use directly, passed down to components thru context
 export const useI18nInternal = ({ userTz, language, locale }) => {
   if (!locale) {
     throw new Error("Unsupported locale language: " + language);
   }
-
-  // TODO: NOT WORKING, always returns
-  const zonedToUtcLocal = useCallback(
-    (localDate) => {
-      // throw new Error("Not working, fix first");
-      try {
-        console.log("[zonedToUtcLocal] START", {
-          localDate,
-          localDateString: localDate.toString(),
-          localDateOffset:
-            tz.getTimezoneOffset(userTz, localDate) / (1000 * 60),
-          userTz,
-          locale,
-        });
-        // NOT WORKING, returns date with CET(DST) offset
-        const resultUtc = tz.zonedTimeToUtc(
-          localDate,
-          // tz.utcToZonedTime(localDate, userTz),
-          userTz,
-          { locale }
-        );
-        console.log("[zonedToUtcLocal] END", {
-          localDate,
-          resultUtc,
-          localDateString: localDate.toString(),
-          resultUtcString: resultUtc.toString(),
-          localDateHours: localDate.getHours(),
-          resultUtcHours: resultUtc.getHours(),
-          userTzOffsetMin: tz.getTimezoneOffset(userTz) / (1000 * 60),
-          userTz,
-          locale,
-        });
-        if (localDate.getHours() === resultUtc.getHours()) throw new Error("");
-
-        return resultUtc;
-      } catch (e) {
-        console.error("[zonedToUtcLocal]", {
-          localDate,
-          userTz,
-          locale,
-          e,
-        });
-        throw e;
-      }
-    },
-    [locale, userTz]
-  );
 
   const parseDate = useCallback(
     (input, referenceDate = new Date()) => {
@@ -205,7 +156,9 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       formatDistanceToNowLocal,
       translateTokenLocal,
       formatRelativeLocal,
-      zonedToUtcLocal,
+      zonedToUtcLocal: () => {
+        throw new Error("TODO: migrate");
+      },
       weekStartsOn: locale.options.weekStartsOn,
       startOfWeekLocal,
     }),
@@ -215,7 +168,6 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       formatLocalMaybe,
       parseUTCLocal,
       formatUtcLocal,
-      zonedToUtcLocal,
       parseDate,
       formatDistanceToNowLocal,
       translateTokenLocal,

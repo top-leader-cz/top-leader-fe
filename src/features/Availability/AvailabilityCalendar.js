@@ -86,23 +86,14 @@ export const AvailabilityCalendar = ({
     }),
     [offsetDays, today, visibleDaysCount]
   );
-  const onNext = useCallback(() => {
-    console.log("onNext");
-    setOffsetDays((d) => d + 1);
-  }, []);
-  const onBack = useCallback(() => {
-    console.log("onBack");
-    setOffsetDays((d) => d - 1);
-  }, []);
+  const createAddOffset = (days) => () => setOffsetDays((d) => d + days);
 
   const { i18n, userTz } = useContext(I18nContext);
   const [pickSlot, setPickSlot] = useState();
-  // const coachAvailabilityQuery = useCoachAvailabilityQuery({
-  //   username: coach?.username,
-  //   calendarInterval,
-  // });
+
   const { someResultsQuery, queries } = useAvailabilityQueries({
     username: coach?.username,
+    timeZone: coach?.timeZone ?? userTz, // TODO: Dan
     calendarInterval,
   });
   const pickSlotMutation = usePickSlotMutation({
@@ -112,11 +103,9 @@ export const AvailabilityCalendar = ({
     },
   });
 
-  // const confirmModal =  // TODO
   const onTimeslotClick = useCallback(
     ({ interval }) => {
       setPickSlot({ interval, coach });
-      // return pickSlotMutation.mutate({ interval });
     },
     [coach]
   );
@@ -126,22 +115,6 @@ export const AvailabilityCalendar = ({
     () => (pickedCoach === coach.username ? undefined : onPickProp),
     [coach.username, onPickProp, pickedCoach]
   );
-
-  // const availabilityIntervalsMaybe = allFetched
-  //   ? availabilityIntervals
-  //   : undefined;
-  // const { daysArr, slotsCount, firstHour } = useMemo(() => {
-  //   if (!availabilityIntervalsMaybe) return {};
-  //   const availabilityIntervals = availabilityIntervalsMaybe;
-  //   const { slotsCount, firstHour } = computeSlotStats(availabilityIntervals);
-  //   const daysArr = createIndicies(visibleDaysCount).map((index) => {
-  //     const date = addDays(index, calendarInterval.start);
-  //     const dayInterval = { start: startOfDay(date), end: endOfDay(date) };
-  //     const dayIntervals = filter( isIntervalWithin({ parentInterval: dayInterval, overlapping: "throw", }), availabilityIntervals );
-  //     return { index, date, dayIntervals, };
-  //   });
-  //   return { daysArr, slotsCount, firstHour };
-  // }, [availabilityIntervalsMaybe, calendarInterval.start, visibleDaysCount]);
 
   console.log(
     "%c[AvailabilityCalendar.rndr]",
@@ -178,17 +151,25 @@ export const AvailabilityCalendar = ({
         <IconButton
           variant="outlined"
           size="small"
-          // disableRipple
           sx={{ color: "inherit" }}
-          onClick={onBack}
+          onClick={createAddOffset(-1)}
         >
           <Icon name={"ChevronLeft"} />
+        </IconButton>
+        <IconButton
+          variant="outlined"
+          size="small"
+          sx={{ color: "inherit" }}
+          onClick={createAddOffset(-3)}
+        >
+          <Icon name={"KeyboardDoubleArrowLeft"} />
         </IconButton>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            flexGrow: 2,
           }}
         >
           {i18n.formatLocal(calendarInterval.start, HEADER_FORMAT)} -{" "}
@@ -197,9 +178,16 @@ export const AvailabilityCalendar = ({
         <IconButton
           variant="outlined"
           size="small"
-          // disableRipple
           sx={{ color: "inherit" }}
-          onClick={onNext}
+          onClick={createAddOffset(3)}
+        >
+          <Icon name={"KeyboardDoubleArrowRight"} />
+        </IconButton>
+        <IconButton
+          variant="outlined"
+          size="small"
+          sx={{ color: "inherit" }}
+          onClick={createAddOffset(1)}
         >
           <Icon name={"ChevronRight"} />
         </IconButton>

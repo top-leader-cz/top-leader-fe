@@ -170,18 +170,19 @@ export const I18nProvider = ({ children }) => {
     },
     [setLanguage]
   );
+  const locale = locales[language];
 
   const i18n = useI18nInternal({
     userTz,
     language,
-    locale: locales[language],
+    locale,
   });
   console.log("[I18nProvider.rndr]", { language, userTz, i18n });
 
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
       <I18nContext.Provider
-        value={{ language, setLanguage, userTz, userTzMutation, i18n }}
+        value={{ language, setLanguage, userTz, userTzMutation, locale, i18n }}
       >
         <IntlProvider
           locale={language}

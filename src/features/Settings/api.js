@@ -79,27 +79,30 @@ const toApiIntervals = ({ formValues, i18n, userTz }) => {
     dayName,
     enabled: formValues[enabledName(dayName)],
     dayRanges: formValues[dayRangesName(dayName)],
-  })).filter(({ enabled }) => enabled);
+  })).filter(({ enabled } = {}) => enabled);
 
   const intervals = pipe(
-    chain(({ dayName, dayRanges }) => {
-      const [from, to, ...other] = dayRanges;
-      // console.log("%c[getAvailabilities]" + dayName, "color:magenta", { dayRanges, utc, utcF, timeFrom, timeTo, });
-      // debugger;
-
-      if (!isValid(from) || !isValid(to)) {
-        throw new Error(`toApiIntervals - Invalid: ${from} - ${to}`);
+    chain(({ dayRanges }) => {
+      if (dayRanges.some((date) => !isValid(date))) {
+        throw new Error(
+          `toApiIntervals - Invalid dayRanges, all dates must be valid`
+        );
+      }
+      if (dayRanges.length % 2 !== 0) {
+        throw new Error(
+          `toApiIntervals - Invalid dayRanges, length must be factor of 2 (start,end,start,end,...)`
+        );
       }
       // TODO: validate multiple ranges
-      return [from, to, ...other];
+      return dayRanges;
     }),
-    tap(log(1)), // TODO: timezone shift + adjust intervals overlapping weeks
+    tap(log(1)), // TODO: adjust intervals overlapping weeks
     splitEvery(2),
     map(([from, to]) => ({
       from: createApiDayTimeObj({ date: from, i18n }),
       to: createApiDayTimeObj({ date: to, i18n }),
     })),
-    tap(log(2)) // TODO: timezone shift + adjust intervals overlapping weeks
+    tap(log(2)) // TODO: adjust intervals overlapping weeks
   )(byDay);
 
   return intervals;
@@ -123,7 +126,36 @@ export const useRecurringAvailabilityMutation = () => {
     onSuccess: useCallback(
       (data) => {
         console.log("mutation.onSuccess", data);
-        queryClient.removeQueries({ queryKey: "coach-availability" });
+        queryClient.removeQueries({ queryKey: ["coach-availability"] });
+        queryClient.removeQueries({ queryKey: ["coaches"] });
+      },
+      [queryClient]
+    ),
+  });
+
+  return mutation;
+};
+
+export const useNonRecurringAvailabilityMutation = () => {
+  const { i18n, userTz } = useContext(I18nContext);
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (values) => {
+      const payload = toApiIntervals({ formValues: values, i18n, userTz });
+
+      console.log("%cMUTATION", "color:lime", { values, payload });
+      return authFetch({
+        method: "POST",
+        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
+        data: payload,
+      });
+    },
+    onSuccess: useCallback(
+      (data) => {
+        console.log("mutation.onSuccess", data);
+        queryClient.removeQueries({ queryKey: ["coach-availability"] });
+        queryClient.removeQueries({ queryKey: ["coaches"] });
       },
       [queryClient]
     ),

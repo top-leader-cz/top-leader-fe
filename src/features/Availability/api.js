@@ -34,6 +34,7 @@ import {
   parseUTCZoned,
 } from "../I18n/utils/date";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
+import * as tz from "date-fns-tz";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -73,27 +74,30 @@ export const isIntervalWithin =
     return startWithin;
   };
 
-const parseSlot = (userTz) => (dateStr) => {
-  // const start = parseSlotDateTime(date, timeFrom, userTz);
-  // const end = parseSlotDateTime(date, timeTo, userTz);
+const parseLocal = ({ dateStr, timeZone }) => {
+  const result = tz.zonedTimeToUtc(dateStr, timeZone);
+  if (!dateStr || !timeZone) debugger;
+  return result;
+};
 
-  // TODO: double check
-  const start = parseUTCZoned(userTz, dateStr);
-  const end = fixEnd(addHours(1, parseUTCZoned(userTz)));
+const parseSlot = (timeZone) => (dateStr) => {
+  // const start = parseSlotDateTime(date, timeFrom, timeZone);
+  // const end = parseSlotDateTime(date, timeTo, timeZone);
+
+  // debugger;
+  const start = parseLocal({ timeZone, dateStr });
+  const end = fixEnd(addHours(1, parseLocal({ timeZone, dateStr })));
 
   return { start, end };
 };
 
-// TODO: move to query and add tests :)
 const parseAvailabilities = ({
-  userTz,
+  timeZone,
   parentInterval,
   overlapping = "throw",
 }) =>
   pipe(
-    // values,
-    // flatten,
-    map(parseSlot(userTz)),
+    map(parseSlot(timeZone)),
     parentInterval
       ? filter(isIntervalWithin({ parentInterval, overlapping }))
       : identity
@@ -134,6 +138,7 @@ export const fetchAvailabilityWeekIntervals = ({
   username,
   fetchFrameKey,
   userTz,
+  timeZone,
 }) => {
   return pipeP(
     fetchFrameKeyToParams({ userTz }),
@@ -145,7 +150,7 @@ export const fetchAvailabilityWeekIntervals = ({
       query: { username: always(username), from: prop("from"), to: prop("to") },
     }),
     authFetch,
-    parseAvailabilities({ userTz })
+    parseAvailabilities({ timeZone })
   )(fetchFrameKey);
 };
 
@@ -165,7 +170,11 @@ const joinResults = pipe(flatten);
 
 // const updateWindows = curryN(2, (interval, intervals) => {});
 
-export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+export const useAvailabilityQueries = ({
+  username,
+  timeZone,
+  calendarInterval,
+}) => {
   // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
   // useEffect(() => {
   //   if (!isFetched(calendarInterval, fetchWindows)) {
@@ -184,7 +193,7 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     retry: false,
     refetchOnWindowFocus: false,
     // refetchOnReconnect: false,
-    enabled: !!username,
+    enabled: !!username && !!timeZone,
     queryKey: [
       "coaches",
       username,
@@ -198,6 +207,7 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
         username,
         fetchFrameKey,
         userTz,
+        timeZone,
       }),
     }),
   }));
