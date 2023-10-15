@@ -10,9 +10,9 @@ export const parseUTCZoned = (userTz, utcStr) => {
   const parsedDate = dffp.parseISO(
     utcStr.endsWith("Z") ? utcStr : utcStr + "Z"
   );
+  const zonedDate = parsedDate;
   // TODO: working without explicit tz setting
-  // const zonedDate = parsedDate;
-  const zonedDate = tz.utcToZonedTime(parsedDate, userTz);
+  // const zonedDate = tz.utcToZonedTime(parsedDate, userTz);
 
   return zonedDate;
 };

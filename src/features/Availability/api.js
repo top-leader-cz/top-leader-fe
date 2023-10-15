@@ -1,24 +1,20 @@
+import { pipeP } from "composable-fetch";
+import { formatInTimeZone } from "date-fns-tz/fp";
 import {
   addDays,
   addHours,
   addMilliseconds,
-  eachWeekOfInterval,
   eachWeekOfIntervalWithOptions,
-  endOfWeekWithOptions,
   formatISO,
   getDay,
   isWithinInterval,
   parseISO,
   startOfDay,
-  startOfWeek,
-  startOfWeekWithOptions,
 } from "date-fns/fp";
 import {
   always,
   applySpec,
-  curryN,
   filter,
-  find,
   flatten,
   identity,
   map,
@@ -27,10 +23,9 @@ import {
   prop,
   replace,
   tap,
-  values,
 } from "ramda";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useMutation, useQueries, useQuery, useQueryClient } from "react-query";
+import { useContext, useMemo } from "react";
+import { useMutation, useQueries, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
 import {
@@ -38,10 +33,8 @@ import {
   getFirstDayOfTheWeek,
   parseUTCZoned,
 } from "../I18n/utils/date";
-import { getWeekStarts } from "../I18n/utils/getWeekStarts";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
-import { pipeP } from "composable-fetch";
-import { formatInTimeZone } from "date-fns-tz/fp";
+import * as tz from "date-fns-tz";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -81,27 +74,30 @@ export const isIntervalWithin =
     return startWithin;
   };
 
-const parseSlot = (userTz) => (dateStr) => {
-  // const start = parseSlotDateTime(date, timeFrom, userTz);
-  // const end = parseSlotDateTime(date, timeTo, userTz);
+const parseLocal = ({ dateStr, timeZone }) => {
+  const result = tz.zonedTimeToUtc(dateStr, timeZone);
+  if (!dateStr || !timeZone) debugger;
+  return result;
+};
 
-  // TODO: double check
-  const start = parseUTCZoned(userTz, dateStr);
-  const end = fixEnd(addHours(1, parseUTCZoned(userTz)));
+const parseSlot = (timeZone) => (dateStr) => {
+  // const start = parseSlotDateTime(date, timeFrom, timeZone);
+  // const end = parseSlotDateTime(date, timeTo, timeZone);
+
+  // debugger;
+  const start = parseLocal({ timeZone, dateStr });
+  const end = fixEnd(addHours(1, parseLocal({ timeZone, dateStr })));
 
   return { start, end };
 };
 
-// TODO: move to query and add tests :)
 const parseAvailabilities = ({
-  userTz,
+  timeZone,
   parentInterval,
   overlapping = "throw",
 }) =>
   pipe(
-    // values,
-    // flatten,
-    map(parseSlot(userTz)),
+    map(parseSlot(timeZone)),
     parentInterval
       ? filter(isIntervalWithin({ parentInterval, overlapping }))
       : identity
@@ -142,6 +138,7 @@ export const fetchAvailabilityWeekIntervals = ({
   username,
   fetchFrameKey,
   userTz,
+  timeZone,
 }) => {
   return pipeP(
     fetchFrameKeyToParams({ userTz }),
@@ -153,7 +150,7 @@ export const fetchAvailabilityWeekIntervals = ({
       query: { username: always(username), from: prop("from"), to: prop("to") },
     }),
     authFetch,
-    parseAvailabilities({ userTz })
+    parseAvailabilities({ timeZone })
   )(fetchFrameKey);
 };
 
@@ -173,7 +170,11 @@ const joinResults = pipe(flatten);
 
 // const updateWindows = curryN(2, (interval, intervals) => {});
 
-export const useAvailabilityQueries = ({ username, calendarInterval }) => {
+export const useAvailabilityQueries = ({
+  username,
+  timeZone,
+  calendarInterval,
+}) => {
   // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
   // useEffect(() => {
   //   if (!isFetched(calendarInterval, fetchWindows)) {
@@ -192,7 +193,7 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     retry: false,
     refetchOnWindowFocus: false,
     // refetchOnReconnect: false,
-    enabled: !!username,
+    enabled: !!username && !!timeZone,
     queryKey: [
       "coaches",
       username,
@@ -206,6 +207,7 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
         username,
         fetchFrameKey,
         userTz,
+        timeZone,
       }),
     }),
   }));
@@ -227,19 +229,20 @@ export const useAvailabilityQueries = ({ username, calendarInterval }) => {
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
       fulfilled.length === queries.length ? joinResults(fulfilled) : undefined;
-    const someIntervalsMaybe = fulfilled.length ? joinResults(fulfilled) : [];
+    const someIntervals = fulfilled.length ? joinResults(fulfilled) : [];
 
     return {
       queries,
-      composedQuery: {
+      allResultsQuery: {
         data: allIntervalsMaybe,
         error: queries.find(({ error }) => error),
         isLoading: queries.some(({ isLoading }) => isLoading),
       },
-      optimisticQuery: {
-        data: someIntervalsMaybe,
+      someResultsQuery: {
+        data: someIntervals,
         error: queries.find(({ error }) => error),
-        isLoading: queries.some(({ isLoading }) => isLoading),
+        isLoading:
+          queries.length && queries.every(({ isLoading }) => isLoading),
       },
     };
   }, [queries]);
@@ -286,7 +289,7 @@ const toUtcFix = pipe(
   tap(plog("toUTC after"))
 );
 
-const padLeft = (char = "0", num) => {
+export const padLeft = (char = "0", num) => {
   const str = `${num}`;
   return str.padStart(2, char);
 };

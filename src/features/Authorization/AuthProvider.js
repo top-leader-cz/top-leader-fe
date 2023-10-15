@@ -160,7 +160,7 @@ export function useAuth() {
 
 const noop = () => {};
 
-// TODO: fix onSuccess and onError in react-query 5
+// Following code fixes onSuccess and onError removed in react-query 5
 // https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
 // https://github.com/TanStack/query/discussions/5279
 export const useMyQuery = ({
