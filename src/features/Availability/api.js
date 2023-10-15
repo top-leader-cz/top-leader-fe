@@ -279,7 +279,7 @@ const toUtcFix = pipe(
   tap(plog("toUTC after"))
 );
 
-const padLeft = (char = "0", num) => {
+export const padLeft = (char = "0", num) => {
   const str = `${num}`;
   return str.padStart(2, char);
 };
