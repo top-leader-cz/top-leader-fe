@@ -15,8 +15,9 @@ export const AvailabilityPreview = () => {
 
   return (
     <AvailabilityCalendar
+      disablePickSlot
       coach={{ username: user.data.username, timeZone: user.data.timeZone }}
-      sx={{ flexShrink: 0 }}
+      sx={{ flexShrink: 0, maxWidth: "100%" }}
     />
   );
 };

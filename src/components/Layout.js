@@ -187,6 +187,8 @@ const LayoutHeader = ({ avatarSrc, heading, noDivider, withNotifications }) => {
   );
 };
 
+export const LayoutCtx = createContext({});
+
 export const Layout = ({
   children,
   header,
@@ -227,75 +229,77 @@ export const Layout = ({
   // console.log("[Layout.rndr]", { stack, rightMenuContent });
 
   return (
-    <Box
-      id="layout"
-      sx={{
-        display: "flex",
-        bgcolor: gray50,
-        minHeight: "100%",
-      }}
-    >
-      <SideMenu
-        width={leftWidth}
-        anchor="left"
-        open={leftOpen}
-        toggleMobile={
-          !downLg ? null : (
-            <IconButton
-              variant="outlined"
-              size="small"
-              disableRipple
-              sx={{ backgroundColor: "white", border: "1px solid #EAECF0" }}
-              onClick={handleToggleLeft}
-            >
-              <Icon name={leftOpen ? "ArrowBack" : "ArrowForward"} />
-            </IconButton>
-          )
-        }
-      >
-        {/* <SideMenu width={256} anchor="left"> */}
-        <MainMenu open={leftOpen} />
-      </SideMenu>
-
+    <LayoutCtx.Provider value={{ downLg, downMd }}>
       <Box
-        component="main"
+        id="layout"
         sx={{
-          px: 4,
-          // mx: 4,
-          width: "100%",
-          flexGrow: 1,
-          position: "relative",
-          //   bgcolor: "background.default",
-          ...contentWrapperSx,
+          display: "flex",
+          bgcolor: gray50,
+          minHeight: "100%",
         }}
       >
-        {header && <LayoutHeader {...header} />}
-        {children}
-      </Box>
-
-      {rightMenuContent && (
         <SideMenu
-          width={rightWidth}
-          anchor="right"
-          open={rightOpen}
+          width={leftWidth}
+          anchor="left"
+          open={leftOpen}
           toggleMobile={
-            !downMd ? null : (
+            !downLg ? null : (
               <IconButton
                 variant="outlined"
                 size="small"
                 disableRipple
                 sx={{ backgroundColor: "white", border: "1px solid #EAECF0" }}
-                onClick={handleToggleRight}
+                onClick={handleToggleLeft}
               >
-                <Icon name={rightOpen ? "ArrowForward" : "ArrowBack"} />
+                <Icon name={leftOpen ? "ArrowBack" : "ArrowForward"} />
               </IconButton>
             )
           }
         >
-          {rightMenuContent}
+          {/* <SideMenu width={256} anchor="left"> */}
+          <MainMenu open={leftOpen} />
         </SideMenu>
-      )}
-    </Box>
+
+        <Box
+          component="main"
+          sx={{
+            px: 4,
+            // mx: 4,
+            width: "100%",
+            flexGrow: 1,
+            position: "relative",
+            //   bgcolor: "background.default",
+            ...contentWrapperSx,
+          }}
+        >
+          {header && <LayoutHeader {...header} />}
+          {children}
+        </Box>
+
+        {rightMenuContent && (
+          <SideMenu
+            width={rightWidth}
+            anchor="right"
+            open={rightOpen}
+            toggleMobile={
+              !downMd ? null : (
+                <IconButton
+                  variant="outlined"
+                  size="small"
+                  disableRipple
+                  sx={{ backgroundColor: "white", border: "1px solid #EAECF0" }}
+                  onClick={handleToggleRight}
+                >
+                  <Icon name={rightOpen ? "ArrowForward" : "ArrowBack"} />
+                </IconButton>
+              )
+            }
+          >
+            {rightMenuContent}
+          </SideMenu>
+        )}
+      </Box>
+    </LayoutCtx.Provider>
   );
 };
 

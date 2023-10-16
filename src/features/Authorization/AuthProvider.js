@@ -1,5 +1,11 @@
 import * as qs from "qs";
-import { createContext, useCallback, useContext, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
@@ -86,15 +92,22 @@ export const qstr = (url, query) => {
 };
 
 export function AuthProvider({ children }) {
-  // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS)
+  // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS):
   const [isLoggedIn, setIsLoggedIn] = useSessionStorage(false);
 
   const queryClient = useQueryClient();
 
+  const qcRef = useRef(queryClient);
+  qcRef.current = queryClient;
+  const signout = useCallback(() => {
+    qcRef.current.removeQueries();
+    setIsLoggedIn(false);
+  }, [setIsLoggedIn]);
+
   const authFetch = useCallback(
     ({ url, query, method = "GET", type = FETCH_TYPE.JSON, data }) =>
-      fetch(qstr(url, query), getInit({ method, data })).then(
-        async (response) => {
+      fetch(qstr(url, query), getInit({ method, data }))
+        .then(async (response) => {
           if (!response.ok) throwOnError(response);
           try {
             if (type === FETCH_TYPE.JSON) return await response.json();
@@ -104,9 +117,14 @@ export function AuthProvider({ children }) {
           } catch (e) {
             return { response };
           }
-        }
-      ),
-    []
+        })
+        .catch((e) => {
+          console.error("[authFetch]", { e, url, method });
+          if (e?.response?.status === 401) signout();
+
+          throw e;
+        }),
+    [signout]
   );
 
   const userQuery = useQuery({
@@ -117,7 +135,7 @@ export function AuthProvider({ children }) {
     // retryOnMount: false,
     onError: (e) => {
       console.log("%c[AuthProvider.userQuery.onError]", "color:coral", { e });
-      if (e?.response?.status === 401) signout(); // TODO: move to authFetch?
+      // if (e?.response?.status === 401) signout(); // TODO: move to authFetch?
     },
   });
 
@@ -129,11 +147,6 @@ export function AuthProvider({ children }) {
     mutationFn: (fields) => _resetPass({ authFetch, ...fields }),
     onSuccess: () => setIsLoggedIn(true),
   });
-
-  const signout = () => {
-    queryClient.removeQueries();
-    setIsLoggedIn(false);
-  };
 
   const value = {
     isLoggedIn,
