@@ -29,9 +29,9 @@ import {
   useAvailabilityQueries,
   usePickSlotMutation,
 } from "./api";
+import { LayoutCtx } from "../../components/Layout";
 
 const HEADER_FORMAT = "d MMM";
-const VISIBLE_DAYS_COUNT = 7;
 
 const computeSlotStats = pipe(
   reduce(
@@ -72,10 +72,13 @@ export const AvailabilityCalendar = ({
   onContact,
   onPick: onPickProp,
   pickPending,
-  visibleDaysCount = VISIBLE_DAYS_COUNT,
+  visibleDaysCount: visibleDaysCountProp,
   sx,
   today: todayProp,
+  disablePickSlot = false,
 }) => {
+  const { downLg } = useContext(LayoutCtx);
+  const visibleDaysCount = visibleDaysCountProp || downLg ? 3 : 7;
   const msg = useMsg({ dict: messages });
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
   const [offsetDays, setOffsetDays] = useState(0);
@@ -103,17 +106,18 @@ export const AvailabilityCalendar = ({
     },
   });
 
-  const onTimeslotClick = useCallback(
-    ({ interval }) => {
-      setPickSlot({ interval, coach });
-    },
-    [coach]
-  );
   const { user } = useAuth();
   const pickedCoach = user.data.coach;
   const onPick = useMemo(
     () => (pickedCoach === coach.username ? undefined : onPickProp),
     [coach.username, onPickProp, pickedCoach]
+  );
+  const onTimeslotClick = useCallback(
+    ({ interval }) => {
+      if (disablePickSlot) return;
+      setPickSlot({ interval, coach });
+    },
+    [disablePickSlot, coach]
   );
 
   console.log(
@@ -131,7 +135,8 @@ export const AvailabilityCalendar = ({
   return (
     <Box
       sx={{
-        width: 335,
+        // width: "100%",
+        maxWidth: downLg ? 180 : 335,
         display: "flex",
         flexDirection: "column",
         gap: 1,
@@ -280,6 +285,7 @@ export const AvailabilityCalendar = ({
         ]}
         sx={{ width: "800px" }}
       />
+
       {(onContact || onPick) && (
         <>
           <ControlsContainer sx={{ mt: 1 }}>

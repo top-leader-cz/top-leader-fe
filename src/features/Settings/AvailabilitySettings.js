@@ -1,7 +1,7 @@
 import { Alert, Box, Divider } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers";
-import { parse, setDay } from "date-fns";
-import { addDays } from "date-fns/fp";
+import { getDay, parse, parseISO, setDay } from "date-fns";
+import { addDays, formatISO } from "date-fns/fp";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
@@ -28,6 +28,7 @@ import {
   useRecurringAvailabilityMutation,
   useRecurringAvailabilityQuery,
 } from "./api";
+import { map } from "ramda";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -101,7 +102,7 @@ const DaySlots = ({ dayName }) => {
   );
 };
 
-const TODO_DISABLED_RECURRENCE = true;
+const TODO_DISABLED_RECURRENCE = false;
 
 export const Recurrence = () => {
   const msg = useMsg();
@@ -156,10 +157,10 @@ const getDateTime = ({
   referenceDate = getReferenceDate({ dayName }),
 }) => parse(time, API_TIME_FORMAT, referenceDate);
 
-const to = (data) => {
-  const initialValues = DAY_NAMES.map((dayName) => {
-    const ranges = data?.filter(({ from }) => from?.day === dayName) || [];
-    const range = ranges[0]; // TODO: multi
+const to = ({ events = [] } = {}, { recurring } = {}) => {
+  const daysValues = DAY_NAMES.map((dayName) => {
+    const ranges = events?.filter(({ from }) => from?.day === dayName) || [];
+    const range = ranges[0]; // TODO: multi + nonrecurring
 
     if (!range)
       return {
@@ -180,59 +181,108 @@ const to = (data) => {
   }).reduce((acc, values) => {
     return { ...acc, ...values };
   }, {});
-
-  console.log("%c[to]", "color:skyblue", { data, initialValues });
-
-  return {
-    [FIELDS_AVAILABILITY.recurring]: true, // TODO
+  const isRec = recurring ?? true;
+  // debugger;
+  const initialValues = {
+    [FIELDS_AVAILABILITY.recurring]: isRec,
     recurrenceRange: [
+      // TODO: Dan
       new Date(),
-      new Date(Date.now() + 3 * 7 * 24 * 3600 * 1000),
+      new Date(Date.now() + 1 * 6 * 24 * 3600 * 1000),
     ],
-    ...initialValues,
+    ...daysValues,
   };
+
+  console.log("%c[to]", "color:skyblue", {
+    isRec,
+    recurring,
+    events,
+    initialValues,
+  });
+
+  return initialValues;
+};
+
+const parseEvent = (str = "") => {
+  // "2023-10-19T17:00:00"
+  const date = parseISO(str);
+  const dayIndex = getDay(date);
+
+  const obj = {
+    day: INDEX_TO_DAY[dayIndex],
+    time: str.substring(11),
+  };
+  return obj;
 };
 
 export const AvailabilitySettings = () => {
+  const msg = useMsg();
+  const { i18n, userTz } = useContext(I18nContext);
+
   const form = useForm({});
+  const recurringValue = form.watch(FIELDS_AVAILABILITY.recurring);
+  const recurrenceRangeValue = form.watch(FIELDS_AVAILABILITY.recurrenceRange);
 
   const { resetForm, resetting } = useResetForm({
-    initialResetting: false,
+    initialResetting: true,
     form,
     to: useCallback(
       (data) =>
         to(data, {
+          [FIELDS_AVAILABILITY.recurring]: recurringValue,
           // userLocale: language,
           // TODO: notify user that timezone settings is different than currently set!
           // userTz,
         }),
-      []
+      [recurringValue]
     ),
   });
 
-  const msg = useMsg();
-  const { i18n, userTz } = useContext(I18nContext);
-  // const availabilityType = AVAILABILITY_TYPE.RECURRING; // TODO
-  // const availabilityType = useFormContext().watch("recurring") ? AVAILABILITY_TYPE.RECURRING : AVAILABILITY_TYPE.NON_RECURRING;
+  const recurringAvailabilityQuery = useRecurringAvailabilityQuery({
+    enabled: recurringValue,
+  });
+  const nonRecurringAvailabilityQuery = useNonRecurringAvailabilityQuery({
+    from: recurrenceRangeValue?.[0],
+    to: recurrenceRangeValue?.[1],
+    enabled: !recurringValue,
+  });
 
-  const recurringAvailabilityQuery = useRecurringAvailabilityQuery();
-  const nonRecurringAvailabilityQuery = useNonRecurringAvailabilityQuery();
+  const query = recurringValue
+    ? recurringAvailabilityQuery
+    : nonRecurringAvailabilityQuery;
+  useEffect(() => {
+    const fixNonRecurringEvents = (events) => {
+      if (!events?.length) return events;
+      if (typeof events[0]?.from === "string")
+        return events.map(map(parseEvent));
+      return events;
+    };
+    const initialValues = Array.isArray(query.data)
+      ? { events: fixNonRecurringEvents(query.data) }
+      : query.data;
+
+    console.log("%c[eff reset]", "color:lime", {
+      data: query.data,
+      initialValues,
+    });
+    resetForm(initialValues ?? {});
+  }, [query.data, recurringValue, resetForm]);
+
   const recurringAvailabilityMutation = useRecurringAvailabilityMutation();
   const nonRecurringAvailabilityMutation =
     useNonRecurringAvailabilityMutation();
+  const mutation = recurringValue
+    ? recurringAvailabilityMutation
+    : nonRecurringAvailabilityMutation;
 
-  const data = recurringAvailabilityQuery.data;
-  useEffect(() => {
-    console.log("%c[eff reset]", "color:lime", { data });
-    if (data) resetForm(data);
-  }, [data, resetForm]);
+  const saveDisabled = mutation.isLoading; // || !!query.error;
+  const isJustLoaderDisplayed = !query.data || resetting;
 
-  const saveDisabled = recurringAvailabilityMutation.isLoading; // || !!query.error;
-  const isJustLoaderDisplayed = !recurringAvailabilityQuery.data || resetting;
-
-  console.log("[AvailabilitySettings.rndr]", {
-    recurringAvailabilityQuery,
-    recurringAvailabilityMutation,
+  console.log("[AvailabilitySettings.rndr]", isJustLoaderDisplayed, {
+    recurringValue,
+    recurrenceRangeValue,
+    query,
+    mutation,
     form,
     i18n,
   });
@@ -256,32 +306,23 @@ export const AvailabilitySettings = () => {
             disabled: saveDisabled,
             onClick: (e) => {
               console.log("Save click");
-              form.handleSubmit(
-                recurringAvailabilityMutation.mutateAsync,
-                onError
-              )(e);
+              form.handleSubmit(mutation.mutateAsync, onError)(e);
             },
           }}
         >
           {/* <B>{rightMenuSubtitle}</B> */}
           {/* <Divider sx={{ my: 3 }} /> */}
-          {!recurringAvailabilityQuery.data ? null : <AvailabilityPreview />}
+          {!query.data ? null : <AvailabilityPreview />}
         </ScrollableRightMenu>
       ),
-      [
-        recurringAvailabilityMutation.mutateAsync,
-        recurringAvailabilityQuery.data,
-        form,
-        msg,
-        saveDisabled,
-      ]
+      [mutation.mutateAsync, query.data, form, msg, saveDisabled]
     )
   );
 
-  if (recurringAvailabilityQuery.error)
+  if (query.error)
     return (
       <QueryRenderer
-        error={recurringAvailabilityQuery.error}
+        error={query.error}
         errored={() => <Alert severity="error">Fetch failed</Alert>}
       />
     );

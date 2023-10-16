@@ -106,20 +106,25 @@ const parseAvailabilities = ({
 // const fetchFrameKeyToParams_ = ({ userTz }) => pipe(
 //     parseISO,
 //     applySpec({
-//       from: pipe( startOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz) ),
-//       to: pipe( endOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz) ), }) );
+//       from: pipe( startOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz) ),
+//       to: pipe( endOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz) ), }) );
 // const getFetchFrameKeys_ = ({ calendarInterval, userTz }) => { return getWeekStarts({ calendarInterval, userTz, weekStartsOn: 1, UTC: false, ISO: true, }); };
+
+export const API_DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 const fetchFrameKeyToParams = ({ userTz }) =>
   pipe(
     parseISO,
     applySpec({
-      from: pipe(startOfDay, formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz)),
+      from: pipe(
+        startOfDay,
+        formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz)
+      ),
       to: pipe(
         startOfDay,
         addDays(7),
         addMilliseconds(-1),
-        formatInTimeZone("yyyy-MM-dd'T'HH:mm:ss", userTz)
+        formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz)
       ),
     })
   );
@@ -187,7 +192,7 @@ export const useAvailabilityQueries = ({
   const { i18n, userTz } = useContext(I18nContext);
   const fetchFrameKeys = getFetchFrameKeys({ calendarInterval, userTz });
   // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
-  console.log(".....", { calendarInterval, fetchFrameKeys });
+  // console.log(".....", { calendarInterval, fetchFrameKeys });
 
   const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
     retry: false,
@@ -216,15 +221,15 @@ export const useAvailabilityQueries = ({
     queries: queryDefs,
     combine: (queries) => {
       // react-router > v5, TODO: useMyQuery
-      console.log(">>> COMBINE WORKS", { queries });
+      // console.log(">>> COMBINE WORKS", { queries });
       return queries;
     },
   });
 
   const composedQueries = useMemo(() => {
     const mapped = pipe(
-      map(path(["data", "weekData"])),
-      tap((data) => console.log({ data }))
+      map(path(["data", "weekData"]))
+      // tap((data) => console.log({ data }))
     )(queries);
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
@@ -247,7 +252,7 @@ export const useAvailabilityQueries = ({
     };
   }, [queries]);
 
-  console.log({ composedQueries });
+  // console.log("[useAvailabilityQueries]", { composedQueries });
 
   return composedQueries;
 };
@@ -275,19 +280,19 @@ export const getIsDayLoading = ({ queries, dayInterval, userTz }) => {
   return !allFetched;
 };
 
-const plog =
-  (...args) =>
-  (data) =>
-    console.log(...args, data) || data;
+// const plog =
+//   (...args) =>
+//   (data) =>
+//     console.log(...args, data) || data;
 
-const rmT = replace(/T?$/, "");
-const toUtcFix = pipe(
-  tap(plog("toUTC 0")),
-  formatISO,
-  tap(plog("toUTC before")),
-  rmT,
-  tap(plog("toUTC after"))
-);
+// const rmT = replace(/T?$/, "");
+// const toUtcFix = pipe(
+//   tap(plog("toUTC 0")),
+//   formatISO,
+//   tap(plog("toUTC before")),
+//   rmT,
+//   tap(plog("toUTC after"))
+// );
 
 export const padLeft = (char = "0", num) => {
   const str = `${num}`;
