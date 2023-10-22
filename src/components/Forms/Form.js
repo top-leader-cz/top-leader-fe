@@ -2,7 +2,8 @@ import { Box } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 
 const onSubmitDefault = (data, e) => console.log("[onSubmit]", data, e);
-const onErrorDefault = (errors, e) => console.log("[onError]", errors, e);
+export const onErrorDefault = (errors, e) =>
+  console.log("[onError]", errors, e);
 
 export const RHForm = ({
   children,

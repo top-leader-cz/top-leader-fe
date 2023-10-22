@@ -1,5 +1,5 @@
 import { Alert, Box, Divider } from "@mui/material";
-import { TimePicker } from "@mui/x-date-pickers";
+// import { TimePicker } from "@mui/x-date-pickers";
 import { getDay, parse, parseISO, setDay } from "date-fns";
 import { addDays, formatISO } from "date-fns/fp";
 import { useCallback, useContext, useEffect, useMemo } from "react";
@@ -90,7 +90,7 @@ const DaySlots = ({ dayName }) => {
       <Box display="flex">
         {enabled ? (
           <TimeRangePickerField
-            Component={TimePicker}
+            // Component={TimePicker}
             name={dayRangesName(dayName)}
             inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
           />

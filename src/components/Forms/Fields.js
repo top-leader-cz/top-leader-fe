@@ -23,6 +23,8 @@ import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
+import { ErrorBoundary } from "react-error-boundary";
+import { onErrorDefault } from "./Form";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -59,43 +61,53 @@ const DateRangePicker = React.forwardRef(
       return field.onChange(newValue);
     };
 
+    // return null;
+
     return (
-      <Box display="flex" sx={sx}>
-        <DesktopDatePicker
-          ref={ref}
-          renderInput={(params) => (
-            <TextField
-              size="small"
-              sx={{ width: 180 }}
-              {...props}
-              {...params}
-            />
-          )}
-          name={field.name}
-          onChange={onChange(0)}
-          onBlur={field.onBlur}
-          value={startValue}
-          inputFormat={inputFormat}
-        />
-        <Box alignSelf="center" sx={{ mx: 1 }}>
-          -
+      <ErrorBoundary onError={onErrorDefault}>
+        <Box display="flex" sx={sx}>
+          <DesktopDatePicker
+            ref={ref}
+            // renderInput={(params) => (
+            //   <TextField
+            //     size="small"
+            //     sx={{ width: 180 }}
+            //     {...props}
+            //     {...params}
+            //   />
+            // )}
+            slotProps={{
+              textField: { size: "small", sx: { width: 180 } },
+            }}
+            name={field.name}
+            onChange={onChange(0)}
+            onBlur={field.onBlur}
+            value={startValue}
+            format={inputFormat}
+          />
+          <Box alignSelf="center" sx={{ mx: 1 }}>
+            -
+          </Box>
+          <DesktopDatePicker
+            slotProps={{
+              textField: { size: "small", sx: { width: 180 } },
+            }}
+            // renderInput={(params) => (
+            //   <TextField
+            //     size="small"
+            //     sx={{ width: 180 }}
+            //     {...props}
+            //     {...params}
+            //   />
+            // )}
+            // name={field.name}
+            onChange={onChange(1)}
+            onBlur={field.onBlur}
+            value={endValue}
+            format={inputFormat}
+          />
         </Box>
-        <DesktopDatePicker
-          renderInput={(params) => (
-            <TextField
-              size="small"
-              sx={{ width: 180 }}
-              {...props}
-              {...params}
-            />
-          )}
-          // name={field.name}
-          onChange={onChange(1)}
-          onBlur={field.onBlur}
-          value={endValue}
-          inputFormat={inputFormat}
-        />
-      </Box>
+      </ErrorBoundary>
     );
   }
 );
@@ -112,34 +124,45 @@ const TimeRangePicker = React.forwardRef(
       newValue[idx] = date;
       return field.onChange(newValue);
     };
+    // return null;
 
     return (
-      <Box display="flex" sx={sx}>
-        <MuiTimePicker
-          ref={ref}
-          renderInput={(params) => (
-            <TextField size="small" {...props} {...params} {...inputProps} />
-          )}
-          name={field.name}
-          onChange={onChange(0)}
-          onBlur={field.onBlur}
-          value={field.value?.[0]}
-          inputFormat={inputFormat}
-        />
-        <Box alignSelf="center" sx={{ mx: 1 }}>
-          -
+      <ErrorBoundary onError={onErrorDefault}>
+        <Box display="flex" sx={sx}>
+          <MuiTimePicker
+            ref={ref}
+            slotProps={{
+              textField: { size: "small", sx: { bgcolor: "white" } },
+              // sx: { width: 180 }}
+            }}
+            // renderInput={(params) => (
+            //   <TextField size="small" {...props} {...params} {...inputProps} />
+            // )}
+            name={field.name}
+            onChange={onChange(0)}
+            onBlur={field.onBlur}
+            value={field.value?.[0]}
+            format={inputFormat}
+          />
+          <Box alignSelf="center" sx={{ mx: 1 }}>
+            -
+          </Box>
+          <MuiTimePicker
+            slotProps={{
+              textField: { size: "small", sx: { bgcolor: "white" } },
+              // sx: { width: 180 }}
+            }}
+            // renderInput={(params) => (
+            //   <TextField size="small" {...props} {...params} {...inputProps} />
+            // )}
+            // name={field.name}
+            onChange={onChange(1)}
+            onBlur={field.onBlur}
+            value={field.value?.[1]}
+            format={inputFormat}
+          />
         </Box>
-        <MuiTimePicker
-          renderInput={(params) => (
-            <TextField size="small" {...props} {...params} {...inputProps} />
-          )}
-          // name={field.name}
-          onChange={onChange(1)}
-          onBlur={field.onBlur}
-          value={field.value?.[1]}
-          inputFormat={inputFormat}
-        />
-      </Box>
+      </ErrorBoundary>
     );
   }
 );
@@ -156,14 +179,22 @@ export const TimeRangePickerField = ({
     [i18n.uiFormats.inputTimeFormat, inputFormatProp]
   );
 
+  // console.log("[TimeRangePickerField.rndr]", {
+  //   inputFormat,
+  //   inputFormatProp,
+  // });
+  // return null;
+
   return (
-    <Controller
-      name={name}
-      rules={rules}
-      render={({ field }) => (
-        <TimeRangePicker {...{ field, inputFormat, inputProps }} />
-      )}
-    />
+    <ErrorBoundary onError={onErrorDefault}>
+      <Controller
+        name={name}
+        rules={rules}
+        render={({ field }) => (
+          <TimeRangePicker {...{ field, inputFormat, inputProps }} />
+        )}
+      />
+    </ErrorBoundary>
   );
 };
 
@@ -179,19 +210,22 @@ export const DateRangePickerField = ({
     [i18n.uiFormats.inputDateFormat, inputFormatProp]
   );
 
+  // return null;
   return (
     // <LocalizationProvider
     //   dateAdapter={AdapterDateFns}
     //   localeText={{ start: "Check-in", end: "Check-out" }}
     // >
-    <Controller
-      // control={methods?.control}
-      name={name}
-      rules={rules}
-      render={({ field }) => (
-        <DateRangePicker {...props} inputFormat={inputFormat} field={field} />
-      )}
-    />
+    <ErrorBoundary onError={onErrorDefault}>
+      <Controller
+        // control={methods?.control}
+        name={name}
+        rules={rules}
+        render={({ field }) => (
+          <DateRangePicker {...props} format={inputFormat} field={field} />
+        )}
+      />
+    </ErrorBoundary>
     // </LocalizationProvider>
   );
 };
@@ -235,20 +269,22 @@ export const DatePickerField = ({
   );
   // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
   const methods = useFormContext();
-
+  return null;
   return (
-    <Controller
-      control={control || methods?.control}
-      name={name}
-      rules={rules}
-      render={({ field }) => (
-        <DesktopDatePicker
-          renderInput={(params) => <TextField {...props} {...params} />}
-          inputFormat={inputFormat}
-          {...field}
-        />
-      )}
-    />
+    <ErrorBoundary onError={onErrorDefault}>
+      <Controller
+        control={control || methods?.control}
+        name={name}
+        rules={rules}
+        render={({ field }) => (
+          <DesktopDatePicker
+            renderInput={(params) => <TextField {...props} {...params} />}
+            format={inputFormat}
+            {...field}
+          />
+        )}
+      />
+    </ErrorBoundary>
   );
 };
 
