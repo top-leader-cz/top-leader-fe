@@ -168,7 +168,7 @@ export const router = createHashRouter([
       {
         path: routes.team,
         element: (
-          <RequireAuth requireUserRoles={HR_AUTHORITIES}>
+          <RequireAuth>
             <TeamPage />
           </RequireAuth>
         ),
