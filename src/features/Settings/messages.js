@@ -82,6 +82,10 @@ export const messages = defineMessages({
     id: "settings.profile.field.experience",
     defaultMessage: "Coaching experience",
   },
+  "settings.profile.field.level": {
+    id: "settings.profile.field.level",
+    defaultMessage: "Level",
+  },
   "settings.profile.field.rate": {
     id: "settings.profile.field.rate",
     defaultMessage: "Rate",

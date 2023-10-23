@@ -235,7 +235,11 @@ export const ProfileSettings = () => {
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
           {COACH.certificates && (
-            <P mt={1}>{getLabel(certificatesOptions)(COACH.certificates)}</P>
+            <P mt={1}>
+              {msg("settings.profile.field.level")}
+              {": "}
+              {getLabel(certificatesOptions)(COACH.certificates)}
+            </P>
           )}
           <P mt={1}>
             {msg("settings.profile.field.experience")}

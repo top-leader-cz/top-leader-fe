@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material";
+import { Box, Card, CardContent, Divider } from "@mui/material";
 import { filter } from "ramda";
 import { useContext, useState } from "react";
 import { useQuery } from "react-query";
@@ -15,6 +15,8 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { CoachCard } from "./CoachCard";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { messages } from "./messages";
+import { ScheduledSessionsCard } from "./ScheduledSessions";
+import { useUserUpcomingSessionsQuery } from "./api";
 
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`;
@@ -138,6 +140,7 @@ const YourCoachPageInner = ({ username }) => {
     queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
     // refetchOnWindowFocus: false,
   });
+  const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery();
   const EXPECT_ITEMS = [
     // {
     //   heading: msg("coaches.aside.items.1.heading"),
@@ -155,7 +158,6 @@ const YourCoachPageInner = ({ username }) => {
       text: msg("coaches.aside.items.3.text"),
     },
   ];
-  // const yourCoachQuery = useQuery({ queryKey: [""] });
 
   return (
     <Layout
@@ -195,13 +197,17 @@ const YourCoachPageInner = ({ username }) => {
           <CoachCard coach={coach} withContact sx={{ my: 3 }} />
         )}
       />
+      <QueryRenderer
+        {...userUpcomingSessionsQuery}
+        success={({ data }) => <ScheduledSessionsCard data={data} />}
+      />
     </Layout>
   );
 };
 
 export function CoachesPage() {
-  // const { user } = useAuth();
-  const user = { data: {} }; // TODO: flip
+  const { user } = useAuth();
+
   console.log("[CoachesPage]", { user });
 
   return (

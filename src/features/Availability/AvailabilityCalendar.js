@@ -109,9 +109,10 @@ export const AvailabilityCalendar = ({
   const { user } = useAuth();
   const pickedCoach = user.data.coach;
   const onPick = useMemo(
-    () => (pickedCoach === coach.username ? undefined : onPickProp),
+    () => (pickedCoach === coach.username ? onPickProp : onPickProp),
     [coach.username, onPickProp, pickedCoach]
   );
+
   const onTimeslotClick = useCallback(
     ({ interval }) => {
       if (disablePickSlot) return;
@@ -126,9 +127,10 @@ export const AvailabilityCalendar = ({
     coach.username,
     {
       calendarInterval,
-      // coachAvailabilityQuery,
-      // composedQuery,
       someResultsQuery,
+      onPick,
+      pickedCoach,
+      coach,
     }
   );
 
@@ -292,10 +294,14 @@ export const AvailabilityCalendar = ({
             {onPick && (
               <LoadingButton
                 variant="outlined"
-                onClick={onPick}
+                onClick={() =>
+                  onPick(pickedCoach === coach.username ? null : coach.username)
+                }
                 loading={pickPending}
               >
-                {msg("coaches.coach.pick")}
+                {pickedCoach === coach.username
+                  ? msg("coaches.coach.change-picked")
+                  : msg("coaches.coach.pick")}
               </LoadingButton>
             )}
             {onContact && (
@@ -323,5 +329,9 @@ export const messages = defineMessages({
   "coaches.coach.pick": {
     id: "coaches.coach.pick",
     defaultMessage: "Pick the Coach",
+  },
+  "coaches.coach.change-picked": {
+    id: "coaches.coach.change-picked",
+    defaultMessage: "Change coach",
   },
 });

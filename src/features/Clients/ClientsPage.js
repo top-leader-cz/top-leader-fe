@@ -1,37 +1,37 @@
 import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { LinkBehavior } from "../../components/LinkBehavior";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { H2, P } from "../../components/Typography";
-import { routes } from "../../routes";
-import { ConfirmModal } from "../Modal/ConfirmModal";
 import {
-  SlotChip,
   StyledTableCell,
   StyledTableRow,
   TLCell,
-  TLTableWithHeader,
-} from "../Team/Team.page";
+} from "../../components/Table";
+import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
+import { H2, P } from "../../components/Typography";
+import { routes } from "../../routes";
+import { gray50 } from "../../theme";
+import { formatName } from "../Coaches/CoachCard";
+import { I18nContext } from "../I18n/I18nProvider";
+import { ConfirmModal } from "../Modal/ConfirmModal";
+import { QueryRenderer } from "../QM/QueryRenderer";
+import { SlotChip } from "../Team/Team.page";
 import {
   useClientsQuery,
   useDeclineMutation,
   useUpcomingSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
-import { formatName } from "../Coaches/CoachCard";
-import { I18nContext } from "../I18n/I18nProvider";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { gray50 } from "../../theme";
 
 export const gray500 = "#667085";
 export const gray900 = "#101828";
 
-const ScheduledSession = ({ time, name, username }) => {
+export const ScheduledSession = ({ time, name, username }) => {
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(time);
 
@@ -66,16 +66,17 @@ const ScheduledSession = ({ time, name, username }) => {
   );
 };
 
-const ScheduledSessionsTableRow = ({
+export const ScheduledSessionsTableRow = ({
   data,
   columns,
   colSpan = columns.length,
   name,
+  sx = {},
 }) => {
   const msg = useMsg({ dict: clientsMessages });
   return (
     <StyledTableRow
-      sx={{ bgcolor: gray50 }}
+      sx={{ bgcolor: gray50, ...sx }}
       //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
     >
       <StyledTableCell colSpan={colSpan} variant="default">
@@ -171,14 +172,6 @@ function ClientsPageInner() {
           name={row.username}
         />
       );
-      return rowData.map(({ username, firstName, lastName, time }) => (
-        <ScheduledSession
-          name={formatName({ firstName, lastName })}
-          username={username}
-          time={time}
-        />
-      ));
-      return <pre>{JSON.stringify(rowData, null, 2)}</pre>;
     },
     [upcomingSessionsQuery.data]
   );

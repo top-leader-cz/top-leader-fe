@@ -31,9 +31,10 @@ import { I18nContext, defaultLanguage } from "../I18n/I18nProvider";
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
 export const INITIAL_FILTER = ({ userLang = defaultLanguage }) => ({
-  languages: [userLang.substring(0, 2)],
+  // languages: [userLang.substring(0, 2)],
+  languages: [],
   fields: [],
-  experience: [1, 7],
+  experience: [1, 10],
   prices: [],
   search: "",
 });

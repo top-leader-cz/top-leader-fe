@@ -126,19 +126,43 @@ export const CoachCard = ({
             image={`/api/latest/coaches/${username}/photo`}
             alt={name}
           />
-          <CoachInfo
-            coach={{ name, role, experience, languages, rate, bio, fields }}
-            maxBioChars={50}
-            sx={{ maxWidth: "50%", flexGrow: 10, width: "150px" }}
-          />
+          <Box
+            sx={{
+              display: "flex",
+              gap: 3,
+              flexWrap: "wrap",
+              justifyContent: "space-around",
+              width: "100%",
+            }}
+          >
+            <CoachInfo
+              coach={{ name, role, experience, languages, rate, bio, fields }}
+              maxBioChars={50}
+              sx={{
+                // maxWidth: "50%",
+                flexGrow: 2,
+                // minWidth: "200px",
+                maxWidth: "400px",
+                // width: "fit-content",
+              }}
+            />
 
-          <AvailabilityCalendar
-            coach={coach}
-            onContact={withContact && handleContact}
-            onPick={pickCoach.onPick}
-            pickPending={pickCoach.pickPending}
-            sx={{ flexShrink: 0 }}
-          />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                // width: "100%",
+              }}
+            >
+              <AvailabilityCalendar
+                coach={coach}
+                onContact={withContact && handleContact}
+                onPick={pickCoach.onPick}
+                pickPending={pickCoach.pickPending}
+                sx={{ flexShrink: 0 }}
+              />
+            </Box>
+          </Box>
         </CardContent>
       </Card>
       <ContactModal
