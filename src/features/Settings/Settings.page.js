@@ -9,6 +9,7 @@ import { GeneralSettings } from "./GeneralSettings";
 import { messages } from "./messages";
 import { ProfileSettings } from "./ProfileSettings";
 import { TLTabs } from "./Tabs";
+import { AdminSettings } from "./AdminSettings";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
@@ -16,6 +17,7 @@ const TABS = {
   PROFILE: "PROFILE",
   GENERAL: "GENERAL",
   AVAILABILITY: "AVAILABILITY",
+  ADMIN: "ADMIN",
 };
 
 const GET_COACH_TABS = ({ msg }) => [
@@ -35,18 +37,25 @@ const GET_COACH_TABS = ({ msg }) => [
     Component: AvailabilitySettings,
   },
 ];
+const GET_ADMIN_TAB = ({ msg }) => ({
+  key: TABS.ADMIN,
+  label: msg("settings.tabs.admin.label"),
+  Component: AdminSettings,
+});
 
 function SettingsPageInner() {
   // const [tab, setTab] = useState(TABS.AVAILABILITY);
   const msg = useMsg();
-  const { isCoach } = useAuth(); // TODO
+  const { isCoach, isAdmin } = useAuth(); // TODO
 
   const tabs = useMemo(() => {
     const COACH_TABS = GET_COACH_TABS({ msg });
-    return isCoach
+    const tabs = isCoach
       ? COACH_TABS
       : [COACH_TABS.find(({ key }) => key === TABS.GENERAL)];
-  }, [isCoach, msg]);
+
+    return isAdmin ? [...tabs, GET_ADMIN_TAB({ msg })] : tabs;
+  }, [isAdmin, isCoach, msg]);
 
   console.log("[SettingsPageInner.rndr]", { tabs });
 

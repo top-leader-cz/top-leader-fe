@@ -14,6 +14,10 @@ export const messages = defineMessages({
     id: "settings.tabs.availability.label",
     defaultMessage: "Availability",
   },
+  "settings.tabs.admin.label": {
+    id: "settings.tabs.admin.label",
+    defaultMessage: "Admin",
+  },
   "settings.profile.aside.title": {
     id: "settings.profile.aside.title",
     defaultMessage: "Your coach profile preview",
