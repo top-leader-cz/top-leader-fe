@@ -56,38 +56,19 @@ export const useUserUpcomingSessionsQuery = () => {
   return useQuery({
     queryKey: ["user-info", "upcoming-sessions"],
     queryFn: () =>
-      authFetch({ url: `/api/latest/user-info/upcoming-sessions` })
-        .then(
-          map(
-            converge(mergeRight, [
-              identity,
-              pipe(prop("coach"), objOf("username")),
-            ])
-          )
-        )
-        .catch(
-          always([
-            {
-              username: "test1",
-              firstName: "Daniel",
-              lastName: "Brekke",
-              time: "2023-10-02T09:00:00",
-            },
-            {
-              username: "test2",
-              firstName: "TODO",
-              lastName: "API",
-              time: "2023-11-02T10:00:00",
-            },
+      authFetch({ url: `/api/latest/user-info/upcoming-sessions` }).then(
+        map(
+          converge(mergeRight, [
+            identity,
+            pipe(prop("coach"), objOf("username")),
           ])
-        ),
+        )
+      ),
   });
 };
 
-// TODO: scheduledSessionService.deleteUserSessions -> *session
-
 export const usePickCoach = ({ coach }) => {
-  const { authFetch, fetchUser } = useAuth();
+  const { authFetch } = useAuth();
   const queryClient = useQueryClient();
   const pickCoachMutation = useMutation({
     mutationFn: async (username) =>
@@ -96,14 +77,14 @@ export const usePickCoach = ({ coach }) => {
         url: `/api/latest/user-info/coach`,
         data: {
           coach:
-            typeof username === "string" || username === null // TODO: {undefined / null / empty string} returns 400 - fix unpick coach
+            typeof username === "string" || username === null
               ? username
               : coach.username,
-        }, // throw without coach
+        },
       }),
     onSuccess: () => {
-      fetchUser();
       queryClient.invalidateQueries({ queryKey: ["user-info"] });
+      queryClient.invalidateQueries({ queryKey: ["coaches"] });
     },
   });
 

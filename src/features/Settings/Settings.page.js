@@ -46,7 +46,7 @@ const GET_ADMIN_TAB = ({ msg }) => ({
 function SettingsPageInner() {
   // const [tab, setTab] = useState(TABS.AVAILABILITY);
   const msg = useMsg();
-  const { isCoach, isAdmin } = useAuth(); // TODO
+  const { isCoach, TODO_RM_isAdmin: isAdmin = true } = useAuth(); // TODO
 
   const tabs = useMemo(() => {
     const COACH_TABS = GET_COACH_TABS({ msg });

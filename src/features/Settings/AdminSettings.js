@@ -1,8 +1,8 @@
 import { Add } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Header } from "../../components/Header";
-import { Layout } from "../../components/Layout";
+import { Layout, LayoutCtx } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { TLCell } from "../../components/Table/TLLoadableTable";
@@ -11,23 +11,46 @@ import { H2, P } from "../../components/Typography";
 // import { AddMemberModal } from "./AddMemberModal";
 // import { CreditTopUpModal } from "./CreditTopUpModal";
 import { messages } from "./messages";
-import { useMyQuery } from "../Authorization/AuthProvider";
+import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
 import { SlotChip } from "../Team/Team.page";
+import { prop } from "ramda";
+import { formatName } from "../Coaches/CoachCard";
+
+const MOCK = [
+  {
+    username: "coach1",
+    firstName: "Mock",
+    lastName: "User",
+    authorities: ["COACH", "USER"],
+    timeZone: "GMT",
+    status: "PENDING",
+    companyId: 2,
+    companyName: "Company 2",
+    coach: "coach1",
+    coachFirstName: "Jane",
+    coachLastName: "Smith",
+    credit: 150,
+    requestedCredit: 75,
+    isTrial: true,
+  },
+];
 
 const useUsersQuery = () => {
+  const { authFetch } = useAuth();
   return useMyQuery({
     queryKey: ["admin", "users"],
-    fetchDef: {
-      url: `/api/latest/admin/users`,
-      query: {
-        size: 100,
-        sort: "username,asc",
-      },
-    },
+    queryFn: () =>
+      authFetch({
+        url: `/api/latest/admin/users`,
+        query: {
+          size: 1,
+          sort: "username,asc",
+        },
+      })
+        .then(prop("content"))
+        .catch(() => MOCK),
   });
 };
-
-const rows = [];
 
 function AdminSettingsInner() {
   //   const [topUpSelected, setTopUpSelected] = useState(false);
@@ -37,30 +60,71 @@ function AdminSettingsInner() {
   const usersQuery = useUsersQuery();
 
   const columns = [
+    {
+      label: msg("settings.admin.table.col.name"),
+      key: "name",
+      render: (row) => (
+        <TLCell
+          avatar
+          component="th"
+          scope="row"
+          name={formatName(row)}
+          sub={row.username}
+        />
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.companyName"),
+      key: "companyName",
+      render: (row) => <TLCell variant="emphasized" name={row.companyName} />,
+    },
+    {
+      label: msg("settings.admin.table.col.role"),
+      key: "role",
+      render: (row) => (
+        <TLCell variant="lighter" name={row.authorities.join(", ")} />
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.coach"),
+      key: "coach",
+      render: (row) => (
+        <TLCell
+          avatar
+          component="th"
+          scope="row"
+          name={formatName({
+            firstName: row.coachFirstName,
+            lastName: row.coachLastName,
+          })}
+          sub={row.coach}
+        />
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.remainingCredits"),
+      key: "remainingCredits",
+      render: (row) => <TLCell variant="emphasized" name={row.credit} />,
+    },
+    {
+      label: msg("settings.admin.table.col.requestedCredits"),
+      key: "requestedCredits",
+      render: (row) => (
+        <TLCell variant="emphasized" name={row.requestedCredit} />
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.status"),
+      key: "status",
+      render: (row) => (
+        <TLCell
+          variant="emphasized"
+          name={`${row.isTrial ? "trial user - " : ""}${row.status}`}
+        />
+      ),
+    },
     // {
-    //   label: msg("team.members.table.col.name"),
-    //   key: "name",
-    //   render: (row) => (
-    //     <TLCell component="th" scope="row" name={row.name} sub={row.username} />
-    //   ),
-    // },
-    // {
-    //   label: msg("team.members.table.col.coach"),
-    //   key: "coach",
-    //   render: (row) => <TLCell name={row.coach} />,
-    // },
-    // {
-    //   label: msg("team.members.table.col.paid"),
-    //   key: "paid",
-    //   render: (row) => <TLCell align="right">{row.creditPaid}</TLCell>,
-    // },
-    // {
-    //   label: msg("team.members.table.col.remaining"),
-    //   key: "remaining",
-    //   render: (row) => <TLCell align="right">{row.creditRemaining}</TLCell>,
-    // },
-    // {
-    //   label: msg("team.members.table.col.action"),
+    //   label: msg("settings.admin.table.col.action"),
     //   key: "action",
     //   render: (row) => (
     //     <TLCell>
@@ -72,20 +136,27 @@ function AdminSettingsInner() {
     // },
   ];
 
-  // console.log("[Team->Credits.page]", { hrUsersQuery });
+  const { downMd } = useContext(LayoutCtx);
+  console.log("[AdminSettings.page]", { usersQuery });
 
   return (
-    <Layout>
-      <Header text={msg("team.heading")} />
+    <>
       <TLTableWithHeader
+        sx={
+          {
+            // position: "fixed", // TODO
+            // left: `${downMd ? 88 + 32 : 256 + 32}px`,
+            // right: 32,
+          }
+        }
         title={
           <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
             <H2>
-              <Msg id="team.members.title" />
+              <Msg id="settings.admin.title" />
             </H2>
             <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
               <Msg
-                id="team.members.title.count.badge"
+                id="settings.admin.title.count.badge"
                 values={{ count: usersQuery.data?.length }}
               />
             </SlotChip>
@@ -93,7 +164,7 @@ function AdminSettingsInner() {
         }
         subheader={
           <P mt={1.5}>
-            <Msg id="team.members.sub" />
+            <Msg id="settings.admin.sub" />
           </P>
         }
         columns={columns}
@@ -107,7 +178,7 @@ function AdminSettingsInner() {
               setAddMemberVisible(true);
             }}
           >
-            <Msg id="team.members.add" />
+            <Msg id="settings.admin.add" />
           </Button>
         }
       />
@@ -119,7 +190,7 @@ function AdminSettingsInner() {
         open={addMemberVisible}
         onClose={() => setAddMemberVisible(false)}
       /> */}
-    </Layout>
+    </>
   );
 }
 

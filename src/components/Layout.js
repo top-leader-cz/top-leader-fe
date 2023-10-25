@@ -54,12 +54,17 @@ const closedMixin = ({ theme, width }) => ({
 });
 
 const MyDrawer = styled(Drawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open, width, ...rest }) => ({
+  shouldForwardProp: (prop) => !["open", "toggleMobile"].includes(prop),
+})(({ theme, open, width, toggleMobile, ...rest }) => ({
   width: width,
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  position: "relative",
+  "& .MuiDrawer-paper": {
+    ...(toggleMobile ? { overflow: "visible" } : {}),
+    boxSizing: "border-box",
+  },
   ...(open && {
     ...openedMixin({ theme, width }),
     "& .MuiDrawer-paper": openedMixin({ theme, width }),
@@ -75,17 +80,10 @@ const SideMenu = ({ children, width, anchor, toggleMobile, open }) => {
     <MyDrawer
       id="side-menu"
       width={width}
-      sx={{
-        position: "relative",
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          ...(toggleMobile ? { overflow: "visible" } : {}),
-          boxSizing: "border-box",
-        },
-      }}
       variant="permanent"
       anchor={anchor}
       open={open}
+      toggleMobile={toggleMobile}
     >
       {children}
       {toggleMobile ? (
@@ -256,7 +254,6 @@ export const Layout = ({
             )
           }
         >
-          {/* <SideMenu width={256} anchor="left"> */}
           <MainMenu open={leftOpen} />
         </SideMenu>
 
