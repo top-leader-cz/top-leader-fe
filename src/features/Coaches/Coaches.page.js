@@ -136,7 +136,7 @@ const YourCoachPageInner = ({ username }) => {
   const msg = useMsg();
   const { authFetch } = useAuth();
   const yourCoachQuery = useQuery({
-    queryKey: ["coaches", filter],
+    queryKey: ["coaches", username],
     queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
     // refetchOnWindowFocus: false,
   });

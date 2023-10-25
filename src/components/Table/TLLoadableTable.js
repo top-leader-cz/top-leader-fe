@@ -49,14 +49,7 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const TLCell = ({
-  children,
-  name,
-  sub,
-  avatar = !!name,
-  align,
-  ...props
-}) => {
+export const TLCell = ({ children, name, sub, avatar, align, ...props }) => {
   return (
     <StyledTableCell {...props}>
       <Box display="flex" flexDirection="row" flexWrap="nowrap">
@@ -115,6 +108,7 @@ export const TLLoadableTable = ({
               success={({ data }) =>
                 data.map((row) => {
                   const expandedEl = expandedRowRender?.({ row, columns });
+                  console.log(">>>", { data, expandedEl, row, columns });
 
                   if (!expandedEl)
                     return (

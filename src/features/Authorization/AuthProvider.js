@@ -160,6 +160,7 @@ export function AuthProvider({ children }) {
     },
     isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
     isHR: userQuery.data?.userRoles?.includes(Authority.HR),
+    isAdmin: userQuery.data?.userRoles?.includes(Authority.ADMIN),
   };
 
   // console.log("[AP.rndr]", value);

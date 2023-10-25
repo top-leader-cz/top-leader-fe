@@ -14,6 +14,10 @@ export const messages = defineMessages({
     id: "settings.tabs.availability.label",
     defaultMessage: "Availability",
   },
+  "settings.tabs.admin.label": {
+    id: "settings.tabs.admin.label",
+    defaultMessage: "Admin",
+  },
   "settings.profile.aside.title": {
     id: "settings.profile.aside.title",
     defaultMessage: "Your coach profile preview",
@@ -157,5 +161,49 @@ export const messages = defineMessages({
   "settings.availability.unavailable": {
     id: "settings.availability.unavailable",
     defaultMessage: "Unavailable",
+  },
+  "settings.admin.title": {
+    id: "settings.admin.title",
+    defaultMessage: "Users",
+  },
+  "settings.admin.title.count.badge": {
+    id: "settings.admin.title.count.badge",
+    defaultMessage: "{count} Users",
+  },
+  "settings.admin.sub": {
+    id: "settings.admin.sub",
+    defaultMessage: "Here you can see the list of your current clients",
+  },
+  "settings.admin.add": {
+    id: "settings.admin.add",
+    defaultMessage: "Add member",
+  },
+  "settings.admin.table.col.name": {
+    id: "settings.admin.table.col.name",
+    defaultMessage: "Name",
+  },
+  "settings.admin.table.col.companyName": {
+    id: "settings.admin.table.col.companyName",
+    defaultMessage: "Company",
+  },
+  "settings.admin.table.col.role": {
+    id: "settings.admin.table.col.role",
+    defaultMessage: "Role",
+  },
+  "settings.admin.table.col.coach": {
+    id: "settings.admin.table.col.coach",
+    defaultMessage: "Current Coach",
+  },
+  "settings.admin.table.col.remainingCredits": {
+    id: "settings.admin.table.col.remainingCredits",
+    defaultMessage: "Remaining credits",
+  },
+  "settings.admin.table.col.requestedCredits": {
+    id: "settings.admin.table.col.requestedCredits",
+    defaultMessage: "Requested credits",
+  },
+  "settings.admin.table.col.status": {
+    id: "settings.admin.table.col.status",
+    defaultMessage: "Status",
   },
 });
