@@ -27,7 +27,7 @@ export const useClientsQuery = ({ ...queryParams } = {}) => {
   });
 };
 
-export const useUpcomingSessionsQuery = (params = {}) => {
+export const useUpcomingCoachSessionsQuery = (params = {}) => {
   const { authFetch } = useAuth();
   return useQuery({
     retry: false,

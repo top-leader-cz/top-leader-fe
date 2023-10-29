@@ -12,11 +12,7 @@ import {
 } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  LANGUAGE_OPTIONS,
-  getCoachLanguagesOptions,
-  renderLanguageOption,
-} from "../../components/Forms";
+import { getCoachLanguagesOptions } from "../../components/Forms";
 import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { RHForm } from "../../components/Forms/Form";
 import { Icon } from "../../components/Icon";
@@ -34,7 +30,7 @@ export const INITIAL_FILTER = ({ userLang = defaultLanguage }) => ({
   // languages: [userLang.substring(0, 2)],
   languages: [],
   fields: [],
-  experience: [1, 10],
+  experience: [1, 20],
   prices: [],
   search: "",
 });
@@ -157,7 +153,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <SliderField
               name="experience"
               label={msg("coaches.filter.experience.label")}
-              range={[1, 10]}
+              range={[1, 20]}
             />
             <Tooltip title={<Rates msg={msg} />} placement="top">
               <div>

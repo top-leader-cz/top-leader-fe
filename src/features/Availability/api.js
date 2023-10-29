@@ -315,39 +315,21 @@ export const usePickSlotMutation = ({
         url: `/api/latest/coaches/${username}/schedule`,
         data: (() => {
           // Clicked on "12:00 +02:00" === 10:00 UTC (DST - letni cas)
-          const localStart = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
-          const firstDayOfTheWeek = getFirstDayOfTheWeek(localStart); // "firstDayOfTheWeek": "2023-09-24",
-          const day = INDEX_TO_DAY[getDay(localStart)]; // 0 - Sun
-          const utcHours = i18n.formatUtcLocal(localStart, "kk");
-          const data = {
-            // interval: map(toUtcFix, interval),
-            firstDayOfTheWeek,
-            day,
-            time: `${padLeft("0", utcHours)}:00:00`,
-            // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
-          };
+          // const localStart = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
+          // const firstDayOfTheWeek = getFirstDayOfTheWeek(localStart); // "firstDayOfTheWeek": "2023-09-24",
+          // const day = INDEX_TO_DAY[getDay(localStart)]; // 0 - Sun
+          // const utcHours = i18n.formatUtcLocal(localStart, "kk");
+          // const data = {
+          //   // interval: map(toUtcFix, interval),
+          //   firstDayOfTheWeek,
+          //   day,
+          //   time: `${padLeft("0", utcHours)}:00:00`,
+          //   // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
+          // };
+          const data = { time: interval.start.toJSON() };
+          // const data = { time: interval.start.toJSON().replace(/Z$/, "") };
           // debugger;
           return data;
-
-          // utc not working, TODO:
-          // const utc = i18n.zonedToUtcLocal(localStart); // "utc": "2023-09-26T10:00:00.000Z",
-          // const firstDayOfTheWeekLocal = i18n.getFirstDayOfTheWeekLocal(); // "firstDayOfTheWeekLocal": "2023-09-25",
-          // console.log("%c[pickSlotMutation]", "color:blue", {
-          //   IO: { interval, data },
-          //   computed: {
-          //     localStart,
-          //     utc, // "utc": "2023-09-26T10:00:00.000Z",
-          //     utcISO: formatISO(utc), // "utcStr": "2023-09-26T12:00:00+02:00",
-          //     localISO: formatISO(localStart), // "2023-09-26T12:00:00+02:00"
-          //     firstDayOfTheWeek, firstDayOfTheWeekLocal, utcISOString: utc.toISOString(), utcString: utc.toString(),
-          //   },
-          //   hours: {
-          //     getHours: { utc: getHours(utc), localStart: getHours(localStart), }, // 12
-          //     format: { utc: format("kk", utc), localStart: format("kk", localStart), }, // 12
-          //     formatLocal: { utc: i18n.formatLocal(utc, "kk"), localStart: i18n.formatLocal(localStart, "kk"), }, // 12
-          //     formatUtcLocal: { utc: i18n.formatUtcLocal(utc, "kk"), localStart: i18n.formatUtcLocal(localStart, "kk"), }, // "10"
-          //   },
-          // });
         })(),
       }),
     onSuccess: (data) => {
@@ -358,6 +340,7 @@ export const usePickSlotMutation = ({
     },
     ...mutationProps,
   });
+  console.log({ pickSlotMutation });
 
   return pickSlotMutation;
 };

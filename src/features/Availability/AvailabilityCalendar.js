@@ -1,5 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, IconButton } from "@mui/material";
+import { Alert, Box, Button, IconButton } from "@mui/material";
 import {
   addDays,
   endOfDay,
@@ -286,7 +286,16 @@ export const AvailabilityCalendar = ({
           },
         ]}
         sx={{ width: "800px" }}
-      />
+      >
+        <QueryRenderer
+          {...pickSlotMutation}
+          success={() => null}
+          loading={() => null}
+          errored={(e) => (
+            <Alert severity="error">{e?.message || "Oops!"}</Alert>
+          )}
+        />
+      </ConfirmModal>
 
       {(onContact || onPick) && (
         <>

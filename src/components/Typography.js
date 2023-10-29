@@ -9,6 +9,7 @@ export const P = ({ emphasized, sx, ...props }) => {
     ? {
         color: "black",
         fontSize: 16,
+        fontWeight: 500,
       }
     : {};
   return <Typography variant="body1" sx={{ ...localSx, ...sx }} {...props} />;

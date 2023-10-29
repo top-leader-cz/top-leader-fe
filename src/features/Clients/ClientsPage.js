@@ -24,7 +24,7 @@ import { SlotChip } from "../Team/Team.page";
 import {
   useClientsQuery,
   useDeclineMutation,
-  useUpcomingSessionsQuery,
+  useUpcomingCoachSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
 
@@ -104,7 +104,7 @@ function ClientsPageInner() {
   const msg = useMsg({ dict: clientsMessages });
 
   const query = useClientsQuery({});
-  const upcomingSessionsQuery = useUpcomingSessionsQuery();
+  const upcomingSessionsQuery = useUpcomingCoachSessionsQuery();
   const declineMutation = useDeclineMutation({
     onSuccess: () => {
       setDeclineMemberVisible();

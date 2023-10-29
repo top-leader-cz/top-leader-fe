@@ -6,7 +6,7 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useQuery } from "react-query";
 import { Navigate, generatePath, useNavigate } from "react-router-dom";
@@ -49,25 +49,47 @@ const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
       </Avatar>
       <Box sx={{ display: "flex", flexDirection: "column", px: 1 }}>
         <Typography>{caption}</Typography>
-        <Typography variant="h2" fontSize={14}>
-          {text}
-        </Typography>
+        <P emphasized>{text}</P>
       </Box>
     </Box>
   );
 };
 
-const ActionStepsTodo = ({ steps = [], label }) => {
+export const ActionStepsReadOnly = ({
+  steps = [],
+  label,
+  heading = label && (
+    <P emphasized sx={{ mt: 3, mb: 2 }}>
+      {label}
+    </P>
+  ),
+}) => {
   // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
   return (
     <>
-      <P sx={{ mt: 3, mb: 2 }}>
-        <b>{label}</b>
-      </P>
-      <Todos items={steps} keyProp="label" />
+      {heading}
+      <ul style={{ paddingLeft: "24px", color: "#667085" /* gray/500 */ }}>
+        {steps.map(({ id, label, date, checked }, i) => {
+          return (
+            <li
+              key={id}
+              style={{
+                paddingTop: "10px",
+                textDecoration: checked ? "line-through" : "none",
+              }}
+            >
+              <P>{label}</P>
+            </li>
+          );
+        })}
+      </ul>
+      {/* <Todos items={steps} keyProp="label" /> */}
     </>
   );
 };
+
+const translateSessionType = ({ type, msg }) =>
+  msg.maybe(`sessions.card.type.${type}`) || msg(`sessions.card.type.default`);
 // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
 // TODO: grid
 const SessionCard = ({
@@ -87,7 +109,7 @@ const SessionCard = ({
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(date);
-  const formattedDate = i18n.formatLocalMaybe(parsed, "Pp");
+  const formattedDate = i18n.formatLocalMaybe(parsed, "P");
 
   // console.log("[SC.rndr]", {
   //   date,
@@ -104,10 +126,10 @@ const SessionCard = ({
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
-            <P>{formattedDate} -</P>
+            <P>{formattedDate}&nbsp;-&nbsp;</P>
           </Box>
           <Box sx={{ width: "100%" }}>
-            <P>{type}</P>
+            <P>{translateSessionType({ type, msg })}</P>
             <Box sx={{ display: "flex", mt: 3 }}>
               <SessionCardIconTile
                 iconName={"InsertChart"}
@@ -123,8 +145,8 @@ const SessionCard = ({
                 sx={{}}
               />
             </Box>
-            <P sx={{ my: 3 }}></P>
-            <ActionStepsTodo
+            <P sx={{ my: 3 }}>{motivation}</P>
+            <ActionStepsReadOnly
               steps={actionSteps}
               label={<Msg id="sessions.card.goals.title" />}
             />
@@ -136,6 +158,7 @@ const SessionCard = ({
 };
 
 function Sessions() {
+  const msg = useMsg({ dict: messages });
   const { authFetch } = useAuth();
   const sessionsQuery = useQuery({
     queryKey: ["user-sessions", "history"],
@@ -146,12 +169,14 @@ function Sessions() {
     entries: sessionsQuery.data ?? [],
     map: (el) => ({
       // Right menu
-      status: "Private session",
+      status: translateSessionType({ type: el.data.type, msg }),
       id: el.id,
       date: el.createdAt,
       timestamp: new Date(el.createdAt).getTime(),
-
-      type: "Private session",
+      // root
+      username: el.username,
+      type: el.type,
+      // data
       areaOfDevelopment: el.data.areaOfDevelopment,
       longTermGoal: el.data.longTermGoal,
       motivation: el.data.motivation,
