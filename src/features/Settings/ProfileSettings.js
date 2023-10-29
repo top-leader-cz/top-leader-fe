@@ -70,7 +70,7 @@ const _COACH = {
   [FIELDS.publicProfile]: false,
 };
 
-const certificatesOptions = [
+export const certificatesOptions = [
   { value: "$", label: "ICF ACC / EMCC EIA Practitioner" },
   { value: "$$", label: "ICF PCC / EMCC EIA Senior Practitioner" },
   { value: "$$$", label: "ICF MCC / EMCC EIA Master Practitioner" },

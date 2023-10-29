@@ -17,6 +17,14 @@ export const messages = defineMessages({
     id: "sessions.card.goals.title",
     defaultMessage: "Goals",
   },
+  "sessions.card.type.USER_SESSION": {
+    id: "sessions.card.type.USER_SESSION",
+    defaultMessage: "Private session",
+  },
+  "sessions.card.type.default": {
+    id: "sessions.card.type.default",
+    defaultMessage: "Session",
+  },
   //
   "sessions.new.steps.area.label": {
     id: "sessions.new.steps.area.label",

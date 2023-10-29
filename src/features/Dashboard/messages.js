@@ -63,6 +63,10 @@ export const messages = defineMessages({
     id: "dashboard.rightmenu.title",
     defaultMessage: "My leadership journey",
   },
+  "dashboard.rightmenu.today": {
+    id: "dashboard.rightmenu.today",
+    defaultMessage: "Today, {date}",
+  },
   "dashboard.rightmenu.upcoming.title.empty": {
     id: "dashboard.rightmenu.upcoming.title.empty",
     defaultMessage: "No upcoming sessions",

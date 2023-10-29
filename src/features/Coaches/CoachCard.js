@@ -8,6 +8,7 @@ import { useFieldsDict } from "../Settings/useFieldsDict";
 import { ContactModal } from "./ContactModal";
 import { usePickCoach } from "./api";
 import { messages } from "./messages";
+import { certificatesOptions } from "../Settings/ProfileSettings";
 
 export const ShowMore = ({
   text = "",
@@ -49,7 +50,7 @@ export const CoachInfo = ({
       }}
     >
       <H1 gutterBottom>{name}</H1>
-      <P gutterBottom>{role}</P>
+      <P gutterBottom>{getLabel(certificatesOptions)(rate)}</P>
       <P gutterBottom>{msg("coaches.coach.experience", { experience })}</P>
       <P gutterBottom>
         {msg("coaches.coach.languages")}

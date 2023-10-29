@@ -11,7 +11,7 @@ export const useMsg = ({ dict } = {}) => {
 
   const msg = useCallback(
     (id, values) => {
-      if (displayKeys) return `${id}`;
+      if (displayKeys) return `"${id}"`;
       return intl.formatMessage(
         {
           ...messages[id],
@@ -21,6 +21,20 @@ export const useMsg = ({ dict } = {}) => {
       );
     },
     [intl, messages]
+  );
+
+  msg.maybe = useCallback(
+    (id, values) => {
+      const translation = msg(id, values);
+      const isTranslated = !!translation && translation !== id;
+
+      // TODO: check that missing keys translated with values return just key (without values)
+      if (values) debugger;
+
+      if (isTranslated) return translation;
+      else return undefined;
+    },
+    [msg]
   );
   // useEffect(() => {
   //   console.log("[useMsg] intl changed");

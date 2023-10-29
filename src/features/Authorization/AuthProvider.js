@@ -62,7 +62,7 @@ const _fetchUser = ({ authFetch }) =>
 
 const throwOnError = (response) => {
   console.log("FETCH ERR", { response });
-  const error = new Error("Response not OK");
+  const error = new Error(`Something went wrong. (${response?.status || ""})`);
   error.response = response;
   throw error;
   // TODO: compare stacktrace

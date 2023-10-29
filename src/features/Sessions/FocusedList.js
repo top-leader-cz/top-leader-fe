@@ -33,7 +33,12 @@ export const FocusedList = ({ items, initialCount = 1 }) => {
           })}
       </ul>
       {visibleCount < items.length ? (
-        <Button variant="text" onClick={() => setVisibleCount((c) => c + 1)}>
+        <Button
+          disableRipple
+          variant="text"
+          sx={{ height: "24px" }}
+          onClick={() => setVisibleCount((c) => c + 1)}
+        >
           {msg("focused-list.show-another-question")}
         </Button>
       ) : null}

@@ -11,9 +11,12 @@ import { useAuth } from "../Authorization";
 import { useUserSessionQuery } from "../Sessions/api";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { Todos } from "../../components/Todos";
-import { useUpcomingSessionsQuery } from "../Clients/api";
+import { useUpcomingCoachSessionsQuery } from "../Clients/api";
 import { formatName } from "../Coaches/CoachCard";
 import { gray500, gray900 } from "../Clients/ClientsPage";
+import { useMsg } from "../../components/Msg/Msg";
+import { useUserUpcomingSessionsQuery } from "../Coaches/api";
+import { ActionStepsReadOnly } from "../Sessions/Sessions";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -78,9 +81,24 @@ const EmptyActionCardContent = ({
   );
 };
 
-const Actions = ({ areaOfDevelopment, ...props }) => {
+const MOCK = [
+  {
+    checked: false,
+    date: "2023-09-06",
+    id: 52,
+    label: "Mock Task1: TODO: RM from FE",
+  },
+  {
+    checked: true,
+    date: "2023-09-06",
+    id: 42,
+    label: "Mock Task2: TODO: RM from FE",
+  },
+];
+
+const Actions = ({ canFetch, ...props }) => {
   const sessionQuery = useUserSessionQuery({
-    enabled: !!areaOfDevelopment.length,
+    enabled: canFetch,
     refetchOnReconnect: true,
   });
 
@@ -93,20 +111,20 @@ const Actions = ({ areaOfDevelopment, ...props }) => {
         loaderName="Block"
         // data={undefined}
         // isLoading
-        success={({
-          data: {
-            actionSteps = [
-              { checked: false, date: "2023-09-06", id: 52, label: "Task1" },
-            ],
-          },
-        }) => (
-          <Todos
-            // sx={{ my: 2 }} // not working
-            items={actionSteps}
-            keyProp={"label"}
-            {...props}
-          />
-        )}
+        success={
+          ({
+            data: {
+              actionSteps = [],
+              // actionSteps = MOCK,
+            },
+          }) => <ActionStepsReadOnly steps={actionSteps} />
+          // <Todos
+          //   // sx={{ my: 2 }} // not working
+          //   items={actionSteps}
+          //   keyProp={"label"}
+          //   {...props}
+          // />
+        }
       />
     </Box>
   );
@@ -185,8 +203,15 @@ const CoachUpcomingSessions = ({ data }) => {
 };
 
 const CoachSessionsCard = ({}) => {
+  const { isCoach } = useAuth();
   const { i18n } = useContext(I18nContext);
-  const upcomingSessionsQuery = useUpcomingSessionsQuery();
+  const msg = useMsg();
+  const coachUpcomingSessionsQuery = useUpcomingCoachSessionsQuery();
+  const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery();
+  const query = isCoach
+    ? coachUpcomingSessionsQuery
+    : userUpcomingSessionsQuery;
+
   const emptySessions = (
     <EmptyActionCardContent
       iconName="RocketLaunch"
@@ -197,15 +222,14 @@ const CoachSessionsCard = ({}) => {
 
   return (
     <ActionCard
-      heading={`${i18n.formatRelativeLocal(new Date())}, ${i18n.formatLocal(
-        new Date(),
-        "PP"
-      )}`}
+      heading={msg("dashboard.rightmenu.today", {
+        date: i18n.formatLocal(new Date(), "PP"),
+      })}
       // heading={i18n.translateTokenLocal("today")}
       // heading={i18n.formatLocal(new Date(), "")}
       button={
-        !upcomingSessionsQuery.isLoading &&
-        !upcomingSessionsQuery.data?.length && {
+        !query.isLoading &&
+        !query.data?.length && {
           variant: "contained",
           href: routes.newSession,
           children: <Msg id="dashboard.rightmenu.upcoming.start" />,
@@ -213,12 +237,26 @@ const CoachSessionsCard = ({}) => {
       }
     >
       <QueryRenderer
-        {...upcomingSessionsQuery}
+        {...query}
         loaderName="Block"
         errored={() => emptySessions}
         success={({ data }) => {
           if (!data?.length) return emptySessions;
-          else return <CoachUpcomingSessions data={data} />;
+          else
+            return (
+              <CoachUpcomingSessions
+                data={
+                  isCoach
+                    ? data
+                    : data.map(({ coach, firstName, lastName, time }) => ({
+                        username: coach,
+                        firstName,
+                        lastName,
+                        time,
+                      }))
+                }
+              />
+            );
         }}
       />
     </ActionCard>
@@ -234,11 +272,15 @@ const SessionsActionCard = ({ ...rest }) => {
       <CoachSessionsCard />
       <ActionCard
         heading={<Msg id="dashboard.rightmenu.actions.heading" />}
-        button={{
-          variant: "outlined",
-          href: !areaOfDevelopment.length ? routes.newSession : routes.sessions,
-          children: <Msg id="dashboard.rightmenu.actions.set-area" />,
-        }}
+        button={
+          !areaOfDevelopment.length && {
+            variant: "outlined",
+            href: !areaOfDevelopment.length
+              ? routes.newSession
+              : routes.sessions,
+            children: <Msg id="dashboard.rightmenu.actions.set-area" />,
+          }
+        }
         sx={{ mt: 10, mb: 5 }}
       >
         {!areaOfDevelopment.length ? (
@@ -249,7 +291,7 @@ const SessionsActionCard = ({ ...rest }) => {
           />
         ) : (
           <Actions
-            areaOfDevelopment={areaOfDevelopment}
+            canFetch={!!areaOfDevelopment?.length}
             sx={{ py: 0.5, minHeight: "140px" }}
           />
         )}
