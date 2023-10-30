@@ -326,8 +326,10 @@ export const usePickSlotMutation = ({
           //   time: `${padLeft("0", utcHours)}:00:00`,
           //   // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
           // };
-          const data = { time: interval.start.toJSON() };
-          // const data = { time: interval.start.toJSON().replace(/Z$/, "") };
+          // const data = { time: interval.start.toJSON() };
+          const data = {
+            time: interval.start.toJSON().replace(/\.\d{3}Z$/, ""),
+          };
           // debugger;
           return data;
         })(),

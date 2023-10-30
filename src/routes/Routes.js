@@ -78,6 +78,14 @@ export const router = createHashRouter([
         ),
       },
       {
+        path: routes.setPassword_TODO_JAKUB_K,
+        element: (
+          <ForbidAuth>
+            <ResetPasswordPage />
+          </ForbidAuth>
+        ),
+      },
+      {
         path: routes.dashboard,
         element: (
           <RequireAuth>

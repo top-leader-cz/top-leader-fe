@@ -49,4 +49,9 @@ export const messages = defineMessages({
     id: "auth.login.microsoft",
     defaultMessage: "Sign in with Microsoft",
   },
+  "auth.invitation.perex": {
+    id: "auth.invitation.perex",
+    defaultMessage:
+      "You’ve been invited to join TopLeader. Please set a password to complete the registration",
+  },
 });

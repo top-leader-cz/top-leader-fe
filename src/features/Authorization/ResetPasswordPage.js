@@ -9,10 +9,12 @@ import { useAuth } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
 import { useParams } from "react-router";
+import { Typography } from "@mui/material";
+import { P } from "../../components/Typography";
 
 export const ResetPasswordPage = () => {
   const msg = useMsg({ dict: messages });
-  const { token } = useParams();
+  const { token, email } = useParams();
   const { resetPasswordMutation } = useAuth();
   const form = useForm({
     defaultValues: { password: "", passwordConfirm: "" },
@@ -40,12 +42,18 @@ export const ResetPasswordPage = () => {
     form,
     resetPasswordMutation,
     token,
+    email,
   });
 
   return (
     <WelcomeScreenTemplate
       perex={
-        "You’ve been invited to join TopLeader. Please set a password to complete the registration" // TODO: translation
+        <>
+          <Typography variant="body1" mt={1} mb={3} textAlign="center">
+            {msg("auth.invitation.perex")}
+          </Typography>
+          <P sx={{ color: "black", mt: 0, mb: 3 }}>{email}</P>
+        </>
       }
       containerSx={{ mt: 14 }}
     >
