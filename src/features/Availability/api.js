@@ -315,7 +315,7 @@ export const usePickSlotMutation = ({
         url: `/api/latest/coaches/${username}/schedule`,
         data: (() => {
           // Clicked on "12:00 +02:00" === 10:00 UTC (DST - letni cas)
-          // const localStart = interval.start; // just toString(): "2023-09-26T10:00:00.000Z"
+          // const localStart = interval.start; // just toJSON(): "2023-09-26T10:00:00.000Z"
           // const firstDayOfTheWeek = getFirstDayOfTheWeek(localStart); // "firstDayOfTheWeek": "2023-09-24",
           // const day = INDEX_TO_DAY[getDay(localStart)]; // 0 - Sun
           // const utcHours = i18n.formatUtcLocal(localStart, "kk");
@@ -327,8 +327,9 @@ export const usePickSlotMutation = ({
           //   // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
           // };
           // const data = { time: interval.start.toJSON() };
+          // const data = { time: interval.start.toJSON().replace(/\.\d{3}Z$/, "") };
           const data = {
-            time: interval.start.toJSON().replace(/\.\d{3}Z$/, ""),
+            time: i18n.formatLocal(interval.start, API_DATETIME_LOCAL_FORMAT),
           };
           // debugger;
           return data;

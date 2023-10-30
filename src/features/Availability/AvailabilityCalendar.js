@@ -120,6 +120,11 @@ export const AvailabilityCalendar = ({
     },
     [disablePickSlot, coach]
   );
+  const { reset } = pickSlotMutation;
+  const handleClosePickSlotModal = useCallback(() => {
+    setPickSlot();
+    reset();
+  }, [reset]);
 
   console.log(
     "%c[AvailabilityCalendar.rndr]",
@@ -260,7 +265,7 @@ export const AvailabilityCalendar = ({
       </Box>
       <ConfirmModal
         open={!!pickSlot}
-        onClose={() => setPickSlot()}
+        onClose={handleClosePickSlotModal}
         iconName="RocketLaunch"
         title={msg("availability-calendar.confirm-reservation.title", {
           date: i18n.formatLocalMaybe(pickSlot?.interval?.start, "PPPPpppp"),
@@ -273,7 +278,7 @@ export const AvailabilityCalendar = ({
             variant: "outlined",
             type: "button",
             children: "Cancel",
-            onClick: () => setPickSlot(),
+            onClick: handleClosePickSlotModal,
           },
           {
             component: LoadingButton,
