@@ -53,7 +53,7 @@ const _resetPass = ({ authFetch, password, token }) =>
   authFetch({
     type: FETCH_TYPE.FORMDATA,
     method: "POST",
-    url: `/set-password/${token}`,
+    url: `/api/public/set-password/${token}`,
     data: { password },
   });
 

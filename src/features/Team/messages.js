@@ -73,4 +73,8 @@ export const messages = defineMessages({
     id: "team.credit.add-member.modal.desc",
     defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
   },
+  "team.credit.add-member.is-authorized": {
+    id: "team.credit.add-member.is-authorized",
+    defaultMessage: "Trial user",
+  },
 });

@@ -24,10 +24,11 @@ import { Authority } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
 import { useCreateUserMutation } from "./api";
+import { messages } from "./messages";
 
 export const AddMemberModal = ({ onClose, open }) => {
-  const msg = useMsg();
-  const addUserMutation = useCreateUserMutation();
+  const msg = useMsg({ dict: messages });
+  const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
   const { userTz, language } = useContext(I18nContext);
 
   const methods = useForm({
@@ -40,7 +41,7 @@ export const AddMemberModal = ({ onClose, open }) => {
       authorities: ["USER"],
       locale: language?.substring(0, 2) ?? "en",
       timeZone: userTz,
-      isAuthorized: true,
+      isAuthorized: false,
     },
   });
   const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
@@ -141,7 +142,7 @@ export const AddMemberModal = ({ onClose, open }) => {
             />
             <FormControlLabel
               control={<CheckboxField name="isAuthorized" />}
-              label="isAuthorized"
+              label={msg("team.credit.add-member.is-authorized")}
             />
 
             <Divider flexItem sx={{ mt: 3 }} />

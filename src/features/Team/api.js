@@ -28,8 +28,10 @@ export const useHrUsersQuery = (params = {}) => {
   });
 };
 
-export const useCreateUserMutation = (params = {}) => {
-  const { authFetch, fetchUser } = useAuth();
+export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (values) =>
       authFetch({
@@ -48,6 +50,10 @@ export const useCreateUserMutation = (params = {}) => {
           };
         })(),
       }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["hr-users"] });
+      onSuccess?.(data);
+    },
     ...params,
   });
 };

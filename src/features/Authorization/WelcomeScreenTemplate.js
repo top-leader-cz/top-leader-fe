@@ -13,7 +13,11 @@ const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";
 
 export const WelcomeScreenTemplate = ({
-  perex = <Msg id="auth.unauthorized.perex" />,
+  perex = (
+    <Typography variant="body1" mt={1} mb={4} textAlign="center">
+      <Msg id="auth.unauthorized.perex" />
+    </Typography>
+  ),
   children,
   containerSx = {},
 }) => {
@@ -59,11 +63,7 @@ export const WelcomeScreenTemplate = ({
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
               Please enter your details
             </Typography> */}
-            {perex && (
-              <Typography variant="body1" mt={1} mb={4} textAlign="center">
-                {perex}
-              </Typography>
-            )}
+            {perex}
 
             {/* <Box
               component="form"
