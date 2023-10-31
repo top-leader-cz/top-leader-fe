@@ -133,11 +133,7 @@ const TimeRangePicker = React.forwardRef(
             ref={ref}
             slotProps={{
               textField: { size: "small", sx: { bgcolor: "white" } },
-              // sx: { width: 180 }}
             }}
-            // renderInput={(params) => (
-            //   <TextField size="small" {...props} {...params} {...inputProps} />
-            // )}
             name={field.name}
             onChange={onChange(0)}
             onBlur={field.onBlur}
@@ -150,11 +146,7 @@ const TimeRangePicker = React.forwardRef(
           <MuiTimePicker
             slotProps={{
               textField: { size: "small", sx: { bgcolor: "white" } },
-              // sx: { width: 180 }}
             }}
-            // renderInput={(params) => (
-            //   <TextField size="small" {...props} {...params} {...inputProps} />
-            // )}
             // name={field.name}
             onChange={onChange(1)}
             onBlur={field.onBlur}
@@ -269,7 +261,7 @@ export const DatePickerField = ({
   );
   // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
   const methods = useFormContext();
-  return null;
+  // return null;
   return (
     <ErrorBoundary onError={onErrorDefault}>
       <Controller
@@ -278,7 +270,9 @@ export const DatePickerField = ({
         rules={rules}
         render={({ field }) => (
           <DesktopDatePicker
-            renderInput={(params) => <TextField {...props} {...params} />}
+            slotProps={{
+              textField: { size: "small" },
+            }}
             format={inputFormat}
             {...field}
           />
@@ -298,7 +292,9 @@ export const TimePicker = ({ control, name, rules, ...props }) => {
       rules={rules}
       render={({ field }) => (
         <MuiTimePicker
-          renderInput={(params) => <TextField {...props} {...params} />}
+          slotProps={{
+            textField: { size: "small" },
+          }}
           {...field}
         />
       )}

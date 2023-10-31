@@ -57,7 +57,7 @@ export const Finished = () => {
           <P>
             <Msg id="sessions.steps.finished.datetime.separator" />
           </P>
-          <TimePicker {...{ control, name: "time", size: "small" }} />
+          <TimePicker {...{ control, name: "time" }} />
         </Box>
         <ControlsContainer sx={{ mt: 10 }}>
           <Button href={routes.sessions} variant="outlined">

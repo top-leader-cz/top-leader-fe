@@ -28,20 +28,26 @@ export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({ actionSteps = [], ...data }) => {
+    mutationFn: async ({ actionSteps = [], ...data }) => {
       console.log("%cMUTATION", "color:lime", { actionSteps, ...data });
-      return authFetch({
+
+      const promise = authFetch({
         method: "POST",
         url: "/api/latest/user-sessions",
         data: {
           ...data,
           actionSteps: actionSteps.map(({ label, date }) => {
-            const formattedDate = format(date, UTC_DATE_FORMAT);
-            console.log("mapStep", { date, formattedDate });
-            return {
-              label,
-              date: formattedDate,
-            };
+            try {
+              const formattedDate = format(date, UTC_DATE_FORMAT);
+              console.log("mapStep", { date, formattedDate });
+              return {
+                label,
+                date: formattedDate,
+              };
+            } catch (e) {
+              console.error("mutation err", { e });
+              throw e;
+            }
           }),
         },
       });
@@ -49,8 +55,11 @@ export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
       //   debugger;
       //   return arg;
       // });
+      console.log("mutation", { promise });
+      return promise;
     },
     onSuccess: (data) => {
+      console.log("mutation onSuccess", { data });
       queryClient.invalidateQueries({ queryKey: ["user-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["user-info"] });
       onSuccess?.(data);

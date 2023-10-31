@@ -134,13 +134,8 @@ export const getTranslatedList = ({ tsKey, msg, startIndex = 1, max = 10 }) => {
     get: (i) => {
       const index = startIndex + i;
       const translationKey = `${tsKey.replace(/\.$/, "")}.${index}`;
-      const translation = msg(translationKey);
-      const isTranslated = !!translation && translation !== translationKey;
-
-      // console.log({ i, index, translation, translationKey, isTranslated });
-
-      if (isTranslated) return translation;
-      else return undefined;
+      const translationMaybe = msg.maybe(translationKey);
+      return translationMaybe;
     },
   });
 };
