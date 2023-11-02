@@ -28,6 +28,7 @@ import { Msg, MsgProvider } from "./Msg";
 import { defineMessages } from "react-intl";
 import { LinkBehavior } from "./LinkBehavior";
 import theme from "../theme";
+import { P } from "./Typography";
 
 const messages = defineMessages({
   "main-menu.items.dashboard": {
@@ -73,7 +74,7 @@ const messages = defineMessages({
 });
 
 // TODO: mobile
-const LogoImg = ({ mobile }) => {
+const LogoImg = ({ mobile, text }) => {
   if (mobile)
     return (
       <Box
@@ -91,6 +92,36 @@ const LogoImg = ({ mobile }) => {
         }}
       />
     );
+
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        width: "100%",
+        // height: 42,
+        // px: 2,
+        // my: 2,
+        // maxHeight: { xs: 233, md: 167 },
+        // maxWidth: { xs: 350, md: 250 },
+      }}
+      alt="Topleader"
+    >
+      <Box
+        component="img"
+        src="/topleader-big.png"
+        sx={{
+          width: "100%",
+          height: 42,
+          px: 2,
+          my: 2,
+          // maxHeight: { xs: 233, md: 167 },
+          // maxWidth: { xs: 350, md: 250 },
+        }}
+        alt="Topleader"
+      />
+      <P sx={{ position: "absolute", bottom: 8, right: 0 }}>{text}</P>
+    </Box>
+  );
 
   return (
     <Box
@@ -129,7 +160,7 @@ const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
 };
 
 export const MainMenu = ({ open }) => {
-  const { signout, isHR, isCoach } = useAuth();
+  const { signout, isHR, isCoach, isAdmin } = useAuth();
   const mobile = !open;
 
   return (
@@ -148,7 +179,10 @@ export const MainMenu = ({ open }) => {
         }}
       >
         <Box>
-          <LogoImg mobile={mobile} />
+          <LogoImg
+            mobile={mobile}
+            text={isAdmin ? "Admin" : isHR ? "HR" : isCoach ? "Coach" : ""}
+          />
           <List component="nav">
             <ListItemLink
               mobile={mobile}

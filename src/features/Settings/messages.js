@@ -194,6 +194,19 @@ export const messages = defineMessages({
     id: "settings.admin.table.col.coach",
     defaultMessage: "Current Coach",
   },
+
+  "settings.admin.table.col.hrs": {
+    id: "settings.admin.table.col.hrs",
+    defaultMessage: "HR",
+  },
+  "settings.admin.table.col.requestedBy": {
+    id: "settings.admin.table.col.requestedBy",
+    defaultMessage: "Requested by",
+  },
+  "settings.admin.table.col.paidCredit": {
+    id: "settings.admin.table.col.paidCredit",
+    defaultMessage: "Credits paid",
+  },
   "settings.admin.table.col.remainingCredits": {
     id: "settings.admin.table.col.remainingCredits",
     defaultMessage: "Remaining credits",

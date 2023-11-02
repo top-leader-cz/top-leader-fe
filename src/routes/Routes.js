@@ -51,9 +51,6 @@ const Root = ({ children, ...props }) => {
   );
 };
 
-const HR_AUTHORITIES = [Authority.HR];
-const COACH_AUTHORITIES = [Authority.COACH];
-
 export const router = createHashRouter([
   {
     path: "/",
@@ -184,7 +181,7 @@ export const router = createHashRouter([
       {
         path: routes.clients,
         element: (
-          <RequireAuth requireUserRoles={COACH_AUTHORITIES}>
+          <RequireAuth someRequired={[Authority.COACH, Authority.ADMIN]}>
             <ClientsPage />
           </RequireAuth>
         ),

@@ -68,7 +68,7 @@ function AdminSettingsInner() {
           avatar
           component="th"
           scope="row"
-          name={formatName(row)}
+          name={formatName(row) || "-"}
           sub={row.username}
         />
       ),
@@ -76,7 +76,9 @@ function AdminSettingsInner() {
     {
       label: msg("settings.admin.table.col.companyName"),
       key: "companyName",
-      render: (row) => <TLCell variant="emphasized" name={row.companyName} />,
+      render: (row) => (
+        <TLCell variant="emphasized" name={row.companyName || "-"} />
+      ),
     },
     {
       label: msg("settings.admin.table.col.role"),
@@ -88,23 +90,45 @@ function AdminSettingsInner() {
     {
       label: msg("settings.admin.table.col.coach"),
       key: "coach",
+      render: ({ coachFirstName, coachLastName, coach }) =>
+        [coachFirstName, coachLastName, coach].some(Boolean) ? (
+          <TLCell
+            avatar
+            component="th"
+            scope="row"
+            name={formatName({
+              firstName: coachFirstName ?? "",
+              lastName: coachLastName ?? "",
+            })}
+            sub={coach ?? ""}
+          />
+        ) : (
+          <TLCell component="th" scope="row" name={"-"} />
+        ),
+    },
+    {
+      label: msg("settings.admin.table.col.hrs"),
+      key: "hrs",
       render: (row) => (
-        <TLCell
-          avatar
-          component="th"
-          scope="row"
-          name={formatName({
-            firstName: row.coachFirstName,
-            lastName: row.coachLastName,
-          })}
-          sub={row.coach}
-        />
+        <TLCell variant="lighter" name={row.hrs?.join?.(", ") ?? "-"} />
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.requestedBy"),
+      key: "requestedBy",
+      render: (row) => (
+        <TLCell variant="lighter" name={row.requestedBy ?? "-"} />
       ),
     },
     {
       label: msg("settings.admin.table.col.remainingCredits"),
       key: "remainingCredits",
       render: (row) => <TLCell variant="emphasized" name={row.credit} />,
+    },
+    {
+      label: msg("settings.admin.table.col.paidCredit"),
+      key: "paidCredit",
+      render: (row) => <TLCell variant="emphasized" name={row.paidCredit} />,
     },
     {
       label: msg("settings.admin.table.col.requestedCredits"),

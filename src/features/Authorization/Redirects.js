@@ -15,7 +15,7 @@ export const AuthRedirect = () => {
   }
 };
 
-export const RequireAuth = ({ children, requireUserRoles = [] }) => {
+export const RequireAuth = ({ children, someRequired = [] }) => {
   const auth = useAuth();
   const location = useLocation();
 
@@ -44,10 +44,10 @@ export const RequireAuth = ({ children, requireUserRoles = [] }) => {
     );
   }
 
-  if (requireUserRoles.length) {
+  if (someRequired.length) {
     if (
-      // intersection(auth.user.data?.userRoles, requireUserRoles).length !== requireUserRoles.length
-      intersection(auth.user.data?.userRoles, requireUserRoles).length < 1
+      // intersection(auth.user.data?.userRoles, someRequired).length !== someRequired.length
+      intersection(auth.user.data?.userRoles, someRequired).length < 1
     )
       return <Navigate to={routes.dashboard} replace />;
   }

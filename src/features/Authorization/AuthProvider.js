@@ -147,6 +147,12 @@ export function AuthProvider({ children }) {
     mutationFn: (fields) => _resetPass({ authFetch, ...fields }),
     onSuccess: () => setIsLoggedIn(true),
   });
+  const hasRole = useCallback(
+    (authority) => {
+      return userQuery.data?.userRoles?.includes(authority);
+    },
+    [userQuery.data?.userRoles]
+  );
 
   const value = {
     isLoggedIn,
@@ -158,9 +164,9 @@ export function AuthProvider({ children }) {
     fetchUser: () => {
       queryClient.invalidateQueries({ queryKey: ["user-info"] });
     },
-    isCoach: userQuery.data?.userRoles?.includes(Authority.COACH),
-    isHR: userQuery.data?.userRoles?.includes(Authority.HR),
-    isAdmin: userQuery.data?.userRoles?.includes(Authority.ADMIN),
+    isCoach: hasRole(Authority.COACH) || hasRole(Authority.ADMIN),
+    isHR: hasRole(Authority.HR) || hasRole(Authority.ADMIN),
+    isAdmin: hasRole(Authority.ADMIN),
   };
 
   // console.log("[AP.rndr]", value);
