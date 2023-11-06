@@ -75,7 +75,7 @@ export const router = createHashRouter([
         ),
       },
       {
-        path: routes.setPassword_TODO_JAKUB_K,
+        path: routes.setPassword_TODO_1_JAKUB_K,
         element: (
           <ForbidAuth>
             <ResetPasswordPage />
