@@ -4,6 +4,7 @@ import { LinkBehavior } from "./components/LinkBehavior";
 
 export const primary25 = "#F9F8FF";
 export const gray50 = "#F9FAFB"; // previously in bg as #EAECF0
+export const gray500 = "#667085";
 export const gray200 = "#EAECF0";
 
 // A custom theme for this app

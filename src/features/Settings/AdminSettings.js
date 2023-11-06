@@ -1,20 +1,20 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
-import { useContext, useState } from "react";
-import { Header } from "../../components/Header";
-import { Layout, LayoutCtx } from "../../components/Layout";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { prop } from "ramda";
+import { useState } from "react";
+import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { TLCell } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
-// import { AddMemberModal } from "./AddMemberModal";
-// import { CreditTopUpModal } from "./CreditTopUpModal";
-import { messages } from "./messages";
 import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
-import { SlotChip } from "../Team/Team.page";
-import { prop } from "ramda";
 import { formatName } from "../Coaches/CoachCard";
+import { SlotChip } from "../Team/Team.page";
+import { MemberAdminModal } from "./Admin/MemberAdminModal";
+import { messages } from "./messages";
+import { gray500 } from "../../theme";
+import { useMutation, useQueryClient } from "react-query";
 
 const MOCK = [
   {
@@ -52,12 +52,34 @@ const useUsersQuery = () => {
   });
 };
 
+export const useConfirmRequestedCreditMutation = ({
+  onSuccess,
+  ...params
+} = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ username }) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/admin/users/${username}/confirm-requested-credits`,
+        data: {},
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
+      onSuccess?.(data);
+    },
+    ...params,
+  });
+};
+
 function AdminSettingsInner() {
-  //   const [topUpSelected, setTopUpSelected] = useState(false);
-  const [addMemberVisible, setAddMemberVisible] = useState(false);
+  const [user, setUser] = useState();
   const msg = useMsg();
 
   const usersQuery = useUsersQuery();
+  const confirmCreditMutation = useConfirmRequestedCreditMutation({});
 
   const columns = [
     {
@@ -134,7 +156,32 @@ function AdminSettingsInner() {
       label: msg("settings.admin.table.col.requestedCredits"),
       key: "requestedCredits",
       render: (row) => (
-        <TLCell variant="emphasized" name={row.requestedCredit} />
+        <TLCell
+          variant="emphasized"
+          name={row.requestedCredit}
+          // after={
+          //   row.requestedCredit ? (
+          //     <Button
+          //       disabled={confirmCreditMutation.isLoading}
+          //       variant="outlined"
+          //       onClick={() => confirmCreditMutation.mutate(row)}
+          //     >
+          //       {msg("settings.admin.table.confirm-credit-button.label")}
+          //     </Button>
+          //   ) : null
+          // }
+        >
+          {row.requestedCredit ? (
+            <Button
+              sx={{ ml: 1 }}
+              disabled={confirmCreditMutation.isLoading}
+              variant="outlined"
+              onClick={() => confirmCreditMutation.mutate(row)}
+            >
+              {msg("settings.admin.table.confirm-credit-button.label")}
+            </Button>
+          ) : null}
+        </TLCell>
       ),
     },
     {
@@ -147,20 +194,24 @@ function AdminSettingsInner() {
         />
       ),
     },
-    // {
-    //   label: msg("settings.admin.table.col.action"),
-    //   key: "action",
-    //   render: (row) => (
-    //     <TLCell>
-    //       <Button variant="outlined" onClick={() => setTopUpSelected(row)}>
-    //         {msg("team.credit.topup")}
-    //       </Button>
-    //     </TLCell>
-    //   ),
-    // },
+    {
+      label: msg("settings.admin.table.col.action"),
+      key: "action",
+      render: (row) => (
+        <TLCell>
+          <Tooltip
+            title={msg("settings.admin.table.edit.tooltip")}
+            placement="top"
+          >
+            <IconButton sx={{ color: gray500 }} onClick={() => setUser(row)}>
+              <Icon name="BorderColorOutlined" />
+            </IconButton>
+          </Tooltip>
+        </TLCell>
+      ),
+    },
   ];
 
-  const { downMd } = useContext(LayoutCtx);
   console.log("[AdminSettings.page]", { usersQuery });
 
   return (
@@ -199,7 +250,7 @@ function AdminSettingsInner() {
             startIcon={<Add />}
             aria-label="add member"
             onClick={() => {
-              setAddMemberVisible(true);
+              setUser({});
             }}
           >
             <Msg id="settings.admin.add" />
@@ -210,10 +261,12 @@ function AdminSettingsInner() {
         selected={topUpSelected}
         onClose={() => setTopUpSelected(null)}
       />
-      <AddMemberModal
-        open={addMemberVisible}
-        onClose={() => setAddMemberVisible(false)}
-      /> */}
+    */}
+      <MemberAdminModal
+        open={!!user}
+        initialValues={user}
+        onClose={() => setUser(false)}
+      />
     </>
   );
 }

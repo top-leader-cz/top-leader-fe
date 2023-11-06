@@ -208,14 +208,14 @@ export const MainMenu = ({ open }) => {
               icon={<ForumOutlined />}
               to={routes.getFeedback}
             />
-            {isHR ? (
-              <ListItemLink
-                mobile={mobile}
-                text={<Msg id="main-menu.items.team" />}
-                icon={<People />}
-                to={routes.team}
-              />
-            ) : null}
+            {/* {isHR ? ( */}
+            <ListItemLink
+              mobile={mobile}
+              text={<Msg id="main-menu.items.team" />}
+              icon={<People />}
+              to={routes.team}
+            />
+            {/* ) : null} */}
             {isCoach ? (
               <ListItemLink
                 mobile={mobile}

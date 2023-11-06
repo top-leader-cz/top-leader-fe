@@ -1,22 +1,20 @@
 import { Avatar, Box, Button } from "@mui/material";
+import { useContext } from "react";
 import { Icon } from "../../components/Icon";
 import { Msg } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
-import { H2, H3, P } from "../../components/Typography";
+import { H3, P } from "../../components/Typography";
 import { routes } from "../../routes";
-import { useContext } from "react";
-import { I18nContext } from "../I18n/I18nProvider";
-import { format } from "date-fns";
 import { useAuth } from "../Authorization";
-import { useUserSessionQuery } from "../Sessions/api";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { Todos } from "../../components/Todos";
+import { gray500, gray900 } from "../Clients/ClientsPage";
 import { useUpcomingCoachSessionsQuery } from "../Clients/api";
 import { formatName } from "../Coaches/CoachCard";
-import { gray500, gray900 } from "../Clients/ClientsPage";
-import { useMsg } from "../../components/Msg/Msg";
 import { useUserUpcomingSessionsQuery } from "../Coaches/api";
+import { I18nContext } from "../I18n/I18nProvider";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { ActionStepsReadOnly } from "../Sessions/Sessions";
+import { useUserSessionQuery } from "../Sessions/api";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -81,20 +79,10 @@ const EmptyActionCardContent = ({
   );
 };
 
-const MOCK = [
-  {
-    checked: false,
-    date: "2023-09-06",
-    id: 52,
-    label: "Mock Task1: TODO: RM from FE",
-  },
-  {
-    checked: true,
-    date: "2023-09-06",
-    id: 42,
-    label: "Mock Task2: TODO: RM from FE",
-  },
-];
+// const MOCK = [
+//   { checked: false, date: "2023-09-06", id: 52, label: "Mock Task1: TODO: RM from FE", },
+//   { checked: true, date: "2023-09-06", id: 42, label: "Mock Task2: TODO: RM from FE", },
+// ];
 
 const Actions = ({ canFetch, ...props }) => {
   const sessionQuery = useUserSessionQuery({
@@ -109,22 +97,12 @@ const Actions = ({ canFetch, ...props }) => {
       <QueryRenderer
         {...sessionQuery}
         loaderName="Block"
-        // data={undefined}
-        // isLoading
-        success={
-          ({
-            data: {
-              actionSteps = [],
-              // actionSteps = MOCK,
-            },
-          }) => <ActionStepsReadOnly steps={actionSteps} />
-          // <Todos
-          //   // sx={{ my: 2 }} // not working
-          //   items={actionSteps}
-          //   keyProp={"label"}
-          //   {...props}
-          // />
-        }
+        success={({
+          data: {
+            actionSteps = [],
+            // actionSteps = MOCK,
+          },
+        }) => <ActionStepsReadOnly steps={actionSteps} />}
       />
     </Box>
   );

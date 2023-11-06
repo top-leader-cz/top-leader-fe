@@ -49,7 +49,15 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const TLCell = ({ children, name, sub, avatar, align, ...props }) => {
+export const TLCell = ({
+  children,
+  name,
+  sub,
+  avatar,
+  align,
+  after,
+  ...props
+}) => {
   return (
     <StyledTableCell {...props}>
       <Box display="flex" flexDirection="row" flexWrap="nowrap">
@@ -74,6 +82,7 @@ export const TLCell = ({ children, name, sub, avatar, align, ...props }) => {
         )}
         {children && <Box>{children}</Box>}
       </Box>
+      {after}
     </StyledTableCell>
   );
 };

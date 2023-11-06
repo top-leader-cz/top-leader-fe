@@ -219,4 +219,49 @@ export const messages = defineMessages({
     id: "settings.admin.table.col.status",
     defaultMessage: "Status",
   },
+  "settings.admin.table.col.action": {
+    id: "settings.admin.table.col.action",
+    defaultMessage: "Action",
+  },
+  "settings.admin.table.edit.tooltip": {
+    id: "settings.admin.table.edit.tooltip",
+    defaultMessage: "Edit",
+  },
+  "settings.admin.table.confirm-credit-button.label": {
+    id: "settings.admin.table.confirm-credit-button.label",
+    defaultMessage: "Confirm",
+  },
+
+  "settings.admin.member.modal.title": {
+    id: "settings.admin.member.modal.title",
+    defaultMessage: "Add new member",
+  },
+  "settings.admin.member.modal.desc": {
+    id: "settings.admin.member.modal.desc",
+    defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
+  },
+  "settings.admin.member.modal.title.edit": {
+    id: "settings.admin.member.modal.title.edit",
+    defaultMessage: "Edit member",
+  },
+  "settings.admin.member.modal.desc.edit": {
+    id: "settings.admin.member.modal.desc.edit",
+    defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
+  },
+  "settings.admin.member.trial": {
+    id: "settings.admin.member.trial",
+    defaultMessage: "Trial user",
+  },
+  "settings.admin.member.cancel": {
+    id: "settings.admin.member.cancel",
+    defaultMessage: "Cancel",
+  },
+  "settings.admin.member.submit.new": {
+    id: "settings.admin.member.submit.new",
+    defaultMessage: "Send invite",
+  },
+  "settings.admin.member.submit.edit": {
+    id: "settings.admin.member.submit.edit",
+    defaultMessage: "Save",
+  },
 });

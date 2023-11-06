@@ -25,6 +25,7 @@ import { I18nContext } from "../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
 import { useCreateUserMutation } from "./api";
 import { messages } from "./messages";
+import { gray500 } from "../../theme";
 
 export const AddMemberModal = ({ onClose, open }) => {
   const msg = useMsg({ dict: messages });
@@ -76,24 +77,23 @@ export const AddMemberModal = ({ onClose, open }) => {
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Avatar sx={{ bgcolor: "#F9FAFB", width: 48, height: 48 }}>
                 <Avatar sx={{ bgcolor: "#EAECF0", width: 36, height: 36 }}>
-                  <Icon name="GroupAdd" sx={{ color: "#667085" }} />
+                  <Icon name="GroupAdd" sx={{ color: gray500 }} />
                 </Avatar>
               </Avatar>
               <IconButton onClick={onClose}>
-                <Icon name="Close" sx={{ color: "#667085" }} />
+                <Icon name="Close" sx={{ color: gray500 }} />
               </IconButton>
             </Box>
             <H2 id="add-member-modal-title">
-              <Msg id="team.credit.add-member.modal.title" />
+              {msg("team.credit.add-member.modal.title")}
             </H2>
             <P id="add-member-modal-description">
-              <Msg id="team.credit.add-member.modal.desc" />
+              {msg("team.credit.add-member.modal.desc")}
             </P>
             <RHFTextField
               name="firstName"
               rules={{ required: true, minLength: 2 }}
-              label={"Name"}
-              placeholder="Name"
+              label={msg("team.credit.add-member.fields.firstName")}
               autoFocus
               size="small"
               fullWidth
@@ -101,8 +101,7 @@ export const AddMemberModal = ({ onClose, open }) => {
             <RHFTextField
               name="lastName"
               rules={{ required: true, minLength: 2 }}
-              label=""
-              placeholder="Surname"
+              label={msg("team.credit.add-member.fields.lastName")}
               autoFocus
               size="small"
               fullWidth
@@ -110,8 +109,7 @@ export const AddMemberModal = ({ onClose, open }) => {
             <RHFTextField
               name="username"
               rules={{ required: true, minLength: 2 }}
-              label=""
-              placeholder="Email"
+              label={msg("team.credit.add-member.fields.username")}
               autoFocus
               size="small"
               fullWidth
@@ -120,25 +118,26 @@ export const AddMemberModal = ({ onClose, open }) => {
             <AutocompleteSelect
               multiple
               disableCloseOnSelect
-              name={"authorities"}
+              name="authorities"
               options={Object.values(Authority).map((value) => ({
                 value,
                 label: value,
               }))}
-              placeholder={"Authorities"}
+              label={msg("team.credit.add-member.fields.authorities")}
             />
             <AutocompleteSelect
               disableClearable
-              name={"locale"}
+              name="locale"
               options={LANGUAGE_OPTIONS}
               renderOption={renderLanguageOption}
-              placeholder="Select languages"
+              label={msg("team.credit.add-member.fields.locale")}
             />
             <AutocompleteSelect
               disableClearable
-              name={"timeZone"}
+              name="timeZone"
               options={TIMEZONE_OPTIONS}
-              placeholder="Timezone" // TODO: translations? should be always populated
+              label={msg("team.credit.add-member.fields.timeZone")}
+              // TODO: translations? should be always populated
             />
             <FormControlLabel
               control={<CheckboxField name="isAuthorized" />}
@@ -148,7 +147,7 @@ export const AddMemberModal = ({ onClose, open }) => {
             <Divider flexItem sx={{ mt: 3 }} />
             <Box display="flex" flexDirection="row" gap={3}>
               <Button fullWidth variant="outlined" onClick={() => onClose()}>
-                <Msg id="coaches.contact.button.cancel" />
+                {msg("coaches.contact.button.cancel")}
               </Button>
               <Button
                 fullWidth
@@ -156,7 +155,7 @@ export const AddMemberModal = ({ onClose, open }) => {
                 type="submit"
                 disabled={addUserMutation.isLoading}
               >
-                <Msg id="team.credit.add-member.submit" />
+                {msg("team.credit.add-member.submit")}
               </Button>
             </Box>
           </FormProvider>

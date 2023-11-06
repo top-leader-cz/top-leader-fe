@@ -10,6 +10,7 @@ import { messages } from "./messages";
 import { ProfileSettings } from "./ProfileSettings";
 import { TLTabs } from "./Tabs";
 import { AdminSettings } from "./AdminSettings";
+import { prop } from "ramda";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
@@ -20,41 +21,41 @@ const TABS = {
   ADMIN: "ADMIN",
 };
 
-const GET_COACH_TABS = ({ msg }) => [
-  {
-    key: TABS.PROFILE,
-    label: msg("settings.tabs.profile.label"),
-    Component: ProfileSettings,
-  },
-  {
-    key: TABS.GENERAL,
-    label: msg("settings.tabs.general.label"),
-    Component: GeneralSettings,
-  },
-  {
-    key: TABS.AVAILABILITY,
-    label: msg("settings.tabs.availability.label"),
-    Component: AvailabilitySettings,
-  },
-];
-const GET_ADMIN_TAB = ({ msg }) => ({
-  key: TABS.ADMIN,
-  label: msg("settings.tabs.admin.label"),
-  Component: AdminSettings,
-});
-
 function SettingsPageInner() {
   // const [tab, setTab] = useState(TABS.AVAILABILITY);
   const msg = useMsg();
   const { isCoach, isAdmin } = useAuth();
 
   const tabs = useMemo(() => {
-    const COACH_TABS = GET_COACH_TABS({ msg });
-    const tabs = isCoach
-      ? COACH_TABS
-      : [COACH_TABS.find(({ key }) => key === TABS.GENERAL)];
-
-    return isAdmin ? [...tabs, GET_ADMIN_TAB({ msg })] : tabs;
+    const tabs = [
+      {
+        key: TABS.PROFILE,
+        // visible: isCoach && !isAdmin,
+        visible: isCoach,
+        label: msg("settings.tabs.profile.label"),
+        Component: ProfileSettings,
+      },
+      {
+        visible: true,
+        key: TABS.GENERAL,
+        label: msg("settings.tabs.general.label"),
+        Component: GeneralSettings,
+      },
+      {
+        // visible: isCoach && !isAdmin,
+        visible: isCoach,
+        key: TABS.AVAILABILITY,
+        label: msg("settings.tabs.availability.label"),
+        Component: AvailabilitySettings,
+      },
+      {
+        visible: isAdmin,
+        key: TABS.ADMIN,
+        label: msg("settings.tabs.admin.label"),
+        Component: AdminSettings,
+      },
+    ].filter(prop("visible"));
+    return tabs;
   }, [isAdmin, isCoach, msg]);
 
   console.log("[SettingsPageInner.rndr]", { tabs });

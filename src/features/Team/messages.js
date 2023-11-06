@@ -73,8 +73,34 @@ export const messages = defineMessages({
     id: "team.credit.add-member.modal.desc",
     defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
   },
-  "team.credit.add-member.is-authorized": {
-    id: "team.credit.add-member.is-authorized",
+
+  "team.credit.add-member.fields.firstName": {
+    id: "team.credit.add-member.fields.firstName",
+    defaultMessage: "Name",
+  },
+  "team.credit.add-member.fields.lastName": {
+    id: "team.credit.add-member.fields.lastName",
+    defaultMessage: "Surname",
+  },
+  "team.credit.add-member.fields.username": {
+    id: "team.credit.add-member.fields.username",
+    defaultMessage: "Email",
+  },
+  "team.credit.add-member.fields.authorities": {
+    id: "team.credit.add-member.fields.authorities",
+    defaultMessage: "Authorities",
+  },
+  "team.credit.add-member.fields.locale": {
+    id: "team.credit.add-member.fields.locale",
+    defaultMessage: "Select languages",
+  },
+  "team.credit.add-member.fields.timeZone": {
+    id: "team.credit.add-member.fields.timeZone",
+    defaultMessage: "Timezone",
+  },
+
+  "team.credit.add-member.fields.is-authorized": {
+    id: "team.credit.add-member.fields.is-authorized",
     defaultMessage: "Trial user",
   },
 });

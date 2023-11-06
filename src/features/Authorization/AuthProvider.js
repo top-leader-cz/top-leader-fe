@@ -164,8 +164,9 @@ export function AuthProvider({ children }) {
     fetchUser: () => {
       queryClient.invalidateQueries({ queryKey: ["user-info"] });
     },
-    isCoach: hasRole(Authority.COACH) || hasRole(Authority.ADMIN),
-    isHR: hasRole(Authority.HR) || hasRole(Authority.ADMIN),
+    hasAuthority: hasRole,
+    isCoach: hasRole(Authority.COACH),
+    isHR: hasRole(Authority.HR),
     isAdmin: hasRole(Authority.ADMIN),
   };
 
