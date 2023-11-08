@@ -9,6 +9,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -153,15 +154,17 @@ export const I18nProvider = ({ children }) => {
       saveUserTz();
     }
   }, [saveUserTz, shouldSaveUserTz]);
+  const userTzWarningConfirmedRef = useRef(false);
   const userTzWarning = Boolean(
     user.data?.timeZone && browserTz && user.data?.timeZone !== browserTz
   );
   useEffect(() => {
     // TODO: move Alert in Layout or inside IntlProvider, translate
-    if (userTzWarning)
-      alert(
-        "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
-      );
+    if (userTzWarning && !userTzWarningConfirmedRef.current)
+      userTzWarningConfirmedRef.current = true;
+    alert(
+      "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
+    );
   }, [userTzWarning]);
 
   const onReset = useCallback(

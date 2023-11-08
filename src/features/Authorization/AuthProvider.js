@@ -60,13 +60,32 @@ const _resetPass = ({ authFetch, password, token }) =>
 const _fetchUser = ({ authFetch }) =>
   authFetch({ url: "/api/latest/user-info" });
 
-const throwOnError = (response) => {
-  console.log("FETCH ERR", { response });
-  const error = new Error(`Something went wrong. (${response?.status || ""})`);
-  error.response = response;
-  throw error;
-  // TODO: compare stacktrace
-  // throw response;
+const throwOnError = async ({ response, type }) => {
+  console.log("FETCH ERR START", { response });
+  let jsonMaybe, parsingError;
+  try {
+    jsonMaybe = await response.json();
+  } catch (e) {
+    parsingError = e;
+    console.log("FETCH ERR NOT PARSED", { response, parsingError });
+  } finally {
+    console.log("FETCH ERR FINALLY", { response, jsonMaybe, parsingError });
+
+    // TODO: get message from response
+    const generalErrorMessage = `Something went wrong. (${
+      response?.status || ""
+    })`;
+    const message =
+      process.env.NODE_ENV === "production" || !jsonMaybe
+        ? generalErrorMessage
+        : JSON.stringify({ status: response?.status, response: jsonMaybe });
+    const error = new Error(message);
+    error.response = response;
+    error.jsonMaybe = jsonMaybe;
+    throw error;
+    // TODO: compare stacktrace
+    // throw response;
+  }
 };
 
 export const FETCH_TYPE = {
@@ -108,7 +127,7 @@ export function AuthProvider({ children }) {
     ({ url, query, method = "GET", type = FETCH_TYPE.JSON, data }) =>
       fetch(qstr(url, query), getInit({ method, data }))
         .then(async (response) => {
-          if (!response.ok) throwOnError(response);
+          if (!response.ok) await throwOnError({ response, type });
           try {
             if (type === FETCH_TYPE.JSON) return await response.json();
             if (type === FETCH_TYPE.JSON_WITH_META)
