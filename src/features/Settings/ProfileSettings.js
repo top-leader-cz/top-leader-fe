@@ -35,6 +35,9 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
+import { ErrorBoundary } from "react-error-boundary";
+import { format, isValid } from "date-fns/fp";
+import { API_DATE_FORMAT } from "../I18n/utils/date";
 
 const FIELDS = {
   firstName: "firstName",
@@ -80,7 +83,9 @@ const to = (data, { userLocale, userTz }) => {
   return {
     ...data,
     certificates: data.rate || undefined,
-    experienceSince: data.experienceSince, // TODO: utc
+    experienceSince: isValid(data.experienceSince)
+      ? data.experienceSince
+      : format(API_DATE_FORMAT, new Date()), // TODO: utc
     languages: data.languages?.length ? data.languages : [userLocale],
   };
 };
@@ -313,7 +318,6 @@ export const ProfileSettings = () => {
       <P sx={{ mb: -1 }}>
         <Msg id="settings.profile.perex" />
       </P>
-
       <FormRow
         label={msg("settings.profile.field.publicProfile")}
         name={FIELDS.publicProfile}
@@ -322,7 +326,6 @@ export const ProfileSettings = () => {
           <SwitchField name={FIELDS.publicProfile} />
         </Box>
       </FormRow>
-
       <FormRow
         label={msg("settings.profile.field.name")}
         name={FIELDS.lastName}
@@ -365,7 +368,6 @@ export const ProfileSettings = () => {
           rows={4}
         />
       </FormRow>
-
       <FormRow
         label={msg("settings.profile.field.languages")}
         name={FIELDS.languages}
@@ -398,17 +400,16 @@ export const ProfileSettings = () => {
       {/* <FormRow
         label={msg("settings.profile.field.certificates")}
         name={FIELDS.certificates}
-      >
+        >
         <BareInputField name={FIELDS.certificates} rules={{}} />
       </FormRow> */}
-
       <FormRow
         label={msg("settings.profile.field.experience")}
         name={FIELDS.experienceSince}
       >
         <DatePickerField
           name={FIELDS.experienceSince}
-          // inputFormat={"MM/dd/yyyy"}
+          inputFormat={API_DATE_FORMAT}
           sx={{ ...WHITE_BG, width: "100%" }}
           size="small"
         />

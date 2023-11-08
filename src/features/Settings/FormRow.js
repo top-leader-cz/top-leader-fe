@@ -1,5 +1,6 @@
 import { Box, Divider } from "@mui/material";
 import { P } from "../../components/Typography";
+import { ErrorBoundary } from "react-error-boundary";
 
 export const FieldLayout = ({
   children,
@@ -38,16 +39,26 @@ export const FormRow = ({
   dividerBottom = false,
 }) => {
   return (
-    <FieldLayout
-      label={!label ? null : <LabelComponent>{label}</LabelComponent>}
-      labelProps={
-        label ? { component: "label", htmlFor: name } : { component: "div" }
-      }
-      dividerTop={dividerTop}
-      dividerBottom={dividerBottom}
-      sx={sx}
+    <ErrorBoundary
+      fallbackRender={({ error, resetErrorBoundary }) => {
+        console.log("FormRow", {
+          name,
+          error,
+        });
+        return `${error?.message}`;
+      }}
     >
-      {children}
-    </FieldLayout>
+      <FieldLayout
+        label={!label ? null : <LabelComponent>{label}</LabelComponent>}
+        labelProps={
+          label ? { component: "label", htmlFor: name } : { component: "div" }
+        }
+        dividerTop={dividerTop}
+        dividerBottom={dividerBottom}
+        sx={sx}
+      >
+        {children}
+      </FieldLayout>
+    </ErrorBoundary>
   );
 };

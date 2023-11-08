@@ -165,6 +165,7 @@ export function AuthProvider({ children }) {
       queryClient.invalidateQueries({ queryKey: ["user-info"] });
     },
     hasAuthority: hasRole,
+    isUser: hasRole(Authority.USER),
     isCoach: hasRole(Authority.COACH),
     isHR: hasRole(Authority.HR),
     isAdmin: hasRole(Authority.ADMIN),

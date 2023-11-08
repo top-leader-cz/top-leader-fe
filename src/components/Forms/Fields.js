@@ -64,7 +64,13 @@ const DateRangePicker = React.forwardRef(
     // return null;
 
     return (
-      <ErrorBoundary onError={onErrorDefault}>
+      <ErrorBoundary
+        fallbackRender={({ error, resetErrorBoundary }) => {
+          console.log({ error });
+          return `${error.message} - ${field?.value}`;
+        }}
+        onError={onErrorDefault}
+      >
         <Box display="flex" sx={sx}>
           <DesktopDatePicker
             ref={ref}
@@ -127,7 +133,13 @@ const TimeRangePicker = React.forwardRef(
     // return null;
 
     return (
-      <ErrorBoundary onError={onErrorDefault}>
+      <ErrorBoundary
+        fallbackRender={({ error, resetErrorBoundary }) => {
+          console.log({ error });
+          return `${error.message} - ${field?.value}`;
+        }}
+        onError={onErrorDefault}
+      >
         <Box display="flex" sx={sx}>
           <MuiTimePicker
             ref={ref}
@@ -178,7 +190,13 @@ export const TimeRangePickerField = ({
   // return null;
 
   return (
-    <ErrorBoundary onError={onErrorDefault}>
+    <ErrorBoundary
+      fallbackRender={({ error, resetErrorBoundary }) => {
+        console.log({ error });
+        return error.message;
+      }}
+      onError={onErrorDefault}
+    >
       <Controller
         name={name}
         rules={rules}
@@ -208,7 +226,13 @@ export const DateRangePickerField = ({
     //   dateAdapter={AdapterDateFns}
     //   localeText={{ start: "Check-in", end: "Check-out" }}
     // >
-    <ErrorBoundary onError={onErrorDefault}>
+    <ErrorBoundary
+      fallbackRender={({ error, resetErrorBoundary }) => {
+        console.log({ error });
+        return error.message;
+      }}
+      onError={onErrorDefault}
+    >
       <Controller
         // control={methods?.control}
         name={name}
@@ -263,19 +287,42 @@ export const DatePickerField = ({
   const methods = useFormContext();
   // return null;
   return (
-    <ErrorBoundary onError={onErrorDefault}>
+    <ErrorBoundary
+      onError={onErrorDefault}
+      fallbackRender={({ error, resetErrorBoundary }) => {
+        console.log("DatePickerField outer", {
+          methods,
+          name,
+          inputFormat,
+          error,
+        });
+        return `${error.message} - ${JSON.stringify({})}`;
+      }}
+    >
       <Controller
         control={control || methods?.control}
         name={name}
         rules={rules}
         render={({ field }) => (
-          <DesktopDatePicker
-            slotProps={{
-              textField: { size: "small" },
+          <ErrorBoundary
+            fallbackRender={({ error, resetErrorBoundary }) => {
+              console.log("DatePickerField inner", {
+                field,
+                name,
+                inputFormat,
+                error,
+              });
+              return `${error.message} - ${JSON.stringify(field?.value)}`;
             }}
-            format={inputFormat}
-            {...field}
-          />
+          >
+            <DesktopDatePicker
+              slotProps={{
+                textField: { size: "small" },
+              }}
+              format={inputFormat}
+              {...field}
+            />
+          </ErrorBoundary>
         )}
       />
     </ErrorBoundary>

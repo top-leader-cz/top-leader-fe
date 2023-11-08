@@ -11,6 +11,7 @@ import { ProfileSettings } from "./ProfileSettings";
 import { TLTabs } from "./Tabs";
 import { AdminSettings } from "./AdminSettings";
 import { prop } from "ramda";
+import { ErrorBoundary } from "react-error-boundary";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
@@ -62,8 +63,15 @@ function SettingsPageInner() {
 
   return (
     <Layout>
-      <Header text={msg("settings.heading")} noDivider />
-      <TLTabs tabs={tabs} />
+      <ErrorBoundary
+        fallbackRender={({ error, resetErrorBoundary }) => {
+          console.log({ error });
+          return error.message;
+        }}
+      >
+        <Header text={msg("settings.heading")} noDivider />
+        <TLTabs tabs={tabs} />
+      </ErrorBoundary>
     </Layout>
   );
 }

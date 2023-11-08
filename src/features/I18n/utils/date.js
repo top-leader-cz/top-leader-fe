@@ -4,6 +4,7 @@ import * as dffp from "date-fns/fp";
 window.dffp = dffp;
 
 export const UTC_DATE_FORMAT = "yyyy-MM-dd";
+export const API_DATE_FORMAT = "yyyy-MM-dd";
 export const API_TIME_FORMAT = "HH:mm:ss";
 
 export const parseUTCZoned = (userTz, utcStr) => {

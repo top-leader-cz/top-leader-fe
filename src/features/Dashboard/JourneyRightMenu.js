@@ -180,7 +180,7 @@ const CoachUpcomingSessions = ({ data }) => {
   );
 };
 
-const CoachSessionsCard = ({}) => {
+const UpcomingSessionsCard = ({}) => {
   const { isCoach } = useAuth();
   const { i18n } = useContext(I18nContext);
   const msg = useMsg();
@@ -241,13 +241,13 @@ const CoachSessionsCard = ({}) => {
   );
 };
 
-const SessionsActionCard = ({ ...rest }) => {
+const SessionsActionCards = ({ ...rest }) => {
   const { user } = useAuth();
   const areaOfDevelopment = user.data.areaOfDevelopment || [];
 
   return (
     <Box {...rest}>
-      <CoachSessionsCard />
+      <UpcomingSessionsCard />
       <ActionCard
         heading={<Msg id="dashboard.rightmenu.actions.heading" />}
         button={
@@ -283,7 +283,7 @@ export const JourneyRightMenu = ({ user }) => {
 
   return (
     <ScrollableRightMenu heading={<Msg id={"dashboard.rightmenu.title"} />}>
-      <SessionsActionCard />
+      <SessionsActionCards />
     </ScrollableRightMenu>
   );
 };
