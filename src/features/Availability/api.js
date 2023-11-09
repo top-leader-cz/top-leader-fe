@@ -339,6 +339,9 @@ export const usePickSlotMutation = ({
       queryClient.invalidateQueries({
         queryKey: ["coaches", username, "availability"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["user-info"],
+      });
       onSuccess?.(data);
     },
     ...mutationProps,

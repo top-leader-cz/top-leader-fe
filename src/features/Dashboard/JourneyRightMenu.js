@@ -124,7 +124,12 @@ const ScheduledDay = ({ time, name, username }) => {
       }}
     >
       <Box
-        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          minWidth: "35px",
+        }}
       >
         <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
           {i18n.formatLocal(parsed, "ccc")}
