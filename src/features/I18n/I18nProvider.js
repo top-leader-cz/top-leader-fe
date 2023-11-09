@@ -155,16 +155,20 @@ export const I18nProvider = ({ children }) => {
     }
   }, [saveUserTz, shouldSaveUserTz]);
   const userTzWarningConfirmedRef = useRef(false);
+  const userDataRef = useRef(user.data);
+  userDataRef.current = user.data;
   const userTzWarning = Boolean(
     user.data?.timeZone && browserTz && user.data?.timeZone !== browserTz
   );
   useEffect(() => {
     // TODO: move Alert in Layout or inside IntlProvider, translate
-    if (userTzWarning && !userTzWarningConfirmedRef.current)
+    if (userTzWarning && !userTzWarningConfirmedRef.current) {
       userTzWarningConfirmedRef.current = true;
-    alert(
-      "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
-    );
+      console.log({ userTz: userDataRef.current?.timeZone, browserTz });
+      alert(
+        "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
+      );
+    }
   }, [userTzWarning]);
 
   const onReset = useCallback(
