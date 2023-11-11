@@ -17,7 +17,7 @@ import {
   SignInPage,
 } from "../features/Authorization";
 import { Authority } from "../features/Authorization/AuthProvider";
-import { ResetPasswordPage } from "../features/Authorization/ResetPasswordPage";
+import { SetPasswordPage } from "../features/Authorization/SetPasswordPage";
 import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
 import { GetFeedbackPage } from "../features/Feedback/GetFeedback.page";
@@ -32,6 +32,7 @@ import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
 import { ClientsPage } from "../features/Clients/ClientsPage";
 import { StartSessionPage } from "../features/Sessions/StartSession.page";
+import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
 
 const GlobalSpinner = () => {
   return (
@@ -71,7 +72,7 @@ export const router = createHashRouter([
         path: routes.setPassword,
         element: (
           <ForbidAuth>
-            <ResetPasswordPage />
+            <SetPasswordPage />
           </ForbidAuth>
         ),
       },
@@ -79,7 +80,15 @@ export const router = createHashRouter([
         path: routes.setPassword_TODO_1_JAKUB_K,
         element: (
           <ForbidAuth>
-            <ResetPasswordPage />
+            <SetPasswordPage />
+          </ForbidAuth>
+        ),
+      },
+      {
+        path: routes.forgotPassword,
+        element: (
+          <ForbidAuth>
+            <ForgotPasswordPage />
           </ForbidAuth>
         ),
       },

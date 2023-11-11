@@ -54,4 +54,25 @@ export const messages = defineMessages({
     defaultMessage:
       "You’ve been invited to join TopLeader. Please set a password to complete the registration",
   },
+  "auth.forgot-pass.title": {
+    id: "auth.forgot-pass.title",
+    defaultMessage: "Forgot password",
+  },
+  "auth.forgot-pass.perex": {
+    id: "auth.forgot-pass.perex",
+    defaultMessage:
+      "Enter your email and we will send you instructions on how to reset your password",
+  },
+  "auth.forgot-pass.username.label": {
+    id: "auth.forgot-pass.username.label",
+    defaultMessage: "Email",
+  },
+  "auth.forgot-pass.submit": {
+    id: "auth.forgot-pass.submit",
+    defaultMessage: "Continue",
+  },
+  "auth.forgot-pass.back": {
+    id: "auth.forgot-pass.back",
+    defaultMessage: "Back to login",
+  },
 });

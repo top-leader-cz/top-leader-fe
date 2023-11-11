@@ -12,7 +12,7 @@ import { useParams } from "react-router";
 import { Typography } from "@mui/material";
 import { P } from "../../components/Typography";
 
-export const ResetPasswordPage = () => {
+export const SetPasswordPage = () => {
   const msg = useMsg({ dict: messages });
   const { token, email } = useParams();
   const { resetPasswordMutation } = useAuth();
@@ -36,7 +36,7 @@ export const ResetPasswordPage = () => {
     ? msg("auth.login.validation.invalid-credentials")
     : "";
 
-  console.log("[ResetPasswordPage.rndr]", {
+  console.log("[SetPasswordPage.rndr]", {
     disabled,
     errorMsg,
     form,

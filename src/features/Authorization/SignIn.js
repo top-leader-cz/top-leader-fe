@@ -8,6 +8,7 @@ import { useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
+import { routes } from "../../routes";
 
 export function SignInPage() {
   const { loginMutation } = useAuth();
@@ -76,6 +77,7 @@ export function SignInPage() {
         <Button
           fullWidth
           variant="text"
+          href={routes.forgotPassword}
           sx={{
             width: "auto",
             float: "right",

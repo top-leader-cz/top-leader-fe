@@ -13,6 +13,7 @@ const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";
 
 export const WelcomeScreenTemplate = ({
+  title = <Msg id="auth.unauthorized.title" />,
   perex = (
     <Typography variant="body1" mt={1} mb={4} textAlign="center">
       <Msg id="auth.unauthorized.perex" />
@@ -58,7 +59,7 @@ export const WelcomeScreenTemplate = ({
               {/* <LockOutlinedIcon /> */}
             </Avatar>
             <Typography variant="h1" mt={3}>
-              <Msg id="auth.unauthorized.title" />
+              {title}
             </Typography>
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
               Please enter your details
