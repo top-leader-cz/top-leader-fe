@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { curryN } from "ramda";
 
 export const LANGUAGE_OPTIONS = [
   { value: "cs", label: "Čeština" },
@@ -36,8 +37,11 @@ export const renderLanguageOption = (props, option, { selected } = {}) => (
   </Box>
 );
 
-export const getLabel = (options) => (searchValue) =>
-  options.find(({ value }) => value === searchValue)?.label || searchValue;
+export const getLabel = curryN(
+  2,
+  (options, searchValue) =>
+    options.find(({ value }) => value === searchValue)?.label || searchValue
+);
 
 // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 

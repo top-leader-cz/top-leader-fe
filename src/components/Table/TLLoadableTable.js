@@ -1,6 +1,8 @@
 import {
   Avatar,
   Box,
+  Chip,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -48,6 +50,18 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
     // border: 0,
   },
 }));
+
+export const TLChipsCell = ({ children, chips = [], ...props }) => {
+  return (
+    <StyledTableCell {...props}>
+      <Stack direction="row" spacing={1}>
+        {chips?.map?.(({ label, bgcolor }) => (
+          <Chip label={label} sx={{ bgcolor, borderRadius: "6px" }} />
+        ))}
+      </Stack>
+    </StyledTableCell>
+  );
+};
 
 export const TLCell = ({
   children,
@@ -104,7 +118,7 @@ export const TLLoadableTable = ({
           <TableHead>
             <TableRow>
               {columns.map(({ label, key }) => (
-                <TLCell key={key}>{label}</TLCell>
+                <TLCell key={key || label}>{label}</TLCell>
               ))}
             </TableRow>
           </TableHead>
@@ -125,7 +139,11 @@ export const TLLoadableTable = ({
                         key={row[key]}
                         //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                       >
-                        {columns.map((column) => column.render(row))}
+                        {columns.map((column) => (
+                          <Fragment key={column.key || column.label}>
+                            {column.render(row)}
+                          </Fragment>
+                        ))}
                       </StyledTableRow>
                     );
 
@@ -134,7 +152,11 @@ export const TLLoadableTable = ({
                       <StyledTableRow
                       //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                       >
-                        {columns.map((column) => column.render(row))}
+                        {columns.map((column) => (
+                          <Fragment key={column.key || column.label}>
+                            {column.render(row)}
+                          </Fragment>
+                        ))}
                       </StyledTableRow>
 
                       {expandedEl}

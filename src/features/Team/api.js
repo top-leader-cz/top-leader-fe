@@ -39,6 +39,7 @@ export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
         url: `/api/latest/user`,
         data: (() => {
           console.log("[useCreateUserMutation]", { values });
+          // debugger;
           return {
             firstName: values.firstName,
             lastName: values.lastName,
@@ -46,7 +47,7 @@ export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
             authorities: values.authorities,
             locale: values.locale?.substring?.(0, 2) ?? "en",
             timeZone: values.timeZone,
-            status: values.isAuthorized ? "AUTHORIZED" : "PENDING",
+            status: values.trialUser ? "AUTHORIZED" : "PENDING",
           };
         })(),
       }),

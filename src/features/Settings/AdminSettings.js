@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { TLCell } from "../../components/Table/TLLoadableTable";
+import { TLCell, TLChipsCell } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
@@ -15,6 +15,8 @@ import { MemberAdminModal } from "./Admin/MemberAdminModal";
 import { messages } from "./messages";
 import { gray500 } from "../../theme";
 import { useMutation, useQueryClient } from "react-query";
+import { getLabel } from "../../components/Forms";
+import { useUserStatusDict } from "./useUserStatusDict";
 
 const MOCK = [
   {
@@ -77,6 +79,7 @@ export const useConfirmRequestedCreditMutation = ({
 function AdminSettingsInner() {
   const [user, setUser] = useState();
   const msg = useMsg();
+  const { userStatusOptions } = useUserStatusDict();
 
   const usersQuery = useUsersQuery();
   const confirmCreditMutation = useConfirmRequestedCreditMutation({});
@@ -187,12 +190,15 @@ function AdminSettingsInner() {
     {
       label: msg("settings.admin.table.col.status"),
       key: "status",
-      render: (row) => (
-        <TLCell
-          variant="emphasized"
-          name={`${row.isTrial ? "trial user - " : ""}${row.status}`}
-        />
-      ),
+      render: (row) => {
+        const chips = [].concat(row.status || []).map(
+          (status) =>
+            userStatusOptions.find((option) => option.value === status) || {
+              label: status,
+            }
+        );
+        return <TLChipsCell chips={chips} />;
+      },
     },
     {
       label: msg("settings.admin.table.col.action"),

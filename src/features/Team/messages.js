@@ -99,8 +99,8 @@ export const messages = defineMessages({
     defaultMessage: "Timezone",
   },
 
-  "team.credit.add-member.fields.is-authorized": {
-    id: "team.credit.add-member.fields.is-authorized",
+  "team.credit.add-member.fields.trial-user": {
+    id: "team.credit.add-member.fields.trial-user",
     defaultMessage: "Trial user",
   },
 });

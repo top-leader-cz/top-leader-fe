@@ -197,9 +197,32 @@ export const CheckboxField = ({ name, rules, ...props }) => {
     <Controller
       name={name}
       rules={rules}
-      render={({ field }) => (
-        <Checkbox {...{ ...props, ...field, checked: !!field.value, name }} />
-      )}
+      render={({ field }) => {
+        // TODO: develop in storybook properly
+        const inverted = false;
+        const invertedProps = inverted
+          ? {
+              checked: !field.value,
+              onChange: (e, value) => {
+                console.log({ e, value });
+                // debugger;
+                field.onChange(e, !value);
+              },
+            }
+          : {};
+        console.log("CheckboxField", name, { inverted, invertedProps, field });
+        return (
+          <Checkbox
+            {...{
+              ...props,
+              ...field,
+              checked: !!field.value,
+              ...invertedProps,
+              name,
+            }}
+          />
+        );
+      }}
     />
   );
 };

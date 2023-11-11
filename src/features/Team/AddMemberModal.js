@@ -27,6 +27,7 @@ import { useCreateUserMutation } from "./api";
 import { messages } from "./messages";
 import { gray500 } from "../../theme";
 
+const HIDDEN_FIELD = { sx: { display: "none" } };
 export const AddMemberModal = ({ onClose, open }) => {
   const msg = useMsg({ dict: messages });
   const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
@@ -42,7 +43,8 @@ export const AddMemberModal = ({ onClose, open }) => {
       authorities: ["USER"],
       locale: language?.substring(0, 2) ?? "en",
       timeZone: userTz,
-      isAuthorized: false,
+      trialUser: false,
+      // isAuthorized: false,
     },
   });
   const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
@@ -124,6 +126,7 @@ export const AddMemberModal = ({ onClose, open }) => {
                 label: value,
               }))}
               label={msg("team.credit.add-member.fields.authorities")}
+              {...HIDDEN_FIELD}
             />
             <AutocompleteSelect
               disableClearable
@@ -140,8 +143,8 @@ export const AddMemberModal = ({ onClose, open }) => {
               // TODO: translations? should be always populated
             />
             <FormControlLabel
-              control={<CheckboxField name="isAuthorized" />}
-              label={msg("team.credit.add-member.is-authorized")}
+              control={<CheckboxField name="trialUser" />}
+              label={msg("team.credit.add-member.fields.trial-user")}
             />
 
             <Divider flexItem sx={{ mt: 3 }} />
