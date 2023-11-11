@@ -31,6 +31,7 @@ import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
 import { ClientsPage } from "../features/Clients/ClientsPage";
+import { StartSessionPage } from "../features/Sessions/StartSession.page";
 
 const GlobalSpinner = () => {
   return (
@@ -143,6 +144,14 @@ export const router = createHashRouter([
         element: (
           <RequireAuth>
             <EditSessionPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.startSession,
+        element: (
+          <RequireAuth>
+            <StartSessionPage />
           </RequireAuth>
         ),
       },

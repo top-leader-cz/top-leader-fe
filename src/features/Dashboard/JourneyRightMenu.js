@@ -214,7 +214,7 @@ const UpcomingSessionsCard = ({}) => {
         !query.isLoading &&
         !query.data?.length && {
           variant: "contained",
-          href: routes.newSession,
+          href: routes.startSession,
           children: <Msg id="dashboard.rightmenu.upcoming.start" />,
         }
       }
@@ -258,9 +258,7 @@ const SessionsActionCards = ({ ...rest }) => {
         button={
           !areaOfDevelopment.length && {
             variant: "outlined",
-            href: !areaOfDevelopment.length
-              ? routes.newSession
-              : routes.sessions,
+            href: routes.startSession,
             children: <Msg id="dashboard.rightmenu.actions.set-area" />,
           }
         }

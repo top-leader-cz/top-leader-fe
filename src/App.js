@@ -1,4 +1,4 @@
-import { Backdrop, Button, CircularProgress } from "@mui/material";
+import { Button } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -6,29 +6,17 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ErrorBoundary } from "react-error-boundary";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { RouterProvider } from "react-router-dom";
-import { AuthProvider, useAuth } from "./features/Authorization/AuthProvider";
+import { AuthProvider } from "./features/Authorization/AuthProvider";
 import { I18nProvider } from "./features/I18n/I18nProvider";
+import "./index.css";
 import { router } from "./routes";
 import theme from "./theme";
-import "./index.css";
+import React from "react";
 
 import { RightMenuProvider } from "./components/Layout"; // circular dependency when imported earlier
+import { GlobalLoader } from "./features/GlobalLoader/GlobalLoader";
 
 const queryClient = new QueryClient();
-
-const GlobalLoader = ({ children }) => {
-  const auth = useAuth();
-  if (auth.isLoggedIn && !auth.user.data)
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-  else return children;
-};
 
 const RESET = () => {
   sessionStorage.clear();
@@ -50,7 +38,6 @@ function ResetAll({ error, resetErrorBoundary }) {
 }
 
 export default function App() {
-  console.log("App rndr");
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
       <QueryClientProvider client={queryClient}>

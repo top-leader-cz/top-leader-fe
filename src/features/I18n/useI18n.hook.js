@@ -101,7 +101,11 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
 
   const formatDistanceToNowLocal = useCallback(
     (date, options = {}) => {
-      return formatDistanceToNow(date, { ...options, locale });
+      try {
+        return formatDistanceToNow(date, { ...options, locale });
+      } catch (e) {
+        return e?.message || "Invalid date";
+      }
     },
     [locale]
   );

@@ -252,7 +252,7 @@ const DashboardCardSession = ({ selectedKeys = [] }) => {
           ? msg("dashboard.cards.sessions.title.filled")
           : msg("dashboard.cards.sessions.title.empty")
       }
-      href={routes.newSession}
+      href={routes.startSession}
       items={items}
       fallbackIcon={{ name: "FitnessCenterOutlined", color: "#66C61C" }}
     />

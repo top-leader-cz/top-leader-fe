@@ -23,65 +23,29 @@ import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
-import { ErrorBoundary } from "react-error-boundary";
 import { onErrorDefault } from "./Form";
+import { ErrorBoundary } from "../ErrorBoundary";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 
-// export const DateRangePicker = ({ name, ...props }) => {
-//   const [value, setValue] = useState([null, null]);
-//   console.log("%c[DateRangePicker.rndr]", "color:coral;", { name });
-
-//   return (
-//     <DesktopDatePicker
-
-//       renderInput={({ value, onChange }) => (
-//         <>
-//           <TextField {...{ value: value?.[0] }} />
-//           <Box sx={{ mx: 2 }}> to </Box>
-//           <TextField {...{ value: value?.[1] }} />
-//         </>
-//       )}
-//     />
-//   );
-// };
-
 const DateRangePicker = React.forwardRef(
   ({ field, sx, inputFormat, ...props }, ref) => {
-    // console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
-    //   field,
-    //   props,
-    // });
-
     const [startValue, endValue] = field.value ?? [];
     const onChange = (idx) => (date) => {
       const newValue = [startValue, endValue];
       newValue[idx] = date;
       return field.onChange(newValue);
     };
-
-    // return null;
-
+    // console.log("%c[DateRangePicker.rndr]", "color:navy;", field.name, {
+    //   field,
+    //   props,
+    // });
     return (
-      <ErrorBoundary
-        fallbackRender={({ error, resetErrorBoundary }) => {
-          console.log({ error });
-          return `${error.message} - ${field?.value}`;
-        }}
-        onError={onErrorDefault}
-      >
+      <ErrorBoundary extraInfo={field?.value}>
         <Box display="flex" sx={sx}>
           <DesktopDatePicker
             ref={ref}
-            // renderInput={(params) => (
-            //   <TextField
-            //     size="small"
-            //     sx={{ width: 180 }}
-            //     {...props}
-            //     {...params}
-            //   />
-            // )}
             slotProps={{
               textField: { size: "small", sx: { width: 180 } },
             }}
@@ -98,14 +62,6 @@ const DateRangePicker = React.forwardRef(
             slotProps={{
               textField: { size: "small", sx: { width: 180 } },
             }}
-            // renderInput={(params) => (
-            //   <TextField
-            //     size="small"
-            //     sx={{ width: 180 }}
-            //     {...props}
-            //     {...params}
-            //   />
-            // )}
             // name={field.name}
             onChange={onChange(1)}
             onBlur={field.onBlur}
@@ -120,26 +76,18 @@ const DateRangePicker = React.forwardRef(
 
 const TimeRangePicker = React.forwardRef(
   ({ inputProps, field, sx, inputFormat, ...props }, ref) => {
-    // console.log("%c[TimeRangePicker.rndr]", "color:coral;", field.name, {
-    //   field,
-    //   props,
-    // });
-
     const onChange = (idx) => (date) => {
       const newValue = [...(field?.value ?? [])];
       newValue[idx] = date;
       return field.onChange(newValue);
     };
-    // return null;
+    // console.log("%c[TimeRangePicker.rndr]", "color:coral;", field.name, {
+    //   field,
+    //   props,
+    // });
 
     return (
-      <ErrorBoundary
-        fallbackRender={({ error, resetErrorBoundary }) => {
-          console.log({ error });
-          return `${error.message} - ${field?.value}`;
-        }}
-        onError={onErrorDefault}
-      >
+      <ErrorBoundary extraInfo={field?.value}>
         <Box display="flex" sx={sx}>
           <MuiTimePicker
             ref={ref}
@@ -190,13 +138,7 @@ export const TimeRangePickerField = ({
   // return null;
 
   return (
-    <ErrorBoundary
-      fallbackRender={({ error, resetErrorBoundary }) => {
-        console.log({ error });
-        return error.message;
-      }}
-      onError={onErrorDefault}
-    >
+    <ErrorBoundary>
       <Controller
         name={name}
         rules={rules}
@@ -220,21 +162,13 @@ export const DateRangePickerField = ({
     [i18n.uiFormats.inputDateFormat, inputFormatProp]
   );
 
-  // return null;
   return (
     // <LocalizationProvider
     //   dateAdapter={AdapterDateFns}
     //   localeText={{ start: "Check-in", end: "Check-out" }}
     // >
-    <ErrorBoundary
-      fallbackRender={({ error, resetErrorBoundary }) => {
-        console.log({ error });
-        return error.message;
-      }}
-      onError={onErrorDefault}
-    >
+    <ErrorBoundary>
       <Controller
-        // control={methods?.control}
         name={name}
         rules={rules}
         render={({ field }) => (
@@ -249,7 +183,6 @@ export const DateRangePickerField = ({
 export const SwitchField = ({ name, rules, ...props }) => {
   return (
     <Controller
-      // control={control || methods?.control}
       name={name}
       rules={rules}
       render={({ field }) => (
@@ -276,48 +209,27 @@ export const DatePickerField = ({
   name,
   rules,
   inputFormat: inputFormatProp,
-  ...props
+  textFieldProps,
 }) => {
   const { i18n } = useContext(I18nContext);
   const inputFormat = useMemo(
     () => inputFormatProp || i18n.uiFormats.inputDateFormat,
     [i18n.uiFormats.inputDateFormat, inputFormatProp]
   );
-  // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
   const methods = useFormContext();
-  // return null;
+  // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
+
   return (
-    <ErrorBoundary
-      onError={onErrorDefault}
-      fallbackRender={({ error, resetErrorBoundary }) => {
-        console.log("DatePickerField outer", {
-          methods,
-          name,
-          inputFormat,
-          error,
-        });
-        return `${error.message} - ${JSON.stringify({})}`;
-      }}
-    >
+    <ErrorBoundary>
       <Controller
         control={control || methods?.control}
         name={name}
         rules={rules}
         render={({ field }) => (
-          <ErrorBoundary
-            fallbackRender={({ error, resetErrorBoundary }) => {
-              console.log("DatePickerField inner", {
-                field,
-                name,
-                inputFormat,
-                error,
-              });
-              return `${error.message} - ${JSON.stringify(field?.value)}`;
-            }}
-          >
+          <ErrorBoundary extraInfo={field?.value}>
             <DesktopDatePicker
               slotProps={{
-                textField: { size: "small" },
+                textField: { size: "small", ...textFieldProps },
               }}
               format={inputFormat}
               {...field}
@@ -520,9 +432,9 @@ export const AutocompleteSelect = ({
   options,
   renderOption,
   InputProps,
-  disableIsOptionEqualToValue,
   placeholder,
   multiple,
+  enableIsOptionEqualToValue = !multiple, // TODO: progressively enable everywhere
   disableCloseOnSelect,
   autoComplete,
   onChange,
@@ -533,6 +445,7 @@ export const AutocompleteSelect = ({
   AutocompleteComponent = Autocomplete,
   TextFieldComponent = TextField,
   disableClearable,
+  ...props
 }) => {
   const from = useMemo(
     () =>
@@ -559,12 +472,12 @@ export const AutocompleteSelect = ({
           disableCloseOnSelect={disableCloseOnSelect}
           disableClearable={disableClearable}
           options={options}
-          // isOptionEqualToValue={ // TODO: try to handle multiple
-          //   disableIsOptionEqualToValue
-          //     ? undefined
-          //     : (option, value) => option.value === value
-          // }
-          // getOptionSelected
+          isOptionEqualToValue={
+            // TODO: test multiple works
+            enableIsOptionEqualToValue
+              ? (option, value) => option.value === value
+              : undefined
+          }
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
             getOption(options, optionOrValue)?.label ||
@@ -572,7 +485,6 @@ export const AutocompleteSelect = ({
           }
           size="small"
           renderOption={renderOption}
-          // value={getValue(options, field.value)}
           onChange={(event, data, action, other) => {
             // console.log(...color("blue", "[AutocompleteSelect.onChange]"), {
             //   name,
@@ -614,6 +526,7 @@ export const AutocompleteSelect = ({
               {...textFieldProps}
             />
           )}
+          {...props}
           // inputValue={`${field.value}`}
           // onInputChange={(event, newInputValue) => {
           //   console.log("[AutocompleteSelect.onInputChange]", {

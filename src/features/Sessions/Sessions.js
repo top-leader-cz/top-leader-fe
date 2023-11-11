@@ -26,6 +26,7 @@ import { useMakeSelectable } from "../Values/MyValues";
 import { useAreasDict } from "./areas";
 import { messages } from "./messages";
 import { I18nContext } from "../I18n/I18nProvider";
+import { parametrizedRoutes } from "../../routes/constants";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (
@@ -122,7 +123,7 @@ const SessionCard = ({
       <CardActionArea
         sx={{ height: "100%" }}
         disableRipple
-        href={id ? generatePath(routes.editSession, { id }) : undefined} // TODO?
+        href={id ? parametrizedRoutes.editSession({ id }) : undefined}
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
@@ -157,14 +158,28 @@ const SessionCard = ({
   );
 };
 
-function Sessions() {
-  const msg = useMsg({ dict: messages });
+export const useSessionsQuery = (qParams = {}) => {
   const { authFetch } = useAuth();
+  const { language } = useContext(I18nContext);
+
   const sessionsQuery = useQuery({
     queryKey: ["user-sessions", "history"],
-    queryFn: () => authFetch({ url: `/api/latest/history/USER_SESSION` }),
+    queryFn: () =>
+      authFetch({ url: `/api/latest/history/USER_SESSION` }).then((data) => {
+        const sortAlphaNum = ({ createdAt: a }, { createdAt: b }) =>
+          b.localeCompare(a, language, { numeric: true });
+        console.log({ data });
+        return data.sort(sortAlphaNum);
+      }),
+    ...qParams,
     // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
   });
+  return sessionsQuery;
+};
+
+function Sessions() {
+  const msg = useMsg({ dict: messages });
+  const sessionsQuery = useSessionsQuery();
   const sel = useMakeSelectable({
     entries: sessionsQuery.data ?? [],
     map: (el) => ({
@@ -206,7 +221,7 @@ function Sessions() {
             // onRemove={history.remove}
             buttonProps={{
               children: <Msg id="sessions.aside.start-button" />,
-              onClick: () => navigate(routes.newSession),
+              onClick: () => navigate(routes.startSession),
             }}
           />
         }
@@ -219,7 +234,10 @@ function Sessions() {
             </Card>
           )}
         >
-          {sel.selected && <SessionCard session={sel.selected} />}
+          {sel.all?.map((session) => (
+            <SessionCard session={session} />
+          ))}
+          {/* {sel.selected && <SessionCard session={sel.selected} />} */}
         </ErrorBoundary>
       </Layout>
     </MsgProvider>

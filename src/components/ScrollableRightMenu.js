@@ -1,6 +1,6 @@
 import { Box, Button, Paper } from "@mui/material";
 import { H2 } from "./Typography";
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export const ScrollableRightMenu = ({
   heading,
@@ -9,12 +9,7 @@ export const ScrollableRightMenu = ({
   sx = {},
 }) => {
   return (
-    <ErrorBoundary
-      fallbackRender={({ error, resetErrorBoundary }) => {
-        console.log({ error });
-        return error.message;
-      }}
-    >
+    <ErrorBoundary>
       <Paper
         square
         sx={{

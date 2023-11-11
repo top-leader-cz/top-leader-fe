@@ -1,3 +1,5 @@
+import { generatePath } from "react-router-dom";
+
 export const routes = {
   signIn: "/sign-in",
   setPassword: "/set-password/:email/:token/*",
@@ -11,6 +13,7 @@ export const routes = {
   sessions: "/sessions",
   newSession: "/new-session",
   editSession: "/session/:id",
+  startSession: "/start-session",
   coaches: "/coaches",
   settings: "/settings",
   getFeedback: "/get-feedback",
@@ -20,4 +23,8 @@ export const routes = {
   muiDefaultApp: "/mui-default-app",
   craDefaultApp: "/cra",
   dev: "/dev",
+};
+
+export const parametrizedRoutes = {
+  editSession: ({ id }) => generatePath(routes.editSession, { id }),
 };

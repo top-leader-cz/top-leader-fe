@@ -1,5 +1,5 @@
 import { Alert, Box, Chip } from "@mui/material";
-
+import { isValid, parse } from "date-fns/fp";
 import {
   useCallback,
   useContext,
@@ -10,12 +10,7 @@ import {
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
-import {
-  LANGUAGE_OPTIONS,
-  getCoachLanguagesOptions,
-  getLabel,
-  renderLanguageOption,
-} from "../../components/Forms";
+import { getCoachLanguagesOptions, getLabel } from "../../components/Forms";
 import {
   AutocompleteSelect,
   BareInputField,
@@ -31,13 +26,13 @@ import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
+import { API_DATE_FORMAT } from "../I18n/utils/date";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
-import { ErrorBoundary } from "react-error-boundary";
-import { format, isValid } from "date-fns/fp";
-import { API_DATE_FORMAT } from "../I18n/utils/date";
+import * as tz from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz/fp";
 
 const FIELDS = {
   firstName: "firstName",
@@ -53,26 +48,6 @@ const FIELDS = {
   rate: "rate",
 };
 
-const _COACH = {
-  [FIELDS.firstName]: "Darnell",
-  [FIELDS.lastName]: "Brekke",
-  [FIELDS.email]: "darnell.brekke@gmail.com",
-  [FIELDS.bio]:
-    "Saepe aspernatur enim velit libero voluptas aut optio nihil est. Ipsum porro aut quod sunt saepe error est consequatur. Aperiam hic consequuntur qui aut omnis atque voluptatum sequi deleniti. ",
-  [FIELDS.languages]: [
-    Intl.DateTimeFormat().resolvedOptions().locale.substring(0, 2),
-  ],
-  // [FIELDS.languages]: navigator.language.substring(0, 2),
-  // https://stackoverflow.com/questions/673905/how-to-determine-users-locale-within-browser
-  // https://attacomsian.com/blog/javascript-current-timezone
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions
-  [FIELDS.fields]: ["business", "life"],
-  [FIELDS.certificates]: undefined, // "Associate Coach Certified - Issued by ICF",
-  [FIELDS.experienceSince]: new Date(Date.now() - 7 * 24 * 3600 * 1000),
-  [FIELDS.rate]: "",
-  [FIELDS.publicProfile]: false,
-};
-
 export const certificatesOptions = [
   { value: "$", label: "ICF ACC / EMCC EIA Practitioner" },
   { value: "$$", label: "ICF PCC / EMCC EIA Senior Practitioner" },
@@ -80,24 +55,30 @@ export const certificatesOptions = [
 ];
 
 const to = (data, { userLocale, userTz }) => {
-  return {
+  const experienceSince = parse(
+    new Date(),
+    API_DATE_FORMAT,
+    data.experienceSince
+  );
+  const initialValues = {
     ...data,
     certificates: data.rate || undefined,
-    experienceSince: isValid(data.experienceSince)
-      ? data.experienceSince
-      : format(API_DATE_FORMAT, new Date()), // TODO: utc
+    experienceSince: isValid(experienceSince) ? experienceSince : null,
     languages: data.languages?.length ? data.languages : [userLocale],
   };
+  console.log("to", { initialValues, data });
+  return initialValues;
 };
 
-const from = async ({ imageSrc, rate, certificates, ...values }) => {
-  console.log("from", { imageSrc, ...values }); // TODO: extract "upload component" and "upload form field"
-  return {
-    ...values,
+const from = async (values, { userTz }) => {
+  const { imageSrc, rate, certificates, experienceSince, ...rest } = values;
+  const payload = {
+    ...rest,
     rate: certificates,
-    // certificates,
-    experienceSince: values.experienceSince, // TODO
+    experienceSince: formatInTimeZone(API_DATE_FORMAT, userTz, experienceSince),
   };
+  console.log("from", { imageSrc, ...rest }); // TODO: extract "upload component" and "upload form field"
+  return payload;
 };
 
 export const useResetForm = ({ to, form, initialResetting }) => {
@@ -123,41 +104,34 @@ export const useResetForm = ({ to, form, initialResetting }) => {
 };
 
 export const ProfileSettings = () => {
-  const { authFetch, user } = useAuth();
   const msg = useMsg();
+  const { authFetch, user } = useAuth();
+  const { language, i18n, userTz } = useContext(I18nContext);
   const { fieldsOptions } = useFieldsDict();
   const form = useForm({});
-  const { language, i18n } = useContext(I18nContext);
   const { resetForm, resetting } = useResetForm({
     initialResetting: true,
     form,
     to: useCallback(
-      (data) => to(data, { userLocale: language.substring(0, 2) }),
-      [language]
+      (data) => to(data, { userTz, userLocale: language.substring(0, 2) }),
+      [language, userTz]
     ),
   });
   const certificates = form.watch("certificates");
 
   const initialValuesQuery = useQuery({
-    queryKey: ["coach-info"], // TODO?
+    queryKey: ["coach-info"],
     queryFn: () => authFetch({ url: "/api/latest/coach-info" }),
     staleTime: 20 * 1000,
     retry: 1,
-    // refetchOnMount: "always",
-    // Reset needed on every component mount -> eff
-    // onSuccess: (data) => {
-    //   // console.log("%cDATA", "color:blue", { data });
-    //   resetForm(data);
-    // },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (values) =>
-      console.log("[save start]", { values, payload: await from(values) }) ||
       authFetch({
         url: "/api/latest/coach-info",
         method: "POST",
-        data: await from(values),
+        data: await from(values, { userTz }),
       }),
     onSuccess: (data) => {
       console.log("[save success]", { data });
@@ -250,9 +224,7 @@ export const ProfileSettings = () => {
             {msg("settings.profile.field.experience")}
             {": "}
             {COACH.experienceSince
-              ? `${i18n.formatDistanceToNowLocal(
-                  i18n.parseDate(COACH.experienceSince)
-                )}`
+              ? `${i18n.formatDistanceToNowLocal(COACH.experienceSince)}`
               : ""}
           </P>
           <P mt={1}>
@@ -380,6 +352,7 @@ export const ProfileSettings = () => {
           options={getCoachLanguagesOptions()}
           // renderOption={renderLanguageOption}
           placeholder={msg("settings.profile.field.languages.placeholder")}
+          enableIsOptionEqualToValue
         />
       </FormRow>
 
@@ -394,6 +367,7 @@ export const ProfileSettings = () => {
           name={FIELDS.fields}
           options={fieldsOptions}
           placeholder={msg("settings.profile.field.fields.placeholder")}
+          enableIsOptionEqualToValue
         />
       </FormRow>
 
@@ -409,8 +383,7 @@ export const ProfileSettings = () => {
       >
         <DatePickerField
           name={FIELDS.experienceSince}
-          inputFormat={API_DATE_FORMAT}
-          sx={{ ...WHITE_BG, width: "100%" }}
+          textFieldProps={{ sx: { ...WHITE_BG, width: "100%" } }}
           size="small"
         />
       </FormRow>
