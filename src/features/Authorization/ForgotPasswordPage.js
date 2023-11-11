@@ -66,7 +66,6 @@ export const ForgotPasswordPage = () => {
           </Typography>
         </>
       }
-      containerSx={{ mt: 14 }}
     >
       <RHForm form={form} onSubmit={handleSubmit}>
         <RHFTextField

@@ -55,7 +55,6 @@ export const SetPasswordPage = () => {
           <P sx={{ color: "black", mt: 0, mb: 3 }}>{email}</P>
         </>
       }
-      containerSx={{ mt: 14 }}
     >
       <RHForm form={form} onSubmit={handleSubmit}>
         <RHFTextField

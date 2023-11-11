@@ -37,8 +37,8 @@ export const WelcomeScreenTemplate = ({
         >
           <Box
             sx={{
-              my: 8,
-              mx: "25%",
+              my: "25%",
+              mx: { sm: "10%", md: "25%" },
               // width: "33%",
               display: "flex",
               flexDirection: "column",
@@ -58,7 +58,7 @@ export const WelcomeScreenTemplate = ({
             >
               {/* <LockOutlinedIcon /> */}
             </Avatar>
-            <Typography variant="h1" mt={3}>
+            <Typography variant="h1" mt={3} sx={{ textAlign: "center" }}>
               {title}
             </Typography>
             {/* <Typography variant="subtitle2" mt={1} mb={5}>
