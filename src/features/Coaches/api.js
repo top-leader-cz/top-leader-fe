@@ -34,7 +34,7 @@ const useCoachAvailabilityQuery = ({ username }) => {
   });
 };
 
-export const useUserUpcomingSessionsQuery = () => {
+export const useUserUpcomingSessionsQuery = (params = {}) => {
   const { authFetch } = useAuth();
   /*
   [
@@ -64,6 +64,7 @@ export const useUserUpcomingSessionsQuery = () => {
           ])
         )
       ),
+    ...params,
   });
 };
 

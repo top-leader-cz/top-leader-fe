@@ -84,7 +84,7 @@ const EmptyActionCardContent = ({
 //   { checked: true, date: "2023-09-06", id: 42, label: "Mock Task2: TODO: RM from FE", },
 // ];
 
-const Actions = ({ canFetch, ...props }) => {
+const Actions = ({ canFetch = true, ...props }) => {
   const sessionQuery = useUserSessionQuery({
     enabled: canFetch,
     refetchOnReconnect: true,
@@ -169,7 +169,8 @@ const CoachUpcomingSessions = ({ data }) => {
         display: "flex",
         flexDirection: "column",
         py: 2.5,
-        height: "300px",
+        // height: "300px",
+        maxHeight: "300px",
         overflow: "scroll",
       }}
     >
@@ -189,8 +190,12 @@ const UpcomingSessionsCard = ({}) => {
   const { isCoach } = useAuth();
   const { i18n } = useContext(I18nContext);
   const msg = useMsg();
-  const coachUpcomingSessionsQuery = useUpcomingCoachSessionsQuery();
-  const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery();
+  const coachUpcomingSessionsQuery = useUpcomingCoachSessionsQuery({
+    enabled: isCoach,
+  });
+  const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery({
+    enabled: !isCoach,
+  });
   const query = isCoach
     ? coachUpcomingSessionsQuery
     : userUpcomingSessionsQuery;
@@ -262,7 +267,7 @@ const SessionsActionCards = ({ ...rest }) => {
             children: <Msg id="dashboard.rightmenu.actions.set-area" />,
           }
         }
-        sx={{ mt: 10, mb: 5 }}
+        sx={{ mt: 5, mb: 5 }}
       >
         {!areaOfDevelopment.length ? (
           <EmptyActionCardContent
