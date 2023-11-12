@@ -23,6 +23,8 @@ import messages_fr from "../../translations/fr.json";
 import { useAuth } from "../Authorization/AuthProvider"; // cyclic dependency when imported from Auth...../index
 import { useI18nInternal } from "./useI18n.hook";
 import { getBrowserTz } from "./utils/date";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 // import messages_de_en from "./translations/de_en.json";
 // import messages_de_cz from "./translations/de_cz.json";
 // import messages_es from "./translations/es.json";
@@ -197,7 +199,12 @@ export const I18nProvider = ({ children }) => {
           messages={messages[language] || {}}
           // messages={{ exampleMessageId: "Example message" }}
         >
-          {children}
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={locale}
+          >
+            {children}
+          </LocalizationProvider>
         </IntlProvider>
       </I18nContext.Provider>
     </ErrorBoundary>

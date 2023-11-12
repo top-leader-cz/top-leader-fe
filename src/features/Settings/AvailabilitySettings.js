@@ -1,7 +1,7 @@
 import { Alert, Box, Divider } from "@mui/material";
 // import { TimePicker } from "@mui/x-date-pickers";
 import { getDay, parse, parseISO, setDay } from "date-fns";
-import { addDays, formatISO } from "date-fns/fp";
+import { addDays, eachDayOfInterval, formatISO, isSameDay } from "date-fns/fp";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
@@ -10,6 +10,8 @@ import {
   DateRangePickerField,
   SwitchField,
   TimeRangePickerField,
+  WeekPickerField,
+  parseWeek,
 } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -61,7 +63,7 @@ const translateDay = ({
   return i18n.formatLocal(date, format);
 };
 
-const DaySlots = ({ dayName }) => {
+const DaySlots = ({ dayName, date, selectedDate }) => {
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
   const enabled = useFormContext().watch(enabledName(dayName));
@@ -70,6 +72,7 @@ const DaySlots = ({ dayName }) => {
     width: "long",
     i18n,
   });
+  const isSelected = selectedDate && date && isSameDay(selectedDate, date);
 
   // console.log("[DaySlots.rndr]", dayName, enabled);
 
@@ -78,7 +81,13 @@ const DaySlots = ({ dayName }) => {
       label={
         <>
           <CheckboxField name={enabledName(dayName)} />
-          <Box component={"span"} sx={{ textTransform: "capitalize" }}>
+          <Box
+            component={"span"}
+            sx={{
+              textTransform: "capitalize",
+              fontWeight: isSelected ? "600" : undefined,
+            }}
+          >
             {dayLabel}
           </Box>
         </>
@@ -107,8 +116,9 @@ const TODO_DISABLED_RECURRENCE = false;
 export const Recurrence = () => {
   const msg = useMsg();
   const recurring = useFormContext().watch("recurring");
+  const recurrenceRange = useFormContext().watch("recurrenceRange");
 
-  console.log("[Recurrence.rndr]", { recurring });
+  console.log("[Recurrence.rndr]", { recurring, recurrenceRange });
 
   return (
     <FormRow
@@ -121,9 +131,10 @@ export const Recurrence = () => {
           disabled={TODO_DISABLED_RECURRENCE}
         />
         {!recurring && (
-          <DateRangePickerField
+          <WeekPickerField
             name={FIELDS_AVAILABILITY.recurrenceRange}
             sx={{ ml: 8, ...WHITE_BG }}
+            // disablePast
           />
         )}
       </Box>
@@ -157,7 +168,7 @@ const getDateTime = ({
   referenceDate = getReferenceDate({ dayName }),
 }) => parse(time, API_TIME_FORMAT, referenceDate);
 
-const to = ({ events = [] } = {}, { recurring } = {}) => {
+const to = ({ events = [] } = {}, { recurring } = {}, { i18n } = {}) => {
   const daysValues = DAY_NAMES.map((dayName) => {
     const ranges = events?.filter(({ from }) => from?.day === dayName) || [];
     const range = ranges[0]; // TODO: multi + nonrecurring
@@ -185,11 +196,7 @@ const to = ({ events = [] } = {}, { recurring } = {}) => {
   // debugger;
   const initialValues = {
     [FIELDS_AVAILABILITY.recurring]: isRec,
-    recurrenceRange: [
-      // TODO: Dan
-      new Date(),
-      new Date(Date.now() + 1 * 6 * 24 * 3600 * 1000),
-    ],
+    recurrenceRange: parseWeek({ i18n }, new Date()),
     ...daysValues,
   };
 
@@ -222,19 +229,27 @@ export const AvailabilitySettings = () => {
   const form = useForm({});
   const recurringValue = form.watch(FIELDS_AVAILABILITY.recurring);
   const recurrenceRangeValue = form.watch(FIELDS_AVAILABILITY.recurrenceRange);
+  const visibleInterval = useMemo(() => {
+    if (recurringValue) return parseWeek({ i18n }, new Date());
+    else return recurrenceRangeValue;
+  }, [i18n, recurrenceRangeValue, recurringValue]);
 
   const { resetForm, resetting } = useResetForm({
     initialResetting: true,
     form,
     to: useCallback(
       (data) =>
-        to(data, {
-          [FIELDS_AVAILABILITY.recurring]: recurringValue,
-          // userLocale: language,
-          // TODO: notify user that timezone settings is different than currently set!
-          // userTz,
-        }),
-      [recurringValue]
+        to(
+          data,
+          {
+            [FIELDS_AVAILABILITY.recurring]: recurringValue,
+            // userLocale: language,
+            // TODO: notify user that timezone settings is different than currently set!
+            // userTz,
+          },
+          { i18n }
+        ),
+      [i18n, recurringValue]
     ),
   });
 
@@ -242,8 +257,8 @@ export const AvailabilitySettings = () => {
     enabled: recurringValue,
   });
   const nonRecurringAvailabilityQuery = useNonRecurringAvailabilityQuery({
-    from: recurrenceRangeValue?.[0],
-    to: recurrenceRangeValue?.[1],
+    start: recurrenceRangeValue?.start,
+    end: recurrenceRangeValue?.end,
     enabled: !recurringValue,
   });
 
@@ -341,9 +356,17 @@ export const AvailabilitySettings = () => {
         </P>
 
         <Recurrence />
-        {DAY_NAMES.map((dayName) => (
-          <DaySlots key={dayName} dayName={dayName} />
+        {eachDayOfInterval(visibleInterval).map((date) => (
+          <DaySlots
+            key={date}
+            date={recurringValue ? undefined : date}
+            selectedDate={recurrenceRangeValue?.selected}
+            dayName={INDEX_TO_DAY[getDay(date)]}
+          />
         ))}
+        {/* {DAY_NAMES.map((dayName) => (
+          <DaySlots key={dayName} dayName={dayName} />
+        ))} */}
       </FormProvider>
     </form>
   );

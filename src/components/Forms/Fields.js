@@ -12,10 +12,18 @@ import {
 } from "@mui/material";
 import { Box, alpha, styled } from "@mui/system";
 import {
+  DateCalendar,
+  DatePicker,
   DesktopDatePicker,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
-import React, { useContext, useEffect, useMemo } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import { I18nContext } from "../../features/I18n/I18nProvider";
@@ -25,6 +33,10 @@ import { P } from "../Typography";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { onErrorDefault } from "./Form";
 import { ErrorBoundary } from "../ErrorBoundary";
+import { endOfWeek, getDay, isSameWeek, startOfWeek } from "date-fns/fp";
+
+import { PickersDay } from "@mui/x-date-pickers/PickersDay";
+import { curryN } from "ramda";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -173,6 +185,161 @@ export const DateRangePickerField = ({
         rules={rules}
         render={({ field }) => (
           <DateRangePicker {...props} format={inputFormat} field={field} />
+        )}
+      />
+    </ErrorBoundary>
+    // </LocalizationProvider>
+  );
+};
+
+const CustomPickersDay = styled(PickersDay, {
+  shouldForwardProp: (prop) => prop !== "isSelected" && prop !== "isHovered",
+})(({ theme, isSelected, isHovered, day, ...rest }) => ({
+  borderRadius: 0,
+  ...(isSelected && {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    "&:hover, &:focus": {
+      backgroundColor: theme.palette.primary.main,
+    },
+  }),
+  ...(isHovered && {
+    backgroundColor: theme.palette.primary[theme.palette.mode],
+    "&:hover, &:focus": {
+      backgroundColor: theme.palette.primary[theme.palette.mode],
+    },
+  }),
+  // ...(getDay(day) === 0 && {
+  //   borderTopLeftRadius: "50%",
+  //   borderBottomLeftRadius: "50%",
+  // }),
+  // ...(getDay(day) === 6 && {
+  //   borderTopRightRadius: "50%",
+  //   borderBottomRightRadius: "50%",
+  // }),
+}));
+
+function Day(props) {
+  const { day, selectedDay, hoveredDay, sx = {}, ...other } = props;
+  const {
+    i18n,
+    locale: {
+      options: { weekStartsOn },
+    },
+  } = useContext(I18nContext);
+  const weekEndsOn = (weekStartsOn + 6) % 7;
+
+  const isInSameWeek = (dayA, dayB) => {
+    if (dayB == null) {
+      return false;
+    }
+    return i18n.dffp.isSameWeek(dayA, dayB);
+  };
+  // debugger;
+
+  return (
+    <CustomPickersDay
+      {...other}
+      day={day}
+      sx={{
+        px: 2.5,
+        ...sx,
+        ...(getDay(day) === weekStartsOn && {
+          borderTopLeftRadius: "50%",
+          borderBottomLeftRadius: "50%",
+        }),
+        ...(getDay(day) === weekEndsOn && {
+          borderTopRightRadius: "50%",
+          borderBottomRightRadius: "50%",
+        }),
+      }}
+      disableMargin
+      selected={false}
+      isSelected={isInSameWeek(day, selectedDay)}
+      isHovered={isInSameWeek(day, hoveredDay)}
+    />
+  );
+}
+
+export const parseWeek = curryN(2, ({ i18n }, date) => {
+  const newValue = {
+    start: i18n.dffp.startOfWeek(date),
+    end: i18n.dffp.endOfWeek(date),
+    selected: date,
+  };
+  return newValue;
+});
+const useWeekIntervalParser = () => {
+  const { i18n } = useContext(I18nContext);
+  return useCallback(parseWeek({ i18n }), [i18n]);
+};
+const WeekPicker = React.forwardRef(({ field, sx, format, ...props }, ref) => {
+  const [hoveredDay, setHoveredDay] = useState(null);
+  const { start, end, selected } = field.value ?? {};
+  const parseWeek = useWeekIntervalParser();
+  const onChange = (date) => {
+    const newValue = parseWeek(date);
+    return field.onChange(newValue);
+  };
+  // const format = `${inputFormat}' - '${inputFormat}`;
+  // console.log("%c[WeekPicker.rndr]", "color:navy;", field.name, {
+  //   field,
+  //   props,
+  // });
+  return (
+    <ErrorBoundary extraInfo={field?.value}>
+      <Box display="flex" sx={sx}>
+        <DatePicker
+          ref={ref}
+          // slots={{ calendar: WeekPickerCalendar }}
+          showDaysOutsideCurrentMonth
+          displayWeekNumber
+          slots={{ day: Day }}
+          slotProps={{
+            textField: { size: "small", sx: { width: 180 } },
+            day: (ownerState) => ({
+              selectedDay: selected,
+              hoveredDay,
+              onPointerEnter: () => setHoveredDay(ownerState.day),
+              onPointerLeave: () => setHoveredDay(null),
+            }),
+          }}
+          name={field.name}
+          onChange={onChange}
+          onBlur={field.onBlur}
+          value={selected}
+          format={format}
+          {...props}
+          // selectedSections={} // TODO}
+        />
+      </Box>
+    </ErrorBoundary>
+  );
+});
+
+export const WeekPickerField = ({
+  name,
+  rules,
+  inputFormat: inputFormatProp,
+  ...props
+}) => {
+  const { i18n } = useContext(I18nContext);
+  const inputFormat = useMemo(
+    () => inputFormatProp || i18n.uiFormats.inputDateFormat,
+    [i18n.uiFormats.inputDateFormat, inputFormatProp]
+  );
+
+  return (
+    // <LocalizationProvider
+    //   dateAdapter={AdapterDateFns}
+    //   localeText={{ start: "Check-in", end: "Check-out" }}
+    // >
+    <ErrorBoundary>
+      <Controller
+        name={name}
+        rules={rules}
+        render={({ field }) => (
+          <WeekPicker {...props} format={inputFormat} field={field} />
         )}
       />
     </ErrorBoundary>

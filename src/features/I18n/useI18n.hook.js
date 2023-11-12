@@ -4,6 +4,7 @@ import * as df from "date-fns";
 import * as tz from "date-fns-tz";
 import { API_TIME_FORMAT, UTC_DATE_FORMAT, parseUTCZoned } from "./utils/date";
 import { formatDistanceToNow } from "date-fns";
+import { filter, fromPairs, keys, map, pipe } from "ramda";
 
 // do not use directly, passed down to components thru context
 export const useI18nInternal = ({ userTz, language, locale }) => {
@@ -141,6 +142,23 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
     },
     [locale]
   );
+  const partiallyAppliedDffp = useMemo(() => {
+    // const exposed = ["isSameWeek", "startOfWeek", "endOfWeek"];
+    const exposed = keys(dffp)
+      .filter((k) => k.endsWith("WithOptions"))
+      .map((k) => k.replace("WithOptions", ""));
+    const fns = pipe(
+      map((fnName) => {
+        const fn = dffp[`${fnName}WithOptions`];
+        if (typeof fn === "function") {
+          return [fnName, (...args) => fn({ locale }, ...args)];
+        }
+      }),
+      filter(Boolean),
+      fromPairs
+    )(exposed);
+    return fns;
+  }, [locale]);
 
   const i18n = useMemo(
     () => ({
@@ -165,18 +183,20 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       },
       weekStartsOn: locale.options.weekStartsOn,
       startOfWeekLocal,
+      dffp: partiallyAppliedDffp,
     }),
     [
       locale,
       formatLocal,
       formatLocalMaybe,
-      parseUTCLocal,
       formatUtcLocal,
+      parseUTCLocal,
       parseDate,
       formatDistanceToNowLocal,
       translateTokenLocal,
       formatRelativeLocal,
       startOfWeekLocal,
+      partiallyAppliedDffp,
     ]
   );
   return i18n;

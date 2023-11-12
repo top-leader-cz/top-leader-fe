@@ -65,8 +65,8 @@ const createApiDayTimeStr =
   };
 
 export const useNonRecurringAvailabilityQuery = ({
-  from,
-  to,
+  start,
+  end,
   enabled = true,
 } = {}) => {
   const { userTz: timeZone } = useContext(I18nContext);
@@ -85,11 +85,11 @@ export const useNonRecurringAvailabilityQuery = ({
       )
     ),
     ([from, to]) => ({ from, to })
-  )([from, to]);
-  console.log("useNonRecurringAvailabilityQuery", { from, to, qParams });
-  // if (from) debugger;
+  )([start, end]);
+  console.log("useNonRecurringAvailabilityQuery", { start, end, qParams });
+  // if (start) debugger;
   const query = useMyQuery({
-    enabled: enabled && !!from && !!to,
+    enabled: enabled && !!start && !!end,
     queryKey: ["coach-availability", AVAILABILITY_TYPE.NON_RECURRING],
     fetchDef: {
       url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
@@ -208,7 +208,7 @@ export const useNonRecurringAvailabilityMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (values) => {
-      const [from, to] = values[FIELDS_AVAILABILITY.recurrenceRange];
+      const { from, to } = values[FIELDS_AVAILABILITY.recurrenceRange];
       const payload = {
         timeFrame: map(
           pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz }))

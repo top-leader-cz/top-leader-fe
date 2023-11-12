@@ -45,14 +45,12 @@ export default function App() {
           <GlobalLoader>
             <ThemeProvider theme={theme}>
               <I18nProvider>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-                    <RightMenuProvider>
-                      <CssBaseline />
-                      <RouterProvider router={router} />
-                    </RightMenuProvider>
-                  </ErrorBoundary>
-                </LocalizationProvider>
+                <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
+                  <RightMenuProvider>
+                    <CssBaseline />
+                    <RouterProvider router={router} />
+                  </RightMenuProvider>
+                </ErrorBoundary>
               </I18nProvider>
             </ThemeProvider>
           </GlobalLoader>

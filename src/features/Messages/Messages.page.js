@@ -39,7 +39,7 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
     <List
       sx={{
         width: "100%",
-        maxWidth: 300,
+        maxWidth: { sm: 150, md: 300 },
         bgcolor: "background.paper",
         borderRadius: "6px 0px 0px 6px",
         borderRight: "1px solid #EAECF0",
@@ -98,7 +98,10 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
                     </Box>
                   )
                 }
-                sx={{ textAlign: "center" }}
+                sx={{
+                  textAlign: "center",
+                  // display: { sm: "none", md: undefined },
+                }}
               />
             </ListItemButton>
           </ListItem>
@@ -410,9 +413,13 @@ function MessagesPageInner() {
           else
             return (
               <Box
-                display={"flex"}
-                alignItems={"stretch"}
-                height={"calc(100% - 103px)"}
+                sx={{
+                  display: "flex",
+                  alignItems: "stretch",
+                  height: "calc(100% - 103px)",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: { xs: 2, sm: 0 },
+                }}
               >
                 <ContactList
                   conversations={data}
