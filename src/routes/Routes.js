@@ -33,6 +33,8 @@ import ErrorPage from "./ErrorPage";
 import { ClientsPage } from "../features/Clients/ClientsPage";
 import { StartSessionPage } from "../features/Sessions/StartSession.page";
 import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
+import { CreateFeedbackPage } from "../features/Feedback/CreateFeedback.page";
+import { FeedbackResultsPage } from "../features/Feedback/FeedbackResults.page";
 
 const GlobalSpinner = () => {
   return (
@@ -185,6 +187,22 @@ export const router = createHashRouter([
         element: (
           <RequireAuth>
             <GetFeedbackPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.createFeedbackForm,
+        element: (
+          <RequireAuth>
+            <CreateFeedbackPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.feedbackResults,
+        element: (
+          <RequireAuth>
+            <FeedbackResultsPage />
           </RequireAuth>
         ),
       },

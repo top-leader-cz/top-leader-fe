@@ -119,7 +119,7 @@ const SessionCard = ({
   // });
 
   return (
-    <Card sx={{ ...sx }} elevation={0}>
+    <Card sx={{ ...sx }}>
       <CardActionArea
         sx={{ height: "100%" }}
         disableRipple

@@ -19,7 +19,9 @@ export const routes = {
   startSession: "/start-session",
   coaches: "/coaches",
   settings: "/settings",
-  getFeedback: "/get-feedback",
+  getFeedback: "/feedback",
+  createFeedbackForm: "/feedback/create",
+  feedbackResults: "/feedback/results/:id",
   team: "/team",
   clients: "/clients",
   messages: "/messages",
@@ -30,4 +32,5 @@ export const routes = {
 
 export const parametrizedRoutes = {
   editSession: ({ id }) => generatePath(routes.editSession, { id }),
+  feedbackResults: ({ id }) => generatePath(routes.feedbackResults, { id }),
 };

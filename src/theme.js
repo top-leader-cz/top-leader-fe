@@ -3,6 +3,7 @@ import defaultTheme from "@mui/material/styles/defaultTheme";
 import { LinkBehavior } from "./components/LinkBehavior";
 
 export const primary25 = "#F9F8FF";
+export const primary500 = "#4720B7";
 export const gray50 = "#F9FAFB"; // previously in bg as #EAECF0
 export const gray500 = "#667085";
 export const gray200 = "#EAECF0";
@@ -11,7 +12,7 @@ export const gray200 = "#EAECF0";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#4720B7",
+      main: primary500,
     },
     secondary: {
       main: "#907ACF",
@@ -98,7 +99,7 @@ const theme = createTheme({
           "&.Mui-selected.MuiListItemButton-root": {
             backgroundColor: primary25,
             ".MuiTypography-root,.MuiListItemIcon-root": {
-              color: "#4720B7",
+              color: primary500,
             },
           },
         },
@@ -117,7 +118,7 @@ const theme = createTheme({
         {
           props: { variant: "selected" },
           style: {
-            color: "#4720B7",
+            color: primary500,
             backgroundColor: primary25,
             border: "1px solid #4720B7",
             padding: "16px",

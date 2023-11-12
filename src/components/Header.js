@@ -2,6 +2,7 @@ import {
   Avatar,
   Badge,
   Box,
+  Button,
   Card,
   CardContent,
   Divider,
@@ -24,6 +25,7 @@ import { useMsg } from "./Msg/Msg";
 import { H1, H2 } from "./Typography";
 import { messages as generalMessages } from "./messages";
 import { I18nContext } from "../features/I18n/I18nProvider";
+import { ArrowBack } from "@mui/icons-material";
 
 const NotificationsPopover = ({
   notifications = [],
@@ -231,7 +233,23 @@ const Notifications = ({ tooltip = "Notifications" }) => {
   );
 };
 
-export const Header = ({ avatar, text, noDivider, withNotifications }) => {
+export const Header = ({
+  avatar,
+  text,
+  noDivider,
+  withNotifications,
+  actionButton,
+  back,
+}) => {
+  const renderInner = () =>
+    back ? (
+      <Button color="inherit" href={back.href} startIcon={<ArrowBack />}>
+        <H2>{text}</H2>
+      </Button>
+    ) : (
+      <H1 sx={{ flexGrow: 1 }}>{text}</H1>
+    );
+
   return (
     <Box mt={4} mb={3}>
       <Box
@@ -241,8 +259,9 @@ export const Header = ({ avatar, text, noDivider, withNotifications }) => {
         alignItems="center"
       >
         {avatar}
-        <H1 sx={{ flexGrow: 1 }}>{text}</H1>
+        {renderInner()}
         {withNotifications && <Notifications />}
+        {actionButton && <Button {...actionButton} />}
       </Box>
       {!noDivider && <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />}
     </Box>

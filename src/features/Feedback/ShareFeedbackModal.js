@@ -1,30 +1,40 @@
 import {
+  Alert,
   Avatar,
   Box,
   Button,
   Divider,
   IconButton,
+  InputAdornment,
   Modal,
+  OutlinedInput,
   Paper,
-  TextField,
 } from "@mui/material";
 import { useCallback } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { AutocompleteSelect, RHFTextField } from "../../components/Forms";
+import { DatePickerField, RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
+import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
+import { messages } from "./messages";
+
+const FIELDS = {
+  validTo: "validTo",
+  emailList: "emailList",
+};
 
 const FIELD_FIELDS = {
   email: "email",
-  role: "role",
+  // role: "role",
 };
 
 const FIELD_DEFAULT_VALUES = {
-  email: "Catalina_Bartoletti29@hotmail.com",
-  role: null,
+  email: "email1@gmail.com",
+  email: "",
+  // role: null,
 };
 
-const ROLE_OPTIONS = [{ value: "manager", label: "Manager" }];
+// const ROLE_OPTIONS = [{ value: "manager", label: "Manager" }];
 
 const EmailListItem = ({ index, remove, getName }) => {
   return (
@@ -32,33 +42,35 @@ const EmailListItem = ({ index, remove, getName }) => {
       <RHFTextField
         name={getName(FIELD_FIELDS.email)}
         placeholder="Email"
-        rules={{}}
+        rules={{ required: "Required" }}
         size="small"
-        sx={{ width: "50%" }}
+        sx={{ flexGrow: 2 }}
       />
-      <AutocompleteSelect
+      {/* <AutocompleteSelect
         name={getName(FIELD_FIELDS.role)}
         placeholder="Role"
         options={ROLE_OPTIONS}
         sx={{ width: "50%" }}
-      />
+      /> */}
 
-      <IconButton
-        onClick={() => remove(index)}
-        sx={{
-          // mx: 2,
-          width: "40px",
-          visibility: index > 0 ? "visible" : "hidden",
-          color: "error.main",
-        }}
-      >
-        <Icon name="DeleteOutlined" />
-      </IconButton>
+      {index > 0 && (
+        <IconButton
+          onClick={() => remove(index)}
+          sx={{
+            // mx: 2,
+            width: "40px",
+            visibility: index > 0 ? "visible" : "hidden",
+            color: "error.main",
+          }}
+        >
+          <Icon name="DeleteOutlined" />
+        </IconButton>
+      )}
     </Box>
   );
 };
 
-const EmailList = ({ name }) => {
+const EmailList = ({ name, addLabel }) => {
   const { fields, append, remove } = useFieldArray({
     name,
     rules: { required: true },
@@ -81,7 +93,7 @@ const EmailList = ({ name }) => {
         startIcon={<Icon name={"Add"} />}
         sx={{ alignSelf: "flex-start" }}
       >
-        Add email
+        {addLabel}
       </Button>
     </Box>
   );
@@ -92,12 +104,18 @@ export const ShareFeedbackModal = ({
   open,
   onSubmit,
   onClose,
-  link = "http://topleader.io/",
+  link,
+  error,
+  isLoading,
 }) => {
+  const msg = useMsg({ dict: messages });
   const form = useForm({
     mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: { emailList: [FIELD_DEFAULT_VALUES] },
+    defaultValues: {
+      [FIELDS.validTo]: null,
+      [FIELDS.emailList]: [FIELD_DEFAULT_VALUES],
+    },
   });
 
   const onCopy = useCallback(() => {
@@ -148,39 +166,78 @@ export const ShareFeedbackModal = ({
                   <Icon name="Close" sx={{ color: "#667085" }} />
                 </IconButton>
               </Box>
-              <H2 id="modal-modal-title">Share feedback form</H2>
+              <H2 id="modal-modal-title">
+                {msg("feedback.create.share-modal.title")}
+              </H2>
               <P id="modal-modal-description">
-                Et et officia laborum magnam sint perspiciatis alias. Ab
-                similique sed. Nisi provident ipsa. Rerum ea nulla odit quis et.
+                {msg("feedback.create.share-modal.desc")}
               </P>
+              {error && <Alert severity="error">{error.message}</Alert>}
               <Box
                 display="flex"
                 flexDirection="row"
-                alignItems="center"
+                alignItems="baseline"
                 gap={3}
               >
-                <TextField
+                {/* <TextField */}
+                <OutlinedInput
                   name="link"
                   value={link}
                   label=""
                   disabled
                   size="small"
-                  sx={{ width: "50%" }}
-                  //   fullWidth
+                  placeholder="Not available yet"
+                  sx={{ flexGrow: 2 }}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      {/* <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton> */}
+                      <IconButton
+                        onClick={onCopy}
+                        disabled={!link}
+                        sx={{ mr: -1 }}
+                      >
+                        <Icon name="ContentCopy" />
+                      </IconButton>
+                    </InputAdornment>
+                  }
                 />
-                <IconButton onClick={onCopy} sx={{}}>
-                  <Icon name="ContentCopy" />
-                </IconButton>
+                <P sx={{ color: "black" }}>
+                  {msg("feedback.create.share-modal.deadline")}
+                </P>
+                <DatePickerField
+                  name={FIELDS.validTo}
+                  rules={{ required: "Required" }}
+                />
               </Box>
               <Divider flexItem />
-              <EmailList name={"emailList"} />
+              <EmailList
+                name={"emailList"}
+                addLabel={msg("feedback.create.share-modal.add-email")}
+              />
               <Divider flexItem />
               <Box display="flex" flexDirection="row" gap={3}>
-                <Button fullWidth variant="outlined" onClick={() => onClose()}>
-                  Cancel
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => onClose()}
+                  disabled={isLoading}
+                >
+                  {msg("feedback.create.share-modal.cancel")}
                 </Button>
-                <Button fullWidth variant="contained" type="submit">
-                  Share
+                <Button
+                  fullWidth
+                  variant="contained"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {msg("feedback.create.share-modal.share")}
                 </Button>
               </Box>
             </FormProvider>

@@ -33,8 +33,41 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
+import { Header } from "../../components/Header";
 
-const IconTile = ({ iconName, caption, text }) => {
+export const IconTileIcon = ({ iconName }) => {
+  return (
+    <Avatar
+      variant="rounded"
+      sx={{
+        width: 100,
+        height: 100,
+        bgcolor: "#DAD2F1",
+        borderRadius: 3,
+      }}
+    >
+      <Icon name={iconName} sx={{ fontSize: 40, color: "primary.main" }} />
+    </Avatar>
+  );
+};
+
+export const IconTile = ({
+  iconName,
+  caption,
+  renderCaption = () => (
+    <Typography variant="h2" fontSize={14} mt={2}>
+      {caption}
+    </Typography>
+  ),
+  text,
+  renderText = () => (
+    <H1 color={"primary.main"} mt={2}>
+      {text}
+    </H1>
+  ),
+  children,
+  ...props
+}) => {
   return (
     <Box
       display="flex"
@@ -43,24 +76,12 @@ const IconTile = ({ iconName, caption, text }) => {
       width={"100%"}
       bgcolor="#FCFCFD"
       p={3}
+      {...props}
     >
-      <Avatar
-        variant="rounded"
-        sx={{
-          width: 100,
-          height: 100,
-          bgcolor: "#DAD2F1",
-          borderRadius: 3,
-        }}
-      >
-        <Icon name={iconName} sx={{ fontSize: 40, color: "primary.main" }} />
-      </Avatar>
-      <Typography variant="h2" fontSize={14} mt={2}>
-        {caption}
-      </Typography>
-      <H1 color={"primary.main"} mt={2}>
-        {text}
-      </H1>
+      <IconTileIcon iconName={iconName} />
+      {renderCaption(caption)}
+      {renderText(text)}
+      {children}
     </Box>
   );
 };
@@ -451,25 +472,10 @@ function EditSessionPageInner() {
         />
       }
     >
-      <Box mt={4} mb={3}>
-        <Box
-          display="flex"
-          flexWrap="nowrap"
-          alignItems="center"
-          flexDirection="row"
-        >
-          <Button
-            color="inherit"
-            href={routes.sessions}
-            startIcon={<ArrowBack />}
-          >
-            <H2>
-              <Msg id="sessions.new.header" />
-            </H2>
-          </Button>
-        </Box>
-        <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
-      </Box>
+      <Header
+        text={<Msg id="sessions.new.header" />}
+        back={{ href: routes.sessions }}
+      />
       {finished ? (
         <Finished />
       ) : (

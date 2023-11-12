@@ -248,11 +248,16 @@ export const DatePickerField = ({
         control={control || methods?.control}
         name={name}
         rules={rules}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <ErrorBoundary extraInfo={field?.value}>
             <DesktopDatePicker
               slotProps={{
-                textField: { size: "small", ...textFieldProps },
+                textField: {
+                  size: "small",
+                  error: !!fieldState.error,
+                  helperText: getError(fieldState.error, rules),
+                  ...textFieldProps,
+                },
               }}
               format={inputFormat}
               {...field}

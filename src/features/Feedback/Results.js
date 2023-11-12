@@ -4,7 +4,19 @@ import { getLabel } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { H2, P } from "../../components/Typography";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
-import { FIELDS, INPUT_TYPES, QUESTION_TITLE_OPTIONS } from "./GetFeedbackForm";
+import { FIELDS, INPUT_TYPES } from "./GetFeedbackForm";
+
+// TODO: useFeedbackQuestionOptionsDict
+const QUESTION_TITLE_OPTIONS = [
+  {
+    value: "$id_style_rating",
+    label: "What do you consider good about my leadership style?",
+  },
+  {
+    value: "$id_public_speak_rating",
+    label: "How good am I at public speaking?",
+  },
+];
 
 const TODO = 2;
 
@@ -106,7 +118,7 @@ const collected = {
   total: 10,
 };
 
-export const Results = ({ onShareForm }) => {
+export const Results = ({ feedbackResults }) => {
   useRightMenu(
     useMemo(
       () => (
@@ -116,13 +128,13 @@ export const Results = ({ onShareForm }) => {
             { label: "Views", value: TODO },
             { label: "Submitted", value: TODO },
           ]}
-          buttonProps={{
-            children: "Share form",
-            onClick: onShareForm,
-          }}
+          // buttonProps={{
+          //   children: "Share form",
+          //   onClick: onShareForm,
+          // }}
         />
       ),
-      [onShareForm]
+      []
     )
   );
 

@@ -5,7 +5,7 @@ import { FIELDS } from "./GetFeedbackForm";
 
 export const FormBuilderMeta = ({}) => {
   return (
-    <Card elevation={0}>
+    <Card>
       <CardContent>
         <Controller
           name={FIELDS.title}
