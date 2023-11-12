@@ -78,15 +78,6 @@ export const messages = defineMessages({
     id: "feedback.create.share-modal.share",
     defaultMessage: "Share",
   },
-  "feedback.tabs.form.label": {
-    id: "feedback.tabs.form.label",
-    defaultMessage: "Form",
-  },
-  "feedback.tabs.results.label": {
-    id: "feedback.tabs.results.label",
-    defaultMessage: "Results",
-  },
-
   "feedback.aside.text": {
     id: "feedback.aside.text",
     defaultMessage: "Feedback on my leadership skills",

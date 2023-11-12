@@ -12,7 +12,7 @@ import { RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { useSendMessageMutation } from "../Messages/queries";
+import { useSendMessageMutation } from "../Messages/api";
 import { formatName } from "./Coaches.page";
 import React, { useCallback } from "react";
 
