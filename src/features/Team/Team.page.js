@@ -12,6 +12,7 @@ import { AddMemberModal } from "./AddMemberModal";
 import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useHrUsersQuery } from "./api";
 import { messages } from "./messages";
+import { useAuth } from "../Authorization";
 
 export const SlotChip = ({ children, sx }) => {
   return (
@@ -48,6 +49,7 @@ function TeamPageInner() {
   const [topUpSelected, setTopUpSelected] = useState(false);
   const [addMemberVisible, setAddMemberVisible] = useState(false);
   const msg = useMsg();
+  const { isHR, isAdmin } = useAuth();
 
   const hrUsersQuery = useHrUsersQuery();
 
@@ -88,43 +90,49 @@ function TeamPageInner() {
   ];
 
   // console.log("[Team->Credits.page]", { hrUsersQuery });
+  const manageUsersProps =
+    isHR || isAdmin
+      ? {
+          title: (
+            <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
+              <H2>
+                <Msg id="team.members.title" />
+              </H2>
+              <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
+                <Msg
+                  id="team.members.title.count.badge"
+                  values={{ count: hrUsersQuery.data?.length }}
+                />
+              </SlotChip>
+            </Box>
+          ),
+          subheader: (
+            <P mt={1.5}>
+              <Msg id="team.members.sub" />
+            </P>
+          ),
+          action: (
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              aria-label="add member"
+              onClick={() => {
+                setAddMemberVisible(true);
+              }}
+            >
+              <Msg id="team.members.add" />
+            </Button>
+          ),
+        }
+      : {};
 
   return (
     <Layout>
       <Header text={msg("team.heading")} />
       <TLTableWithHeader
-        title={
-          <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
-            <H2>
-              <Msg id="team.members.title" />
-            </H2>
-            <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
-              <Msg
-                id="team.members.title.count.badge"
-                values={{ count: hrUsersQuery.data?.length }}
-              />
-            </SlotChip>
-          </Box>
-        }
-        subheader={
-          <P mt={1.5}>
-            <Msg id="team.members.sub" />
-          </P>
-        }
+        {...manageUsersProps}
         columns={columns}
         query={hrUsersQuery}
-        action={
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            aria-label="add member"
-            onClick={() => {
-              setAddMemberVisible(true);
-            }}
-          >
-            <Msg id="team.members.add" />
-          </Button>
-        }
       />
       <CreditTopUpModal
         selected={topUpSelected}
