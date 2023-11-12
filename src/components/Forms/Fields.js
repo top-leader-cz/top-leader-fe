@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   FormControl,
+  IconButton,
   InputLabel,
   OutlinedInput,
   Slider,
@@ -12,11 +13,22 @@ import {
 } from "@mui/material";
 import { Box, alpha, styled } from "@mui/system";
 import {
-  DateCalendar,
   DatePicker,
   DesktopDatePicker,
   TimePicker as MuiTimePicker,
 } from "@mui/x-date-pickers";
+import { PickersDay } from "@mui/x-date-pickers/PickersDay";
+import { getDay, isSameDay, isValid } from "date-fns/fp";
+import {
+  chain,
+  curryN,
+  map,
+  pipe,
+  remove,
+  sort,
+  splitEvery,
+  when,
+} from "ramda";
 import React, {
   useCallback,
   useContext,
@@ -27,19 +39,185 @@ import React, {
 import { Controller, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import { I18nContext } from "../../features/I18n/I18nProvider";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
+import { ErrorBoundary } from "../ErrorBoundary";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
-import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
-import { onErrorDefault } from "./Form";
-import { ErrorBoundary } from "../ErrorBoundary";
-import { endOfWeek, getDay, isSameWeek, startOfWeek } from "date-fns/fp";
-
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-import { curryN } from "ramda";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+
+export const getIntervals = pipe(
+  when(
+    ({ length }) => length % 2 !== 0,
+    () => {
+      throw new Error(
+        "getIntervals - Invalid dayRanges, length must be factor of 2 (start,end,start,end,...)"
+      );
+    }
+  ),
+  splitEvery(2),
+  map(([start, end]) => ({ start, end }))
+);
+const getValuesArr = pipe(chain((interval) => [interval.start, interval.end]));
+
+const arr = [];
+const TimeRangesPicker = React.forwardRef(
+  ({ inputProps, field, inputFormat, referenceDate, ...props }, ref) => {
+    const { userTz } = useContext(I18nContext);
+    const value = field.value ?? arr;
+    const intervals = getIntervals(value);
+    const sortedValue = [...value]; // TODO
+    // const sortedValue = getValuesArr(intervals);
+    const onChange = (idx) => (date) => {
+      if (!isValid(referenceDate)) {
+        console.error(
+          "TimeRangesPicker - referenceDate must be valid",
+          field.name,
+          {
+            date,
+            referenceDate,
+          }
+        );
+      }
+      if (!isSameDay(referenceDate, date)) {
+        console.error(
+          "TimeRangesPicker - date must be same day as reference",
+          field.name,
+          {
+            date,
+            referenceDate,
+          }
+        );
+      }
+      const adjustedDate = new Date(referenceDate.getTime());
+      adjustedDate.setHours(date.getHours());
+      adjustedDate.setMinutes(date.getMinutes());
+      adjustedDate.setSeconds(date.getSeconds());
+      adjustedDate.setMilliseconds(date.getMilliseconds());
+      const newValue = [...sortedValue];
+      newValue[idx] = adjustedDate;
+      // debugger;
+      return field.onChange(newValue);
+    };
+    const onAdd = useCallback(() => {
+      const newValue = [...sortedValue, null, null];
+      return field.onChange(newValue);
+    }, [field, sortedValue]);
+    const onRemove = useCallback(
+      (intervalIndex) => {
+        const startIdx = intervalIndex * 2;
+        const newValue = remove(startIdx, 2, sortedValue);
+        return field.onChange(newValue);
+      },
+      [field, sortedValue]
+    );
+    // console.log("%c[TimeRangesPicker.rndr]", "color:coral;", field.name, {
+    //   field,
+    //   props,
+    // });
+
+    return (
+      <ErrorBoundary extraInfo={field?.value}>
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          {intervals.map(({ start, end }, intervalIndex) => (
+            <Box
+              key={`${intervalIndex}`}
+              display="flex"
+              sx={{ mt: !!intervalIndex ? 3 : undefined }}
+            >
+              <MuiTimePicker
+                ref={ref}
+                slotProps={{
+                  textField: { size: "small", sx: { bgcolor: "white" } },
+                }}
+                name={field.name}
+                value={start}
+                onChange={onChange(0 + intervalIndex * 2)}
+                onBlur={field.onBlur}
+                format={inputFormat}
+                referenceDate={referenceDate}
+                timezone={userTz}
+              />
+              <Box alignSelf="center" sx={{ mx: 1 }}>
+                -
+              </Box>
+              <MuiTimePicker
+                slotProps={{
+                  textField: { size: "small", sx: { bgcolor: "white" } },
+                }}
+                // name={field.name}
+                onChange={onChange(1 + intervalIndex * 2)}
+                value={end}
+                onBlur={field.onBlur}
+                format={inputFormat}
+                referenceDate={referenceDate}
+                timezone={userTz}
+              />
+              {intervalIndex === 0 ? (
+                <IconButton sx={{ ml: 2 }} onClick={onAdd}>
+                  <Icon
+                    name="Add"
+                    sx={
+                      {
+                        // color: "#667085",
+                      }
+                    }
+                  />
+                </IconButton>
+              ) : (
+                <IconButton
+                  sx={{ ml: 2 }}
+                  onClick={() => onRemove(intervalIndex)}
+                >
+                  <Icon
+                    name="DeleteOutlined"
+                    sx={
+                      {
+                        // color: "#667085",
+                      }
+                    }
+                  />
+                </IconButton>
+              )}
+            </Box>
+          ))}
+        </Box>
+      </ErrorBoundary>
+    );
+  }
+);
+
+export const TimeRangesPickerField = ({
+  name,
+  rules,
+  inputFormat: inputFormatProp,
+  inputProps,
+  referenceDate,
+}) => {
+  const { i18n } = useContext(I18nContext);
+  const inputFormat = useMemo(
+    () => inputFormatProp || i18n.uiFormats.inputTimeFormat,
+    [i18n.uiFormats.inputTimeFormat, inputFormatProp]
+  );
+
+  // TODO: fields array with intervals: https://react-hook-form.com/docs/usefieldarray
+
+  return (
+    <ErrorBoundary>
+      <Controller
+        name={name}
+        rules={rules}
+        render={({ field }) => (
+          <TimeRangesPicker
+            {...{ field, inputFormat, inputProps, referenceDate }}
+          />
+        )}
+      />
+    </ErrorBoundary>
+  );
+};
 
 const DateRangePicker = React.forwardRef(
   ({ field, sx, inputFormat, ...props }, ref) => {
@@ -85,83 +263,6 @@ const DateRangePicker = React.forwardRef(
     );
   }
 );
-
-const TimeRangePicker = React.forwardRef(
-  ({ inputProps, field, sx, inputFormat, ...props }, ref) => {
-    const onChange = (idx) => (date) => {
-      const newValue = [...(field?.value ?? [])];
-      newValue[idx] = date;
-      return field.onChange(newValue);
-    };
-    // console.log("%c[TimeRangePicker.rndr]", "color:coral;", field.name, {
-    //   field,
-    //   props,
-    // });
-
-    return (
-      <ErrorBoundary extraInfo={field?.value}>
-        <Box display="flex" sx={sx}>
-          <MuiTimePicker
-            ref={ref}
-            slotProps={{
-              textField: { size: "small", sx: { bgcolor: "white" } },
-            }}
-            name={field.name}
-            onChange={onChange(0)}
-            onBlur={field.onBlur}
-            value={field.value?.[0]}
-            format={inputFormat}
-          />
-          <Box alignSelf="center" sx={{ mx: 1 }}>
-            -
-          </Box>
-          <MuiTimePicker
-            slotProps={{
-              textField: { size: "small", sx: { bgcolor: "white" } },
-            }}
-            // name={field.name}
-            onChange={onChange(1)}
-            onBlur={field.onBlur}
-            value={field.value?.[1]}
-            format={inputFormat}
-          />
-        </Box>
-      </ErrorBoundary>
-    );
-  }
-);
-
-export const TimeRangePickerField = ({
-  name,
-  rules,
-  inputFormat: inputFormatProp,
-  inputProps,
-}) => {
-  const { i18n } = useContext(I18nContext);
-  const inputFormat = useMemo(
-    () => inputFormatProp || i18n.uiFormats.inputTimeFormat,
-    [i18n.uiFormats.inputTimeFormat, inputFormatProp]
-  );
-
-  // console.log("[TimeRangePickerField.rndr]", {
-  //   inputFormat,
-  //   inputFormatProp,
-  // });
-  // return null;
-
-  return (
-    <ErrorBoundary>
-      <Controller
-        name={name}
-        rules={rules}
-        render={({ field }) => (
-          <TimeRangePicker {...{ field, inputFormat, inputProps }} />
-        )}
-      />
-    </ErrorBoundary>
-  );
-};
-
 export const DateRangePickerField = ({
   name,
   rules,
@@ -377,7 +478,7 @@ export const CheckboxField = ({ name, rules, ...props }) => {
               },
             }
           : {};
-        console.log("CheckboxField", name, { inverted, invertedProps, field });
+        // console.log("CheckboxField", name, { inverted, invertedProps, field });
         return (
           <Checkbox
             {...{

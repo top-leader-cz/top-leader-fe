@@ -132,6 +132,10 @@ const toApiIntervals = ({ formValues, i18n, userTz, mapper }) => {
   const intervals = pipe(
     chain(({ dayRanges }) => {
       if (dayRanges.some((date) => !isValid(date))) {
+        console.error({
+          dayRanges,
+          firstInvalidIndex: dayRanges.findIndex((date) => !isValid(date)),
+        });
         throw new Error(
           `toApiIntervals - Invalid dayRanges, all dates must be valid`
         );
@@ -146,10 +150,13 @@ const toApiIntervals = ({ formValues, i18n, userTz, mapper }) => {
     }),
     tap(log("toApiIntervals - 1")), // TODO: adjust intervals overlapping weeks
     map(mapper),
+    tap(log("toApiIntervals - 2")), // TODO: adjust intervals overlapping weeks
     splitEvery(2),
+    tap(log("toApiIntervals - 3")), // TODO: adjust intervals overlapping weeks
     map(([from, to]) => ({ from, to })),
-    tap(log("toApiIntervals - 2")) // TODO: adjust intervals overlapping weeks
+    tap(log("toApiIntervals - 4")) // TODO: adjust intervals overlapping weeks
   )(byDay);
+  // debugger;
 
   return intervals;
 };
@@ -211,7 +218,7 @@ export const useNonRecurringAvailabilityMutation = () => {
       const { from, to } = values[FIELDS_AVAILABILITY.recurrenceRange];
       const payload = {
         timeFrame: map(
-          pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz }))
+          pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })) // TODO: validate
         )({ from, to }),
         events: toApiIntervals({
           formValues: values,
@@ -222,6 +229,11 @@ export const useNonRecurringAvailabilityMutation = () => {
       };
 
       console.log("%cMUTATION", "color:lime", { values, from, to, payload });
+      console.log("TODO: validate timeFrame - startOfDay", {
+        timeFrame: payload.timeFrame,
+        from,
+        to,
+      });
       // debugger;
 
       return authFetch({

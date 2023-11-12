@@ -1,15 +1,14 @@
-import { Alert, Box, Divider } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 // import { TimePicker } from "@mui/x-date-pickers";
 import { getDay, parse, parseISO, setDay } from "date-fns";
-import { addDays, eachDayOfInterval, formatISO, isSameDay } from "date-fns/fp";
+import { eachDayOfInterval, isSameDay } from "date-fns/fp";
+import { chain, map, pipe } from "ramda";
 import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
-  B,
   CheckboxField,
-  DateRangePickerField,
   SwitchField,
-  TimeRangePickerField,
+  TimeRangesPickerField,
   WeekPickerField,
   parseWeek,
 } from "../../components/Forms";
@@ -30,7 +29,6 @@ import {
   useRecurringAvailabilityMutation,
   useRecurringAvailabilityQuery,
 } from "./api";
-import { map } from "ramda";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -73,6 +71,8 @@ const DaySlots = ({ dayName, date, selectedDate }) => {
     i18n,
   });
   const isSelected = selectedDate && date && isSameDay(selectedDate, date);
+  const referenceDate =
+    date || getDayInReferenceWeek({ dayName, referenceDate: date });
 
   // console.log("[DaySlots.rndr]", dayName, enabled);
 
@@ -98,10 +98,22 @@ const DaySlots = ({ dayName, date, selectedDate }) => {
     >
       <Box display="flex">
         {enabled ? (
-          <TimeRangePickerField
-            // Component={TimePicker}
+          <TimeRangesPickerField
             name={dayRangesName(dayName)}
+            // rules={{
+            //   validate: {
+            //     myvalidation: (a, b, c) => {
+            //       console.log("validate", { a, b, c });
+            //       debugger;
+            //     },
+            //   },
+            //   validate: (a, b, c) => {
+            //     console.log("validate", { a, b, c });
+            //     debugger;
+            //   },
+            // }}
             inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
+            referenceDate={referenceDate}
           />
         ) : (
           msg("settings.availability.unavailable")
@@ -150,7 +162,7 @@ export const FIELDS_AVAILABILITY = {
   recurrenceRange: "recurrenceRange",
 };
 
-const getDayInThisWeek = ({ dayName, referenceDate } = {}) => {
+const getDayInReferenceWeek = ({ dayName, referenceDate } = {}) => {
   const refDate = new Date(referenceDate || new Date());
   const targetDayIndex = INDEX_TO_DAY.findIndex((name) => name === dayName);
 
@@ -159,35 +171,46 @@ const getDayInThisWeek = ({ dayName, referenceDate } = {}) => {
 const getReferenceDate = ({ dayName } = {}) => {
   if (!dayName) return new Date();
 
-  return getDayInThisWeek({ dayName });
+  return getDayInReferenceWeek({ dayName });
 };
 
-const getDateTime = ({
+export const getDateTime = ({
   time = "09:00:00",
-  dayName,
+  day,
+  dayName = day,
   referenceDate = getReferenceDate({ dayName }),
 }) => parse(time, API_TIME_FORMAT, referenceDate);
 
 const to = ({ events = [] } = {}, { recurring } = {}, { i18n } = {}) => {
   const daysValues = DAY_NAMES.map((dayName) => {
     const ranges = events?.filter(({ from }) => from?.day === dayName) || [];
-    const range = ranges[0]; // TODO: multi + nonrecurring
+    if (ranges.some(({ from, to }) => from.day !== to.day)) {
+      console.error({ ranges });
+      throw new Error("to - Invalid dayRanges, all dates must be same day");
+    }
+    // const range = ranges[0]; // TODO: multi + nonrecurring
 
-    if (!range)
+    if (!ranges.length)
       return {
         [enabledName(dayName)]: false,
         [dayRangesName(dayName)]: [
-          getDateTime({ time: "09:00:00", dayName }),
-          getDateTime({ time: "17:00:00", dayName }),
+          getDateTime({ time: "09:00:00", day: dayName }),
+          getDateTime({ time: "17:00:00", day: dayName }),
         ],
       };
 
+    // debugger;
+
     return {
       [enabledName(dayName)]: true,
-      [dayRangesName(dayName)]: [
-        getDateTime({ time: range.from.time, dayName }),
-        getDateTime({ time: range.to.time, dayName }),
-      ],
+      // [dayRangesName(dayName)]: [
+      //   getDateTime({ time: range.from.time, dayName }),
+      //   getDateTime({ time: range.to.time, dayName }),
+      // ],
+      [dayRangesName(dayName)]: pipe(
+        chain(({ from, to }) => [from, to]),
+        map(getDateTime)
+      )(ranges),
     };
   }).reduce((acc, values) => {
     return { ...acc, ...values };
