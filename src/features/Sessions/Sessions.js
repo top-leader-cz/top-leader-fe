@@ -7,7 +7,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useContext } from "react";
-import { ErrorBoundary } from "react-error-boundary";
 import { useQuery } from "react-query";
 import { Navigate, generatePath, useNavigate } from "react-router-dom";
 
@@ -27,6 +26,7 @@ import { useAreasDict } from "./areas";
 import { messages } from "./messages";
 import { I18nContext } from "../I18n/I18nProvider";
 import { parametrizedRoutes } from "../../routes/constants";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (
@@ -102,6 +102,7 @@ const SessionCard = ({
     areaOfDevelopment,
     longTermGoal,
     motivation,
+    reflection,
     actionSteps,
   } = {},
   sx = { mb: 3 },
@@ -146,7 +147,7 @@ const SessionCard = ({
                 sx={{}}
               />
             </Box>
-            <P sx={{ my: 3 }}>{motivation}</P>
+            <P sx={{ my: 3 }}>{reflection || motivation}</P>
             <ActionStepsReadOnly
               steps={actionSteps}
               label={<Msg id="sessions.card.goals.title" />}
@@ -195,6 +196,7 @@ function Sessions() {
       areaOfDevelopment: el.data.areaOfDevelopment,
       longTermGoal: el.data.longTermGoal,
       motivation: el.data.motivation,
+      reflection: el.data.reflection,
       actionSteps: el.data.actionSteps,
     }),
   });
@@ -227,13 +229,7 @@ function Sessions() {
         }
       >
         <Header text={<Msg id="sessions.heading" />} />
-        <ErrorBoundary
-          fallbackRender={({ error }) => (
-            <Card sx={{}} elevation={0}>
-              Error occured: {error.message}
-            </Card>
-          )}
-        >
+        <ErrorBoundary>
           {sel.all?.map((session) => (
             <SessionCard session={session} />
           ))}
