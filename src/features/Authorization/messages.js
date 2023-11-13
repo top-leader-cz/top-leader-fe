@@ -49,8 +49,8 @@ export const messages = defineMessages({
     id: "auth.login.microsoft",
     defaultMessage: "Sign in with Microsoft",
   },
-  "auth.invitation.perex": {
-    id: "auth.invitation.perex",
+  "auth.set-password.perex": {
+    id: "auth.set-password.perex",
     defaultMessage:
       "You’ve been invited to join TopLeader. Please set a password to complete the registration",
   },
@@ -74,5 +74,45 @@ export const messages = defineMessages({
   "auth.forgot-pass.back": {
     id: "auth.forgot-pass.back",
     defaultMessage: "Back to login",
+  },
+  "auth.check-email.title": {
+    id: "auth.check-email.title",
+    defaultMessage: "Check your email",
+  },
+  "auth.check-email.perex": {
+    id: "auth.check-email.perex",
+    defaultMessage: "We’ve sent the instructions on",
+  },
+  "auth.check-email.resend.text": {
+    id: "auth.check-email.resend.text",
+    defaultMessage: "Didn’t receive the email?",
+  },
+  "auth.check-email.resend.action": {
+    id: "auth.check-email.resend.action",
+    defaultMessage: "Send again",
+  },
+  "auth.password-changed.title": {
+    id: "auth.password-changed.title",
+    defaultMessage: "Password changed",
+  },
+  "auth.password-changed.perex": {
+    id: "auth.password-changed.perex",
+    defaultMessage: "Your password has now been successfully changed",
+  },
+  "auth.password-changed.login": {
+    id: "auth.password-changed.login",
+    defaultMessage: "Log In",
+  },
+  "auth.reset-password.title": {
+    id: "auth.reset-password.title",
+    defaultMessage: "Set a new password",
+  },
+  "auth.reset-password.perex": {
+    id: "auth.reset-password.perex",
+    defaultMessage: "Enter your new password below",
+  },
+  "auth.reset-password.submit": {
+    id: "auth.reset-password.submit",
+    defaultMessage: "Change password",
   },
 });

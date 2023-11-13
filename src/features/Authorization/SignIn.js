@@ -9,6 +9,7 @@ import { useAuth } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
 import { routes } from "../../routes";
+import { parametrizedRoutes } from "../../routes/constants";
 
 export function SignInPage() {
   const { loginMutation } = useAuth();
@@ -77,7 +78,7 @@ export function SignInPage() {
         <Button
           fullWidth
           variant="text"
-          href={routes.forgotPassword}
+          href={parametrizedRoutes.forgotPassword()}
           sx={{
             width: "auto",
             float: "right",

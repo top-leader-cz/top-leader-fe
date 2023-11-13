@@ -565,7 +565,14 @@ const debugLog = (debug) => {
   }
 };
 
-export const RHFTextField = ({ name, control, rules, debug, ...props }) => {
+export const RHFTextField = ({
+  name,
+  control,
+  rules,
+  debug,
+  size = "small", // "medium"
+  ...props
+}) => {
   const methods = useFormContext();
 
   return (
@@ -579,6 +586,7 @@ export const RHFTextField = ({ name, control, rules, debug, ...props }) => {
           error={!!fieldState.error}
           helperText={getError(fieldState.error, rules)}
           // helperText={fieldState.error}
+          size={size}
           {...props}
           {...field}
         />

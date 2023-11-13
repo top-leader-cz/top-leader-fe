@@ -5,8 +5,9 @@ import { LinkBehavior } from "./components/LinkBehavior";
 export const primary25 = "#F9F8FF";
 export const primary500 = "#4720B7";
 export const gray50 = "#F9FAFB"; // previously in bg as #EAECF0
-export const gray500 = "#667085";
 export const gray200 = "#EAECF0";
+export const gray500 = "#667085";
+export const gray900 = "#101828";
 
 // A custom theme for this app
 const theme = createTheme({
@@ -37,28 +38,28 @@ const theme = createTheme({
     h1: {
       fontSize: 24,
       fontWeight: 600,
-      color: "#101828", // gray/900
+      color: gray900,
       lineHeight: 1.21,
       letterSpacing: "0em",
     },
     h2: {
       fontSize: 18,
       fontWeight: 600,
-      color: "#101828", // gray/900
+      color: gray900,
       lineHeight: 1.21,
       letterSpacing: "0em",
     },
     h3: {
       fontSize: 14,
       fontWeight: 600,
-      color: "#101828", // gray/900
+      color: gray900,
       lineHeight: 1.21,
       letterSpacing: "0em",
     },
     body1: {
       fontSize: 14,
       fontWeight: 400,
-      color: "#667085", // gray/500
+      color: gray500,
       lineHeight: 1.21,
     },
     button: {
@@ -81,6 +82,15 @@ const theme = createTheme({
     //     },
     //   },
     // },
+    MuiInputBase: {
+      styleOverrides: {
+        input: ({ ownerState }) => ({
+          ...(ownerState?.size === "small" && {
+            "&.MuiInputBase-inputSizeSmall": { padding: "9.5px 14px" },
+          }),
+        }),
+      },
+    },
     MuiAvatar: {
       styleOverrides: {
         rounded: {
@@ -120,7 +130,7 @@ const theme = createTheme({
           style: {
             color: primary500,
             backgroundColor: primary25,
-            border: "1px solid #4720B7",
+            border: `1px solid ${primary500}`,
             padding: "16px",
             borderRadius: "10px",
           },
@@ -128,7 +138,7 @@ const theme = createTheme({
         {
           props: { variant: "unselected" },
           style: {
-            color: "#101828",
+            color: gray900,
             backgroundColor: "#FFFFFF",
             border: "1px solid transparent",
             padding: "16px",

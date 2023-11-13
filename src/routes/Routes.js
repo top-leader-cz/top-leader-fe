@@ -35,6 +35,8 @@ import { StartSessionPage } from "../features/Sessions/StartSession.page";
 import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
 import { CreateFeedbackPage } from "../features/Feedback/CreateFeedback.page";
 import { FeedbackResultsPage } from "../features/Feedback/FeedbackResults.page";
+import { CheckEmailPage } from "../features/Authorization/CheckEmailPage";
+import { PasswordChangedPage } from "../features/Authorization/PasswordChangedPage";
 
 const GlobalSpinner = () => {
   return (
@@ -87,10 +89,42 @@ export const router = createHashRouter([
         ),
       },
       {
+        path: routes.resetPassword,
+        element: (
+          <ForbidAuth>
+            <SetPasswordPage isExistingUser />
+          </ForbidAuth>
+        ),
+      },
+      {
+        path: routes.resetPassword_TODO_1_JAKUB_K,
+        element: (
+          <ForbidAuth>
+            <SetPasswordPage isExistingUser />
+          </ForbidAuth>
+        ),
+      },
+      {
+        path: routes.passwordChanged,
+        element: (
+          <ForbidAuth>
+            <PasswordChangedPage />
+          </ForbidAuth>
+        ),
+      },
+      {
         path: routes.forgotPassword,
         element: (
           <ForbidAuth>
             <ForgotPasswordPage />
+          </ForbidAuth>
+        ),
+      },
+      {
+        path: routes.checkEmail,
+        element: (
+          <ForbidAuth>
+            <CheckEmailPage />
           </ForbidAuth>
         ),
       },

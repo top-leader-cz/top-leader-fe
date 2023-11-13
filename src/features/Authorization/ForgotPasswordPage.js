@@ -12,8 +12,10 @@ import { useAuth } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
 import { routes } from "../../routes";
+import { useNavigate, useParams } from "react-router-dom";
+import { parametrizedRoutes } from "../../routes/constants";
 
-const useForgotPasswordMutation = (params = {}) => {
+export const useForgotPasswordMutation = (params = {}) => {
   const { authFetch } = useAuth();
   const mutation = useMutation({
     mutationFn: ({ username, locale = "cs" }) =>
@@ -30,20 +32,23 @@ const useForgotPasswordMutation = (params = {}) => {
 
 export const ForgotPasswordPage = () => {
   const msg = useMsg({ dict: messages });
+  const { email } = useParams();
+  const navigate = useNavigate();
   const forgotPasswordMutation = useForgotPasswordMutation();
 
   const form = useForm({
-    defaultValues: { username: "" },
+    defaultValues: { username: email || "" },
   });
-  const handleSubmit = ({ username }, e) => {
+  const handleSubmit = async ({ username }, e) => {
     console.log("[submit]", { username });
     // if (password !== passwordConfirm) {
     //   form.setError("passwordConfirm", { message: "Must match" });
     //   return;
     // }
 
-    return forgotPasswordMutation.mutate({ username });
+    await forgotPasswordMutation.mutateAsync({ username });
     // .catch((e) => { form.setError("password", { message: "Error" }); });
+    navigate(parametrizedRoutes.checkEmail({ email: username }));
   };
 
   const disabled = forgotPasswordMutation.isLoading;
