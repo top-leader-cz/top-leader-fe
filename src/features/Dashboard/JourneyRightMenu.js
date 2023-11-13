@@ -15,6 +15,7 @@ import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { ActionStepsReadOnly } from "../Sessions/Sessions";
 import { useUserSessionQuery } from "../Sessions/api";
+import { assoc, curry, evolve, keys, map, pipe, reduce, sort } from "ramda";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -110,7 +111,6 @@ const Actions = ({ canFetch = true, ...props }) => {
 
 const ScheduledDay = ({ time, name, username }) => {
   const { i18n } = useContext(I18nContext);
-  const parsed = i18n.parseUTCLocal(time);
 
   return (
     <Box
@@ -132,10 +132,10 @@ const ScheduledDay = ({ time, name, username }) => {
         }}
       >
         <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
-          {i18n.formatLocal(parsed, "ccc")}
+          {i18n.formatLocal(time, "ccc")}
         </P>
         <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
-          {i18n.formatLocal(parsed, "d")}
+          {i18n.formatLocal(time, "d")}
         </P>
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -143,7 +143,7 @@ const ScheduledDay = ({ time, name, username }) => {
           {name || username}
         </P>
         <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
-          {i18n.formatLocal(parsed, "p")}
+          {i18n.formatLocal(time, "p")}
         </P>
       </Box>
 
@@ -152,7 +152,7 @@ const ScheduledDay = ({ time, name, username }) => {
       </Box>
       <Box display="flex" gap={1}>
         <P sx={{ fontSize: 18, color: gray900, fontWeight: 600 }}>
-          {i18n.formatLocal(parsed, "pppp")}
+          {i18n.formatLocal(time, "pppp")}
         </P>
         <P sx={{ fontSize: 18, color: gray900, fontWeight: 400 }}>
           {name || username}
@@ -185,6 +185,11 @@ const CoachUpcomingSessions = ({ data }) => {
     </Box>
   );
 };
+
+// https://github.com/ramda/ramda/wiki/Cookbook#rename-keys-of-an-object
+export const renameKeys = curry((keysMap, obj) =>
+  reduce((acc, key) => assoc(keysMap[key] || key, obj[key], acc), {}, keys(obj))
+);
 
 const UpcomingSessionsCard = ({}) => {
   const { isCoach } = useAuth();
@@ -230,21 +235,18 @@ const UpcomingSessionsCard = ({}) => {
         errored={() => emptySessions}
         success={({ data }) => {
           if (!data?.length) return emptySessions;
-          else
-            return (
-              <CoachUpcomingSessions
-                data={
-                  isCoach
-                    ? data
-                    : data.map(({ coach, firstName, lastName, time }) => ({
-                        username: coach,
-                        firstName,
-                        lastName,
-                        time,
-                      }))
-                }
-              />
-            );
+
+          const parseTime = evolve({ time: i18n.parseUTCLocal });
+          const mappedData = pipe(
+            map(
+              isCoach
+                ? parseTime
+                : pipe(renameKeys({ coach: "username" }), parseTime)
+            ),
+            sort((a, b) => +a.time - b.time)
+          )(data);
+
+          return <CoachUpcomingSessions data={mappedData} />;
         }}
       />
     </ActionCard>

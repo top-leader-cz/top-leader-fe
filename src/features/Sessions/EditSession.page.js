@@ -1,4 +1,3 @@
-import { ArrowBack } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -13,11 +12,12 @@ import {
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ActionSteps, RHFTextField } from "../../components/Forms";
+import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { H1, H2, P } from "../../components/Typography";
+import { H1, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
@@ -33,7 +33,6 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
-import { Header } from "../../components/Header";
 
 export const IconTileIcon = ({ iconName }) => {
   return (
@@ -476,7 +475,7 @@ function EditSessionPageInner() {
         text={<Msg id="sessions.new.header" />}
         back={{ href: routes.sessions }}
       />
-      {finished ? (
+      {"TODO:remove me!!!" || finished ? (
         <Finished />
       ) : (
         <StepComponent
