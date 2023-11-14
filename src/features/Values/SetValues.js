@@ -54,7 +54,7 @@ const useMyValues = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async ({ selectedKeys }) => {
-      authFetch({
+      return authFetch({
         method: "POST",
         url: `/api/latest/user-info/values`,
         data: { data: selectedKeys },
@@ -62,16 +62,16 @@ const useMyValues = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["values"] });
+      fetchUser();
+      navigate(routes.dashboard);
     },
   });
 
   const navigate = useNavigate();
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     mutation.mutate({ selectedKeys });
-    fetchUser();
-    navigate(routes.dashboard);
-  }, [fetchUser, mutation, navigate, selectedKeys]);
+  }, [mutation, selectedKeys]);
 
   return {
     handleSave,

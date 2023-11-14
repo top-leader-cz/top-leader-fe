@@ -95,7 +95,7 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
 
   const deleteAnswersMutation = useMutation({
     mutationFn: async () => {
-      authFetch({
+      return authFetch({
         method: "DELETE",
         url: `/api/latest/user-assessments`,
       });

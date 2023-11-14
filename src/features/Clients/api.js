@@ -77,7 +77,10 @@ export const useDeclineMutation = (mutationParams = {}) => {
       }),
     ...mutationParams,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["coach-clients"] }); // TODO: test
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["coach-clients"],
+      }); // TODO: test
       mutationParams?.onSuccess?.(data);
     },
   });
