@@ -78,7 +78,11 @@ export const useUserReflectionMutation = ({ onSuccess, ...rest } = {}) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     /* { "reflection": "string", "newActionSteps": [ { "label": "string", "date": "2023-08-29" } ], "checked": [ 0 ] } */
-    mutationFn: async ({ actionSteps = [], ...data }) => {
+    mutationFn: async ({
+      actionSteps = [],
+      previousActionSteps = [],
+      ...data
+    }) => {
       console.log("%cMUTATION", "color:lime", { actionSteps, ...data });
       return await authFetch({
         method: "POST",
@@ -93,6 +97,9 @@ export const useUserReflectionMutation = ({ onSuccess, ...rest } = {}) => {
               date: formattedDate,
             };
           }),
+          checked: previousActionSteps
+            .filter(({ checked }) => checked)
+            .map(({ id }) => id),
         },
       });
     },
