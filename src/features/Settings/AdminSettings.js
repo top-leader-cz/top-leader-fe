@@ -44,7 +44,7 @@ const useUsersQuery = () => {
       authFetch({
         url: `/api/latest/admin/users`,
         query: {
-          size: 1,
+          size: 10000,
           sort: "username,asc",
         },
       })
