@@ -54,17 +54,13 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
   );
 
   const formatUtcLocal = useCallback(
-    (localDate, formatStr = "Pp") => {
+    (date, formatStr = "Pp") => {
       try {
-        // TODO: not working
-        // const utcDate = zonedToUtcLocal(localDate);
-        // console.log("[formatUtcLocal] 0", { userTz, localDate, formatStr, utcDate, });
-
-        const resultStr = tz.formatInTimeZone(localDate, "UTC", formatStr);
+        const resultStr = tz.formatInTimeZone(date, "UTC", formatStr);
         // const resultStr = formatLocal(utcDate, formatStr);
         console.log("[formatUtcLocal] 1", {
           userTz,
-          localDate,
+          date,
           formatStr,
           // utcDate,
           resultStr,
@@ -72,11 +68,7 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
 
         return resultStr;
       } catch (e) {
-        console.error("[formatUtcLocal]", {
-          localDate,
-          userTz,
-          e,
-        });
+        console.error("[formatUtcLocal]", { date, userTz, e });
         throw e;
       }
     },

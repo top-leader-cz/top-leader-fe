@@ -44,7 +44,7 @@ const ControlsInner = ({
       </Button>
 
       <Button
-        type="submit"
+        type="button"
         variant="contained"
         endIcon={<ArrowForward />}
         onClick={(e) => {

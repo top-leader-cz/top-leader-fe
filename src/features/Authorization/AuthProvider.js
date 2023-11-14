@@ -125,6 +125,7 @@ export function AuthProvider({ children }) {
 
   const authFetch = useCallback(
     ({ url, query, method = "GET", type = FETCH_TYPE.JSON, data }) =>
+      console.log("authFetch ", method, url, { query, data }) ||
       fetch(qstr(url, query), getInit({ method, data }))
         .then(async (response) => {
           if (!response.ok) await throwOnError({ response, type });

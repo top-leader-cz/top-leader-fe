@@ -9,9 +9,21 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ActionSteps, RHFTextField } from "../../components/Forms";
+import {
+  ActionSteps,
+  CheckboxField,
+  RHFTextField,
+  StaticValueField,
+} from "../../components/Forms";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -33,6 +45,8 @@ import { Controls, ControlsContainer } from "./steps/Controls";
 import { Finished } from "./steps/Finished";
 import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
+import { RHForm } from "../../components/Forms/Form";
+import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 
 export const IconTileIcon = ({ iconName }) => {
   return (
@@ -174,6 +188,7 @@ export const SessionTodos = ({ actionSteps = [], withoutControls }) => {
   const onCheckAll = useCallback(() => {
     setAllChecked((v) => !v);
   }, []);
+  console.log({ allChecked });
 
   return (
     <Stack sx={{ ...userInputSx }}>
@@ -207,6 +222,102 @@ export const SessionTodos = ({ actionSteps = [], withoutControls }) => {
   );
 };
 
+export const SessionTodosFields = ({ name, rules, withoutControls }) => {
+  const msg = useMsg();
+  const { setValue, watch } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    name,
+    rules,
+    // shouldUnregister: false,
+  });
+  const list = watch(name);
+
+  const [allChecked, setAllChecked] = useState();
+  const handleCheckAll = useCallback(
+    (e, value) => {
+      console.log(name, "handleCheckAll", { e, value });
+      list.forEach((field, i) => {
+        setValue(`${name}.${i}.checked`, value);
+      });
+      setAllChecked(value);
+    },
+    [list, setValue, name]
+  );
+  const isAllChecked = !!list.length && list.every((field) => field.checked);
+  useEffect(() => {
+    console.log("[SessionTodosFields.useEffect]", { list, isAllChecked });
+    setAllChecked(isAllChecked);
+  }, [list, isAllChecked, name]);
+
+  console.log("[SessionTodosFields.rndr]", { fields, list, allChecked });
+
+  return (
+    <Stack sx={{ ...userInputSx }}>
+      {fields.map(({ id, ...fieldDefaultValues }, i) => (
+        <FormControlLabel
+          key={id}
+          control={<CheckboxField name={`${name}.${i}.checked`} />}
+          // label={label} // just defaultValue, not updated
+          label={<StaticValueField name={`${name}.${i}.label`} />}
+        />
+      ))}
+      {!withoutControls && (
+        <>
+          <Divider sx={{ my: 2, opacity: 0.4 }} />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="allChecked"
+                  checked={!!allChecked}
+                  onChange={handleCheckAll}
+                />
+              }
+              label={msg("sessions.edit.steps.reflect.mark-all-as-completed")}
+            />
+          </Box>
+        </>
+      )}
+    </Stack>
+  );
+};
+
+const DEFAULT_VALUES = {
+  actionSteps: [
+    // { id, label, date = "2023-09-06", checked = false }
+    { label: "-", checked: false },
+  ],
+};
+// already in FormStepCard
+const SessionTodosForm = ({
+  name = "actionSteps",
+  defaultValues = DEFAULT_VALUES,
+  onChange,
+  ...props
+}) => {
+  const form = useForm({
+    mode: "all",
+    defaultValues,
+  });
+  const list = form.watch(name);
+  useEffect(() => {
+    console.log(name, "onChange eff TODO", { list });
+  }, [list, name]);
+  console.log(name, "rndr", { list, defaultValues });
+
+  return (
+    <RHForm form={form}>
+      <SessionTodosFields name={name} {...props} />
+    </RHForm>
+  );
+};
+
 const reflectionKeyName = "reflection";
 const ReflectStep = ({
   step,
@@ -232,8 +343,19 @@ const ReflectStep = ({
   console.log("[ReflectStep.rndr]", { previousActionSteps });
 
   return (
-    <FormStepCard {...{ step, stepper, data, setData, handleNext, handleBack }}>
-      <SessionTodos actionSteps={previousActionSteps} />
+    <FormStepCard
+      {...{
+        step,
+        stepper,
+        data: { ...data, previousActionSteps },
+        setData,
+        handleNext,
+        handleBack,
+      }}
+    >
+      {/* <SessionTodosForm name={"previousActionSteps"} defaultValues={previousActionSteps} /> */}
+      <SessionTodosFields name={"previousActionSteps"} />
+      {/* <SessionTodos actionSteps={previousActionSteps} /> */}
       <Box sx={{ ...userInputSx }}>
         <P>{motivationOrReflection}</P>
       </Box>
@@ -263,7 +385,7 @@ const SetActionStepsStep = ({
   setData,
   handleNext,
   handleBack,
-  previousActionSteps = [],
+  submitDisabled,
 }) => {
   return (
     <FormStepCard
@@ -280,14 +402,15 @@ const SetActionStepsStep = ({
           handleNext={onFinish}
           handleBack={handleBack}
           nextProps={{
-            disabled: !formState.isValid,
+            disabled: !formState.isValid || submitDisabled,
             children: "Done",
             endIcon: undefined,
           }}
         />
       )}
     >
-      <SessionTodos actionSteps={previousActionSteps} withoutControls />
+      <SessionTodosFields name={"previousActionSteps"} />
+      {/* <SessionTodos actionSteps={previousActionSteps} withoutControls /> */}
       {/* <Todos items={exampleTodos} keyProp="id" /> */}
       <P my={2}></P>
       <ActionSteps
@@ -326,7 +449,7 @@ function EditSessionPageInner() {
     },
     {
       StepComponent: ReflectStep,
-      fields: [{ name: reflectionKeyName }],
+      fields: [{ name: reflectionKeyName }, { name: "previousActionSteps" }], // TODO: to enum
       label: msg("sessions.edit.steps.reflect.label"),
       caption: msg("sessions.edit.steps.reflect.caption"),
       iconName: "Lightbulb",
@@ -335,7 +458,10 @@ function EditSessionPageInner() {
     },
     {
       StepComponent: SetActionStepsStep,
-      fields: [{ name: setActionStepsKeyName }],
+      fields: [
+        { name: setActionStepsKeyName },
+        { name: "previousActionSteps" },
+      ],
       label: msg("sessions.edit.steps.setaction.label"),
       caption: msg("sessions.edit.steps.setaction.caption"),
       iconName: "Explore",
@@ -402,6 +528,7 @@ function EditSessionPageInner() {
     initialIndex: 0,
     initialData: {
       actionSteps: DEFAULT_VALUE_ROW,
+      previousActionSteps: [],
     },
   });
 
@@ -412,11 +539,8 @@ function EditSessionPageInner() {
   activeStepIndexRef.current = activeStepIndex;
 
   const mutation = useUserReflectionMutation({
-    onSuccess: useCallback((data) => {
-      // TODO: not called sometimes!
-      console.log("mutation.onSuccess", data);
-      setFinished(true);
-    }, []),
+    onSuccess: () =>
+      console.log("mutation.onSuccess", data) || setFinished(true),
   });
 
   const handleFinish = (data) => {
@@ -426,10 +550,8 @@ function EditSessionPageInner() {
         "[NewSession.onFinish] TODO? Area changed, call user sessions?"
       );
     mutation.mutate(data);
-    return;
     // setFinished(true);
   };
-  const isLoading = sessionQuery.isLoading || mutation.isLoading;
 
   console.log("[EditSessionPage.rndr]", {
     id,
@@ -440,7 +562,7 @@ function EditSessionPageInner() {
     adjust,
   });
 
-  if (isLoading) return <QueryRenderer isLoading />;
+  if (sessionQuery.isLoading) return <QueryRenderer isLoading />;
 
   const date = new Date();
   const formattedDate = i18n.formatLocalMaybe(date, "P");
@@ -493,6 +615,7 @@ function EditSessionPageInner() {
           previousArea={sessionQuery.data?.areaOfDevelopment ?? ""}
           previousGoal={sessionQuery.data?.longTermGoal ?? ""}
           setAdjust={setAdjust}
+          submitDisabled={mutation.isLoading}
         />
       )}
     </Layout>

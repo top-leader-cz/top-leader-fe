@@ -18,7 +18,7 @@ export const RHForm = ({
 
   return (
     <Box
-      component={"form"}
+      component="form"
       onSubmit={form.handleSubmit(onSubmit, onError)}
       sx={sx}
     >

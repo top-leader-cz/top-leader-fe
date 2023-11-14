@@ -460,6 +460,17 @@ export const SwitchField = ({ name, rules, ...props }) => {
   );
 };
 
+export const StaticValueField = ({ name, children, ...props }) => {
+  return (
+    <Controller
+      name={name}
+      render={({ field }) =>
+        typeof children === "function" ? children(field) : field.value
+      }
+    />
+  );
+};
+
 export const CheckboxField = ({ name, rules, ...props }) => {
   return (
     <Controller
@@ -482,11 +493,11 @@ export const CheckboxField = ({ name, rules, ...props }) => {
         return (
           <Checkbox
             {...{
-              ...props,
-              ...field,
-              checked: !!field.value,
-              ...invertedProps,
               name,
+              checked: !!field.value,
+              ...field,
+              ...props,
+              ...invertedProps,
             }}
           />
         );
