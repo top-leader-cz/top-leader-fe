@@ -44,6 +44,7 @@ import { ErrorBoundary } from "../ErrorBoundary";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
+import { Score } from "../Score";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -971,6 +972,23 @@ export const BareInputField = ({
             {getError(fieldState.error, rules)}
           </P>
         </Box>
+      )}
+    />
+  );
+};
+
+export const ScoreField = ({ name, rules, ...props }) => {
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field, fieldState, formState }) => (
+        <Score
+          {...field}
+          {...props}
+          error={!!fieldState.error}
+          onChange={({ value }) => field.onChange(value)}
+        />
       )}
     />
   );

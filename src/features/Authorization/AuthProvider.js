@@ -9,6 +9,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
+import { always, tryCatch } from "ramda";
 
 export const AuthContext = createContext(null);
 
@@ -62,14 +63,22 @@ const _fetchUser = ({ authFetch }) =>
 
 const throwOnError = async ({ response, type }) => {
   console.log("FETCH ERR START", { response });
-  let jsonMaybe, parsingError;
+  let jsonMaybe, parsingError, textMaybe;
   try {
-    jsonMaybe = await response.json();
+    if (response.headers.get("content-type")?.includes("application/json"))
+      jsonMaybe = await response.json();
+    else if (response.headers.get("content-type")?.includes("text/html"))
+      textMaybe = await response.text();
   } catch (e) {
     parsingError = e;
     console.log("FETCH ERR NOT PARSED", { response, parsingError });
   } finally {
-    console.log("FETCH ERR FINALLY", { response, jsonMaybe, parsingError });
+    console.log("FETCH ERR FINALLY", {
+      response,
+      jsonMaybe,
+      textMaybe,
+      parsingError,
+    });
 
     // TODO: get message from response
     const generalErrorMessage = `Something went wrong. (${
@@ -82,6 +91,7 @@ const throwOnError = async ({ response, type }) => {
     const error = new Error(message);
     error.response = response;
     error.jsonMaybe = jsonMaybe;
+    error.textMaybe = textMaybe;
     throw error;
     // TODO: compare stacktrace
     // throw response;
@@ -124,12 +134,20 @@ export function AuthProvider({ children }) {
   }, [setIsLoggedIn]);
 
   const authFetch = useCallback(
-    ({ url, query, method = "GET", type = FETCH_TYPE.JSON, data }) =>
+    ({
+      url,
+      query,
+      method = "GET",
+      type = FETCH_TYPE.JSON,
+      data,
+      isPublicApi = false,
+    }) =>
       console.log("authFetch ", method, url, { query, data }) ||
       fetch(qstr(url, query), getInit({ method, data }))
         .then(async (response) => {
           if (!response.ok) await throwOnError({ response, type });
           try {
+            // TODO: parse response first
             if (type === FETCH_TYPE.JSON) return await response.json();
             if (type === FETCH_TYPE.JSON_WITH_META)
               return { response, json: await response.json() };
@@ -139,8 +157,12 @@ export function AuthProvider({ children }) {
           }
         })
         .catch((e) => {
-          console.error("[authFetch]", { e, url, method });
-          if (e?.response?.status === 401) signout();
+          console.error(
+            "[authFetch] ",
+            isPublicApi ? "" : "removing queries and logging out",
+            { e, url, method }
+          );
+          if (e?.response?.status === 401 && !isPublicApi) signout();
 
           throw e;
         }),

@@ -2,7 +2,7 @@ import { pipeP } from "composable-fetch";
 import { useMutation, useQuery } from "react-query";
 import { useAuth } from "../Authorization";
 
-export const useAnswersQuery = ({ onSuccess, ...mutationParams } = {}) => {
+export const useAnswersQuery = ({ onSuccess, ...params } = {}) => {
   const { authFetch } = useAuth();
   return useQuery({
     queryKey: ["assessment"],
@@ -24,7 +24,7 @@ export const useAnswersQuery = ({ onSuccess, ...mutationParams } = {}) => {
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    ...mutationParams,
+    ...params,
   });
 };
 export const useDeleteAnswersMutation = (mutationParams = {}) => {

@@ -90,4 +90,20 @@ export const messages = defineMessages({
     id: "feedback.aside.collected",
     defaultMessage: "Responses collected",
   },
+  "feedback.external.heading": {
+    id: "feedback.external.heading",
+    defaultMessage: "Feedback form",
+  },
+  // "feedback.external.title": {
+  //   id: "feedback.external.title",
+  //   defaultMessage: "Feedback on {name} performance",
+  // },
+  "feedback.external.deadline": {
+    id: "feedback.external.deadline",
+    defaultMessage: "Please answer until {date}",
+  },
+  "feedback.external.submit": {
+    id: "feedback.external.submit",
+    defaultMessage: "Submit form",
+  },
 });

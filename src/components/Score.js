@@ -14,9 +14,15 @@ const messages = defineMessages({
   },
 });
 
+const DEFAULT_OPTIONS = Array(10)
+  .fill()
+  .map((_, i) => ({ value: i + 1, label: i + 1 }));
+
 const ScoreInner = ({
   value,
   onChange,
+  error,
+  options = DEFAULT_OPTIONS,
   left = (
     <P>
       <Msg id="score.min" />
@@ -39,18 +45,17 @@ const ScoreInner = ({
     >
       {left}
       <Box sx={{ mx: 2, display: "flex", flexFlow: "row nowrap" }}>
-        {Array(10)
-          .fill()
-          .map((_, i) => (
-            <Button
-              key={i}
-              variant={value === i + 1 ? "contained" : "outlined"}
-              sx={{ minWidth: 32, mx: 1 }}
-              onClick={() => onChange({ value: i + 1 })}
-            >
-              {i + 1}
-            </Button>
-          ))}
+        {options.map((option) => (
+          <Button
+            key={option.value}
+            variant={value === option.value ? "contained" : "outlined"}
+            sx={{ minWidth: 32, mx: 1 }}
+            onClick={() => onChange({ value: option.value })}
+            color={error ? "error" : "primary"}
+          >
+            {option.label}
+          </Button>
+        ))}
       </Box>
       {right}
     </Box>

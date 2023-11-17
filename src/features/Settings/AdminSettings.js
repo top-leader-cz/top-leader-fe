@@ -10,8 +10,8 @@ import { TLCell, TLChipsCell } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { gray500 } from "../../theme";
-import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
-import { formatName } from "../Coaches/CoachCard";
+import { Authority, useAuth, useMyQuery } from "../Authorization/AuthProvider";
+import { formatName, getCoachPhotoUrl } from "../Coaches/CoachCard";
 import { SlotChip } from "../Team/Team.page";
 import { MemberAdminModal } from "./Admin/MemberAdminModal";
 import { messages } from "./messages";
@@ -90,6 +90,12 @@ function AdminSettingsInner() {
       render: (row) => (
         <TLCell
           avatar
+          // avatar={row.authorities?.includes(Authority.COACH)}
+          avatarSrc={
+            row.authorities?.includes(Authority.COACH)
+              ? getCoachPhotoUrl(row.username)
+              : undefined
+          }
           component="th"
           scope="row"
           name={formatName(row) || "-"}
@@ -118,6 +124,7 @@ function AdminSettingsInner() {
         [coachFirstName, coachLastName, coach].some(Boolean) ? (
           <TLCell
             avatar
+            avatarSrc={getCoachPhotoUrl(coach)}
             component="th"
             scope="row"
             name={formatName({

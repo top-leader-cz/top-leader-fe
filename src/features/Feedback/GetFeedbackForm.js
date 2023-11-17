@@ -67,7 +67,7 @@ const DEFAULT_VALUES = {
   fields: [FIELD_DEFAULT_VALUES],
 };
 
-const InputPreview = ({ inputType, index }) => {
+export const InputPreview = ({ inputType, index }) => {
   if (inputType === INPUT_TYPES.TEXT)
     return (
       <TextField

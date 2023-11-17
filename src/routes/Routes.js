@@ -37,6 +37,7 @@ import { CreateFeedbackPage } from "../features/Feedback/CreateFeedback.page";
 import { FeedbackResultsPage } from "../features/Feedback/FeedbackResults.page";
 import { CheckEmailPage } from "../features/Authorization/CheckEmailPage";
 import { PasswordChangedPage } from "../features/Authorization/PasswordChangedPage";
+import { ExternalFeedbackPage } from "../features/Feedback/ExternalFeedbackPage";
 
 const GlobalSpinner = () => {
   return (
@@ -238,6 +239,14 @@ export const router = createHashRouter([
           <RequireAuth>
             <FeedbackResultsPage />
           </RequireAuth>
+        ),
+      },
+      {
+        path: routes.externalFeedbackPage,
+        element: (
+          // <ForbidAuth>
+          <ExternalFeedbackPage />
+          // </ForbidAuth>
         ),
       },
       {

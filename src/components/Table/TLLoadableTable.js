@@ -15,6 +15,8 @@ import {
 import { Fragment } from "react";
 import { QueryRenderer } from "../../features/QM/QueryRenderer";
 import { P } from "../Typography";
+import { Icon } from "../Icon";
+import { gray200 } from "../../theme";
 
 export const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== "variant",
@@ -68,6 +70,7 @@ export const TLCell = ({
   name,
   sub,
   avatar,
+  avatarSrc,
   align,
   after,
   ...props
@@ -80,8 +83,14 @@ export const TLCell = ({
             {avatar && (
               <Avatar
                 variant="circular"
-                src={`https://i.pravatar.cc/44?u=${"" + Math.random()}`}
                 sx={{ width: 44, height: 44, bgcolor: "transparent", mr: 2 }}
+                {...(avatarSrc
+                  ? { src: avatarSrc }
+                  : {
+                      children: (
+                        <Icon name={"Person"} sx={{ color: gray200 }} />
+                      ),
+                    })}
               />
             )}
             {!sub ? (

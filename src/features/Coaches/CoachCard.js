@@ -90,6 +90,9 @@ export const CoachInfo = ({
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`.trim();
 
+export const getCoachPhotoUrl = (username) =>
+  username ? `/api/latest/coaches/${username}/photo` : "";
+
 export const CoachCard = ({
   coach,
   withContact,
@@ -124,7 +127,7 @@ export const CoachCard = ({
           <CardMedia
             component="img"
             sx={{ width: 225, borderRadius: 0.6 }}
-            image={`/api/latest/coaches/${username}/photo`}
+            image={getCoachPhotoUrl(username)}
             alt={name}
           />
           <Box
