@@ -13,6 +13,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMutation, useQueryClient } from "react-query";
 import { I18nContext } from "../I18n/I18nProvider";
 import { useNavigate } from "react-router-dom";
+import { useFeedbackOptionsQuery } from "./api";
 
 const from = ({ shareFormValues, formBuilderValues, username, language }) => {
   const validTo = shareFormValues.validTo || "2023-12-20T23:10:46.567Z"; // TODO
@@ -48,10 +49,7 @@ function CreateFeedbackPageInner() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const feedbackOptionsQuery = useMyQuery({
-    queryKey: ["feedback", "options"],
-    fetchDef: { url: `/api/latest/feedback/options` },
-  });
+  const feedbackOptionsQuery = useFeedbackOptionsQuery();
   const postFeedbackFormMutation = useMutation({
     mutationFn: async (data) =>
       console.log("mutating", { data }) ||

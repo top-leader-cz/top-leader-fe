@@ -1,8 +1,7 @@
 import { Alert, Box, Button, Card, CardContent } from "@mui/material";
-import { evolve, map, pick, prop } from "ramda";
-import { useCallback, useContext } from "react";
+import { prop } from "ramda";
+import { useCallback, useContext, useState } from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useParams } from "react-router-dom";
 import { RHFTextField, ScoreField, getLabel } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
@@ -11,14 +10,20 @@ import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { gray200 } from "../../theme";
-import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
+import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { INPUT_TYPES } from "./GetFeedbackForm";
+import {
+  useExternalFeedbackMutation,
+  useExternalFeedbackQuery,
+  useFeedbackOptionsQuery,
+  useRequestAccessMutation,
+} from "./api";
 import { messages } from "./messages";
 import { useFeedbackQuestionOptionsDict } from "./useFeedbackQuestionOptionsDict";
 
-const FIELDS = {
+export const FIELDS = {
   answers: "answers",
 };
 
@@ -118,28 +123,6 @@ const FeedbackFieldCard = ({
             value: key,
           }))}
         />
-        {/* <Divider sx={{ my: 3 }} />
-        <Box display="flex" flexDirection="row" gap={3}>
-          <AutocompleteSelect
-            name={titleName}
-            rules={{ required: "Required" }}
-            options={feedbackQuestionOptions}
-            sx={{ maxWidth: "50%", flex: "0 1 auto" }}
-          />
-          <AutocompleteSelect
-            name={inputTypeName}
-            rules={{ required: "Required" }}
-            options={INPUT_TYPE_OPTIONS}
-            sx={{ maxWidth: "50%", flex: "0 1 180px" }}
-          />
-
-          <FormGroup>
-            <FormControlLabel
-              control={<CheckboxField name={getName(SUBFIELDS.required)} />}
-              label="Required"
-            />
-          </FormGroup>
-        </Box> */}
       </CardContent>
     </Card>
   );
@@ -198,12 +181,7 @@ const DEFAULT_FEEDBACK_OPTIONS = {
 
 const ExternalFeedbackForm = ({ data, onSubmit }) => {
   const msg = useMsg();
-  const feedbackOptionsQuery = useMyQuery({
-    retry: 1,
-    queryKey: ["feedback", "options"],
-    fetchDef: { url: `/api/latest/feedback/options` }, // TODO: 401
-    queryFn: async () => DEFAULT_FEEDBACK_OPTIONS,
-  });
+  const feedbackOptionsQuery = useFeedbackOptionsQuery({ retry: 1 });
   const form = useForm({
     defaultValues: {
       [FIELDS.answers]: data.questions.map((question) => ({
@@ -219,29 +197,160 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
     control: form.control,
   });
 
+  const renderForm = ({ data: feedbackOptions }) => (
+    <RHForm form={form} onSubmit={onSubmit}>
+      <FeedbackMeta data={data} />
+      {fields.map(({ id }, i) => (
+        <FeedbackFieldCard
+          key={id}
+          index={i}
+          feedbackOptions={feedbackOptions}
+          getName={(fieldName) => `${FIELDS.answers}.${i}.${fieldName}`}
+          sx={{ mt: 3 }}
+        />
+      ))}
+      <Box sx={{ textAlign: "right" }}>
+        <Button type="submit" variant="contained" sx={{ mt: 4 }}>
+          {msg("feedback.external.submit")}
+        </Button>
+      </Box>
+    </RHForm>
+  );
+
   return (
     <QueryRenderer
       {...feedbackOptionsQuery}
-      success={({ data: feedbackOptions }) => (
-        <RHForm form={form} onSubmit={onSubmit}>
-          <FeedbackMeta data={data} />
-          {fields.map(({ id }, i) => (
-            <FeedbackFieldCard
-              key={id}
-              index={i}
-              feedbackOptions={feedbackOptions}
-              getName={(fieldName) => `${FIELDS.answers}.${i}.${fieldName}`}
-              sx={{ mt: 3 }}
-            />
-          ))}
-          <Box sx={{ textAlign: "right" }}>
-            <Button type="submit" variant="contained" sx={{ mt: 4 }}>
-              {msg("feedback.external.submit")}
-            </Button>
-          </Box>
-        </RHForm>
-      )}
+      loaderName="Block"
+      success={({ data }) => renderForm({ data })}
+      errored={({ error }) => {
+        return (
+          <>
+            <Alert severity="error" sx={{ my: 3 }}>
+              Options fetch error, using mock. {error?.message}
+            </Alert>
+            {renderForm({ data: DEFAULT_FEEDBACK_OPTIONS })}
+          </>
+        );
+      }}
     />
+  );
+};
+
+const FinishedModal = ({ visible, onConfirm, onClose, data, msg }) => (
+  <ConfirmModal
+    open={!!visible}
+    onClose={onClose}
+    iconName="RocketLaunch"
+    title={msg("feedback.external.finished-modal.title", {
+      user: data.username,
+    })}
+    desc={msg("feedback.external.finished-modal.desc")}
+    buttons={[
+      {
+        variant: "outlined",
+        type: "button",
+        children: msg("feedback.external.finished-modal.request-access.no"),
+        onClick: onClose,
+      },
+      {
+        variant: "contained",
+        type: "button",
+        children: msg("feedback.external.finished-modal.request-access.yes"),
+        onClick: onConfirm,
+      },
+    ]}
+    sx={{ width: "500px" }}
+  />
+);
+
+const RequestAccessModal = ({ visible, onClose, params }) => {
+  const msg = useMsg();
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      company: "",
+      hrEmail: "",
+    },
+  });
+  const mutation = useRequestAccessMutation({ params, onSuccess: onClose });
+
+  return (
+    <ConfirmModal
+      open={!!visible}
+      onClose={onClose}
+      iconName="Login"
+      title={{
+        children: msg("feedback.external.request-access-modal.title"),
+        props: { textAlign: "center" },
+      }}
+      desc={{
+        children: msg("feedback.external.request-access-modal.desc"),
+        props: { textAlign: "center" },
+      }}
+      noDivider
+      sx={{ width: "400px" }}
+    >
+      <RHForm
+        form={form}
+        onSubmit={mutation.mutateAsync}
+        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      >
+        {mutation.error && (
+          <Alert severity="error" sx={{ my: 3 }}>
+            {mutation.error?.message}
+          </Alert>
+        )}
+        <RHFTextField
+          name="firstName"
+          rules={{ required: true, minLength: 2 }}
+          label={msg("feedback.external.request-access-modal.fields.firstName")}
+          autoFocus
+          size="small"
+          fullWidth
+        />
+        <RHFTextField
+          name="lastName"
+          rules={{ required: true, minLength: 2 }}
+          label={msg("feedback.external.request-access-modal.fields.lastName")}
+          autoFocus
+          size="small"
+          fullWidth
+        />
+        <RHFTextField
+          name="email"
+          rules={{ required: true, minLength: 5 }}
+          label={msg("feedback.external.request-access-modal.fields.email")}
+          autoFocus
+          size="small"
+          fullWidth
+        />
+        <RHFTextField
+          name="company"
+          // rules={{}}
+          label={msg("feedback.external.request-access-modal.fields.company")}
+          autoFocus
+          size="small"
+          fullWidth
+        />
+        <RHFTextField
+          name="hrEmail"
+          // rules={{}}
+          label={msg("feedback.external.request-access-modal.fields.hrEmail")}
+          autoFocus
+          size="small"
+          fullWidth
+        />
+        <Button
+          {...{
+            variant: "contained",
+            type: "submit",
+            children: msg("feedback.external.request-access-modal.request"),
+          }}
+        />
+      </RHForm>
+    </ConfirmModal>
   );
 };
 
@@ -284,48 +393,21 @@ const MOCK = {
 
 const ExternalFeedbackPageInner = () => {
   const msg = useMsg();
-  const { authFetch } = useAuth();
   const { formId, username, token } = useParams();
-  // const enabled = !!formId && !!username && !!token;
-  const enabled = true;
-  const queryClient = useQueryClient();
-  const externalFeedbackQuery = useQuery({
-    retry: 1,
-    refetchOnWindowFocus: false,
+
+  const [finishedModalVisible, setFinishedModalVisible] = useState();
+  const [requestAccessModalVisible, setRequestAccessModalVisible] = useState();
+
+  const enabled = !!formId && !!username && !!token;
+  // const enabled = false;
+  const externalFeedbackQuery = useExternalFeedbackQuery({
+    params: { formId, username, token },
     enabled,
-    queryKey: ["feedback", "external"],
-    queryFn: async () => {
-      try {
-        const res = await authFetch({
-          isPublicApi: true,
-          url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
-        });
-        // debugger;
-        return res;
-      } catch (e) {
-        console.log("[ExternalFeedbackPageInner.catch]", { e });
-        // debugger;
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-        throw e;
-      }
-    },
   });
-  const mutation = useMutation({
-    mutationFn: async (data) =>
-      console.log("mutating", { data }) ||
-      authFetch({
-        isPublicApi: true,
-        method: "POST",
-        url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
-        data: (() => {
-          // debugger;
-          return evolve({
-            [FIELDS.answers]: map(pick(["question", "answer"])),
-          })(data);
-        })(),
-      }),
+  const mutation = useExternalFeedbackMutation({
+    params: { formId, username, token },
     onSuccess: () => {
-      // TODO: Request access
+      setFinishedModalVisible(true);
     },
   });
 
@@ -344,33 +426,71 @@ const ExternalFeedbackPageInner = () => {
     <Box sx={{ px: 3 }}>
       {mutation.error && (
         <Alert severity="error" sx={{ my: 3 }}>
-          {" "}
-          {mutation.error?.message}{" "}
+          {mutation.error?.message}
         </Alert>
       )}
       <Header text={msg("feedback.external.heading")} />
-      {/* {enabled ? ( */}
-      <QueryRenderer
-        {...externalFeedbackQuery}
-        loaderName="Block"
-        success={({ data }) => {
-          return <ExternalFeedbackForm data={data} onSubmit={onSubmit} />;
-          return <pre>{JSON.stringify(data, null, 2)}</pre>;
-        }}
-        errored={({ error }) => {
-          return (
-            <>
-              <Alert severity="error" sx={{ my: 3 }}>
-                Fetch error, displaying mock. {error?.message}
-              </Alert>
-              <ExternalFeedbackForm data={MOCK} onSubmit={onSubmit} />;
-            </>
-          );
-        }}
-      />
-      {/* ) : (
+      {!enabled ? (
         <div>Oops! Incomplete url.</div>
-      )} */}
+      ) : (
+        <QueryRenderer
+          {...externalFeedbackQuery}
+          loaderName="Block"
+          success={({ data }) => {
+            return (
+              <>
+                <ExternalFeedbackForm data={data} onSubmit={onSubmit} />
+                {
+                  <FinishedModal
+                    visible={finishedModalVisible}
+                    onConfirm={() => {
+                      setFinishedModalVisible();
+                      setRequestAccessModalVisible(true);
+                    }}
+                    msg={msg}
+                    onClose={() => setFinishedModalVisible()}
+                    data={data}
+                  />
+                }
+                <RequestAccessModal
+                  data={data}
+                  params={{ formId, username, token }}
+                  visible={requestAccessModalVisible}
+                  onClose={() => setRequestAccessModalVisible()}
+                />
+              </>
+            );
+          }}
+          errored={({ error }) => {
+            return (
+              <>
+                <Alert severity="error" sx={{ my: 3 }}>
+                  Fetch error, displaying mock. {error?.message}
+                </Alert>
+                <ExternalFeedbackForm data={MOCK} onSubmit={onSubmit} />;
+                {
+                  <FinishedModal
+                    visible={finishedModalVisible}
+                    onConfirm={() => {
+                      setFinishedModalVisible();
+                      setRequestAccessModalVisible(true);
+                    }}
+                    msg={msg}
+                    onClose={() => setFinishedModalVisible()}
+                    data={MOCK}
+                  />
+                }
+                <RequestAccessModal
+                  data={MOCK}
+                  params={{ formId, username, token }}
+                  visible={requestAccessModalVisible}
+                  onClose={() => setRequestAccessModalVisible()}
+                />
+              </>
+            );
+          }}
+        />
+      )}
     </Box>
   );
 };

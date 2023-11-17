@@ -327,7 +327,9 @@ export const ProfileSettings = () => {
         <FileUpload
           name={FIELDS.imageSrc}
           src={`/api/latest/coach-info/photo`}
-          secondaryText={msg("settings.profile.field.photo.limit")}
+          secondaryText={msg("settings.profile.field.photo.limit", {
+            maxSize: "10MB",
+          })}
           onChange={handlePhotoUpload}
         />
       </FormRow>

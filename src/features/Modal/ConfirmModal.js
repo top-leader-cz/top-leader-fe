@@ -19,6 +19,7 @@ export const ConfirmModal = ({
   desc,
   children,
   buttons,
+  noDivider,
   sx = {},
 }) => {
   return (
@@ -56,10 +57,18 @@ export const ConfirmModal = ({
             <Icon name="Close" sx={{ color: "#667085" }} />
           </IconButton>
         </Box>
-        {title && <H2 id="modal-modal-title">{title}</H2>}
-        {desc && <P id="modal-modal-description">{desc}</P>}
+        {title && (
+          <H2 id="modal-modal-title" {...(title?.props ?? {})}>
+            {title?.children ?? title}
+          </H2>
+        )}
+        {desc && (
+          <P id="modal-modal-description" {...(desc?.props ?? {})}>
+            {desc?.children ?? desc}
+          </P>
+        )}
         {children}
-        <Divider flexItem />
+        {!noDivider && <Divider flexItem />}
         {buttons && (
           <Box display="flex" flexDirection="row" gap={3}>
             {buttons.map(({ Component = Button, ...button }) => (

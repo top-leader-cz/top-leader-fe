@@ -343,7 +343,7 @@
   "settings.general.field.newPasswordConfirm": "Confirm new password",
   "settings.general.perex": "Update general app settings here",
   "settings.profile.field.experience": "Experience",
-  "settings.profile.field.photo.limit": "SVG, PNG, JPG or GIF (max. 800 x 400px)",
+  "settings.profile.field.photo.limit": "SVG, PNG, JPG or GIF (max. {maxSize})",
   "team.credit.topup": "Top up credit",
   "team.credit.topup-modal.desc": "Enter the amount of credits you want to top up.",
   "team.credit.topup-modal.submit": "Request credit top up",

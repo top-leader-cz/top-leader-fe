@@ -106,4 +106,55 @@ export const messages = defineMessages({
     id: "feedback.external.submit",
     defaultMessage: "Submit form",
   },
+  "feedback.external.finished-modal.title": {
+    id: "feedback.external.finished-modal.title",
+    defaultMessage:
+      "Thank you for providing your valuable feedback on {user}!!",
+  },
+  "feedback.external.finished-modal.desc": {
+    id: "feedback.external.finished-modal.desc",
+    defaultMessage:
+      "If you would like to explore more of the TopLeader platform you can request the access",
+  },
+  "feedback.external.finished-modal.request-access.no": {
+    id: "feedback.external.finished-modal.request-access.no",
+    defaultMessage: "Done",
+  },
+  "feedback.external.finished-modal.request-access.yes": {
+    id: "feedback.external.finished-modal.request-access.yes",
+    defaultMessage: "Request access",
+  },
+
+  "feedback.external.request-access-modal.title": {
+    id: "feedback.external.request-access-modal.title",
+    defaultMessage: "Request access",
+  },
+  "feedback.external.request-access-modal.desc": {
+    id: "feedback.external.request-access-modal.desc",
+    defaultMessage: "Please enter your details",
+  },
+  "feedback.external.request-access-modal.fields.firstName": {
+    id: "feedback.external.request-access-modal.fields.firstName",
+    defaultMessage: "Name",
+  },
+  "feedback.external.request-access-modal.fields.lastName": {
+    id: "feedback.external.request-access-modal.fields.lastName",
+    defaultMessage: "Surname",
+  },
+  "feedback.external.request-access-modal.fields.email": {
+    id: "feedback.external.request-access-modal.fields.email",
+    defaultMessage: "Email",
+  },
+  "feedback.external.request-access-modal.fields.company": {
+    id: "feedback.external.request-access-modal.fields.company",
+    defaultMessage: "Company (optional)",
+  },
+  "feedback.external.request-access-modal.fields.hrEmail": {
+    id: "feedback.external.request-access-modal.fields.hrEmail",
+    defaultMessage: "HR (optional)",
+  },
+  "feedback.external.request-access-modal.request": {
+    id: "feedback.external.request-access-modal.request",
+    defaultMessage: "Request access",
+  },
 });

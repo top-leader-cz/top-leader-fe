@@ -48,7 +48,7 @@ export const messages = defineMessages({
   },
   "settings.profile.field.photo.limit": {
     id: "settings.profile.field.photo.limit",
-    defaultMessage: "SVG, PNG, JPG or GIF (max. 800 x 400px)",
+    defaultMessage: "SVG, PNG, JPG or GIF (max. {maxSize})",
   },
   "settings.profile.field.bio": {
     id: "settings.profile.field.bio",
