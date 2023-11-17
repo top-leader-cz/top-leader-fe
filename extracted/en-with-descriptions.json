@@ -47,6 +47,33 @@
   "assessment.unfinished.title": {
     "defaultMessage": "Unfinished assessment"
   },
+  "auth.check-email.perex": {
+    "defaultMessage": "We’ve sent the instructions on"
+  },
+  "auth.check-email.resend.action": {
+    "defaultMessage": "Send again"
+  },
+  "auth.check-email.resend.text": {
+    "defaultMessage": "Didn’t receive the email?"
+  },
+  "auth.check-email.title": {
+    "defaultMessage": "Check your email"
+  },
+  "auth.forgot-pass.back": {
+    "defaultMessage": "Back to login"
+  },
+  "auth.forgot-pass.perex": {
+    "defaultMessage": "Enter your email and we will send you instructions on how to reset your password"
+  },
+  "auth.forgot-pass.submit": {
+    "defaultMessage": "Continue"
+  },
+  "auth.forgot-pass.title": {
+    "defaultMessage": "Forgot password"
+  },
+  "auth.forgot-pass.username.label": {
+    "defaultMessage": "Email"
+  },
   "auth.login.email.label": {
     "defaultMessage": "Email"
   },
@@ -76,6 +103,27 @@
   },
   "auth.login.validation.invalid-credentials": {
     "defaultMessage": "Invalid credentials"
+  },
+  "auth.password-changed.login": {
+    "defaultMessage": "Log In"
+  },
+  "auth.password-changed.perex": {
+    "defaultMessage": "Your password has now been successfully changed"
+  },
+  "auth.password-changed.title": {
+    "defaultMessage": "Password changed"
+  },
+  "auth.reset-password.perex": {
+    "defaultMessage": "Enter your new password below"
+  },
+  "auth.reset-password.submit": {
+    "defaultMessage": "Change password"
+  },
+  "auth.reset-password.title": {
+    "defaultMessage": "Set a new password"
+  },
+  "auth.set-password.perex": {
+    "defaultMessage": "You’ve been invited to join TopLeader. Please set a password to complete the registration"
   },
   "auth.unauthorized.perex": {
     "defaultMessage": "Please enter your details"
@@ -129,7 +177,13 @@
     "defaultMessage": "Clients"
   },
   "clients.title.count.badge": {
-    "defaultMessage": "{count} Clients"
+    "defaultMessage": "{count, plural, =0 {No Clients} =1 {# Client} other {# Clients}}"
+  },
+  "clients.upcoming.all-sessions": {
+    "defaultMessage": "All upcoming sessions"
+  },
+  "clients.upcoming.with-name": {
+    "defaultMessage": "Upcoming sessions with {name}"
   },
   "coaches.aside.items.1.heading": {
     "defaultMessage": "€100"
@@ -151,6 +205,9 @@
   },
   "coaches.aside.title": {
     "defaultMessage": "What to expect"
+  },
+  "coaches.coach.change-picked": {
+    "defaultMessage": "Change coach"
   },
   "coaches.coach.contact": {
     "defaultMessage": "Contact"
@@ -270,6 +327,9 @@
   "dashboard.rightmenu.title": {
     "defaultMessage": "My leadership journey"
   },
+  "dashboard.rightmenu.today": {
+    "defaultMessage": "Today, {date}"
+  },
   "dashboard.rightmenu.upcoming.perex.empty": {
     "defaultMessage": "Sessions with a coach will apear here"
   },
@@ -317,6 +377,177 @@
   },
   "dict.areas.9": {
     "defaultMessage": "Apply critical thinking"
+  },
+  "dict.feedback.question.communication.ask-for-more-information.label": {
+    "defaultMessage": "Does the employee ask for more information if they do not understand something?"
+  },
+  "dict.feedback.question.communication.communicate-effectively.label": {
+    "defaultMessage": "Does the employee communicate effectively with customers/managers/peers?"
+  },
+  "dict.feedback.question.communication.communicate-well-in-writing.label": {
+    "defaultMessage": "Does the employee communicate well in writing with good grammar and spelling?"
+  },
+  "dict.feedback.question.communication.ideas-to-others.label": {
+    "defaultMessage": "Does the employee effectively communicate their ideas to others?"
+  },
+  "dict.feedback.question.communication.listen-well.label": {
+    "defaultMessage": "Does this employee listen well to others’ suggestions?"
+  },
+  "dict.feedback.question.communication.opportunity-for-discussion.label": {
+    "defaultMessage": "Does the employee create opportunities for discussion and dialogue?"
+  },
+  "dict.feedback.question.communication.speak-clearly.label": {
+    "defaultMessage": "Does the employee speak in a clear and concise way?"
+  },
+  "dict.feedback.question.consider-other-team-members.label": {
+    "defaultMessage": "Does the person consider other team members’ opinions before making a decision?"
+  },
+  "dict.feedback.question.efficiency.complete-their-tasks.label": {
+    "defaultMessage": "Does the employee complete their tasks effectively?"
+  },
+  "dict.feedback.question.efficiency.daily-work-effectively.label": {
+    "defaultMessage": "Does the employee deal with daily work tasks effectively?"
+  },
+  "dict.feedback.question.efficiency.exceed-expectations.label": {
+    "defaultMessage": "Does the employee exceed expectations with their work?"
+  },
+  "dict.feedback.question.efficiency.improve-processes.label": {
+    "defaultMessage": "Does the employee improve processes to make them more effective?"
+  },
+  "dict.feedback.question.efficiency.maintain-high-standards.label": {
+    "defaultMessage": "Does the employee maintain high standards in their work?"
+  },
+  "dict.feedback.question.efficiency.sense-of-collaboration.label": {
+    "defaultMessage": "Does the employee create a sense of collaboration when working with others?"
+  },
+  "dict.feedback.question.efficiency.work-finished-right.label": {
+    "defaultMessage": "Is the employee’s work finished to the right level every time?"
+  },
+  "dict.feedback.question.efficiency.work-on-time.label": {
+    "defaultMessage": "Does the employee complete their work on time?"
+  },
+  "dict.feedback.question.general.clear-vision-that-aligns-with-the-organisation.label": {
+    "defaultMessage": "Does the person provide a clear vision that aligns with the organisation’s objectives?"
+  },
+  "dict.feedback.question.general.effectively-solve-problems.label": {
+    "defaultMessage": "Does the person effectively solve problems?"
+  },
+  "dict.feedback.question.general.responsive-to-their-team.label": {
+    "defaultMessage": "Is the person responsive to their team’s needs and questions?"
+  },
+  "dict.feedback.question.general.work-in-respectful-manners.label": {
+    "defaultMessage": "Does the person work in a respectful manner to others?"
+  },
+  "dict.feedback.question.general.work-under-pressure-to-meet-deadlines.label": {
+    "defaultMessage": "Can the person work under pressure to meet deadlines?"
+  },
+  "dict.feedback.question.interpersonal.collaborate-with-others.label": {
+    "defaultMessage": "Does the employee collaborate with others effectively in a team?"
+  },
+  "dict.feedback.question.interpersonal.exhibit-the-core-values.label": {
+    "defaultMessage": "Does the employee exhibit the core people values of the organisation?"
+  },
+  "dict.feedback.question.interpersonal.have-conflict-with-others.label": {
+    "defaultMessage": "Does the employee regularly have conflict with others?"
+  },
+  "dict.feedback.question.interpersonal.manage-the-emotions.label": {
+    "defaultMessage": "Does the employee manage the emotions and keep them in check?"
+  },
+  "dict.feedback.question.interpersonal.manage-the-stress.label": {
+    "defaultMessage": "Does the employee effectively manage their stress levels?"
+  },
+  "dict.feedback.question.interpersonal.other-staff-will-turn-to.label": {
+    "defaultMessage": "Is this employee someone that other staff will turn to for advice?"
+  },
+  "dict.feedback.question.interpersonal.show-respect.label": {
+    "defaultMessage": "Does this employee show respect to others in their team?"
+  },
+  "dict.feedback.question.interpersonal.work-well-with-others.label": {
+    "defaultMessage": "Does this employee work well with others on tasks?"
+  },
+  "dict.feedback.question.leadership.accountability-for-the-work.label": {
+    "defaultMessage": "Does the employee take accountability for their work and carry it out meeting the deadline?"
+  },
+  "dict.feedback.question.leadership.bring-ideas.label": {
+    "defaultMessage": "Does the employee bring ideas to the table when problem-solving and Brainstorming?"
+  },
+  "dict.feedback.question.leadership.demonstrating-leadership.label": {
+    "defaultMessage": "Is the employee demonstrating leadership on a daily basis?"
+  },
+  "dict.feedback.question.leadership.duties-without-issues.label": {
+    "defaultMessage": "Does the employee carry out duties without issue?"
+  },
+  "dict.feedback.question.leadership.others-look-to-help.label": {
+    "defaultMessage": "Do other team members look to the employee to help them with their work?"
+  },
+  "dict.feedback.question.leadership.provide-solutions.label": {
+    "defaultMessage": "Does the employee provide solutions to difficult customer problems?"
+  },
+  "dict.feedback.question.leadership.supervise-work.label": {
+    "defaultMessage": "Does the employee supervise work to an effective level?"
+  },
+  "dict.feedback.question.motivation.appear-motivated-by-their-job.label": {
+    "defaultMessage": "Does the employee appear to be motivated by their job?"
+  },
+  "dict.feedback.question.motivation.communicate-motivated.label": {
+    "defaultMessage": "Does the employee communicate that they are motivated with their job?"
+  },
+  "dict.feedback.question.motivation.difficullt-to-motivate.label": {
+    "defaultMessage": "Is the employee difficult to motivate to do a task?"
+  },
+  "dict.feedback.question.motivation.level-of-motivation.label": {
+    "defaultMessage": "What is the level of motivation that the employee shows?"
+  },
+  "dict.feedback.question.motivation.motivate-others.label": {
+    "defaultMessage": "Does the employee motivate others in a group task?"
+  },
+  "dict.feedback.question.motivation.share-their-work.label": {
+    "defaultMessage": "Is the employee motivated to independently share their work with others?"
+  },
+  "dict.feedback.question.organizational.active-in-meetings.label": {
+    "defaultMessage": "Is the employee active in meetings?"
+  },
+  "dict.feedback.question.organizational.know-goals.label": {
+    "defaultMessage": "Does the employee know about the organisation goals?"
+  },
+  "dict.feedback.question.organizational.know-strategic-vision.label": {
+    "defaultMessage": "Does the employee know about the organisation’s strategic vision?"
+  },
+  "dict.feedback.question.organizational.live-values.label": {
+    "defaultMessage": "Does the employee live the company values daily?"
+  },
+  "dict.feedback.question.organizational.provide-feedback-about-ideas.label": {
+    "defaultMessage": "Does the employee actively provide feedback about the organisation's ideas or activities?"
+  },
+  "dict.feedback.question.organizational.recmmend-the-company.label": {
+    "defaultMessage": "Does the employee recommend the company to customers?"
+  },
+  "dict.feedback.question.organizational.showing-engagement.label": {
+    "defaultMessage": "Is the employee showing engagement with the organisation goals?"
+  },
+  "dict.feedback.question.problemsolving.communicate-the-problem-to-others.label": {
+    "defaultMessage": "Does the employee effectively communicate the problem to others and bring them on board?"
+  },
+  "dict.feedback.question.problemsolving.effective-at-evaluating.label": {
+    "defaultMessage": "Is the employee effective at evaluating a problem?"
+  },
+  "dict.feedback.question.problemsolving.feel-confident-in-exploring-problem.label": {
+    "defaultMessage": "Does the employee feel confident in exploring problems without assistance?"
+  },
+  "dict.feedback.question.problemsolving.provide-creative-solution.label": {
+    "defaultMessage": "Does the employee provide creative solutions to problems?"
+  },
+  "dict.feedback.question.problemsolving.recognize-problem.label": {
+    "defaultMessage": "Does the employee recognise when there is a problem?"
+  },
+  "dict.feedback.question.problemsolving.suggest-useful-solutions.label": {
+    "defaultMessage": "Does the employee suggest useful solutions to a problem?"
+  },
+  "dict.feedback.question.problemsolving.understand-the-impacts-and-dependencies.label": {
+    "defaultMessage": "Does the employee understand the impacts and dependencies of a problem?"
+  },
+  "dict.feedback.question.problemsolving.work-independently.label": {
+    "defaultMessage": "Is the employee able to work independently to fix a problem?"
   },
   "dict.fields.business.label": {
     "defaultMessage": "Business"
@@ -1305,6 +1536,15 @@
   "dict.talents.strategist.tips.5": {
     "defaultMessage": "Your capability to foresee potential issues in the future may make your colleagues play down your arguments because they need time to be proven right. Try to openly communicate your insights to show your assumptions are built on solid expectations."
   },
+  "dict.user_status.authorized.label": {
+    "defaultMessage": "Authorized"
+  },
+  "dict.user_status.paid.label": {
+    "defaultMessage": "Paid"
+  },
+  "dict.user_status.pending.label": {
+    "defaultMessage": "Pending"
+  },
   "dict.values.accountability.description": {
     "defaultMessage": "Being accountable is about creating a culture where people value responsibility. Your goals are constantly reinforced with accountability. Creating accountability increases your dedication to complete your goals, and it forces you to follow through on commitments. Accountability keeps you engaged. You can become personally accountable for your success. Just go for it!"
   },
@@ -1494,14 +1734,107 @@
   "feedback.aside.text": {
     "defaultMessage": "Feedback on my leadership skills"
   },
+  "feedback.create.add-question": {
+    "defaultMessage": "Add question"
+  },
+  "feedback.create.heading": {
+    "defaultMessage": "Back to the dashboard"
+  },
+  "feedback.create.next-btn": {
+    "defaultMessage": "Share form"
+  },
+  "feedback.create.share-modal.add-email": {
+    "defaultMessage": "Add email"
+  },
+  "feedback.create.share-modal.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "feedback.create.share-modal.deadline": {
+    "defaultMessage": "Response deadline"
+  },
+  "feedback.create.share-modal.desc": {
+    "defaultMessage": "Set email addresses and positions of people who you want to share the form with to provide you the feedback."
+  },
+  "feedback.create.share-modal.share": {
+    "defaultMessage": "Share"
+  },
+  "feedback.create.share-modal.title": {
+    "defaultMessage": "Share feedback form"
+  },
+  "feedback.create.stats.questions": {
+    "defaultMessage": "Questions"
+  },
+  "feedback.create.stats.required": {
+    "defaultMessage": "Required"
+  },
+  "feedback.external.deadline": {
+    "defaultMessage": "Please answer until {date}"
+  },
+  "feedback.external.finished-modal.desc": {
+    "defaultMessage": "If you would like to explore more of the TopLeader platform you can request the access"
+  },
+  "feedback.external.finished-modal.request-access.no": {
+    "defaultMessage": "Done"
+  },
+  "feedback.external.finished-modal.request-access.yes": {
+    "defaultMessage": "Request access"
+  },
+  "feedback.external.finished-modal.title": {
+    "defaultMessage": "Thank you for providing your valuable feedback on {user}!!"
+  },
+  "feedback.external.heading": {
+    "defaultMessage": "Feedback form"
+  },
+  "feedback.external.request-access-modal.desc": {
+    "defaultMessage": "Please enter your details"
+  },
+  "feedback.external.request-access-modal.fields.company": {
+    "defaultMessage": "Company (optional)"
+  },
+  "feedback.external.request-access-modal.fields.email": {
+    "defaultMessage": "Email"
+  },
+  "feedback.external.request-access-modal.fields.firstName": {
+    "defaultMessage": "Name"
+  },
+  "feedback.external.request-access-modal.fields.hrEmail": {
+    "defaultMessage": "HR (optional)"
+  },
+  "feedback.external.request-access-modal.fields.lastName": {
+    "defaultMessage": "Surname"
+  },
+  "feedback.external.request-access-modal.request": {
+    "defaultMessage": "Request access"
+  },
+  "feedback.external.request-access-modal.title": {
+    "defaultMessage": "Request access"
+  },
+  "feedback.external.submit": {
+    "defaultMessage": "Submit form"
+  },
   "feedback.heading": {
     "defaultMessage": "Feedback form"
   },
-  "feedback.tabs.form.label": {
-    "defaultMessage": "Form"
+  "feedback.list.card.created-at": {
+    "defaultMessage": "Created at {createdAt}"
   },
-  "feedback.tabs.results.label": {
-    "defaultMessage": "Results"
+  "feedback.list.card.responses-count": {
+    "defaultMessage": "{responsesCount} responses"
+  },
+  "feedback.list.card.shared-count": {
+    "defaultMessage": "Shared with {sharedCount} people"
+  },
+  "feedback.list.empty.create-btn": {
+    "defaultMessage": "Create new form"
+  },
+  "feedback.list.empty.description": {
+    "defaultMessage": "Start by creating a new one"
+  },
+  "feedback.list.empty.title": {
+    "defaultMessage": "There are no feedback forms yet"
+  },
+  "feedback.list.heading": {
+    "defaultMessage": "Get Feedback"
   },
   "file-upload.primary": {
     "defaultMessage": "Click to upload"
@@ -1557,6 +1890,15 @@
   "messages.conversation.send": {
     "defaultMessage": "Send"
   },
+  "messages.empty.create-btn": {
+    "defaultMessage": "Choose the coach"
+  },
+  "messages.empty.description": {
+    "defaultMessage": "Messages will appear here once a conversation with a coach begins."
+  },
+  "messages.empty.title": {
+    "defaultMessage": "There are no messages yet"
+  },
   "messages.heading": {
     "defaultMessage": "Messages"
   },
@@ -1577,6 +1919,12 @@
   },
   "sessions.card.goals.title": {
     "defaultMessage": "Goals"
+  },
+  "sessions.card.type.USER_SESSION": {
+    "defaultMessage": "Private session"
+  },
+  "sessions.card.type.default": {
+    "defaultMessage": "Session"
   },
   "sessions.edit.steps.align.adjust": {
     "defaultMessage": "No, I would like to adjust"
@@ -1719,6 +2067,81 @@
   "sessions.steps.finished.title": {
     "defaultMessage": "Congratulations, you’ve completed your session!"
   },
+  "settings.admin.add": {
+    "defaultMessage": "Add member"
+  },
+  "settings.admin.member.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "settings.admin.member.modal.desc": {
+    "defaultMessage": "Esse distinctio delectus omnis sint est mollitia."
+  },
+  "settings.admin.member.modal.desc.edit": {
+    "defaultMessage": "Esse distinctio delectus omnis sint est mollitia."
+  },
+  "settings.admin.member.modal.title": {
+    "defaultMessage": "Add new member"
+  },
+  "settings.admin.member.modal.title.edit": {
+    "defaultMessage": "Edit member"
+  },
+  "settings.admin.member.submit.edit": {
+    "defaultMessage": "Save"
+  },
+  "settings.admin.member.submit.new": {
+    "defaultMessage": "Send invite"
+  },
+  "settings.admin.member.trial": {
+    "defaultMessage": "Trial user"
+  },
+  "settings.admin.sub": {
+    "defaultMessage": "Here you can see the list of your current clients"
+  },
+  "settings.admin.table.col.action": {
+    "defaultMessage": "Action"
+  },
+  "settings.admin.table.col.coach": {
+    "defaultMessage": "Current Coach"
+  },
+  "settings.admin.table.col.companyName": {
+    "defaultMessage": "Company"
+  },
+  "settings.admin.table.col.hrs": {
+    "defaultMessage": "HR"
+  },
+  "settings.admin.table.col.name": {
+    "defaultMessage": "Name"
+  },
+  "settings.admin.table.col.paidCredit": {
+    "defaultMessage": "Credits paid"
+  },
+  "settings.admin.table.col.remainingCredits": {
+    "defaultMessage": "Remaining credits"
+  },
+  "settings.admin.table.col.requestedBy": {
+    "defaultMessage": "Requested by"
+  },
+  "settings.admin.table.col.requestedCredits": {
+    "defaultMessage": "Requested credits"
+  },
+  "settings.admin.table.col.role": {
+    "defaultMessage": "Role"
+  },
+  "settings.admin.table.col.status": {
+    "defaultMessage": "Status"
+  },
+  "settings.admin.table.confirm-credit-button.label": {
+    "defaultMessage": "Confirm"
+  },
+  "settings.admin.table.edit.tooltip": {
+    "defaultMessage": "Edit"
+  },
+  "settings.admin.title": {
+    "defaultMessage": "Users"
+  },
+  "settings.admin.title.count.badge": {
+    "defaultMessage": "{count} Users"
+  },
   "settings.availability.aside.save": {
     "defaultMessage": "Save"
   },
@@ -1803,6 +2226,9 @@
   "settings.profile.field.languages.placeholder": {
     "defaultMessage": "Select languages you speak"
   },
+  "settings.profile.field.level": {
+    "defaultMessage": "Level"
+  },
   "settings.profile.field.name": {
     "defaultMessage": "Name"
   },
@@ -1810,7 +2236,7 @@
     "defaultMessage": "Photo"
   },
   "settings.profile.field.photo.limit": {
-    "defaultMessage": "SVG, PNG, JPG or GIF (max. 800 x 400px)"
+    "defaultMessage": "SVG, PNG, JPG or GIF (max. {maxSize})"
   },
   "settings.profile.field.publicProfile": {
     "defaultMessage": "Public account"
@@ -1826,6 +2252,9 @@
   },
   "settings.profile.perex": {
     "defaultMessage": "Update your info here"
+  },
+  "settings.tabs.admin.label": {
+    "defaultMessage": "Admin"
   },
   "settings.tabs.availability.label": {
     "defaultMessage": "Availability"
@@ -1872,6 +2301,27 @@
   "strengths.tips.title": {
     "defaultMessage": "💡 Tips for action"
   },
+  "team.credit.add-member.fields.authorities": {
+    "defaultMessage": "Authorities"
+  },
+  "team.credit.add-member.fields.firstName": {
+    "defaultMessage": "Name"
+  },
+  "team.credit.add-member.fields.lastName": {
+    "defaultMessage": "Surname"
+  },
+  "team.credit.add-member.fields.locale": {
+    "defaultMessage": "Select languages"
+  },
+  "team.credit.add-member.fields.timeZone": {
+    "defaultMessage": "Timezone"
+  },
+  "team.credit.add-member.fields.trial-user": {
+    "defaultMessage": "Trial user"
+  },
+  "team.credit.add-member.fields.username": {
+    "defaultMessage": "Email"
+  },
   "team.credit.add-member.modal.desc": {
     "defaultMessage": "Esse distinctio delectus omnis sint est mollitia."
   },
@@ -1883,6 +2333,9 @@
   },
   "team.credit.topup": {
     "defaultMessage": "Top up credit"
+  },
+  "team.credit.topup-modal.amount.label": {
+    "defaultMessage": "Amount of credits (1 credit = 1$)"
   },
   "team.credit.topup-modal.desc": {
     "defaultMessage": "Enter the amount of credits you want to top up."
@@ -1921,7 +2374,7 @@
     "defaultMessage": "Team members"
   },
   "team.members.title.count.badge": {
-    "defaultMessage": "{count} members"
+    "defaultMessage": "{count, plural, =0 {No Members} =1 {# Member} other {# Members} }"
   },
   "values.aside.perex": {
     "defaultMessage": "History"
