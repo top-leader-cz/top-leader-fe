@@ -27,6 +27,7 @@ import {
   useUpcomingCoachSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
+import { AddClientModal } from "./AddClientModal";
 
 export const gray500 = "#667085";
 export const gray900 = "#101828";
@@ -74,6 +75,9 @@ export const ScheduledSessionsTableRow = ({
   sx = {},
 }) => {
   const msg = useMsg({ dict: clientsMessages });
+
+  if (!data?.length) return null;
+
   return (
     <StyledTableRow
       sx={{ bgcolor: gray50, ...sx }}
@@ -213,7 +217,6 @@ function ClientsPageInner() {
         query={query}
         action={
           <Button
-            disabled // TODO
             variant="contained"
             startIcon={<Add />}
             aria-label="add member"
@@ -225,10 +228,10 @@ function ClientsPageInner() {
           </Button>
         }
       />
-      {/* <AddMemberModal // TODO
+      <AddClientModal
         open={addMemberVisible}
         onClose={() => setAddMemberVisible(false)}
-      /> */}
+      />
       <ConfirmModal
         open={!!declineMemberVisible}
         onClose={() => setDeclineMemberVisible()}

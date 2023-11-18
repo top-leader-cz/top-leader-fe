@@ -12,6 +12,7 @@ import { ScheduledSessionsTableRow } from "../Clients/ClientsPage";
 
 export const ScheduledSessionsCard = ({ data }) => {
   //   const msg = useMsg({ dict: myCoachMessages });
+  if (!data?.length) return null;
   return (
     <TLTableWithHeader
       headerBefore={

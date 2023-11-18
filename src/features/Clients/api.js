@@ -65,6 +65,36 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
   });
 };
 
+export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
+  /*
+{
+  "email": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "isTrial": true
+}
+  */
+  return useMutation({
+    mutationFn: async (data) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/coach-clients`,
+        data,
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["coach-clients"],
+      });
+      onSuccess?.(data);
+    },
+    ...rest,
+  });
+};
+
 export const useDeclineMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch, fetchUser } = useAuth();
   const queryClient = useQueryClient();
@@ -79,7 +109,7 @@ export const useDeclineMutation = ({ onSuccess, ...rest } = {}) => {
       queryClient.invalidateQueries({
         exact: false,
         queryKey: ["coach-clients"],
-      }); // TODO: test
+      });
       onSuccess?.(data);
     },
     ...rest,

@@ -31,7 +31,7 @@ import { useCoachesQuery } from "../../Coaches/Coaches.page";
 import { identity, map, pipe, prop } from "ramda";
 import { formatName } from "../../Coaches/CoachCard";
 
-const STATUS_OPTIONS = [
+export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
   { label: "Pending", value: "PENDING" },
 ];
@@ -208,7 +208,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             <AutocompleteSelect
               name="status"
               label={msg("settings.admin.member.modal.fields.status")}
-              options={STATUS_OPTIONS}
+              options={USER_STATUS_OPTIONS}
             />
           ) : null}
           <AutocompleteSelect

@@ -65,4 +65,37 @@ export const clientsMessages = defineMessages({
     id: "clients.upcoming.with-name",
     defaultMessage: "Upcoming sessions with {name}",
   },
+
+  "clients.add-client.modal.title": {
+    id: "clients.add-client.modal.title",
+    defaultMessage: "Add new member",
+  },
+  "clients.add-client.modal.desc": {
+    id: "clients.add-client.modal.desc",
+    defaultMessage: " ",
+  },
+  "clients.add-client.fields.firstName": {
+    id: "clients.add-client.fields.firstName",
+    defaultMessage: "First name",
+  },
+  "clients.add-client.fields.lastName": {
+    id: "clients.add-client.fields.lastName",
+    defaultMessage: "Last name",
+  },
+  "clients.add-client.fields.email": {
+    id: "clients.add-client.fields.email",
+    defaultMessage: "Email",
+  },
+  "clients.add-client.fields.isTrial": {
+    id: "clients.add-client.fields.isTrial",
+    defaultMessage: "Trial user",
+  },
+  "clients.add-client.cancel": {
+    id: "clients.add-client.cancel",
+    defaultMessage: "Cancel",
+  },
+  "clients.add-client.submit": {
+    id: "clients.add-client.submit",
+    defaultMessage: "Send invite",
+  },
 });
