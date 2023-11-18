@@ -14,116 +14,16 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   AutocompleteSelect,
   CheckboxField,
-  LANGUAGE_OPTIONS,
   RHFTextField,
-  renderLanguageOption,
 } from "../../../components/Forms";
 import { Icon } from "../../../components/Icon";
 import { useMsg } from "../../../components/Msg/Msg";
 import { H2, P } from "../../../components/Typography";
-import { Authority, useAuth } from "../../Authorization/AuthProvider";
+import { gray500 } from "../../../theme";
+import { Authority } from "../../Authorization/AuthProvider";
 import { I18nContext } from "../../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../../Settings/GeneralSettings";
-import { useMutation, useQueryClient } from "react-query";
-import { gray500 } from "../../../theme";
-
-export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/admin/users`,
-        data: (() => {
-          /*
-          {
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-
-  "timeZone": "string",
-  "companyId": 0,
-  "isTrial": true,
-  "authorities": [ "USER" ]
-}
-          */
-          console.log("[useCreateUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-
-            companyId: values.companyId,
-            isTrial: values.isTrial,
-
-            authorities: values.authorities,
-            timeZone: values.timeZone,
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
-      onSuccess?.(data);
-    },
-    ...params,
-  });
-};
-export const useEditUserMutation = ({ onSuccess, ...params } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/admin/users/${values.username}`,
-        data: (() => {
-          /*
-          {
-  "firstName": "string",
-  "lastName": "string",
-
-  "timeZone": "string",
-  "companyId": 0,
-  "isTrial": true,
-  "authorities": [
-    "USER"
-  ],
-
-  "status": "AUTHORIZED",
-  "coach": "string",
-  "credit": 0
-}
-          */
-          console.log("[useCreateUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            // username: values.username, // new only
-
-            companyId: values.companyId,
-            isTrial: values.isTrial,
-
-            authorities: values.authorities,
-            timeZone: values.timeZone,
-
-            // TODO: mui error for conditional autocomplete
-            status:
-              values.status || values.isAuthorized ? "AUTHORIZED" : "PENDING",
-            // coach: ""
-            // credit: 0
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
-      onSuccess?.(data);
-    },
-    ...params,
-  });
-};
+import { useAdminCreateUserMutation, useAdminEditUserMutation } from "./api";
 
 const STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
@@ -135,8 +35,8 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
   const msg = useMsg();
 
   const isEdit = !!initialValues && !!Object.values(initialValues).length;
-  const editUserMutation = useEditUserMutation({ onSuccess: onClose });
-  const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
+  const editUserMutation = useAdminEditUserMutation({ onSuccess: onClose });
+  const addUserMutation = useAdminCreateUserMutation({ onSuccess: onClose });
   const mutation = isEdit ? editUserMutation : addUserMutation;
 
   const defaultValues = {

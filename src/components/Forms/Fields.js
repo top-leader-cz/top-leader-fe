@@ -63,13 +63,41 @@ export const getIntervals = pipe(
 );
 const getValuesArr = pipe(chain((interval) => [interval.start, interval.end]));
 
+export const anchorTime = (date, time) => {
+  try {
+    const {
+      hours = 0,
+      minutes = 0,
+      seconds = 0,
+      milliseconds = 0,
+    } = typeof time?.getTime === "function"
+      ? {
+          hours: time.getHours(),
+          minutes: time.getMinutes(),
+          seconds: time.getSeconds(),
+          milliseconds: time.getMilliseconds(),
+        }
+      : {};
+    const target = new Date(date.getTime());
+    target.setHours(hours);
+    target.setMinutes(minutes);
+    target.setSeconds(seconds);
+    target.setMilliseconds(milliseconds);
+    return target;
+  } catch (e) {
+    console.error("anchorTime", { date, time, e });
+    debugger;
+    return undefined;
+  }
+};
+
 const arr = [];
 const TimeRangesPicker = React.forwardRef(
   ({ inputProps, field, inputFormat, referenceDate, ...props }, ref) => {
     const { userTz } = useContext(I18nContext);
     const value = field.value ?? arr;
     const intervals = getIntervals(value);
-    const sortedValue = [...value]; // TODO
+    const sortedValue = [...value]; // TODO: model as array of intervals instead of array of dates
     // const sortedValue = getValuesArr(intervals);
     const onChange = (idx) => (date) => {
       if (!isValid(referenceDate)) {
@@ -92,11 +120,8 @@ const TimeRangesPicker = React.forwardRef(
           }
         );
       }
-      const adjustedDate = new Date(referenceDate.getTime());
-      adjustedDate.setHours(date.getHours());
-      adjustedDate.setMinutes(date.getMinutes());
-      adjustedDate.setSeconds(date.getSeconds());
-      adjustedDate.setMilliseconds(date.getMilliseconds());
+      const adjustedDate = anchorTime(referenceDate, date);
+
       const newValue = [...sortedValue];
       newValue[idx] = adjustedDate;
       // debugger;

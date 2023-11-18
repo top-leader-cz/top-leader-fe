@@ -32,15 +32,22 @@ export const QueryRenderer = ({
   success = (query) =>
     children?.(query) ||
     children || <pre>{JSON.stringify(query.data, null, 2)}</pre>,
-  errored = ({ error }) => {
-    error && <Alert severity="error">{error?.message || "Oops!"}</Alert>;
-  },
+  errored = ({ error }) =>
+    error && (
+      <Alert severity="error" sx={{ wordWrap: "break-word" }}>
+        {error?.message || "Oops!"}
+      </Alert>
+    ),
   // errored = (e) => <pre>{JSON.stringify(e, null, 2)}</pre>,
   loaderName = "Backdrop",
   loading = Loaders[loaderName],
-  ...query
+  query: queryProp,
+  // queries,
+  ...queryRest
 }) => {
-  if (query.data) return success(query);
-  if (query.isLoading) return loading(query);
-  if (query.error) return errored(query);
+  const query = queryProp || queryRest; // TODO: migrate to separate prop, add queries renderer
+
+  if (query.data) return success?.(query);
+  if (query.isLoading) return loading?.(query);
+  if (query.error) return errored?.(query);
 };

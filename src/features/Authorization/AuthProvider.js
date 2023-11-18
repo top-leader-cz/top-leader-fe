@@ -157,12 +157,14 @@ export function AuthProvider({ children }) {
           }
         })
         .catch((e) => {
-          console.error(
-            "[authFetch] ",
-            isPublicApi ? "" : "removing queries and logging out",
-            { e, url, method }
-          );
-          if (e?.response?.status === 401 && !isPublicApi) signout();
+          if (e?.response?.status === 401 && !isPublicApi) {
+            console.error(
+              "[authFetch] ",
+              isPublicApi ? "" : "removing queries and logging out",
+              { e, url, method }
+            );
+            signout();
+          }
 
           throw e;
         }),

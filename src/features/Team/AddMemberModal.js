@@ -26,6 +26,7 @@ import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
 import { useCreateUserMutation } from "./api";
 import { messages } from "./messages";
 import { gray500 } from "../../theme";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
 export const AddMemberModal = ({ onClose, open }) => {
@@ -49,6 +50,8 @@ export const AddMemberModal = ({ onClose, open }) => {
   });
   const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
+
+  console.log("[AddMemberModal.rndr]", { ...addUserMutation });
 
   return (
     <Modal
@@ -86,6 +89,11 @@ export const AddMemberModal = ({ onClose, open }) => {
                 <Icon name="Close" sx={{ color: gray500 }} />
               </IconButton>
             </Box>
+            <QueryRenderer
+              query={addUserMutation}
+              success={null}
+              loading={null}
+            />
             <H2 id="add-member-modal-title">
               {msg("team.credit.add-member.modal.title")}
             </H2>

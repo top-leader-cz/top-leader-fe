@@ -2,7 +2,11 @@ import { EmojiEvents } from "@mui/icons-material";
 import { Alert, Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
 import { useForm } from "react-hook-form";
-import { DatePickerField, TimePicker } from "../../../components/Forms";
+import {
+  DatePickerField,
+  TimePicker,
+  anchorTime,
+} from "../../../components/Forms";
 import { Msg } from "../../../components/Msg";
 import { H1, P } from "../../../components/Typography";
 import { routes } from "../../../routes";
@@ -11,17 +15,26 @@ import { RHForm } from "../../../components/Forms/Form";
 import { useMutation } from "react-query";
 import { useAuth } from "../../Authorization";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { I18nContext } from "../../I18n/I18nProvider";
+import { API_DATETIME_LOCAL_FORMAT } from "../../Availability/api";
 
 export const useSchedulePrivateSessionMutation = (params = {}) => {
   const { authFetch } = useAuth();
+  const { i18n } = useContext(I18nContext);
+
   return useMutation({
-    mutationFn: async (data) =>
-      // POST /api/latest/coaches/{username}/schedule
+    mutationFn: async ({ date, time }) =>
       authFetch({
-        // url: `/api/latest/coaches/${null}/schedule`,
-        url: `/api/latest/coaches/${""}/schedule`,
+        url: `/api/latest/coaches/schedule`,
         method: "POST",
-        data,
+        data: (() => {
+          const dateTime = anchorTime(date, time);
+          // debugger;
+          return {
+            time: i18n.formatLocal(dateTime, API_DATETIME_LOCAL_FORMAT),
+          };
+        })(),
       }),
     ...params,
   });
