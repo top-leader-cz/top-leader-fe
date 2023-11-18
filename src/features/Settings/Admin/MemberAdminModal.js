@@ -110,7 +110,8 @@ export const useEditUserMutation = ({ onSuccess, ...params } = {}) => {
             timeZone: values.timeZone,
 
             // TODO: mui error for conditional autocomplete
-            // status: values.isAuthorized ? "AUTHORIZED" : "PENDING",
+            status:
+              values.status || values.isAuthorized ? "AUTHORIZED" : "PENDING",
             // coach: ""
             // credit: 0
           };
@@ -275,7 +276,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           ) : null}
           {isEdit ? (
             <AutocompleteSelect
-              disabled
+              // disabled
               name={"status"}
               options={STATUS_OPTIONS}
               label={"Status"}
