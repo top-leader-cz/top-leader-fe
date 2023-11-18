@@ -5,12 +5,13 @@ import {
   CardActionArea,
   CardContent,
   Chip,
+  CircularProgress,
   Skeleton,
   TextField,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -23,6 +24,9 @@ import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu, JourneyRightMenu_ } from "./JourneyRightMenu";
 import { messages } from "./messages";
 import { useAreas } from "../Sessions/steps/AreaStep";
+import { useMyQuery } from "../Authorization/AuthProvider";
+import { useIsFetching, useMutation, useQueryClient } from "react-query";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -49,38 +53,34 @@ const sx = {
   height: "100%",
 };
 
-const useNote = () => {
-  const url = "/api/rest/note";
-  const [_note, _setNote] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { _authFetch } = useAuth();
-
-  const getNote = useCallback(() => {
-    setIsLoading(true);
-    _authFetch({ url }).then(({ response, json }) => {
-      // console.log(url, response.status, json);
-      _setNote(json?.note?.[0]?.content ?? "");
-      setIsLoading(false);
-    });
-  }, [_authFetch, _setNote]);
-
-  // TODO
-  // useEffect(() => {
-  //   getNote();
-  // }, []);
-
-  const setNote = useCallback(
-    ({ note }) => {
-      if (_note === note) return;
-      setIsLoading(true);
-      _authFetch({ url, method: "POST", data: { content: note } }).then(() =>
-        getNote()
-      );
+const useNoteQuery = () => {
+  return useMyQuery({
+    queryKey: ["note"],
+    fetchDef: {
+      url: "/api/latest/note",
     },
-    [_note, _authFetch, getNote]
-  );
+  });
+};
+const useNoteMutation = () => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
 
-  return { note: _note, isLoading, setNote };
+  return useMutation({
+    mutationFn: async ({ notes, previousNotes }) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/user-info/notes`,
+        data: (() => {
+          console.log("[useNoteMutation]", { notes });
+          return {
+            notes,
+          };
+        })(),
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["user-info"] });
+    },
+  });
 };
 
 const NotesLoader = () => {
@@ -96,32 +96,84 @@ const NotesLoader = () => {
 const DashboardCardNotes = () => {
   // const [note, setNote] = useLocalStorage("dashboard_note", "");
   const msg = useMsg();
-  const { note, isLoading, setNote } = useNote();
+  const { user } = useAuth();
+  const [note, setNote] = useState(user.data.notes);
+  const noteMutation = useNoteMutation();
+  const isFetchingUser = useIsFetching({ queryKey: ["user-info"] });
+  // useEffect(() => { setNote?.(user.data.notes); }, [user.data.notes])
+
+  const { isLoading, isFetching, isPending } = noteMutation;
+  console.log({ isLoading, isFetching, isPending, noteMutation });
 
   return (
     <Card>
-      <CardContent sx={sx}>
+      <CardContent sx={{ position: "relative", ...sx }}>
         <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
-        {isLoading && <NotesLoader />}
         <TextField
           multiline
           minRows={18}
           placeholder={msg("dashboard.cards.notes.placeholder.empty")}
-          defaultValue={note}
-          onBlur={(e) => setNote({ note: e.target.value })}
-          sx={
-            !isLoading
-              ? undefined
-              : {
-                  visibility: "hidden",
-                }
-          }
-          // value={note}
-          // onChange={(e) => setNote({ note: e.target.value })}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          // defaultValue={user.data.notes || ""}
+          onBlur={(e) => {
+            if (note !== user.data.notes) {
+              // TODO: race condition: Cmd+Z + Blur during user loading after save?
+              noteMutation.mutate({
+                notes: note,
+                previousNotes: user.data.notes,
+              });
+            }
+          }}
+        />
+        <CircularProgress
+          color="inherit"
+          size={20}
+          // thickness={2}
+          sx={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            opacity: isFetchingUser ? 0.1 : noteMutation.isLoading ? 1 : 0,
+          }}
         />
       </CardContent>
     </Card>
   );
+
+  // return (
+  //   <Card>
+  //     <CardContent sx={sx}>
+  //       <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
+  //       <QueryRenderer
+  //         {...noteQuery}
+  //         loading={() => <NotesLoader />}
+  //         success={({ data }) => {
+  //           return (
+  //             <TextField
+  //               multiline
+  //               minRows={18}
+  //               placeholder={msg("dashboard.cards.notes.placeholder.empty")}
+  //               defaultValue={user.data.notes}
+  //               onBlur={(e) => noteMutation.mutate({ note: e.target.value })}
+  //               // sx={
+  //               //   !isLoading
+  //               //     ? undefined
+  //               //     : {
+  //               //         visibility: "hidden",
+  //               //       }
+  //               // }
+  //               // value={note}
+  //               // onChange={(e) => setNote({ note: e.target.value })}
+  //             />
+  //           );
+  //         }}
+  //       />
+  //       {/* {isLoading && <NotesLoader />} */}
+
+  //     </CardContent>
+  //   </Card>
+  // );
 };
 
 const DashboardCard = ({
