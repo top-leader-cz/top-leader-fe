@@ -1840,7 +1840,7 @@
     "defaultMessage": "Click to upload"
   },
   "focused-list.show-another-question": {
-    "defaultMessage": "Show another question"
+    "defaultMessage": "Show another example"
   },
   "general.message-from": {
     "defaultMessage": "Message from {from}"
@@ -1921,7 +1921,7 @@
     "defaultMessage": "Goals"
   },
   "sessions.card.type.USER_SESSION": {
-    "defaultMessage": "Private session"
+    "defaultMessage": "Session"
   },
   "sessions.card.type.default": {
     "defaultMessage": "Session"
@@ -2129,6 +2129,9 @@
   },
   "settings.admin.table.col.status": {
     "defaultMessage": "Status"
+  },
+  "settings.admin.table.col.sumRequestedCredit": {
+    "defaultMessage": "All credits"
   },
   "settings.admin.table.confirm-credit-button.label": {
     "defaultMessage": "Confirm"
@@ -2369,6 +2372,12 @@
   },
   "team.members.table.col.remaining": {
     "defaultMessage": "Remaining credits"
+  },
+  "team.members.table.col.requested": {
+    "defaultMessage": "Requested credits"
+  },
+  "team.members.table.col.scheduled": {
+    "defaultMessage": "Scheduled credits"
   },
   "team.members.title": {
     "defaultMessage": "Team members"

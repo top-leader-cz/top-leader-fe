@@ -76,7 +76,6 @@
   "messages.empty.title": "There are no messages yet",
   "messages.heading": "Messages",
   "session.step-card.step": "Step {current}/{total}",
-  "sessions.card.type.default": "Session",
   "sessions.edit.steps.align.adjust": "No, I would like to adjust",
   "sessions.edit.steps.reflect.mark-all-as-completed": "Mark all as completed",
   "settings.admin.member.modal.desc": "Esse distinctio delectus omnis sint est mollitia.",
@@ -93,6 +92,7 @@
   "settings.admin.table.col.requestedCredits": "Requested credits",
   "settings.admin.table.col.role": "Role",
   "settings.admin.table.col.status": "Status",
+  "settings.admin.table.col.sumRequestedCredit": "All credits",
   "settings.admin.table.confirm-credit-button.label": "Confirm",
   "settings.admin.table.edit.tooltip": "Edit",
   "settings.admin.title": "Users",
@@ -112,5 +112,7 @@
   "team.credit.add-member.modal.desc": "Esse distinctio delectus omnis sint est mollitia.",
   "team.credit.add-member.modal.title": "Add new member",
   "team.credit.add-member.submit": "Send invite",
-  "team.credit.topup-modal.amount.label": "Amount of credits (1 credit = 1$)"
+  "team.credit.topup-modal.amount.label": "Amount of credits (1 credit = 1$)",
+  "team.members.table.col.requested": "Requested credits",
+  "team.members.table.col.scheduled": "Scheduled credits"
 }

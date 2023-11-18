@@ -95,20 +95,29 @@ export const useGoalHints = () => {
   );
 };
 
-function NewSessionPageInner() {
+export const useMotivationHints = () => {
   const msg = useMsg();
-  const { i18n } = useContext(I18nContext);
 
-  const goalHints = useGoalHints();
-  const motivationHints = useMemo(
+  return useMemo(
     () =>
-      getTranslatedList({
+      pipe(
+        getTranslatedList,
+        uniq
+      )({
         tsKey: "sessions.new.steps.motivation.focusedlist",
         msg,
         startIndex: 1,
       }),
     [msg]
   );
+};
+
+function NewSessionPageInner() {
+  const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
+
+  const goalHints = useGoalHints();
+  const motivationHints = useMotivationHints();
   const STEPS = [
     {
       StepComponent: AreaStep,

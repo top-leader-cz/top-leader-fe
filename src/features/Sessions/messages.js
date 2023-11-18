@@ -19,7 +19,7 @@ export const messages = defineMessages({
   },
   "sessions.card.type.USER_SESSION": {
     id: "sessions.card.type.USER_SESSION",
-    defaultMessage: "Private session",
+    defaultMessage: "Session",
   },
   "sessions.card.type.default": {
     id: "sessions.card.type.default",

@@ -10,7 +10,7 @@ const FocusedListRoot = styled(Box)(({ theme }) => ({
 const messages = defineMessages({
   "focused-list.show-another-question": {
     id: "focused-list.show-another-question",
-    defaultMessage: "Show another question",
+    defaultMessage: "Show another example",
   },
 });
 
