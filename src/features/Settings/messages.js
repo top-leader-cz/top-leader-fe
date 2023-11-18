@@ -252,6 +252,48 @@ export const messages = defineMessages({
     id: "settings.admin.member.modal.desc.edit",
     defaultMessage: "Esse distinctio delectus omnis sint est mollitia.",
   },
+
+  "settings.admin.member.modal.fields.firstName": {
+    id: "settings.admin.member.modal.fields.firstName",
+    defaultMessage: "Name",
+  },
+  "settings.admin.member.modal.fields.lastName": {
+    id: "settings.admin.member.modal.fields.lastName",
+    defaultMessage: "Surname",
+  },
+  "settings.admin.member.modal.fields.username": {
+    id: "settings.admin.member.modal.fields.username",
+    defaultMessage: "Email",
+  },
+  "settings.admin.member.modal.fields.companyId": {
+    id: "settings.admin.member.modal.fields.companyId",
+    defaultMessage: "Company",
+  },
+  "settings.admin.member.modal.fields.authorities": {
+    id: "settings.admin.member.modal.fields.authorities",
+    defaultMessage: "Roles",
+  },
+  "settings.admin.member.modal.fields.coach": {
+    id: "settings.admin.member.modal.fields.coach",
+    defaultMessage: "Current coach",
+  },
+  "settings.admin.member.modal.fields.credit": {
+    id: "settings.admin.member.modal.fields.credit",
+    defaultMessage: "Credit",
+  },
+  "settings.admin.member.modal.fields.status": {
+    id: "settings.admin.member.modal.fields.status",
+    defaultMessage: "Status",
+  },
+  "settings.admin.member.modal.fields.locale": {
+    id: "settings.admin.member.modal.fields.locale",
+    defaultMessage: "Select languages",
+  },
+  "settings.admin.member.modal.fields.timeZone": {
+    id: "settings.admin.member.modal.fields.timeZone",
+    defaultMessage: "Timezone",
+  },
+
   "settings.admin.member.trial": {
     id: "settings.admin.member.trial",
     defaultMessage: "Trial user",

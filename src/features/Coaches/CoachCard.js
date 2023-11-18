@@ -88,7 +88,7 @@ export const CoachInfo = ({
 };
 
 export const formatName = ({ firstName, lastName }) =>
-  `${firstName} ${lastName}`.trim();
+  `${firstName ?? ""} ${lastName ?? ""}`.trim();
 
 export const getCoachPhotoUrl = (username) =>
   username ? `/api/latest/coaches/${username}/photo` : "";

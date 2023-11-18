@@ -17,6 +17,7 @@ import { QueryRenderer } from "../../features/QM/QueryRenderer";
 import { P } from "../Typography";
 import { Icon } from "../Icon";
 import { gray200 } from "../../theme";
+import { formatName } from "../../features/Coaches/CoachCard";
 
 export const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== "variant",
@@ -77,8 +78,11 @@ export const TLCell = ({
   avatarSrc,
   align,
   after,
+  debug,
   ...props
 }) => {
+  if (debug) debugger;
+
   return (
     <StyledTableCell {...props}>
       <Box display="flex" flexDirection="row" flexWrap="nowrap">
@@ -110,6 +114,55 @@ export const TLCell = ({
         {children && <Box>{children}</Box>}
       </Box>
       {after}
+    </StyledTableCell>
+  );
+};
+
+const TableCellAvatar = ({ src }) => {
+  return (
+    <Avatar
+      variant="circular"
+      sx={{ width: 44, height: 44, bgcolor: "transparent", mr: 2 }}
+      {...(src
+        ? { src: src }
+        : {
+            children: <Icon name={"Person"} sx={{ color: gray200 }} />,
+          })}
+    />
+  );
+};
+
+export const UserCell = ({
+  firstName,
+  lastName,
+  name = formatName({ firstName, lastName }),
+  email,
+  avatarSrc,
+  debug,
+  component = "th",
+  scope = "row",
+  ...props
+}) => {
+  const hasData = Boolean(name || email || avatarSrc);
+  if (debug) debugger;
+
+  return (
+    <StyledTableCell {...props}>
+      <Box display="flex" flexDirection="row" flexWrap="nowrap">
+        {!hasData ? null : (
+          <Box display="flex" alignItems={"center"}>
+            {avatarSrc && <TableCellAvatar src={avatarSrc} />}
+            {!email ? (
+              name
+            ) : (
+              <Box display={"flex"} flexDirection={"column"}>
+                <Box>{name}</Box>
+                <P>{email}</P>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
     </StyledTableCell>
   );
 };

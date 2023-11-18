@@ -26,7 +26,7 @@ import { I18nContext, defaultLanguage } from "../I18n/I18nProvider";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
-export const INITIAL_FILTER = ({ userLang = defaultLanguage }) => ({
+export const INITIAL_FILTER = ({ userLang = defaultLanguage } = {}) => ({
   // languages: [userLang.substring(0, 2)],
   languages: [],
   fields: [],
@@ -113,7 +113,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   );
   const onClearFilters = () => {
     console.log("RESETTING");
-    const initialValues = INITIAL_FILTER({ userLang: language });
+    const initialValues = INITIAL_FILTER();
     methods.setValue("languages", initialValues.languages);
     methods.setValue("fields", initialValues.fields);
     methods.setValue("experience", initialValues.experience);

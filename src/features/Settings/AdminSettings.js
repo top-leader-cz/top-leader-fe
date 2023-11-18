@@ -6,7 +6,11 @@ import { useMutation, useQueryClient } from "react-query";
 import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { TLCell, TLChipsCell } from "../../components/Table/TLLoadableTable";
+import {
+  TLCell,
+  TLChipsCell,
+  UserCell,
+} from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { gray500 } from "../../theme";
@@ -16,21 +20,7 @@ import { SlotChip } from "../Team/Team.page";
 import { MemberAdminModal } from "./Admin/MemberAdminModal";
 import { messages } from "./messages";
 import { useUserStatusDict } from "./useUserStatusDict";
-
-const useUsersQuery = () => {
-  const { authFetch } = useAuth();
-  return useMyQuery({
-    queryKey: ["admin", "users"],
-    queryFn: () =>
-      authFetch({
-        url: `/api/latest/admin/users`,
-        query: {
-          size: 10000,
-          sort: "username,asc",
-        },
-      }).then(prop("content")),
-  });
-};
+import { useUsersQuery } from "./Admin/api";
 
 export const useConfirmRequestedCreditMutation = ({
   onSuccess,
@@ -99,22 +89,14 @@ function AdminSettingsInner() {
     {
       label: msg("settings.admin.table.col.coach"),
       key: "coach",
-      render: ({ coachFirstName, coachLastName, coach }) =>
-        [coachFirstName, coachLastName, coach].some(Boolean) ? (
-          <TLCell
-            avatar
-            avatarSrc={getCoachPhotoUrl(coach)}
-            component="th"
-            scope="row"
-            name={formatName({
-              firstName: coachFirstName ?? "",
-              lastName: coachLastName ?? "",
-            })}
-            sub={coach ?? ""}
-          />
-        ) : (
-          <TLCell component="th" scope="row" name={"-"} />
-        ),
+      render: ({ coachFirstName, coachLastName, coach }) => (
+        <UserCell
+          email={coach}
+          firstName={coachFirstName}
+          lastName={coachLastName}
+          avatarSrc={getCoachPhotoUrl(coach)}
+        />
+      ),
     },
     {
       label: msg("settings.admin.table.col.hrs"),

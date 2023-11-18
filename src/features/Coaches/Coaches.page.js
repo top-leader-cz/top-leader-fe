@@ -17,6 +17,7 @@ import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { messages } from "./messages";
 import { ScheduledSessionsCard } from "./ScheduledSessions";
 import { useUserUpcomingSessionsQuery } from "./api";
+import { useMyQuery } from "../Authorization/AuthProvider";
 
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`;
@@ -45,22 +46,27 @@ const getPayload = ({
     prices: prices?.length ? prices : undefined,
   };
 
+export const useCoachesQuery = ({ filter, ...rest } = {}) => {
+  const coachesQuery = useMyQuery({
+    queryKey: ["coaches", filter],
+    fetchDef: {
+      method: "POST",
+      url: "/api/latest/coaches",
+      data: getPayload({ filter }),
+    },
+    // queryFn: () => authFetch({ method: "POST", url: "/api/latest/coaches", data: getPayload({ filter }), }),
+    refetchOnWindowFocus: false,
+    ...rest,
+  });
+
+  return coachesQuery;
+};
+
 export function CoachesPageInner() {
   const msg = useMsg();
   const { language } = useContext(I18nContext);
-  const [filter, setFilter] = useState(INITIAL_FILTER({ userLang: language }));
-
-  const { authFetch } = useAuth();
-  const coachesQuery = useQuery({
-    queryKey: ["coaches", filter],
-    queryFn: () =>
-      authFetch({
-        method: "POST",
-        url: "/api/latest/coaches",
-        data: getPayload({ filter }),
-      }),
-    refetchOnWindowFocus: false,
-  });
+  const [filter, setFilter] = useState(INITIAL_FILTER());
+  const coachesQuery = useCoachesQuery({ filter });
 
   const EXPECT_ITEMS = [
     // {

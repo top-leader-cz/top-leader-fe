@@ -1,5 +1,21 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAuth } from "../../Authorization/AuthProvider";
+import { useAuth, useMyQuery } from "../../Authorization/AuthProvider";
+import { prop } from "ramda";
+
+export const useUsersQuery = () => {
+  const { authFetch } = useAuth();
+  return useMyQuery({
+    queryKey: ["admin", "users"],
+    queryFn: () =>
+      authFetch({
+        url: `/api/latest/admin/users`,
+        query: {
+          size: 10000,
+          sort: "username,asc",
+        },
+      }).then(prop("content")),
+  });
+};
 
 export const useAdminCreateUserMutation = ({ onSuccess, ...params } = {}) => {
   const { authFetch } = useAuth();
@@ -11,29 +27,17 @@ export const useAdminCreateUserMutation = ({ onSuccess, ...params } = {}) => {
         method: "POST",
         url: `/api/latest/admin/users`,
         data: (() => {
-          /*
-          {
-  "username": "string",
-  "firstName": "string",
-  "lastName": "string",
-
-  "timeZone": "string",
-  "companyId": 0,
-  "isTrial": true,
-  "authorities": [ "USER" ]
-}
-          */
           console.log("[useAdminCreateUserMutation]", { values });
           return {
             firstName: values.firstName,
             lastName: values.lastName,
             username: values.username,
-
             companyId: values.companyId,
             isTrial: values.isTrial,
-
             authorities: values.authorities,
             timeZone: values.timeZone,
+
+            locale: values.locale,
           };
         })(),
       }),
@@ -44,7 +48,16 @@ export const useAdminCreateUserMutation = ({ onSuccess, ...params } = {}) => {
     ...params,
   });
 };
-export const useAdminEditUserMutation = ({ onSuccess, ...params } = {}) => {
+
+const creditFrom = (credit) => {
+  const num = Number(credit);
+  const nan = isNaN(num);
+  console.log("[creditFrom]", { credit, num, nan });
+  if (credit === null || nan) return null;
+  return num;
+};
+
+export const useAdminEditUserMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
@@ -54,47 +67,34 @@ export const useAdminEditUserMutation = ({ onSuccess, ...params } = {}) => {
         method: "POST",
         url: `/api/latest/admin/users/${values.username}`,
         data: (() => {
-          /*
-          {
-  "firstName": "string",
-  "lastName": "string",
-
-  "timeZone": "string",
-  "companyId": 0,
-  "isTrial": true,
-  "authorities": [
-    "USER"
-  ],
-
-  "status": "AUTHORIZED",
-  "coach": "string",
-  "credit": 0
-}
-          */
           console.log("[useAdminEditUserMutation]", { values });
           return {
             firstName: values.firstName,
             lastName: values.lastName,
             // username: values.username, // new only
-
             companyId: values.companyId,
             isTrial: values.isTrial,
-
             authorities: values.authorities,
             timeZone: values.timeZone,
+
+            locale: values.locale,
 
             // TODO: mui error for conditional autocomplete
             status:
               values.status || values.isAuthorized ? "AUTHORIZED" : "PENDING",
-            // coach: ""
-            // credit: 0
+            coach: values.coach,
+            credit: creditFrom(values.credit),
           };
         })(),
       }),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
+      queryClient.refetchQueries({
+        // queryKey: ["admin"], // Not working for some reason
+        queryKey: ["admin", "users"],
+        exact: false,
+      });
       onSuccess?.(data);
     },
-    ...params,
+    ...rest,
   });
 };

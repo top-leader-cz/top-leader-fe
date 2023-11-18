@@ -14,7 +14,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   AutocompleteSelect,
   CheckboxField,
+  LANGUAGE_OPTIONS,
   RHFTextField,
+  renderLanguageOption,
 } from "../../../components/Forms";
 import { Icon } from "../../../components/Icon";
 import { useMsg } from "../../../components/Msg/Msg";
@@ -24,15 +26,31 @@ import { Authority } from "../../Authorization/AuthProvider";
 import { I18nContext } from "../../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../../Settings/GeneralSettings";
 import { useAdminCreateUserMutation, useAdminEditUserMutation } from "./api";
+import { INITIAL_FILTER } from "../../Coaches/CoachesFilter";
+import { useCoachesQuery } from "../../Coaches/Coaches.page";
+import { identity, map, pipe, prop } from "ramda";
+import { formatName } from "../../Coaches/CoachCard";
 
 const STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
   { label: "Pending", value: "PENDING" },
 ];
 
+export const getLoadableOptions = ({ query, map = identity }) => {
+  if (query.data) return { options: map(query.data) };
+  if (query.error || query.isLoading)
+    return {
+      options: [],
+      disabled: true,
+      placeholder: query.isLoading ? "Loading..." : "Error loading options",
+    };
+};
+
 export const MemberAdminForm = ({ onClose, initialValues }) => {
   const { userTz, language } = useContext(I18nContext);
   const msg = useMsg();
+
+  const coachesQuery = useCoachesQuery({ filter: INITIAL_FILTER() });
 
   const isEdit = !!initialValues && !!Object.values(initialValues).length;
   const editUserMutation = useAdminEditUserMutation({ onSuccess: onClose });
@@ -57,18 +75,21 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
     coach: initialValues.coach,
     credit: initialValues.credit,
 
-    // locale: language?.substring(0, 2) ?? "en",
+    locale: initialValues.locale || language?.substring(0, 2) || "en",
   };
   const methods = useForm({
     mode: "onSubmit",
-    // mode: "all",¯
     defaultValues,
   });
 
   const onSubmit = (values, e) => mutation.mutateAsync(values);
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
-  console.log("[MemberAdminModal.rndr]", { initialValues, defaultValues });
+  console.log("[MemberAdminModal.rndr]", {
+    initialValues,
+    defaultValues,
+    coachesQuery,
+  });
 
   return (
     <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
@@ -116,26 +137,21 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           </P>
           <RHFTextField
             name="firstName"
+            label={msg("settings.admin.member.modal.fields.firstName")}
             rules={{ required: true, minLength: 2 }}
-            label={"Name"}
             autoFocus
-            size="small"
             fullWidth
           />
           <RHFTextField
             name="lastName"
+            label={msg("settings.admin.member.modal.fields.lastName")}
             rules={{ required: true, minLength: 2 }}
-            label={"Surname"}
-            autoFocus
-            size="small"
             fullWidth
           />
           <RHFTextField
             name="username"
+            label={msg("settings.admin.member.modal.fields.username")}
             rules={{ required: true, minLength: 2 }}
-            label={"Email"}
-            autoFocus
-            size="small"
             fullWidth
             disabled={isEdit}
           />
@@ -148,9 +164,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
               <RHFTextField
                 disabled
                 name="companyId"
-                label={"Company"}
-                autoFocus
-                size="small"
+                label={msg("settings.admin.member.modal.fields.companyId")}
                 fullWidth
               />
             </div>
@@ -159,41 +173,56 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           <AutocompleteSelect
             multiple
             disableCloseOnSelect
-            name={"authorities"}
+            name="authorities"
+            label={msg("settings.admin.member.modal.fields.authorities")}
             options={Object.values(Authority).map((value) => ({
               value,
               label: value,
             }))}
-            label={"Roles"}
           />
           {isEdit ? (
             <AutocompleteSelect
-              disabled
-              name={"coach"}
-              options={[]} // TODO
-              label={"Current coach"}
+              name="coach"
+              label={msg("settings.admin.member.modal.fields.coach")}
+              {...getLoadableOptions({
+                query: coachesQuery,
+                map: pipe(
+                  prop("content"),
+                  map((coach) => ({
+                    value: coach.username,
+                    label: `${formatName(coach)} (${coach.username})`,
+                  }))
+                ),
+              })}
+            />
+          ) : null}
+          {isEdit ? (
+            <RHFTextField
+              name="credit"
+              label={msg("settings.admin.member.modal.fields.credit")}
+              rules={{}}
+              fullWidth
             />
           ) : null}
           {isEdit ? (
             <AutocompleteSelect
-              // disabled
-              name={"status"}
+              name="status"
+              label={msg("settings.admin.member.modal.fields.status")}
               options={STATUS_OPTIONS}
-              label={"Status"}
             />
           ) : null}
-          {/* <AutocompleteSelect
-            disableClearable
-            name={"locale"}
-            options={LANGUAGE_OPTIONS}
-            renderOption={renderLanguageOption}
-            label={"Select languages"}
-          /> */}
           <AutocompleteSelect
             disableClearable
-            name={"timeZone"}
+            name="locale"
+            label={msg("settings.admin.member.modal.fields.locale")}
+            options={LANGUAGE_OPTIONS}
+            renderOption={renderLanguageOption}
+          />
+          <AutocompleteSelect
+            disableClearable
+            name="timeZone"
+            label={msg("settings.admin.member.modal.fields.timeZone")}
             options={TIMEZONE_OPTIONS}
-            label={"Timezone"}
           />
           <FormControlLabel
             control={<CheckboxField name="isTrial" />}

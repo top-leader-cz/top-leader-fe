@@ -84,8 +84,8 @@ export const usePickCoach = ({ coach }) => {
         },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user-info"] });
-      queryClient.invalidateQueries({ queryKey: ["coaches"] });
+      queryClient.refetchQueries({ queryKey: ["user-info"] });
+      queryClient.refetchQueries({ queryKey: ["coaches"] });
     },
   });
 
