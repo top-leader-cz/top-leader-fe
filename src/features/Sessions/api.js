@@ -26,6 +26,7 @@ export const useUserSessionQuery = ({ ...rest } = {}) => {
 };
 
 export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
+  const { i18n } = useContext(I18nContext);
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
@@ -40,7 +41,10 @@ export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
           ...data,
           actionSteps: actionSteps.map(({ label, date }) => {
             try {
-              const formattedDate = format(date, UTC_DATE_FORMAT);
+              const formattedDate = i18n.formatLocalMaybe(
+                date,
+                UTC_DATE_FORMAT
+              );
               console.log("mapStep", { date, formattedDate });
               return {
                 label,

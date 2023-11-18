@@ -26,6 +26,7 @@ import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
 import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
 import { getTranslatedList } from "./EditSession.page";
+import { pipe, uniq } from "ramda";
 
 export const StepperRightMenu = ({
   heading,
@@ -77,33 +78,28 @@ export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   };
 };
 
-// BACKUP for reference
-const createSessionEntry = ({ area, goal, motivation, steps }) => {
-  return {
-    timestamp: new Date().getTime(),
-    date: new Date().toISOString(),
-    type: "Private session",
-    area,
-    goal,
-    motivation,
-    steps,
-  };
-  /* NEW BE: return { timestamp: new Date().getTime(), date: new Date().toISOString(), type: "Private session", areaOfDevelopment, longTermGoal, motivation, actionSteps, }; */
-};
-
-function NewSessionPageInner() {
+export const useGoalHints = () => {
   const msg = useMsg();
-  const { i18n } = useContext(I18nContext);
 
-  const goalHints = useMemo(
+  return useMemo(
     () =>
-      getTranslatedList({
+      pipe(
+        getTranslatedList,
+        uniq // TODO: translations - sessions.new.steps.goal.focusedlist.1 === 2
+      )({
         tsKey: "sessions.new.steps.goal.focusedlist",
         msg,
         startIndex: 1,
       }),
     [msg]
   );
+};
+
+function NewSessionPageInner() {
+  const msg = useMsg();
+  const { i18n } = useContext(I18nContext);
+
+  const goalHints = useGoalHints();
   const motivationHints = useMemo(
     () =>
       getTranslatedList({
@@ -206,7 +202,7 @@ function NewSessionPageInner() {
   };
 
   const isLoading = unmountedUi || query.isFetching || mutation.isLoading;
-  console.log("[NewSessionPage.rndr]", { data, query, isLoading });
+  console.log("[NewSessionPage.rndr]", { goalHints, data, query, isLoading });
 
   if (isLoading) return <QueryRenderer isLoading />;
 

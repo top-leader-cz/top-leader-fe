@@ -147,7 +147,9 @@ const SessionCard = ({
                 sx={{}}
               />
             </Box>
-            <P sx={{ my: 3 }}>{reflection || motivation}</P>
+            <P sx={{ my: 3, whiteSpace: "pre-wrap", lineHeight: 2 }}>
+              {reflection || motivation}
+            </P>
             <ActionStepsReadOnly
               steps={actionSteps}
               label={<Msg id="sessions.card.goals.title" />}

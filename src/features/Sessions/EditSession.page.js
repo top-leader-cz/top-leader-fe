@@ -34,7 +34,7 @@ import { routes } from "../../routes";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { FocusedList } from "./FocusedList";
-import { StepperRightMenu, useSteps } from "./NewSession";
+import { StepperRightMenu, useGoalHints, useSteps } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
 import { useUserReflectionMutation, useUserSessionQuery } from "./api";
 import { useAreasDict } from "./areas";
@@ -169,6 +169,7 @@ export const getTranslatedList = ({ tsKey, msg, startIndex = 1, max = 10 }) => {
       const index = startIndex + i;
       const translationKey = `${tsKey.replace(/\.$/, "")}.${index}`;
       const translationMaybe = msg.maybe(translationKey);
+
       return translationMaybe;
     },
   });
@@ -347,7 +348,12 @@ const ReflectStep = ({
       {...{
         step,
         stepper,
-        data: { ...data, previousActionSteps },
+        data: {
+          ...data,
+          previousActionSteps: previousActionSteps.filter(
+            ({ checked }) => !checked
+          ),
+        },
         setData,
         handleNext,
         handleBack,
@@ -469,15 +475,7 @@ function EditSessionPageInner() {
       perex: msg("sessions.edit.steps.setaction.perex"),
     },
   ];
-  const goalHints = useMemo(
-    () =>
-      getTranslatedList({
-        tsKey: "sessions.new.steps.goal.focusedlist",
-        msg,
-        startIndex: 1,
-      }),
-    [msg]
-  );
+  const goalHints = useGoalHints();
   const ADJUST_STEPS = [
     {
       StepComponent: AreaStep,
@@ -533,7 +531,6 @@ function EditSessionPageInner() {
   });
 
   const sessionQuery = useUserSessionQuery({});
-  const reflectionQuery = {}; // TODO
 
   const activeStepIndexRef = useRef(activeStepIndex);
   activeStepIndexRef.current = activeStepIndex;
@@ -608,9 +605,7 @@ function EditSessionPageInner() {
           handleNext={handleNext}
           handleBack={handleBack}
           onFinish={handleFinish}
-          motivationOrReflection={
-            sessionQuery.data?.motivation ?? reflectionQuery?.data?.reflection
-          }
+          motivationOrReflection={sessionQuery.data?.motivation}
           previousActionSteps={sessionQuery.data?.actionSteps ?? []}
           previousArea={sessionQuery.data?.areaOfDevelopment ?? ""}
           previousGoal={sessionQuery.data?.longTermGoal ?? ""}

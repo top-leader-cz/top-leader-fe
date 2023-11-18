@@ -16,7 +16,13 @@ export const useSchedulePrivateSessionMutation = (params = {}) => {
   const { authFetch } = useAuth();
   return useMutation({
     mutationFn: async (data) =>
-      authFetch({ url: "/api/latest/TODO", method: "POST", data }),
+      // POST /api/latest/coaches/{username}/schedule
+      authFetch({
+        // url: `/api/latest/coaches/${null}/schedule`,
+        url: `/api/latest/coaches/${""}/schedule`,
+        method: "POST",
+        data,
+      }),
     ...params,
   });
 };
