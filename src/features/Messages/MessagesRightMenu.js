@@ -61,7 +61,7 @@ export const MessagesRightMenu = ({
       <QueryRenderer
         {...coachQuery}
         loaderName="Block"
-        errored={(e) => {
+        errored={({ error }) => {
           // console.log("coachQuery.errored.rndr", { e })
           return null;
         }}

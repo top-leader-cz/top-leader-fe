@@ -296,8 +296,8 @@ export const AvailabilityCalendar = ({
           {...pickSlotMutation}
           success={() => null}
           loading={() => null}
-          errored={(e) => (
-            <Alert severity="error">{e?.message || "Oops!"}</Alert>
+          errored={({ error }) => (
+            <Alert severity="error">{error?.message || "Oops!"}</Alert>
           )}
         />
       </ConfirmModal>

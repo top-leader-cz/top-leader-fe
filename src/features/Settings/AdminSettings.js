@@ -17,25 +17,6 @@ import { MemberAdminModal } from "./Admin/MemberAdminModal";
 import { messages } from "./messages";
 import { useUserStatusDict } from "./useUserStatusDict";
 
-const MOCK = [
-  {
-    username: "coach1",
-    firstName: "Mock",
-    lastName: "User",
-    authorities: ["COACH", "USER"],
-    timeZone: "GMT",
-    status: "PENDING",
-    companyId: 2,
-    companyName: "Company 2",
-    coach: "coach1",
-    coachFirstName: "Jane",
-    coachLastName: "Smith",
-    credit: 150,
-    requestedCredit: 75,
-    isTrial: true,
-  },
-];
-
 const useUsersQuery = () => {
   const { authFetch } = useAuth();
   return useMyQuery({
@@ -47,9 +28,7 @@ const useUsersQuery = () => {
           size: 10000,
           sort: "username,asc",
         },
-      })
-        .then(prop("content"))
-        .catch(() => MOCK),
+      }).then(prop("content")),
   });
 };
 
@@ -156,6 +135,11 @@ function AdminSettingsInner() {
       key: "remainingCredits",
       render: (row) => <TLCell variant="emphasized" name={row.credit} />,
     },
+    // {
+    //   label: msg("settings.admin.table.col.scheduledCredit"),
+    //   key: "scheduledCredit",
+    //   render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
+    // },
     {
       label: msg("settings.admin.table.col.paidCredit"),
       key: "paidCredit",
@@ -191,6 +175,13 @@ function AdminSettingsInner() {
             </Button>
           ) : null}
         </TLCell>
+      ),
+    },
+    {
+      label: msg("settings.admin.table.col.sumRequestedCredit"),
+      key: "sumRequestedCredit",
+      render: (row) => (
+        <TLCell variant="emphasized" name={row.sumRequestedCredit} />
       ),
     },
     {

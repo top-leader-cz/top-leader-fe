@@ -65,7 +65,7 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
   });
 };
 
-export const useDeclineMutation = (mutationParams = {}) => {
+export const useDeclineMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch, fetchUser } = useAuth();
   const queryClient = useQueryClient();
 
@@ -75,13 +75,13 @@ export const useDeclineMutation = (mutationParams = {}) => {
         method: "DELETE",
         url: `/api/latest/coach-clients/${username}`,
       }),
-    ...mutationParams,
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         exact: false,
         queryKey: ["coach-clients"],
       }); // TODO: test
-      mutationParams?.onSuccess?.(data);
+      onSuccess?.(data);
     },
+    ...rest,
   });
 };

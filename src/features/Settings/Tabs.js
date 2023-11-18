@@ -1,6 +1,8 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/system";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import * as qs from "qs";
 
 export function TabPanel({ children, Component, value, tabName, props = {} }) {
   return (
@@ -72,16 +74,41 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
 //   })
 // );
 
-export const TLTabs = ({
-  tabs = [],
-  initialTabKey = tabs[0]?.key,
-  ariaLabel = "tabs",
-}) => {
-  const [tabName, setTab] = useState(initialTabKey);
+const queryParamName = "tab";
 
+export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
+  let [searchParams, setSearchParams] = useSearchParams();
+  const queryTabKey = searchParams.get(queryParamName);
+  const defaultTabKey = useMemo(() => {
+    return initialTabKey || queryTabKey || tabs[0]?.key;
+  }, [initialTabKey, queryTabKey, tabs]);
+  const [tabName, setTab] = useState(defaultTabKey);
   const handleChange = (event, newValue) => {
-    setTab(newValue);
+    try {
+      // console.log("[TLTabs.change]", { value: tabName, newValue });
+      setTab(newValue);
+
+      searchParams.set(queryParamName, newValue);
+      const qStr = searchParams.toString();
+      // console.log("[TLTabs.change]", { qStr });
+      setSearchParams(qStr);
+    } catch (e) {
+      console.error(e);
+      // debugger;
+    }
   };
+  useEffect(() => {
+    // console.log("TAB SYNC EFF START", { queryTabKey, current: tabName });
+    if (queryTabKey && queryTabKey !== tabName) {
+      // console.log("TAB SYNC EFF RUN", { queryTabKey, current: tabName });
+      setTab(queryTabKey);
+    }
+  }, [queryTabKey, tabName]);
+  // console.log("[TLTabs.rndr]", {
+  //   tabName,
+  //   queryTabKey,
+  //   defaultTabKey,
+  // });
 
   return (
     <Box sx={{ width: "100%" }}>

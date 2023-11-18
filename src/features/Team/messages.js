@@ -37,6 +37,18 @@ export const messages = defineMessages({
     id: "team.members.table.col.remaining",
     defaultMessage: "Remaining credits",
   },
+  "team.members.table.col.requested": {
+    id: "team.members.table.col.requested",
+    defaultMessage: "Requested credits",
+  },
+  "team.members.table.col.scheduled": {
+    id: "team.members.table.col.scheduled",
+    defaultMessage: "Scheduled credits",
+  },
+  // "team.members.table.col.all": {
+  //   id: "team.members.table.col.all",
+  //   defaultMessage: "All credits",
+  // },
   "team.members.table.col.action": {
     id: "team.members.table.col.action",
     defaultMessage: "Action",

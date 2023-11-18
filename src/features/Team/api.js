@@ -7,28 +7,33 @@ export const useHrUsersQuery = (params = {}) => {
     queryKey: ["hr-users"],
     queryFn: () => authFetch({ url: `/api/latest/hr-users` }),
     select: (data) => {
-      return data.map((user) => {
-        //  {
-        //   username: "string",
-        //   coach: "string",
-        //   credit: 0,
-        //   requestedCredit: 0,
-        //   state: "AUTHORIZED",
-        // };
-        return {
-          name: user.username, // TODO
-          username: user.username,
-          coach: user.coach,
-          creditPaid: user.requestedCredit,
-          creditRemaining: user.credit,
-        };
-      });
+      return data.map(
+        ({
+          coach,
+          username,
+          credit,
+          paidCredit,
+          requestedCredit,
+          scheduledCredit,
+          state,
+        }) => {
+          return {
+            username,
+            coach,
+            credit,
+            paidCredit,
+            requestedCredit,
+            scheduledCredit,
+            state,
+          };
+        }
+      );
     },
     ...params,
   });
 };
 
-export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
+export const useCreateUserMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
@@ -55,11 +60,11 @@ export const useCreateUserMutation = ({ onSuccess, ...params } = {}) => {
       queryClient.invalidateQueries({ queryKey: ["hr-users"] });
       onSuccess?.(data);
     },
-    ...params,
+    ...rest,
   });
 };
 
-export const useCreditRequestMutation = (params = {}) => {
+export const useCreditRequestMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch, fetchUser } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
@@ -73,8 +78,8 @@ export const useCreditRequestMutation = (params = {}) => {
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["hr-users"] });
-      params?.onSuccess?.(data);
+      onSuccess?.(data);
     },
-    ...params,
+    ...rest,
   });
 };

@@ -28,23 +28,6 @@ export const SlotChip = ({ children, sx }) => {
   );
 };
 
-const rows = [
-  {
-    name: "Marty Schinner",
-    email: "marty.schinner@gmail.com",
-    coach: "Frank Bogish",
-    creditPaid: 1200,
-    creditRemaining: 800,
-  },
-  {
-    name: "Ella Romaguera",
-    email: "ella.romaguera@gmail.com",
-    coach: "Gerardo Feil",
-    creditPaid: 1200,
-    creditRemaining: 1000,
-  },
-];
-
 function TeamPageInner() {
   const [topUpSelected, setTopUpSelected] = useState(false);
   const [addMemberVisible, setAddMemberVisible] = useState(false);
@@ -58,7 +41,12 @@ function TeamPageInner() {
       label: msg("team.members.table.col.name"),
       key: "name",
       render: (row) => (
-        <TLCell component="th" scope="row" name={row.name} sub={row.username} />
+        <TLCell
+          component="th"
+          scope="row"
+          name={row.username}
+          sub={row.username}
+        />
       ),
     },
     {
@@ -69,13 +57,28 @@ function TeamPageInner() {
     {
       label: msg("team.members.table.col.paid"),
       key: "paid",
-      render: (row) => <TLCell align="right">{row.creditPaid}</TLCell>,
+      render: (row) => <TLCell align="right">{row.paidCredit}</TLCell>,
     },
     {
       label: msg("team.members.table.col.remaining"),
       key: "remaining",
-      render: (row) => <TLCell align="right">{row.creditRemaining}</TLCell>,
+      render: (row) => <TLCell align="right">{row.credit}</TLCell>,
     },
+    {
+      label: msg("team.members.table.col.requested"),
+      key: "requested",
+      render: (row) => <TLCell align="right">{row.requestedCredit}</TLCell>,
+    },
+    {
+      label: msg("team.members.table.col.scheduled"),
+      key: "scheduled",
+      render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
+    },
+    // {
+    //   label: msg("team.members.table.col.all"),
+    //   key: "all",
+    //   render: (row) => <TLCell align="right">{row.sumRequestedCredit}</TLCell>,
+    // },
     {
       label: msg("team.members.table.col.action"),
       key: "action",
@@ -89,7 +92,7 @@ function TeamPageInner() {
     },
   ];
 
-  // console.log("[Team->Credits.page]", { hrUsersQuery });
+  console.log("[Team->Credits.page]", { hrUsersQuery });
   const manageUsersProps =
     isHR || isAdmin
       ? {

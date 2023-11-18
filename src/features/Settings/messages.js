@@ -215,6 +215,10 @@ export const messages = defineMessages({
     id: "settings.admin.table.col.requestedCredits",
     defaultMessage: "Requested credits",
   },
+  "settings.admin.table.col.sumRequestedCredit": {
+    id: "settings.admin.table.col.sumRequestedCredit",
+    defaultMessage: "All credits",
+  },
   "settings.admin.table.col.status": {
     id: "settings.admin.table.col.status",
     defaultMessage: "Status",

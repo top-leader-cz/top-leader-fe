@@ -58,7 +58,11 @@ export const TLChipsCell = ({ children, chips = [], ...props }) => {
     <StyledTableCell {...props}>
       <Stack direction="row" spacing={1}>
         {chips?.map?.(({ label, bgcolor }) => (
-          <Chip label={label} sx={{ bgcolor, borderRadius: "6px" }} />
+          <Chip
+            key={label}
+            label={label}
+            sx={{ bgcolor, borderRadius: "6px" }}
+          />
         ))}
       </Stack>
     </StyledTableCell>
@@ -140,7 +144,7 @@ export const TLLoadableTable = ({
               success={({ data }) =>
                 data.map((row) => {
                   const expandedEl = expandedRowRender?.({ row, columns });
-                  console.log(">>>", { data, expandedEl, row, columns });
+                  // console.log(">>>", { data, expandedEl, row, columns });
 
                   if (!expandedEl)
                     return (

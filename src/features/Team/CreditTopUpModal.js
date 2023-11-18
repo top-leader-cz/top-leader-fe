@@ -14,6 +14,10 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useCreditRequestMutation } from "./api";
 
+const TOPUP_FIELDS = {
+  credit: "credit",
+};
+
 export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
   const msg = useMsg();
   const mutation = useCreditRequestMutation({
@@ -25,7 +29,9 @@ export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
   const methods = useForm({
     mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: {},
+    defaultValues: {
+      [TOPUP_FIELDS.credit]: "",
+    },
   });
   console.log({ selected });
   const onSubmit = (values, e) =>
@@ -81,7 +87,7 @@ export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
             </P>
             {/* <OutlinedField label="Subject" /> */}
             <RHFTextField
-              name="credit"
+              name={TOPUP_FIELDS.credit}
               rules={{ required: true, minLength: 3 }}
               label={<Msg id="team.credit.topup-modal.amount.label" />}
               //   label={msg("coaches.contact.subject.label")}
