@@ -56,6 +56,10 @@ export const messages = defineMessages({
     id: "coaches.coach.contact",
     defaultMessage: "Contact",
   },
+  "coaches.coach.introduction-link": {
+    id: "coaches.coach.introduction-link",
+    defaultMessage: "See video introduction",
+  },
 
   "coaches.contact.title": {
     id: "coaches.contact.title",

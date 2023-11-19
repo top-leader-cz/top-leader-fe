@@ -54,6 +54,14 @@ export const messages = defineMessages({
     id: "settings.profile.field.bio",
     defaultMessage: "Bio",
   },
+  "settings.profile.field.webLink": {
+    id: "settings.profile.field.webLink",
+    defaultMessage: "Video introduction",
+  },
+  "settings.profile.field.webLink.placeholder": {
+    id: "settings.profile.field.webLink.placeholder",
+    defaultMessage: "https://",
+  },
   "settings.profile.field.timezone": {
     id: "settings.profile.field.timezone",
     defaultMessage: "Timezone",

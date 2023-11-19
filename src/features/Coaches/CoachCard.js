@@ -9,6 +9,7 @@ import { ContactModal } from "./ContactModal";
 import { usePickCoach } from "./api";
 import { messages } from "./messages";
 import { certificatesOptions } from "../Settings/ProfileSettings";
+import { Icon } from "../../components/Icon";
 
 export const ShowMore = ({
   text = "",
@@ -93,6 +94,36 @@ export const formatName = ({ firstName, lastName }) =>
 export const getCoachPhotoUrl = (username) =>
   username ? `/api/latest/coaches/${username}/photo` : "";
 
+export const IntroLink = ({ webLink }) => {
+  const msg = useMsg({ dict: messages });
+
+  if (!webLink) return null;
+
+  return (
+    <Box
+      component={"a"}
+      target="_blank"
+      rel="noreferrer"
+      href={webLink}
+      sx={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        bgcolor: "#101828CC",
+        color: "white",
+        py: 1,
+        textAlign: "center",
+        fontSize: 14,
+        textDecoration: "none",
+      }}
+    >
+      {msg("coaches.coach.introduction-link")}&nbsp;
+      <Icon name={"OpenInNew"} sx={{ fontSize: 14 }} />
+    </Box>
+  );
+};
+
 export const CoachCard = ({
   coach,
   withContact,
@@ -111,6 +142,7 @@ export const CoachCard = ({
     languages,
     bio,
     fields,
+    webLink,
   } = coach;
   const [contactCoach, setContactCoach] = useState(null);
   const handleContact = useCallback(() => setContactCoach(coach), [coach]);
@@ -124,12 +156,27 @@ export const CoachCard = ({
     <>
       <Card sx={{ ...sx }}>
         <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
-          <CardMedia
-            component="img"
-            sx={{ width: 225, borderRadius: 0.6 }}
-            image={getCoachPhotoUrl(username)}
-            alt={name}
-          />
+          <Box
+            sx={{
+              borderRadius: 0.6,
+              minWidth: 225,
+              width: 225,
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <CardMedia
+              component="img"
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 0.6,
+              }}
+              image={getCoachPhotoUrl(username)}
+              alt={name}
+            />
+            <IntroLink webLink={webLink} />
+          </Box>
           <Box
             sx={{
               display: "flex",

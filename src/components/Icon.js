@@ -27,17 +27,18 @@ import {
   KeyboardDoubleArrowRight,
   Lightbulb,
   Lock,
+  Login,
   Mail,
   MailOutline,
   NotificationsOutlined,
-  PersonAdd,
+  OpenInNew,
   Person,
+  PersonAdd,
   QuestionMark,
   RocketLaunch,
   Search,
   Star,
   Storage,
-  Login,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -69,17 +70,18 @@ const Icons = {
   KeyboardDoubleArrowRight,
   Lightbulb,
   Lock,
+  Login,
   Mail,
   MailOutline,
   NotificationsOutlined,
-  PersonAdd,
+  OpenInNew,
   Person,
+  PersonAdd,
   QuestionMark,
   RocketLaunch,
   Search,
   Star,
   Storage,
-  Login,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

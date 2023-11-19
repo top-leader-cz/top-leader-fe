@@ -33,6 +33,7 @@ import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
 import * as tz from "date-fns-tz";
 import { formatInTimeZone } from "date-fns-tz/fp";
+import { IntroLink } from "../Coaches/CoachCard";
 
 const FIELDS = {
   firstName: "firstName",
@@ -40,6 +41,7 @@ const FIELDS = {
   email: "email",
   imageSrc: "imageSrc", // TODO: extract "upload component" and "upload form field"
   bio: "bio",
+  webLink: "webLink",
   languages: "languages",
   fields: "fields",
   certificates: "certificates",
@@ -203,14 +205,26 @@ export const ProfileSettings = () => {
             },
           }}
         >
-          <Box width="100%" align="left" mt={3}>
+          <Box
+            sx={{
+              borderRadius: 0.6,
+              minWidth: 225,
+              width: 225,
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <Box
               component="img"
-              borderRadius={1}
-              width={225}
+              sx={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 1,
+              }}
               alignSelf={"center"}
               src={`/api/latest/coach-info/photo?${reloadPhotoToken}`}
             />
+            <IntroLink webLink={COACH.webLink} />
           </Box>
           <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
           {COACH.certificates && (
@@ -258,6 +272,7 @@ export const ProfileSettings = () => {
         COACH.experienceSince,
         COACH.fields,
         COACH.firstName,
+        COACH.webLink,
         COACH.languages,
         COACH.lastName,
         fieldsOptions,
@@ -342,6 +357,17 @@ export const ProfileSettings = () => {
           rows={4}
         />
       </FormRow>
+      <FormRow
+        label={msg("settings.profile.field.webLink")}
+        name={FIELDS.webLink}
+      >
+        <BareInputField
+          name={FIELDS.webLink}
+          rules={{}}
+          placeholder={msg("settings.profile.field.webLink.placeholder")}
+        />
+      </FormRow>
+
       <FormRow
         label={msg("settings.profile.field.languages")}
         name={FIELDS.languages}
