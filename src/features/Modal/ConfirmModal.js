@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import React, {
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useReducer,
@@ -19,11 +20,13 @@ import React, {
 import { Icon } from "../../components/Icon";
 import { H2, P } from "../../components/Typography";
 import {
+  adjust,
   always,
   applySpec,
   assoc,
   concat,
   evolve,
+  find,
   findIndex,
   identity,
   ifElse,
@@ -40,6 +43,11 @@ import {
 import { v4 as uuid } from "uuid";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
+const CONFIRM_MODAL_TYPE = {
+  INFO: "INFO",
+  ERROR: "ERROR",
+};
+
 export const ConfirmModal = ({
   open,
   onClose,
@@ -50,8 +58,14 @@ export const ConfirmModal = ({
   buttons,
   noDivider,
   error,
+  // type = CONFIRM_MODAL_TYPE.INFO,
   sx = {},
 }) => {
+  // const color = {
+  //   [CONFIRM_MODAL_TYPE.INFO]: "primary",
+  //   [CONFIRM_MODAL_TYPE.ERROR]: "error",
+  // }[type];
+
   return (
     <Modal
       open={open}
@@ -119,29 +133,26 @@ export const ConfirmModal = ({
 export const ModalCtx = React.createContext({});
 
 const ACTION = {
-  SET_MODAL: "SET_MODAL",
-  ON_CLOSE: "ON_CLOSE",
-  DESTROY: "DESTROY",
+  UPDATE_MODAL: "UPDATE_MODAL",
+  DESTROY_MODAL: "DESTROY_MODAL",
 };
-
 const INITIAL_STATE = {
   stack: [],
 };
 
-const updateStack = (payload) => (stack) => {
+const adjustStack = (payload) => (stack) => {
   const index = findIndex(propEq("id", payload.id))(stack);
   if (index === -1) return [...stack, payload];
-  else return update(index, payload, stack);
+  else return adjust(index, (modal) => ({ ...modal, ...payload }), stack);
 };
 
 const reducer = (state, { payload, type }) => {
+  // console.log("reducer", type, { payload, type, state });
   switch (type) {
-    case ACTION.SET_MODAL:
-      return evolve({ stack: updateStack(payload) }, state);
-    case ACTION.ON_CLOSE:
-    case ACTION.DESTROY:
+    case ACTION.UPDATE_MODAL:
+      return evolve({ stack: adjustStack(payload) }, state);
+    case ACTION.DESTROY_MODAL:
       return evolve({ stack: reject(propEq("id", payload.id)) }, state);
-    // case ACTION.ON_CLOSE: return evolve( { stack: (stack) => { return pipe( prop("payload"), assoc("open", false), updateStack )(action)(stack); }, }, state );
     default:
       return state;
   }
@@ -155,31 +166,41 @@ export const ModalProvider = ({ children }) => {
     ({ getButtons, onClose: onCloseProp, ...modal }) => {
       const onClose = () => {
         dispatch({
-          type: ACTION.ON_CLOSE,
-          payload: modal,
+          type: ACTION.UPDATE_MODAL,
+          payload: { id: modal.id, open: false },
         });
         onCloseProp?.();
       };
-      return {
+      const mapped = {
         ...modal,
+        open: modal.open ?? false,
         key: modal.id,
         buttons: getButtons?.({ onClose }) || modal.buttons,
         onClose,
       };
+
+      return mapped;
     },
     []
   );
 
+  const stackRef = useRef(stack);
+  stackRef.current = stack;
+
   const ctx = useMemo(
     () => ({
+      updateModal: pipe(
+        applySpec({ type: always(ACTION.UPDATE_MODAL), payload: identity }),
+        dispatch
+      ),
       destroyModal: pipe(
-        applySpec({ type: always(ACTION.DESTROY), payload: pick(["id"]) }),
+        applySpec({
+          type: always(ACTION.DESTROY_MODAL),
+          payload: pick(["id"]),
+        }),
         dispatch
       ),
-      setModal: pipe(
-        applySpec({ type: always(ACTION.SET_MODAL), payload: identity }),
-        dispatch
-      ),
+      getModalStatic: ({ id }) => find(propEq("id", id))(stackRef.current),
     }),
     []
   );
@@ -198,29 +219,14 @@ export const ModalProvider = ({ children }) => {
 };
 
 const useModal = ({ modal }) => {
-  const [open, _setOpen] = useState(false);
-  const setOpen = useCallback(
-    (open) => {
-      console.log("[useModal setOpen]", open, modal?.desc);
-      _setOpen(open);
-    },
-    [modal?.desc]
-  );
-  const { setModal, destroyModal } = React.useContext(ModalCtx);
   const id = useRef(uuid());
+  const { updateModal, destroyModal } = useContext(ModalCtx);
 
-  console.log("[useModal rndr]", open, { modal, id: id.current });
   useEffect(() => {
-    const newModal = { ...modal, open, id: id.current };
-    console.log("[useModal eff]", open, { modal, newModal });
-
-    if (open) {
-      debugger;
-      setModal(newModal);
-    } else {
-      destroyModal({ id: id.current });
-    }
-  }, [destroyModal, modal, open, setModal]);
+    const withId = { ...modal, id: id.current };
+    // console.log("[useModal eff]", { withId });
+    updateModal(withId);
+  }, [modal, updateModal]);
 
   useEffect(
     () => () => {
@@ -229,6 +235,11 @@ const useModal = ({ modal }) => {
     [destroyModal]
   );
 
-  return { show: () => setOpen(true) };
+  return {
+    show: useCallback(
+      () => updateModal({ id: id.current, open: true }),
+      [updateModal]
+    ),
+  };
 };
 ConfirmModal.useModal = useModal;

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
+import { formatName } from "../Coaches/CoachCard";
 
 export const useClientsQuery = ({ ...queryParams } = {}) => {
   const { authFetch } = useAuth();
@@ -16,10 +17,8 @@ export const useClientsQuery = ({ ...queryParams } = {}) => {
         // "nextSession": "2023-10-02T09:00:00"
         // };
         return {
-          name: `${user?.firstName} ${user?.lastName}`,
-          username: user.username,
-          lastSession: user.lastSession,
-          nextSession: user.nextSession,
+          ...user,
+          name: formatName(user),
         };
       });
     },
@@ -34,17 +33,6 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
     queryKey: ["coach-info", "upcoming-sessions"],
     queryFn: () =>
       authFetch({ url: `/api/latest/coach-info/upcoming-sessions` }),
-    select: (data) => {
-      return data.map((user) => {
-        /* [ {
-        "username": "slavik.dan12@gmail.com",
-        "firstName": "",
-        "lastName": "",
-        "time": "2023-10-02T09:00:00"
-        } ] */
-        return user;
-      });
-    },
     ...params,
   });
 };
@@ -56,6 +44,11 @@ export const useDeclineSessionMutation = ({ onSuccess, ...rest } = {}) => {
   return useMutation({
     mutationFn: async (upcomingSession) => {
       const id = upcomingSession?.id || upcomingSession?.sessionId;
+
+      if (!id)
+        throw new Error(
+          `No session id provided, "id" or "sessionId" accepted on upcoming session object`
+        );
 
       return authFetch({
         method: "DELETE",

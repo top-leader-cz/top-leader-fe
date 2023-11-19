@@ -69,6 +69,11 @@ export const clientsMessages = defineMessages({
     id: "clients.upcoming.decline-session",
     defaultMessage: "Cancel",
   },
+  "clients.upcoming.decline-session.confirm.title": {
+    id: "clients.upcoming.decline-session.confirm.title",
+    defaultMessage:
+      "Are you sure you want to decline session on {date} with {name} ({username})?",
+  },
 
   "clients.add-client.modal.title": {
     id: "clients.add-client.modal.title",

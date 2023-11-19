@@ -15,6 +15,7 @@ import React from "react";
 
 import { RightMenuProvider } from "./components/Layout"; // circular dependency when imported earlier
 import { GlobalLoader } from "./features/GlobalLoader/GlobalLoader";
+import { ModalProvider } from "./features/Modal/ConfirmModal";
 
 const queryClient = new QueryClient();
 
@@ -40,22 +41,24 @@ function ResetAll({ error, resetErrorBoundary }) {
 export default function App() {
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <GlobalLoader>
-            <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <GlobalLoader>
               <I18nProvider>
-                <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-                  <RightMenuProvider>
-                    <CssBaseline />
-                    <RouterProvider router={router} />
-                  </RightMenuProvider>
-                </ErrorBoundary>
+                <ModalProvider>
+                  <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
+                    <RightMenuProvider>
+                      <CssBaseline />
+                      <RouterProvider router={router} />
+                    </RightMenuProvider>
+                  </ErrorBoundary>
+                </ModalProvider>
               </I18nProvider>
-            </ThemeProvider>
-          </GlobalLoader>
-        </AuthProvider>
-      </QueryClientProvider>
+            </GlobalLoader>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

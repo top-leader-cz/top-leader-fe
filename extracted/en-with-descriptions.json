@@ -140,6 +140,30 @@
   "clients.add": {
     "defaultMessage": "Add member"
   },
+  "clients.add-client.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "clients.add-client.fields.email": {
+    "defaultMessage": "Email"
+  },
+  "clients.add-client.fields.firstName": {
+    "defaultMessage": "First name"
+  },
+  "clients.add-client.fields.isTrial": {
+    "defaultMessage": "Trial user"
+  },
+  "clients.add-client.fields.lastName": {
+    "defaultMessage": "Last name"
+  },
+  "clients.add-client.modal.desc": {
+    "defaultMessage": ""
+  },
+  "clients.add-client.modal.title": {
+    "defaultMessage": "Add new member"
+  },
+  "clients.add-client.submit": {
+    "defaultMessage": "Send invite"
+  },
   "clients.decline.no": {
     "defaultMessage": "No, cancel"
   },
@@ -181,6 +205,12 @@
   },
   "clients.upcoming.all-sessions": {
     "defaultMessage": "All upcoming sessions"
+  },
+  "clients.upcoming.decline-session": {
+    "defaultMessage": "Cancel"
+  },
+  "clients.upcoming.decline-session.confirm.title": {
+    "defaultMessage": "Are you sure you want to decline session on {date} with {name} ({username})?"
   },
   "clients.upcoming.with-name": {
     "defaultMessage": "Upcoming sessions with {name}"
@@ -2078,6 +2108,36 @@
   },
   "settings.admin.member.modal.desc.edit": {
     "defaultMessage": "Esse distinctio delectus omnis sint est mollitia."
+  },
+  "settings.admin.member.modal.fields.authorities": {
+    "defaultMessage": "Roles"
+  },
+  "settings.admin.member.modal.fields.coach": {
+    "defaultMessage": "Current coach"
+  },
+  "settings.admin.member.modal.fields.companyId": {
+    "defaultMessage": "Company"
+  },
+  "settings.admin.member.modal.fields.credit": {
+    "defaultMessage": "Credit"
+  },
+  "settings.admin.member.modal.fields.firstName": {
+    "defaultMessage": "Name"
+  },
+  "settings.admin.member.modal.fields.lastName": {
+    "defaultMessage": "Surname"
+  },
+  "settings.admin.member.modal.fields.locale": {
+    "defaultMessage": "Select languages"
+  },
+  "settings.admin.member.modal.fields.status": {
+    "defaultMessage": "Status"
+  },
+  "settings.admin.member.modal.fields.timeZone": {
+    "defaultMessage": "Timezone"
+  },
+  "settings.admin.member.modal.fields.username": {
+    "defaultMessage": "Email"
   },
   "settings.admin.member.modal.title": {
     "defaultMessage": "Add new member"

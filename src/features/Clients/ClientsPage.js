@@ -8,9 +8,11 @@ import { LinkBehavior } from "../../components/LinkBehavior";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import {
+  DateCell,
   StyledTableCell,
   StyledTableRow,
   TLCell,
+  UserCell,
 } from "../../components/Table";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
@@ -18,9 +20,10 @@ import { routes } from "../../routes";
 import { gray50 } from "../../theme";
 import { formatName } from "../Coaches/CoachCard";
 import { I18nContext } from "../I18n/I18nProvider";
-import { ConfirmModal, ModalProvider } from "../Modal/ConfirmModal";
+import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { SlotChip } from "../Team/Team.page";
+import { AddClientModal } from "./AddClientModal";
 import {
   useClientsQuery,
   useDeclineMutation,
@@ -28,25 +31,10 @@ import {
   useUpcomingCoachSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
-import { AddClientModal } from "./AddClientModal";
 
 export const gray500 = "#667085";
 export const gray900 = "#101828";
 
-// const m = {
-//         // open:!!declineMemberVisible,
-//         onClose:() => setDeclineMemberVisible(),
-//         iconName:"RocketLaunch",
-//         title: msg("clients.decline.title", {
-//           name: declineMemberVisible?.name,
-//         }),
-//         desc:"",
-//         error:declineMutation.error,
-//         // buttons:,
-//         sx:{ width: "800px" }
-// }
-
-// TODO: decline session modal - same as declineMemberVisible
 const ScheduledSession = ({ data, canCancel }) => {
   const {
     time,
@@ -64,10 +52,13 @@ const ScheduledSession = ({ data, canCancel }) => {
   const modal = useMemo(() => {
     return {
       iconName: "RocketLaunch",
-      title: msg("clients.upcoming.decline-session.confirm.title"),
-      desc: username,
+      title: msg("clients.upcoming.decline-session.confirm.title", {
+        date: i18n.formatLocal(parsed, "Pp"),
+        name,
+        username,
+      }),
+      desc: "",
       error: cancelMutation.error,
-
       getButtons: ({ onClose }) => [
         {
           variant: "outlined",
@@ -78,6 +69,7 @@ const ScheduledSession = ({ data, canCancel }) => {
         {
           component: LoadingButton,
           variant: "contained",
+          color: "error",
           type: "button",
           children: "Decline",
           disabled: cancelMutation.isLoading,
@@ -86,7 +78,7 @@ const ScheduledSession = ({ data, canCancel }) => {
         },
       ],
     };
-  }, [cancelMutation, data, msg]);
+  }, [cancelMutation, data, i18n, msg, name, parsed, username]);
   const { show } = ConfirmModal.useModal({ modal });
 
   const renderCancelButton = () => {
@@ -202,18 +194,19 @@ function ClientsPageInner() {
       label: msg("clients.table.col.name"),
       key: "name",
       render: (row) => (
-        <TLCell component="th" scope="row" name={row.name} sub={row.username} />
+        <UserCell email={row.username} name={formatName(row)} />
+        // <TLCell component="th" scope="row" name={row.name} sub={row.username} />
       ),
     },
     {
       label: msg("clients.table.col.lastSession"),
       key: "lastSession",
-      render: (row) => <TLCell>{row.lastSession}</TLCell>,
+      render: (row) => <DateCell utcStr={row.lastSession} />,
     },
     {
       label: msg("clients.table.col.nextSession"),
       key: "nextSession",
-      render: (row) => <TLCell>{row.nextSession}</TLCell>,
+      render: (row) => <DateCell utcStr={row.nextSession} />,
     },
     {
       label: msg("clients.table.col.action"),
@@ -262,8 +255,42 @@ function ClientsPageInner() {
     },
     [upcomingSessionsQuery.data]
   );
+  ConfirmModal.useModal({
+    modal: useMemo(
+      () => ({
+        open: !!declineMemberVisible,
+        onClose: () => setDeclineMemberVisible(),
+        iconName: "RocketLaunch",
+        title: msg("clients.decline.title", {
+          name: declineMemberVisible?.name || declineMemberVisible?.username,
+        }),
+        desc: "",
+        error: declineMutation.error,
+        sx: { width: "800px" },
+        buttons: [
+          {
+            variant: "outlined",
+            type: "button",
+            children: msg("clients.decline.no"),
+            onClick: () => setDeclineMemberVisible(),
+          },
+          {
+            component: LoadingButton,
+            variant: "contained",
+            color: "error",
+            type: "button",
+            children: msg("clients.decline.yes"),
+            disabled: declineMutation.isLoading,
+            loading: declineMutation.isLoading,
+            onClick: () => declineMutation.mutate(declineMemberVisible),
+          },
+        ],
+      }),
+      [declineMemberVisible, declineMutation, msg]
+    ),
+  });
 
-  console.log("[Clients.page]", { query });
+  console.log("[Clients.page]", { query, declineMemberVisible });
 
   return (
     <Layout>
@@ -315,34 +342,6 @@ function ClientsPageInner() {
         open={addMemberVisible}
         onClose={() => setAddMemberVisible(false)}
       />
-      <ConfirmModal
-        open={!!declineMemberVisible}
-        onClose={() => setDeclineMemberVisible()}
-        iconName="RocketLaunch"
-        title={msg("clients.decline.title", {
-          name: declineMemberVisible?.name,
-        })}
-        desc={""}
-        error={declineMutation.error}
-        buttons={[
-          {
-            variant: "outlined",
-            type: "button",
-            children: msg("clients.decline.no"),
-            onClick: () => setDeclineMemberVisible(),
-          },
-          {
-            component: LoadingButton,
-            variant: "contained",
-            type: "button",
-            children: msg("clients.decline.yes"),
-            disabled: declineMutation.isLoading,
-            loading: declineMutation.isLoading,
-            onClick: () => declineMutation.mutate(declineMemberVisible),
-          },
-        ]}
-        sx={{ width: "800px" }}
-      />
     </Layout>
   );
 }
@@ -350,9 +349,7 @@ function ClientsPageInner() {
 export function ClientsPage() {
   return (
     <MsgProvider messages={clientsMessages}>
-      <ModalProvider>
-        <ClientsPageInner />
-      </ModalProvider>
+      <ClientsPageInner />
     </MsgProvider>
   );
 }

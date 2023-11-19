@@ -12,12 +12,14 @@ import {
   styled,
   tableCellClasses,
 } from "@mui/material";
-import { Fragment } from "react";
+import { Fragment, useContext } from "react";
 import { QueryRenderer } from "../../features/QM/QueryRenderer";
 import { P } from "../Typography";
 import { Icon } from "../Icon";
 import { gray200 } from "../../theme";
 import { formatName } from "../../features/Coaches/CoachCard";
+import { I18nContext } from "../../features/I18n/I18nProvider";
+import { ErrorBoundary } from "../ErrorBoundary";
 
 export const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== "variant",
@@ -162,6 +164,36 @@ export const UserCell = ({
             )}
           </Box>
         )}
+      </Box>
+    </StyledTableCell>
+  );
+};
+
+const parseAndFormat = ({ utcStr, i18n, defaultStr = "" }) => {
+  try {
+    // if (!utcStr) return "";
+    // return utcStr;
+    // const formattedDate = new Date(utcStr).toLocaleDateString();
+    const parsed = i18n.parseUTCLocal(utcStr);
+    const formattedDate = i18n.formatLocal(parsed, "Pp");
+    console.log("[parseAndFormat]", { parsed, formattedDate });
+    return formattedDate;
+  } catch (e) {
+    console.error("[parseAndFormat]", { e, utcStr, i18n, defaultStr });
+    return defaultStr;
+  }
+};
+
+export const DateCell = ({ utcStr, defaultStr = utcStr || "", ...props }) => {
+  const { i18n } = useContext(I18nContext);
+  const formattedDate = parseAndFormat({ utcStr, i18n, defaultStr });
+  // const formattedDate = utcStr;
+  console.log("DateCellInner", { utcStr, formattedDate, defaultStr });
+
+  return (
+    <StyledTableCell {...props} title={utcStr}>
+      <Box display="flex" flexDirection="row" flexWrap="nowrap">
+        {formattedDate}
       </Box>
     </StyledTableCell>
   );

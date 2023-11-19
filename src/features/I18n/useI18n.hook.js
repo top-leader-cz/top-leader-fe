@@ -26,7 +26,13 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
 
   const parseUTCLocal = useCallback(
     (utcStr) => {
-      return parseUTCZoned(userTz, utcStr);
+      try {
+        return parseUTCZoned(userTz, utcStr);
+      } catch (e) {
+        console.error("[parseUTCLocal]", { utcStr, userTz, e });
+        throw e;
+        // return utcStr;
+      }
     },
     [userTz]
   );
