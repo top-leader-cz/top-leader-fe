@@ -1,7 +1,7 @@
 import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Tooltip } from "@mui/material";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { LinkBehavior } from "../../components/LinkBehavior";
@@ -18,7 +18,7 @@ import { routes } from "../../routes";
 import { gray50 } from "../../theme";
 import { formatName } from "../Coaches/CoachCard";
 import { I18nContext } from "../I18n/I18nProvider";
-import { ConfirmModal } from "../Modal/ConfirmModal";
+import { ConfirmModal, ModalProvider } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { SlotChip } from "../Team/Team.page";
 import {
@@ -33,6 +33,19 @@ import { AddClientModal } from "./AddClientModal";
 export const gray500 = "#667085";
 export const gray900 = "#101828";
 
+// const m = {
+//         // open:!!declineMemberVisible,
+//         onClose:() => setDeclineMemberVisible(),
+//         iconName:"RocketLaunch",
+//         title: msg("clients.decline.title", {
+//           name: declineMemberVisible?.name,
+//         }),
+//         desc:"",
+//         error:declineMutation.error,
+//         // buttons:,
+//         sx:{ width: "800px" }
+// }
+
 // TODO: decline session modal - same as declineMemberVisible
 const ScheduledSession = ({ data, canCancel }) => {
   const {
@@ -46,8 +59,36 @@ const ScheduledSession = ({ data, canCancel }) => {
   const parsed = i18n.parseUTCLocal(time);
   const msg = useMsg({ dict: clientsMessages });
 
-  const declineSessionMutation = useDeclineSessionMutation();
-  const cancelMutation = canCancel ? declineSessionMutation : undefined;
+  const _declineSessionMutation = useDeclineSessionMutation();
+  const cancelMutation = canCancel ? _declineSessionMutation : undefined;
+  const modal = useMemo(() => {
+    return {
+      iconName: "RocketLaunch",
+      title: msg("clients.upcoming.decline-session.confirm.title"),
+      desc: username,
+      error: cancelMutation.error,
+
+      getButtons: ({ onClose }) => [
+        {
+          variant: "outlined",
+          type: "button",
+          children: "Cancel",
+          onClick: () => onClose(),
+        },
+        {
+          component: LoadingButton,
+          variant: "contained",
+          type: "button",
+          children: "Decline",
+          disabled: cancelMutation.isLoading,
+          loading: cancelMutation.isLoading,
+          onClick: () => cancelMutation.mutate(data),
+        },
+      ],
+    };
+  }, [cancelMutation, data, msg]);
+  const { show } = ConfirmModal.useModal({ modal });
+
   const renderCancelButton = () => {
     if (!cancelMutation) return null;
     return (
@@ -56,7 +97,7 @@ const ScheduledSession = ({ data, canCancel }) => {
         sx={{ ml: 2, bgcolor: "white" }}
         variant="outlined"
         color="error"
-        onClick={() => cancelMutation.mutate(data)}
+        onClick={() => show()}
         loading={cancelMutation.isLoading}
       >
         {msg("clients.upcoming.decline-session")}
@@ -309,7 +350,9 @@ function ClientsPageInner() {
 export function ClientsPage() {
   return (
     <MsgProvider messages={clientsMessages}>
-      <ClientsPageInner />
+      <ModalProvider>
+        <ClientsPageInner />
+      </ModalProvider>
     </MsgProvider>
   );
 }
