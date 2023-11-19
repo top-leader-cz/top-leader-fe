@@ -77,9 +77,17 @@ export const messages = defineMessages({
     id: "team.credit.add-member.submit",
     defaultMessage: "Send invite",
   },
+  "team.credit.edit-member.submit": {
+    id: "team.credit.edit-member.submit",
+    defaultMessage: "Save",
+  },
   "team.credit.add-member.modal.title": {
     id: "team.credit.add-member.modal.title",
     defaultMessage: "Add new member",
+  },
+  "team.credit.edit-member.modal.title": {
+    id: "team.credit.edit-member.modal.title",
+    defaultMessage: "Edit member",
   },
   "team.credit.add-member.modal.desc": {
     id: "team.credit.add-member.modal.desc",

@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Button,
   Chip,
   Stack,
   Table,
@@ -9,6 +10,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   styled,
   tableCellClasses,
 } from "@mui/material";
@@ -20,6 +22,7 @@ import { gray200 } from "../../theme";
 import { formatName } from "../../features/Coaches/CoachCard";
 import { I18nContext } from "../../features/I18n/I18nProvider";
 import { ErrorBoundary } from "../ErrorBoundary";
+import { omit, pick } from "ramda";
 
 export const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== "variant",
@@ -116,6 +119,37 @@ export const TLCell = ({
         {children && <Box>{children}</Box>}
       </Box>
       {after}
+    </StyledTableCell>
+  );
+};
+
+export const ActionsCell = ({ buttons = [], ...props }) => {
+  const renderButton = ({ Component = Button, ...button }) => (
+    <Component
+      key={button.key || JSON.stringify(omit(["children"], button))}
+      {...button}
+    />
+  );
+  const render = (button) =>
+    button.tooltip ? (
+      <ErrorBoundary>
+        <Tooltip title={button.tooltip}>{renderButton(button)}</Tooltip>
+      </ErrorBoundary>
+    ) : (
+      renderButton(button)
+    );
+
+  return (
+    <StyledTableCell {...props}>
+      <Box
+        display="flex"
+        flexDirection="row"
+        flexWrap="nowrap"
+        justifyContent={"space-between"}
+        gap={2}
+      >
+        {buttons.map(render)}
+      </Box>
     </StyledTableCell>
   );
 };

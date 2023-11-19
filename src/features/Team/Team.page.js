@@ -1,11 +1,11 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { TLCell } from "../../components/Table/TLLoadableTable";
+import { ActionsCell, TLCell } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { AddMemberModal } from "./AddMemberModal";
@@ -13,6 +13,8 @@ import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useHrUsersQuery } from "./api";
 import { messages } from "./messages";
 import { useAuth } from "../Authorization";
+import { gray500 } from "../../theme";
+import { Icon } from "../../components/Icon";
 
 export const SlotChip = ({ children, sx }) => {
   return (
@@ -30,7 +32,7 @@ export const SlotChip = ({ children, sx }) => {
 
 function TeamPageInner() {
   const [topUpSelected, setTopUpSelected] = useState(false);
-  const [addMemberVisible, setAddMemberVisible] = useState(false);
+  const [member, setMember] = useState();
   const msg = useMsg();
   const { isHR, isAdmin } = useAuth();
 
@@ -83,11 +85,22 @@ function TeamPageInner() {
       label: msg("team.members.table.col.action"),
       key: "action",
       render: (row) => (
-        <TLCell>
-          <Button variant="outlined" onClick={() => setTopUpSelected(row)}>
-            {msg("team.credit.topup")}
-          </Button>
-        </TLCell>
+        <ActionsCell
+          buttons={[
+            {
+              variant: "outlined",
+              onClick: () => setTopUpSelected(row),
+              children: msg("team.credit.topup"),
+            },
+            {
+              tooltip: msg("settings.admin.table.edit.tooltip"),
+              Component: IconButton,
+              onClick: () => setMember(row),
+              children: <Icon name="BorderColorOutlined" />,
+              sx: { color: gray500 },
+            },
+          ]}
+        />
       ),
     },
   ];
@@ -120,7 +133,7 @@ function TeamPageInner() {
               startIcon={<Add />}
               aria-label="add member"
               onClick={() => {
-                setAddMemberVisible(true);
+                setMember({});
               }}
             >
               <Msg id="team.members.add" />
@@ -142,8 +155,9 @@ function TeamPageInner() {
         onClose={() => setTopUpSelected(null)}
       />
       <AddMemberModal
-        open={addMemberVisible}
-        onClose={() => setAddMemberVisible(false)}
+        open={!!member}
+        initialValues={member}
+        onClose={() => setMember()}
       />
     </Layout>
   );

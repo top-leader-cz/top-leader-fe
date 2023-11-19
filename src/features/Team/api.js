@@ -64,6 +64,37 @@ export const useCreateUserMutation = ({ onSuccess, ...rest } = {}) => {
   });
 };
 
+export const useEditUserMutation = ({ onSuccess, ...rest } = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (values) =>
+      authFetch({
+        method: "PUT",
+        url: `/api/latest/user/${values.username}`,
+        data: (() => {
+          console.log("[useEditUserMutation]", { values });
+          // debugger;
+          return {
+            firstName: values.firstName,
+            lastName: values.lastName,
+            username: values.username,
+            authorities: values.authorities,
+            locale: values.locale?.substring?.(0, 2) ?? "en",
+            timeZone: values.timeZone,
+            status: values.trialUser ? "AUTHORIZED" : "PENDING",
+          };
+        })(),
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["hr-users"] });
+      onSuccess?.(data);
+    },
+    ...rest,
+  });
+};
+
 export const useCreditRequestMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch, fetchUser } = useAuth();
   const queryClient = useQueryClient();

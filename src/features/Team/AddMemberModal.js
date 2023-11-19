@@ -8,7 +8,7 @@ import {
   Modal,
   Paper,
 } from "@mui/material";
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AutocompleteSelect,
@@ -23,21 +23,33 @@ import { H2, P } from "../../components/Typography";
 import { Authority } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
-import { useCreateUserMutation } from "./api";
+import { useCreateUserMutation, useEditUserMutation } from "./api";
 import { messages } from "./messages";
 import { gray500 } from "../../theme";
 import { QueryRenderer } from "../QM/QueryRenderer";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
-export const AddMemberModal = ({ onClose, open }) => {
+
+const obj = {};
+
+export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
+  const isEdit = !!initialValues?.username;
+
   const msg = useMsg({ dict: messages });
-  const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
   const { userTz, language } = useContext(I18nContext);
 
-  const methods = useForm({
-    mode: "onSubmit",
-    // mode: "all",¯
-    defaultValues: {
+  const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
+  const editUserMutation = useEditUserMutation({ onSuccess: onClose });
+  const mutation = isEdit ? editUserMutation : addUserMutation;
+  const { reset: resetAdd } = addUserMutation;
+  const { reset: resetEdit } = editUserMutation;
+  const resetMutation = useCallback(() => {
+    resetAdd();
+    resetEdit();
+  }, [resetAdd, resetEdit]);
+
+  const defaultValues = useMemo(
+    () => ({
       firstName: "",
       lastName: "",
       username: "",
@@ -45,13 +57,33 @@ export const AddMemberModal = ({ onClose, open }) => {
       locale: language?.substring(0, 2) ?? "en",
       timeZone: userTz,
       trialUser: false,
-      // isAuthorized: false,
-    },
+    }),
+    [language, userTz]
+  );
+
+  const methods = useForm({
+    mode: "onSubmit",
+    defaultValues,
   });
-  const onSubmit = (values, e) => addUserMutation.mutateAsync(values);
+  const { reset: resetForm } = methods;
+  useEffect(() => {
+    if (!open) {
+      resetMutation();
+      resetForm(defaultValues);
+    } else if (isEdit) {
+      console.log("[AddMemberModal reset]", { initialValues, defaultValues });
+      resetForm({ ...defaultValues, ...initialValues });
+    }
+  }, [defaultValues, initialValues, isEdit, open, resetForm, resetMutation]);
+  const onSubmit = (values, e) => mutation.mutateAsync(values);
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
-  console.log("[AddMemberModal.rndr]", { ...addUserMutation });
+  console.log("[AddMemberModal.rndr]", isEdit, {
+    initialValues,
+    defaultValues,
+    mutation,
+    isEdit,
+  });
 
   return (
     <Modal
@@ -89,13 +121,13 @@ export const AddMemberModal = ({ onClose, open }) => {
                 <Icon name="Close" sx={{ color: gray500 }} />
               </IconButton>
             </Box>
-            <QueryRenderer
-              query={addUserMutation}
-              success={null}
-              loading={null}
-            />
+            <QueryRenderer query={mutation} success={null} loading={null} />
             <H2 id="add-member-modal-title">
-              {msg("team.credit.add-member.modal.title")}
+              {msg(
+                isEdit
+                  ? "team.credit.edit-member.modal.title"
+                  : "team.credit.add-member.modal.title"
+              )}
             </H2>
             <P id="add-member-modal-description">
               {msg("team.credit.add-member.modal.desc")}
@@ -117,6 +149,7 @@ export const AddMemberModal = ({ onClose, open }) => {
               fullWidth
             />
             <RHFTextField
+              disabled={isEdit}
               name="username"
               rules={{ required: true, minLength: 2 }}
               label={msg("team.credit.add-member.fields.username")}
@@ -164,9 +197,13 @@ export const AddMemberModal = ({ onClose, open }) => {
                 fullWidth
                 variant="contained"
                 type="submit"
-                disabled={addUserMutation.isLoading}
+                disabled={mutation.isLoading}
               >
-                {msg("team.credit.add-member.submit")}
+                {msg(
+                  isEdit
+                    ? "team.credit.edit-member.submit"
+                    : "team.credit.add-member.submit"
+                )}
               </Button>
             </Box>
           </FormProvider>
