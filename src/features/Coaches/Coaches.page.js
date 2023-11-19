@@ -40,8 +40,7 @@ const getPayload = ({
     languages: languages?.length ? languages : undefined,
     fields: fields?.length ? fields : undefined,
     experienceFrom,
-    // TODO: BE bug - not accepting from-to, just one value from range
-    // experienceTo,
+    experienceTo,
     name: search,
     prices: prices?.length ? prices : undefined,
   };

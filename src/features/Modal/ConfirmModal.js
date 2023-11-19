@@ -1,4 +1,5 @@
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -20,6 +21,7 @@ export const ConfirmModal = ({
   children,
   buttons,
   noDivider,
+  error,
   sx = {},
 }) => {
   return (
@@ -57,6 +59,11 @@ export const ConfirmModal = ({
             <Icon name="Close" sx={{ color: "#667085" }} />
           </IconButton>
         </Box>
+        {!error?.message ? null : (
+          <Alert severity="error" sx={{ my: 3 }}>
+            {error?.message}
+          </Alert>
+        )}
         {title && (
           <H2 id="modal-modal-title" {...(title?.props ?? {})}>
             {title?.children ?? title}

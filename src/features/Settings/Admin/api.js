@@ -98,3 +98,25 @@ export const useAdminEditUserMutation = ({ onSuccess, ...rest } = {}) => {
     ...rest,
   });
 };
+
+export const useConfirmRequestedCreditMutation = ({
+  onSuccess,
+  ...params
+} = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ username }) =>
+      authFetch({
+        method: "POST",
+        url: `/api/latest/admin/users/${username}/confirm-requested-credits`,
+        data: {},
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
+      onSuccess?.(data);
+    },
+    ...params,
+  });
+};

@@ -36,28 +36,12 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
       authFetch({ url: `/api/latest/coach-info/upcoming-sessions` }),
     select: (data) => {
       return data.map((user) => {
-        /*
-        [
-    {
+        /* [ {
         "username": "slavik.dan12@gmail.com",
         "firstName": "",
         "lastName": "",
         "time": "2023-10-02T09:00:00"
-    },
-    {
-        "username": "coach1@gmail.com",
-        "firstName": "",
-        "lastName": "",
-        "time": "2023-10-02T10:00:00"
-    }
-]
-        */
-        //  [{
-        // "username": "string",
-        // "firstName": "string",
-        // "lastName": "string",
-        // "time": "2023-09-30T17:55:22.338Z"
-        // }]
+        } ] */
         return user;
       });
     },
@@ -65,18 +49,39 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
   });
 };
 
-export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
+export const useDeclineSessionMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
-  /*
-{
+  return useMutation({
+    mutationFn: async (upcomingSession) => {
+      const id = upcomingSession?.id || upcomingSession?.sessionId;
+
+      return authFetch({
+        method: "DELETE",
+        url: `/api/latest/user-info/upcoming-sessions/${id}`,
+      });
+    },
+    onSuccess: (data) => {
+      // TODO: also for user?
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["coach-info", "upcoming-sessions"],
+      });
+      onSuccess?.(data);
+    },
+    ...rest,
+  });
+};
+
+export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+  /* {
   "email": "string",
   "firstName": "string",
   "lastName": "string",
-  "isTrial": true
-}
-  */
+  "isTrial": true } */
   return useMutation({
     mutationFn: async (data) =>
       authFetch({

@@ -80,7 +80,8 @@ export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
   let [searchParams, setSearchParams] = useSearchParams();
   const queryTabKey = searchParams.get(queryParamName);
   const defaultTabKey = useMemo(() => {
-    return initialTabKey || queryTabKey || tabs[0]?.key;
+    const key = initialTabKey || queryTabKey || tabs[0]?.key;
+    return tabs.some((t) => t.key === key) ? key : tabs[0]?.key;
   }, [initialTabKey, queryTabKey, tabs]);
   const [tabName, setTab] = useState(defaultTabKey);
   const handleChange = (event, newValue) => {
@@ -104,11 +105,12 @@ export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
       setTab(queryTabKey);
     }
   }, [queryTabKey, tabName]);
-  // console.log("[TLTabs.rndr]", {
-  //   tabName,
-  //   queryTabKey,
-  //   defaultTabKey,
-  // });
+  console.log("[TLTabs.rndr]", {
+    tabs,
+    tabName,
+    queryTabKey,
+    defaultTabKey,
+  });
 
   return (
     <Box sx={{ width: "100%" }}>

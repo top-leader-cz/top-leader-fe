@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
@@ -24,6 +24,7 @@ import { SlotChip } from "../Team/Team.page";
 import {
   useClientsQuery,
   useDeclineMutation,
+  useDeclineSessionMutation,
   useUpcomingCoachSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
@@ -32,15 +33,54 @@ import { AddClientModal } from "./AddClientModal";
 export const gray500 = "#667085";
 export const gray900 = "#101828";
 
-export const ScheduledSession = ({ time, name, username }) => {
+// TODO: decline session modal - same as declineMemberVisible
+const ScheduledSession = ({ data, canCancel }) => {
+  const {
+    time,
+    username,
+    firstName,
+    lastName,
+    name = formatName({ firstName, lastName }),
+  } = data;
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(time);
+  const msg = useMsg({ dict: clientsMessages });
+
+  const declineSessionMutation = useDeclineSessionMutation();
+  const cancelMutation = canCancel ? declineSessionMutation : undefined;
+  const renderCancelButton = () => {
+    if (!cancelMutation) return null;
+    return (
+      <LoadingButton
+        // size="small"
+        sx={{ ml: 2, bgcolor: "white" }}
+        variant="outlined"
+        color="error"
+        onClick={() => cancelMutation.mutate(data)}
+        loading={cancelMutation.isLoading}
+      >
+        {msg("clients.upcoming.decline-session")}
+      </LoadingButton>
+    );
+  };
+  const cancelButton = cancelMutation?.error ? (
+    <Tooltip
+      title={cancelMutation.error?.message}
+      placement="top"
+      // sx={{ color: "red" }}
+    >
+      {renderCancelButton()}
+    </Tooltip>
+  ) : (
+    renderCancelButton()
+  );
 
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "row",
+        alignItems: "baseline",
         py: 2,
         gap: 2,
         borderBottom: `1px solid #EAECF0`,
@@ -63,6 +103,7 @@ export const ScheduledSession = ({ time, name, username }) => {
           {name || username}
         </P>
       </Box>
+      {cancelButton}
     </Box>
   );
 };
@@ -72,6 +113,7 @@ export const ScheduledSessionsTableRow = ({
   columns,
   colSpan = columns.length,
   name,
+  canCancel = true,
   sx = {},
 }) => {
   const msg = useMsg({ dict: clientsMessages });
@@ -89,12 +131,11 @@ export const ScheduledSessionsTableRow = ({
             ? msg("clients.upcoming.with-name", { name })
             : msg("clients.upcoming.all-sessions")}
         </H2>
-        {data.map(({ username, firstName, lastName, time }) => (
+        {data.map((session) => (
           <ScheduledSession
-            key={time + username}
-            name={formatName({ firstName, lastName })}
-            username={username}
-            time={time}
+            key={session.time + session.username}
+            data={session}
+            canCancel={canCancel}
           />
         ))}
       </StyledTableCell>
@@ -174,6 +215,7 @@ function ClientsPageInner() {
           data={rowData}
           columns={columns}
           name={row.username}
+          canCancel
         />
       );
     },
@@ -240,6 +282,7 @@ function ClientsPageInner() {
           name: declineMemberVisible?.name,
         })}
         desc={""}
+        error={declineMutation.error}
         buttons={[
           {
             variant: "outlined",

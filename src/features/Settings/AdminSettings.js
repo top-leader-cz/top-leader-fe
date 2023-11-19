@@ -1,8 +1,6 @@
 import { Add } from "@mui/icons-material";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
-import { prop } from "ramda";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
 import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -14,35 +12,13 @@ import {
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { gray500 } from "../../theme";
-import { Authority, useAuth, useMyQuery } from "../Authorization/AuthProvider";
+import { Authority } from "../Authorization/AuthProvider";
 import { formatName, getCoachPhotoUrl } from "../Coaches/CoachCard";
 import { SlotChip } from "../Team/Team.page";
 import { MemberAdminModal } from "./Admin/MemberAdminModal";
+import { useConfirmRequestedCreditMutation, useUsersQuery } from "./Admin/api";
 import { messages } from "./messages";
 import { useUserStatusDict } from "./useUserStatusDict";
-import { useUsersQuery } from "./Admin/api";
-
-export const useConfirmRequestedCreditMutation = ({
-  onSuccess,
-  ...params
-} = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ username }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/admin/users/${username}/confirm-requested-credits`,
-        data: {},
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
-      onSuccess?.(data);
-    },
-    ...params,
-  });
-};
 
 function AdminSettingsInner() {
   const [user, setUser] = useState();

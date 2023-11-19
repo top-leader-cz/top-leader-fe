@@ -30,7 +30,7 @@ export const INITIAL_FILTER = ({ userLang = defaultLanguage } = {}) => ({
   // languages: [userLang.substring(0, 2)],
   languages: [],
   fields: [],
-  experience: [1, 20],
+  experience: [1, 70],
   prices: [],
   search: "",
 });
@@ -153,7 +153,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <SliderField
               name="experience"
               label={msg("coaches.filter.experience.label")}
-              range={[1, 20]}
+              range={[1, 70]}
             />
             <Tooltip title={<Rates msg={msg} />} placement="top">
               <div>
