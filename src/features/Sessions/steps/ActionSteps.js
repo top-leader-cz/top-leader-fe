@@ -1,11 +1,15 @@
 import { Box, Button, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
-import { DatePickerField, RHFTextField } from ".";
-import { Icon } from "../Icon";
-import { MsgProvider } from "../Msg";
-import { Msg, useMsg } from "../Msg/Msg";
-import { P } from "../Typography";
+import {
+  DatePickerField,
+  RHFTextField,
+} from "../../../components/Forms/Fields";
+import { Icon } from "../../../components/Icon";
+import { MsgProvider } from "../../../components/Msg";
+import { Msg, useMsg } from "../../../components/Msg/Msg";
+import { P } from "../../../components/Typography";
+import { notBlank } from "../EditSession.page";
 
 const messages = defineMessages({
   "action-steps.label.placeholder": {
@@ -48,7 +52,10 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
             control={control}
             name={`${name}.${i}.label`}
             placeholder={msg("action-steps.label.placeholder")}
-            rules={{ required: "Required" }}
+            rules={{
+              required: "Required",
+              validate: { notBlank: notBlank(0) },
+            }}
             size="small"
             autoFocus
             sx={{

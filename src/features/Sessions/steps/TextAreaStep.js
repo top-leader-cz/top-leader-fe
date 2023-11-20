@@ -1,31 +1,10 @@
 import { Box, TextField } from "@mui/material";
+import { identity } from "ramda";
 import { useForm } from "react-hook-form";
-import { RHFTextField } from "../../../components/Forms";
+import { notBlank } from "../EditSession.page";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
-import { FormStepCard } from "./FormStepCard";
-
-export const notBlank = (v) => v?.trim().length > 0;
-
-// methods.formState.isValid not set properly
-const TextAreaStepTODO = ({ textAreaName, ...props }) => {
-  return (
-    <FormStepCard {...props}>
-      <RHFTextField
-        name={textAreaName}
-        rules={{ required: true }}
-        placeholder={"Type your own " + textAreaName}
-        autoFocus
-        size="small"
-        hiddenLabel
-        multiline
-        rows={4}
-        sx={{ my: 4 }}
-        fullWidth
-      />
-    </FormStepCard>
-  );
-};
+import { SESSION_FIELDS } from "./constants";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
@@ -34,13 +13,16 @@ export const TextAreaStep = ({
   handleBack,
   data,
   setData,
+  step: { fieldDefMap = {}, ...step },
   ...props
 }) => {
+  const field = fieldDefMap[textAreaName];
   const { register, handleSubmit, watch, formState } = useForm({
     defaultValues: data,
   });
+  const map = field?.map || identity;
   const componentData = {
-    [textAreaName]: watch(textAreaName)?.trim(),
+    [textAreaName]: map(watch(textAreaName)),
   };
   console.log("[TextAreaStep.rndr]", formState.isValid, {
     componentData,
@@ -48,7 +30,7 @@ export const TextAreaStep = ({
   });
 
   return (
-    <SessionStepCard {...props}>
+    <SessionStepCard step={step} {...props}>
       <Box
         component="form"
         noValidate
@@ -63,9 +45,10 @@ export const TextAreaStep = ({
           multiline
           rows={4}
           {...register(textAreaName, {
-            required: true,
+            required: "Required",
             validate: {
-              notBlank,
+              notBlank: notBlank(0),
+              ...field?.validate,
             },
           })}
           sx={{ my: 4 }}
@@ -83,10 +66,10 @@ export const TextAreaStep = ({
   );
 };
 
-export const MotivationStep = (props) => (
-  <TextAreaStep textAreaName={"motivation"} {...props} />
+export const GoalStep = (props) => (
+  <TextAreaStep textAreaName={SESSION_FIELDS.LONG_TERM_GOAL} {...props} />
 );
 
-export const GoalStep = (props) => (
-  <TextAreaStep textAreaName={"longTermGoal"} {...props} />
+export const MotivationStep = (props) => (
+  <TextAreaStep textAreaName={SESSION_FIELDS.MOTIVATION} {...props} />
 );

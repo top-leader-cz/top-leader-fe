@@ -5,7 +5,10 @@ import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { ActionsCell, TLCell } from "../../components/Table/TLLoadableTable";
+import {
+  StyledTableCell,
+  TLCell,
+} from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
 import { AddMemberModal } from "./AddMemberModal";
@@ -15,6 +18,39 @@ import { messages } from "./messages";
 import { useAuth } from "../Authorization";
 import { gray500 } from "../../theme";
 import { Icon } from "../../components/Icon";
+import { omit } from "ramda";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
+
+export const ActionsCell = ({ buttons = [], ...props }) => {
+  const renderButton = ({ Component = Button, ...button }) => (
+    <Component
+      key={button.key || JSON.stringify(omit(["children"], button))}
+      {...button}
+    />
+  );
+  const render = (button) =>
+    button.tooltip ? (
+      <ErrorBoundary>
+        <Tooltip title={button.tooltip}>{renderButton(button)}</Tooltip>
+      </ErrorBoundary>
+    ) : (
+      renderButton(button)
+    );
+
+  return (
+    <StyledTableCell {...props}>
+      <Box
+        display="flex"
+        flexDirection="row"
+        flexWrap="nowrap"
+        justifyContent={"space-between"}
+        gap={2}
+      >
+        {buttons.map(render)}
+      </Box>
+    </StyledTableCell>
+  );
+};
 
 export const SlotChip = ({ children, sx }) => {
   return (

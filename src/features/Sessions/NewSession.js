@@ -1,13 +1,6 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -21,12 +14,8 @@ import { SessionStepCard } from "./SessionStepCard";
 import { VerticalStepper } from "./VerticalStepper";
 import { useUserSessionMutation, useUserSessionQuery } from "./api";
 import { messages } from "./messages";
-import { ActionStepsStep } from "./steps/ActionStepsStep";
-import { AreaStep } from "./steps/AreaStep";
 import { Finished } from "./steps/Finished";
-import { GoalStep, MotivationStep } from "./steps/TextAreaStep";
-import { getTranslatedList } from "./EditSession.page";
-import { pipe, uniq } from "ramda";
+import { useNewSessionSteps, useSteps } from "./steps/useSessionSteps";
 
 export const StepperRightMenu = ({
   heading,
@@ -47,113 +36,11 @@ export const StepperRightMenu = ({
   );
 };
 
-export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
-  const [activeStepIndex, setActiveStepIndex] = useState(initialIndex);
-  const [data, setData] = useState(initialData);
-  const activeStep = steps[activeStepIndex];
-
-  const handleNext = useCallback((data) => {
-    setData(
-      (prev) => console.log("handleNext", data, prev) || { ...prev, ...data }
-    );
-    setActiveStepIndex((i) => i + 1);
-  }, []);
-
-  const handleBack = useCallback((data) => {
-    setData((prev) => ({ ...prev, ...data }));
-    setActiveStepIndex((i) => Math.max(0, i - 1));
-  }, []);
-
-  return {
-    steps,
-    activeStep,
-    activeStepIndex: Math.min(activeStepIndex, steps.length - 1),
-    setActiveStepIndex,
-    isFirst: activeStepIndex === 0,
-    isLast: activeStepIndex === steps.length - 1,
-    handleNext,
-    handleBack,
-    data,
-    setData,
-  };
-};
-
-export const useGoalHints = () => {
-  const msg = useMsg();
-
-  return useMemo(
-    () =>
-      pipe(
-        getTranslatedList,
-        uniq // TODO: translations - sessions.new.steps.goal.focusedlist.1 === 2
-      )({
-        tsKey: "sessions.new.steps.goal.focusedlist",
-        msg,
-        startIndex: 1,
-      }),
-    [msg]
-  );
-};
-
-export const useMotivationHints = () => {
-  const msg = useMsg();
-
-  return useMemo(
-    () =>
-      pipe(
-        getTranslatedList,
-        uniq
-      )({
-        tsKey: "sessions.new.steps.motivation.focusedlist",
-        msg,
-        startIndex: 1,
-      }),
-    [msg]
-  );
-};
-
 function NewSessionPageInner() {
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
 
-  const goalHints = useGoalHints();
-  const motivationHints = useMotivationHints();
-  const STEPS = [
-    {
-      StepComponent: AreaStep,
-      label: msg("sessions.new.steps.area.label"),
-      caption: msg("sessions.new.steps.area.caption"),
-      iconName: "InsertChart",
-      heading: msg("sessions.new.steps.area.heading"),
-      perex: msg("sessions.new.steps.area.perex"),
-    },
-    {
-      StepComponent: GoalStep,
-      label: msg("sessions.new.steps.goal.label"),
-      caption: msg("sessions.new.steps.goal.caption"),
-      iconName: "Adjust",
-      heading: msg("sessions.new.steps.goal.heading"),
-      perex: msg("sessions.new.steps.goal.perex"),
-      focusedList: goalHints,
-    },
-    {
-      StepComponent: MotivationStep,
-      label: msg("sessions.new.steps.motivation.label"),
-      caption: msg("sessions.new.steps.motivation.caption"),
-      iconName: "RocketLaunch",
-      heading: msg("sessions.new.steps.motivation.heading"),
-      perex: msg("sessions.new.steps.motivation.perex"),
-      focusedList: motivationHints,
-    },
-    {
-      StepComponent: ActionStepsStep,
-      label: msg("sessions.new.steps.actionsteps.label"),
-      caption: msg("sessions.new.steps.actionsteps.caption"),
-      iconName: "Explore",
-      heading: msg("sessions.new.steps.actionsteps.heading"),
-      perex: msg("sessions.new.steps.actionsteps.perex"),
-    },
-  ];
+  const { steps: STEPS } = useNewSessionSteps();
 
   const {
     activeStep: { StepComponent = SessionStepCard, ...activeStep } = {},
@@ -211,7 +98,7 @@ function NewSessionPageInner() {
   };
 
   const isLoading = unmountedUi || query.isFetching || mutation.isLoading;
-  console.log("[NewSessionPage.rndr]", { goalHints, data, query, isLoading });
+  console.log("[NewSessionPage.rndr]", { data, query, isLoading });
 
   if (isLoading) return <QueryRenderer isLoading />;
 

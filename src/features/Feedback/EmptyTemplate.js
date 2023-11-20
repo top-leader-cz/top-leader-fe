@@ -1,6 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { H1, P } from "../../components/Typography";
-import { IconTile } from "../Sessions/EditSession.page";
+import { IconTile } from "../../components/IconTile/IconTile";
 
 export const EmptyTemplate = ({ title, description, iconName, button }) => {
   return (

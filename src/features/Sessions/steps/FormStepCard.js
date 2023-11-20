@@ -1,15 +1,15 @@
 import { Box } from "@mui/material";
+import { identity } from "ramda";
 import { FormProvider, useForm } from "react-hook-form";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
-import { identity } from "ramda";
 
 export const FormStepCard = ({
   handleNext,
   handleBack,
   data,
   setData,
-  step: { fields = [], ...step },
+  step: { fieldDefMap = [], ...step },
   stepper,
   sx,
   children,
@@ -26,11 +26,16 @@ export const FormStepCard = ({
     defaultValues: data, // TODO: pick(keys, data) vs values: pick(keys, data)
   });
   const componentData = Object.fromEntries(
-    fields.map(({ name, map = identity }) => {
+    Object.entries(fieldDefMap).map(([name, { map = identity }]) => {
       const value = methods.watch(name);
       try {
         return [name, map(value)];
       } catch (e) {
+        console.error("[FormStepCard.rndr] error when mapping field", {
+          name,
+          value,
+          e,
+        });
         return [name, value];
       }
     })

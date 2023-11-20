@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { Stack } from "@mui/system";
 
-export const Todos = ({ items, textProp = "label", keyProp, ...props }) => {
+const Todos = ({ items, textProp = "label", keyProp, ...props }) => {
   return (
     <Stack {...props}>
       {items.map((item) => (

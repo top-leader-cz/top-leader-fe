@@ -44,7 +44,8 @@
     "translations-match-csv": "node ./scripts/translations-csv-converter.js",
     "generate-translations": "npm run extract-translations && npm run translations-match-csv",
     "convert-translations-from-windows-1250": "node ./scripts/win1250toutf8.js",
-    "convert-translations-to-windows-1250": "node ./scripts/utf8towin1250.js"
+    "convert-translations-to-windows-1250": "node ./scripts/utf8towin1250.js",
+    "analyze-build": "craco build"
   },
   "eslintConfig": {
     "extends": [
@@ -67,7 +68,11 @@
   "proxy_bak": "https://topleader.hasura.app",
   "proxy": "https://topleader-394306.ey.r.appspot.com",
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@formatjs/cli": "^6.0.1",
-    "string-similarity": "^4.0.4"
+    "circular-dependency-plugin": "^5.2.2",
+    "circular-dependency-plugin-visualizer": "^1.2.3",
+    "string-similarity": "^4.0.4",
+    "webpack-bundle-analyzer": "^4.10.1"
   }
 }

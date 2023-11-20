@@ -964,9 +964,32 @@ export const AutocompleteSelect = ({
 //   );
 // };
 
-const getError = (error, rules) =>
-  error?.message ||
-  [error?.type, rules?.[error?.type]].filter(Boolean).join(": ");
+const validationMessages = defineMessages({
+  "dict.validation.required": {
+    id: "dict.validation.required",
+    defaultMessage: "Required",
+  },
+  "dict.validation.notBlank": {
+    id: "dict.validation.notBlank",
+    defaultMessage: "Cannot be blank",
+  },
+});
+
+const getError = (error, rules) => {
+  const tsKey = `dict.validation.${error?.type}`;
+  const translated = validationMessages[tsKey]?.defaultMessage;
+  const errorMsg =
+    translated ||
+    error?.message ||
+    [error?.type, rules?.[error?.type]].filter(Boolean).join(": ");
+
+  if (errorMsg) {
+    console.log("getError", { error, rules, tsKey, translated, errorMsg });
+    // debugger;
+  }
+
+  return errorMsg;
+};
 
 export const StyledOutlinedInput = styled(OutlinedInput)({
   backgroundColor: "white",

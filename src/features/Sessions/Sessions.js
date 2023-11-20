@@ -6,27 +6,26 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { useCallback, useContext } from "react";
+import { useContext } from "react";
 import { useQuery } from "react-query";
-import { Navigate, generatePath, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { Todos } from "../../components/Todos";
 import { P } from "../../components/Typography";
 import { routes } from "../../routes";
+import { parametrizedRoutes } from "../../routes/constants";
 import { useAuth } from "../Authorization";
+import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { useAreasDict } from "./areas";
 import { messages } from "./messages";
-import { I18nContext } from "../I18n/I18nProvider";
-import { parametrizedRoutes } from "../../routes/constants";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
   return (
@@ -65,7 +64,6 @@ export const ActionStepsReadOnly = ({
     </P>
   ),
 }) => {
-  // const {control} = useForm({defaultValues: Object.fromEntries(steps.map(({id, label}) => ))})
   return (
     <>
       {heading}
@@ -84,15 +82,13 @@ export const ActionStepsReadOnly = ({
           );
         })}
       </ul>
-      {/* <Todos items={steps} keyProp="label" /> */}
     </>
   );
 };
 
 const translateSessionType = ({ type, msg }) =>
   msg.maybe(`sessions.card.type.${type}`) || msg(`sessions.card.type.default`);
-// {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
-// TODO: grid
+
 const SessionCard = ({
   session: {
     timestamp,
@@ -202,12 +198,6 @@ function Sessions() {
       actionSteps: el.data.actionSteps,
     }),
   });
-
-  // const query = useQuery({
-  //   queryKey: ["user-sessions"],
-  //   queryFn: () => authFetch({ url: `/api/latest/user-sessions` }),
-  //   // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
-  // });
   const navigate = useNavigate();
 
   console.log("[Sessions.rndr]", {

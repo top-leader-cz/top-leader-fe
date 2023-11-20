@@ -123,36 +123,36 @@ export const TLCell = ({
   );
 };
 
-export const ActionsCell = ({ buttons = [], ...props }) => {
-  const renderButton = ({ Component = Button, ...button }) => (
-    <Component
-      key={button.key || JSON.stringify(omit(["children"], button))}
-      {...button}
-    />
-  );
-  const render = (button) =>
-    button.tooltip ? (
-      <ErrorBoundary>
-        <Tooltip title={button.tooltip}>{renderButton(button)}</Tooltip>
-      </ErrorBoundary>
-    ) : (
-      renderButton(button)
-    );
+// export const ActionsCell = ({ buttons = [], ...props }) => {
+//   const renderButton = ({ Component = Button, ...button }) => (
+//     <Component
+//       key={button.key || JSON.stringify(omit(["children"], button))}
+//       {...button}
+//     />
+//   );
+//   const render = (button) =>
+//     button.tooltip ? (
+//       <ErrorBoundary>
+//         <Tooltip title={button.tooltip}>{renderButton(button)}</Tooltip>
+//       </ErrorBoundary>
+//     ) : (
+//       renderButton(button)
+//     );
 
-  return (
-    <StyledTableCell {...props}>
-      <Box
-        display="flex"
-        flexDirection="row"
-        flexWrap="nowrap"
-        justifyContent={"space-between"}
-        gap={2}
-      >
-        {buttons.map(render)}
-      </Box>
-    </StyledTableCell>
-  );
-};
+//   return (
+//     <StyledTableCell {...props}>
+//       <Box
+//         display="flex"
+//         flexDirection="row"
+//         flexWrap="nowrap"
+//         justifyContent={"space-between"}
+//         gap={2}
+//       >
+//         {buttons.map(render)}
+//       </Box>
+//     </StyledTableCell>
+//   );
+// };
 
 const TableCellAvatar = ({ src }) => {
   return (

@@ -1,8 +1,10 @@
 import { Box } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { ActionSteps } from "../../../components/Forms";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
+import { identity } from "ramda";
+import { SESSION_FIELDS } from "./constants";
+import { ActionSteps } from "./ActionSteps";
 
 export const DEFAULT_VALUE_ROW = [{ label: "", date: null }];
 
@@ -13,18 +15,20 @@ export const ActionStepsStep = ({
   setData,
   onFinish,
   disabled: disabledProp,
+  step: { fieldDefMap, ...step },
   ...props
 }) => {
-  const keyName = "actionSteps";
+  const keyName = SESSION_FIELDS.ACTION_STEPS;
   const { control, watch, formState } = useForm({
     mode: "onBlur",
     defaultValues: {
       [keyName]: data[keyName]?.length ? data[keyName] : DEFAULT_VALUE_ROW,
     },
   });
+  const map = fieldDefMap[keyName]?.map || identity;
   const nextData = {
     ...data,
-    [keyName]: watch(keyName),
+    [keyName]: map(watch(keyName)),
   };
 
   // TODO: fieldArray errors?
@@ -46,7 +50,7 @@ export const ActionStepsStep = ({
     !nextData[keyName]?.length || !formState.isValid || disabledProp;
 
   return (
-    <SessionStepCard {...props}>
+    <SessionStepCard step={step} {...props}>
       <Box
         component="form"
         noValidate

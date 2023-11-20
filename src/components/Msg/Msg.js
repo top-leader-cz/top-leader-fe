@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useMsgCtx } from "./";
+import { useMsgCtx } from "./MsgCtx";
 
 const displayKeys = false;
 

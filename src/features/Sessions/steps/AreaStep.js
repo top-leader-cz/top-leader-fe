@@ -1,11 +1,13 @@
 import { ArrowForward } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
+import { identity } from "ramda";
 import { useMemo, useState } from "react";
 import { Msg } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 import { SelectableChip } from "../../../components/SelectableChip";
 import { SessionStepCard } from "../SessionStepCard";
 import { useAreasDict } from "../areas";
+import { SESSION_FIELDS } from "./constants";
 
 export const useAreas = ({ valueArr }) => {
   const { areas: areasDict } = useAreasDict();
@@ -55,14 +57,13 @@ const useArea = ({ valueArr, value = valueArr?.length ? valueArr[0] : "" }) => {
 };
 
 export const AreaStep = ({
-  keyName = "areaOfDevelopment",
   handleNext,
   data,
   setData,
-  step,
+  step: { fieldDefMap, ...step },
   stepper,
 }) => {
-  const valueArr = data[keyName];
+  const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
   const value = valueArr?.length ? valueArr[0] : "";
   const { areasArr, isCustomArea, areaMaybe, customAreaMaybe } = useArea({
     value,
@@ -72,8 +73,10 @@ export const AreaStep = ({
   const [customArea, setCustomArea] = useState(customAreaMaybe ?? "");
 
   const newArea = customArea?.trim() || selected;
+  const field = fieldDefMap[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
+  const map = field?.map || identity;
   const next = () => {
-    handleNext({ [keyName]: [newArea] });
+    handleNext({ [SESSION_FIELDS.AREA_OF_DEVELOPMENT]: map(newArea) });
   };
   const msg = useMsg();
 
