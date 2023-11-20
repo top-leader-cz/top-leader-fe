@@ -27,6 +27,7 @@ import {
   remove,
   sort,
   splitEvery,
+  uniq,
   when,
 } from "ramda";
 import React, {
@@ -608,6 +609,7 @@ export const RHFTextField = ({
   rules,
   debug,
   size = "small", // "medium"
+  // trim = false,
   ...props
 }) => {
   const methods = useFormContext();
@@ -626,6 +628,13 @@ export const RHFTextField = ({
           size={size}
           {...props}
           {...field}
+          // onChange={
+          //   !trim
+          //     ? field.onChange
+          //     : (e, newValue) => {
+          //         field.onChange(newValue?.trim());
+          //       }
+          // }
         />
       )}
     />
@@ -791,7 +800,7 @@ export const AutocompleteSelect = ({
   const from = useMemo(
     () =>
       multiple
-        ? (data) => data?.map((item) => item?.value ?? item) ?? []
+        ? (data) => uniq(data?.map((item) => item?.value ?? item) ?? [])
         : (data) => data?.value ?? null,
     [multiple]
   );

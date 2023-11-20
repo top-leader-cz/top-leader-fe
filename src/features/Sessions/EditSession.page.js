@@ -47,6 +47,7 @@ import { FormStepCard } from "./steps/FormStepCard";
 import { GoalStep } from "./steps/TextAreaStep";
 import { RHForm } from "../../components/Forms/Form";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { trim } from "ramda";
 
 export const IconTileIcon = ({ iconName }) => {
   return (
@@ -319,6 +320,11 @@ const SessionTodosForm = ({
   );
 };
 
+export const notBlank =
+  (gtLen = 0) =>
+  (v) =>
+    v?.trim?.()?.length > gtLen;
+
 const reflectionKeyName = "reflection";
 const ReflectStep = ({
   step,
@@ -368,7 +374,7 @@ const ReflectStep = ({
       <FocusedList items={hints} />
       <RHFTextField
         name={reflectionKeyName}
-        rules={{ required: true }}
+        rules={{ required: true, validate: { notBlank: notBlank(0) } }}
         placeholder={"Type your own " + reflectionKeyName}
         autoFocus
         size="small"
@@ -455,7 +461,10 @@ function EditSessionPageInner() {
     },
     {
       StepComponent: ReflectStep,
-      fields: [{ name: reflectionKeyName }, { name: "previousActionSteps" }], // TODO: to enum
+      fields: [
+        { name: reflectionKeyName, map: trim },
+        { name: "previousActionSteps" },
+      ], // TODO: to enum
       label: msg("sessions.edit.steps.reflect.label"),
       caption: msg("sessions.edit.steps.reflect.caption"),
       iconName: "Lightbulb",

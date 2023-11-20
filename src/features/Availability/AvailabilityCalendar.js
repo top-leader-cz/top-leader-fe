@@ -338,7 +338,7 @@ export const messages = defineMessages({
   "availability-calendar.confirm-reservation.desc": {
     id: "availability-calendar.confirm-reservation.desc",
     defaultMessage:
-      "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}.",
+      "By booking this time slot you are confirming if want to proceed coaching sessions with {name}.",
   },
   "coaches.coach.pick": {
     id: "coaches.coach.pick",

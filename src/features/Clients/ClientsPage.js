@@ -79,7 +79,7 @@ const ScheduledSession = ({ data, canCancel }) => {
       ],
     };
   }, [cancelMutation, data, i18n, msg, name, parsed, username]);
-  const { show } = ConfirmModal.useModal({ modal });
+  const { show } = ConfirmModal.useModal(modal);
 
   const renderCancelButton = () => {
     if (!cancelMutation) return null;
@@ -255,8 +255,8 @@ function ClientsPageInner() {
     },
     [upcomingSessionsQuery.data]
   );
-  ConfirmModal.useModal({
-    modal: useMemo(
+  ConfirmModal.useModal(
+    useMemo(
       () => ({
         open: !!declineMemberVisible,
         onClose: () => setDeclineMemberVisible(),
@@ -287,8 +287,8 @@ function ClientsPageInner() {
         ],
       }),
       [declineMemberVisible, declineMutation, msg]
-    ),
-  });
+    )
+  );
 
   console.log("[Clients.page]", { query, declineMemberVisible });
 

@@ -1,8 +1,7 @@
 import { Button } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { RouterProvider } from "react-router-dom";
@@ -11,11 +10,18 @@ import { I18nProvider } from "./features/I18n/I18nProvider";
 import "./index.css";
 import { router } from "./routes";
 import theme from "./theme";
-import React from "react";
 
 import { RightMenuProvider } from "./components/Layout"; // circular dependency when imported earlier
 import { GlobalLoader } from "./features/GlobalLoader/GlobalLoader";
-import { ModalProvider } from "./features/Modal/ConfirmModal";
+import {
+  ConfirmModal,
+  ModalCtx,
+  SnackbarCtx,
+  StackProvider,
+  TLSnackbar,
+  mapModalExtraProps,
+  mapSnackbarExtraProps,
+} from "./features/Modal/ConfirmModal";
 
 const queryClient = new QueryClient();
 
@@ -46,14 +52,26 @@ export default function App() {
           <AuthProvider>
             <GlobalLoader>
               <I18nProvider>
-                <ModalProvider>
-                  <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-                    <RightMenuProvider>
-                      <CssBaseline />
-                      <RouterProvider router={router} />
-                    </RightMenuProvider>
-                  </ErrorBoundary>
-                </ModalProvider>
+                <StackProvider
+                  logAs="ModalProvider"
+                  Ctx={ModalCtx}
+                  ItemComponent={ConfirmModal}
+                  mapExtraProps={mapModalExtraProps}
+                >
+                  <StackProvider
+                    logAs="SnackbarProvider"
+                    Ctx={SnackbarCtx}
+                    ItemComponent={TLSnackbar}
+                    mapExtraProps={mapSnackbarExtraProps}
+                  >
+                    <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
+                      <RightMenuProvider>
+                        <CssBaseline />
+                        <RouterProvider router={router} />
+                      </RightMenuProvider>
+                    </ErrorBoundary>
+                  </StackProvider>
+                </StackProvider>
               </I18nProvider>
             </GlobalLoader>
           </AuthProvider>

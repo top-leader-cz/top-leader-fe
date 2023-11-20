@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
+import { identity } from "ramda";
 
 export const FormStepCard = ({
   handleNext,
@@ -25,7 +26,14 @@ export const FormStepCard = ({
     defaultValues: data, // TODO: pick(keys, data) vs values: pick(keys, data)
   });
   const componentData = Object.fromEntries(
-    fields.map(({ name }) => [name, methods.watch(name)])
+    fields.map(({ name, map = identity }) => {
+      const value = methods.watch(name);
+      try {
+        return [name, map(value)];
+      } catch (e) {
+        return [name, value];
+      }
+    })
   );
 
   console.log("[FormStepCard.rndr]", methods.formState.isValid, {

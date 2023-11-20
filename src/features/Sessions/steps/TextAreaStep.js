@@ -5,6 +5,8 @@ import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { FormStepCard } from "./FormStepCard";
 
+export const notBlank = (v) => v?.trim().length > 0;
+
 // methods.formState.isValid not set properly
 const TextAreaStepTODO = ({ textAreaName, ...props }) => {
   return (
@@ -38,7 +40,7 @@ export const TextAreaStep = ({
     defaultValues: data,
   });
   const componentData = {
-    [textAreaName]: watch(textAreaName),
+    [textAreaName]: watch(textAreaName)?.trim(),
   };
   console.log("[TextAreaStep.rndr]", formState.isValid, {
     componentData,
@@ -60,7 +62,12 @@ export const TextAreaStep = ({
           hiddenLabel
           multiline
           rows={4}
-          {...register(textAreaName, { required: true })}
+          {...register(textAreaName, {
+            required: true,
+            validate: {
+              notBlank,
+            },
+          })}
           sx={{ my: 4 }}
           fullWidth
         />

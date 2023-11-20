@@ -7,6 +7,7 @@ import {
   IconButton,
   Modal,
   Paper,
+  Snackbar,
 } from "@mui/material";
 import React, {
   useCallback,
@@ -43,10 +44,10 @@ import {
 import { v4 as uuid } from "uuid";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
-const CONFIRM_MODAL_TYPE = {
-  INFO: "INFO",
-  ERROR: "ERROR",
-};
+// const CONFIRM_MODAL_TYPE = {
+//   INFO: "INFO",
+//   ERROR: "ERROR",
+// };
 
 export const ConfirmModal = ({
   open,
@@ -130,11 +131,46 @@ export const ConfirmModal = ({
   );
 };
 
+export const TLSnackbar = ({ open, onClose, type, ...rest }) => {
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    onClose();
+  };
+  const action = (
+    <IconButton
+      size="small"
+      aria-label="close"
+      color="inherit"
+      onClick={handleClose}
+    >
+      <Icon name={"Close"} />
+    </IconButton>
+  );
+
+  return (
+    <Snackbar
+      open={open}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      action={action}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      {...rest}
+    >
+      {type ? (
+        <Alert severity={type} action={action}>
+          {rest.message}
+        </Alert>
+      ) : null}
+    </Snackbar>
+  );
+};
+
 export const ModalCtx = React.createContext({});
+export const SnackbarCtx = React.createContext({});
 
 const ACTION = {
-  UPDATE_MODAL: "UPDATE_MODAL",
-  DESTROY_MODAL: "DESTROY_MODAL",
+  UPDATE: "UPDATE",
+  DESTROY: "DESTROY",
 };
 const INITIAL_STATE = {
   stack: [],
@@ -143,45 +179,57 @@ const INITIAL_STATE = {
 const adjustStack = (payload) => (stack) => {
   const index = findIndex(propEq("id", payload.id))(stack);
   if (index === -1) return [...stack, payload];
-  else return adjust(index, (modal) => ({ ...modal, ...payload }), stack);
+  else return adjust(index, (item) => ({ ...item, ...payload }), stack);
 };
 
 const reducer = (state, { payload, type }) => {
   // console.log("reducer", type, { payload, type, state });
   switch (type) {
-    case ACTION.UPDATE_MODAL:
+    case ACTION.UPDATE:
       return evolve({ stack: adjustStack(payload) }, state);
-    case ACTION.DESTROY_MODAL:
+    case ACTION.DESTROY:
       return evolve({ stack: reject(propEq("id", payload.id)) }, state);
     default:
       return state;
   }
 };
 
-export const ModalProvider = ({ children }) => {
+export const mapModalExtraProps = ({ buttons, getButtons }, { onClose }) => ({
+  buttons: getButtons?.({ onClose }) || buttons,
+});
+
+export const mapSnackbarExtraProps = (item, { onClose }) => ({});
+
+export const StackProvider = ({
+  Ctx = ModalCtx,
+  ItemComponent = ConfirmModal,
+  logAs = "StackProvider",
+  children,
+  mapExtraProps,
+}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const { stack } = state;
 
   const mapProps = useCallback(
-    ({ getButtons, onClose: onCloseProp, ...modal }) => {
+    ({ onClose: onCloseProp, ...item }) => {
       const onClose = () => {
         dispatch({
-          type: ACTION.UPDATE_MODAL,
-          payload: { id: modal.id, open: false },
+          type: ACTION.UPDATE,
+          payload: { id: item.id, open: false },
         });
         onCloseProp?.();
       };
       const mapped = {
-        ...modal,
-        open: modal.open ?? false,
-        key: modal.id,
-        buttons: getButtons?.({ onClose }) || modal.buttons,
+        ...item,
+        open: item.open ?? false,
+        key: item.id,
         onClose,
+        ...mapExtraProps?.(item, { onClose }),
       };
 
       return mapped;
     },
-    []
+    [mapExtraProps]
   );
 
   const stackRef = useRef(stack);
@@ -189,57 +237,86 @@ export const ModalProvider = ({ children }) => {
 
   const ctx = useMemo(
     () => ({
-      updateModal: pipe(
-        applySpec({ type: always(ACTION.UPDATE_MODAL), payload: identity }),
+      updateItem: pipe(
+        applySpec({ type: always(ACTION.UPDATE), payload: identity }),
         dispatch
       ),
-      destroyModal: pipe(
+      destroyItem: pipe(
         applySpec({
-          type: always(ACTION.DESTROY_MODAL),
+          type: always(ACTION.DESTROY),
           payload: pick(["id"]),
         }),
         dispatch
       ),
-      getModalStatic: ({ id }) => find(propEq("id", id))(stackRef.current),
     }),
     []
   );
-  console.log("[ModalProvider.rndr]", { ctx, stack });
+  console.log(`[${logAs}.rndr]`, { Ctx, ctx, stack, ItemComponent });
 
   return (
-    <ModalCtx.Provider value={ctx}>
-      <>
-        {children}
-        {stack.map((modal) => (
-          <ConfirmModal {...mapProps(modal)} />
+    <Ctx.Provider value={ctx}>
+      {children}
+      <div style={{ position: "absolute" }}>
+        {stack.map((item) => (
+          <ItemComponent {...mapProps(item)} />
         ))}
-      </>
-    </ModalCtx.Provider>
+      </div>
+    </Ctx.Provider>
   );
 };
 
-const useModal = ({ modal }) => {
+const obj = {};
+export const useModal = (modal = obj) => {
   const id = useRef(uuid());
-  const { updateModal, destroyModal } = useContext(ModalCtx);
+  const { updateItem, destroyItem } = useContext(ModalCtx);
 
   useEffect(() => {
     const withId = { ...modal, id: id.current };
     // console.log("[useModal eff]", { withId });
-    updateModal(withId);
-  }, [modal, updateModal]);
+    updateItem(withId);
+  }, [modal, updateItem]);
 
   useEffect(
     () => () => {
-      destroyModal({ id: id.current });
+      destroyItem({ id: id.current });
     },
-    [destroyModal]
+    [destroyItem]
   );
 
   return {
     show: useCallback(
-      () => updateModal({ id: id.current, open: true }),
-      [updateModal]
+      () => updateItem({ id: id.current, open: true }),
+      [updateItem]
     ),
   };
 };
 ConfirmModal.useModal = useModal;
+
+export const useSnackbar = (
+  snackbar = obj,
+  { destroyOnUnmount = false } = obj
+) => {
+  const id = useRef(uuid());
+  const { updateItem, destroyItem } = useContext(SnackbarCtx);
+
+  useEffect(() => {
+    const withId = { ...snackbar, id: id.current };
+    updateItem(withId);
+  }, [snackbar, updateItem]);
+
+  const destroyOnUnmountRef = useRef(destroyOnUnmount);
+  destroyOnUnmountRef.current = destroyOnUnmount;
+  useEffect(
+    () => () => {
+      if (destroyOnUnmountRef.current) destroyItem({ id: id.current });
+    },
+    [destroyItem]
+  );
+
+  return {
+    show: useCallback(
+      (item = {}) => updateItem({ id: id.current, open: true, ...item }),
+      [updateItem]
+    ),
+  };
+};

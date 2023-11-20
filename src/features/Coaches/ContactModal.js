@@ -6,6 +6,7 @@ import {
   IconButton,
   Modal,
   Paper,
+  Snackbar,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
@@ -14,7 +15,9 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useSendMessageMutation } from "../Messages/api";
 import { formatName } from "./Coaches.page";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
+import { useSnackbar } from "../Modal/ConfirmModal";
+import { messages } from "./messages";
 
 // {
 //     "username": "coach1@gmail.com",
@@ -47,11 +50,22 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
     defaultValues: DEFAULT_VALUES,
   });
   const { reset } = methods;
+  const { show: showSnackbar } = useSnackbar();
   const sendMutation = useSendMessageMutation({
     onSuccess: useCallback(() => {
+      showSnackbar({
+        type: "success",
+        message: msg("coaches.contact.success"),
+      });
       reset(DEFAULT_VALUES);
       onClose();
-    }, [onClose, reset]),
+    }, [msg, onClose, reset, showSnackbar]),
+    onError: (e) => {
+      showSnackbar({
+        type: "error",
+        message: e?.message || "Oops",
+      });
+    },
   });
   const onSubmit = (data, e) => {
     const { subject, message } = data;
@@ -147,14 +161,18 @@ const DEFAULT_VALUES = {
 
 // TODO: Form reset after close/submit
 export const ContactModal = ({ onClose, coach, open = !!coach }) => {
+  const msg = useMsg({ dict: messages });
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <ContactForm coach={coach} onClose={onClose} />
-    </Modal>
+    <>
+      <Modal
+        open={open}
+        onClose={onClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <ContactForm coach={coach} onClose={onClose} />
+      </Modal>
+    </>
   );
 };

@@ -89,6 +89,11 @@ export const messages = defineMessages({
     id: "coaches.contact.button.cancel",
     defaultMessage: "Cancel",
   },
+  "coaches.contact.success": {
+    id: "coaches.contact.success",
+    defaultMessage:
+      "Your message has been sent, your coach will contact you as soon as possible",
+  },
 
   "coaches.aside.title": {
     id: "coaches.aside.title",

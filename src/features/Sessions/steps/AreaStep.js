@@ -71,7 +71,7 @@ export const AreaStep = ({
   const [selected, setSelected] = useState(areaMaybe?.key);
   const [customArea, setCustomArea] = useState(customAreaMaybe ?? "");
 
-  const newArea = customArea || selected;
+  const newArea = customArea?.trim() || selected;
   const next = () => {
     handleNext({ [keyName]: [newArea] });
   };
