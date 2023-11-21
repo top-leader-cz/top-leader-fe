@@ -1,7 +1,6 @@
 import { defaultTo, evolve, map, pipe, trim } from "ramda";
 import { useCallback, useState } from "react";
 import { useMsg } from "../../../components/Msg/Msg";
-import { notBlank } from "../EditSession.page";
 import { ActionStepsStep } from "./ActionStepsStep";
 import { AlignStep } from "./AlignStep";
 import { AreaStep } from "./AreaStep";
@@ -10,6 +9,7 @@ import { SetActionStepsStep } from "./SetActionStepsStep";
 import { GoalStep, MotivationStep } from "./TextAreaStep";
 import { SESSION_FIELDS } from "./constants";
 import { useGoalHints, useMotivationHints } from "./hints";
+import { notBlank } from "../../../components/Forms/validations";
 
 export const useSteps = ({ steps, initialIndex = 0, initialData = {} }) => {
   const [activeStepIndex, setActiveStepIndex] = useState(initialIndex);

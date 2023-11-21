@@ -1,23 +1,28 @@
 import { EmojiEvents } from "@mui/icons-material";
 import { Alert, Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 import {
   DatePickerField,
   TimePicker,
   anchorTime,
 } from "../../../components/Forms";
+import { RHForm } from "../../../components/Forms/Form";
 import { Msg } from "../../../components/Msg";
 import { H1, P } from "../../../components/Typography";
 import { routes } from "../../../routes";
-import { ControlsContainer } from "./Controls";
-import { RHForm } from "../../../components/Forms/Form";
-import { useMutation } from "react-query";
 import { useAuth } from "../../Authorization";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { I18nContext } from "../../I18n/I18nProvider";
 import { API_DATETIME_LOCAL_FORMAT } from "../../Availability/api";
+import { I18nContext } from "../../I18n/I18nProvider";
+import { ControlsContainer } from "./Controls";
+import {
+  invalidDate,
+  todayOrFuture,
+  invalidTime,
+} from "../../../components/Forms/validations";
 
 export const useSchedulePrivateSessionMutation = (params = {}) => {
   const { authFetch } = useAuth();
@@ -49,6 +54,7 @@ export const Finished = () => {
     },
   });
   const form = useForm({
+    mode: "all",
     defaultValues: {
       date: addDays(7, new Date()),
       time: parse(new Date(), "HH:mm", "14:00"),
@@ -96,19 +102,31 @@ export const Finished = () => {
               display: "flex",
               flexDirection: "row",
               justifyContent: "center",
-              alignItems: "center",
+              alignItems: "baseline",
               gap: 3,
               my: 7.5,
             }}
           >
             <DatePickerField
-              {...{ control, name: "date", rules: { required: "Required" } }}
+              {...{
+                control,
+                name: "date",
+                disablePast: true,
+                rules: {
+                  required: true,
+                  validate: { invalidDate, todayOrFuture },
+                },
+              }}
             />
             <P>
               <Msg id="sessions.steps.finished.datetime.separator" />
             </P>
             <TimePicker
-              {...{ control, name: "time", rules: { required: "Required" } }}
+              {...{
+                control,
+                name: "time",
+                rules: { required: true, validate: { invalidTime } },
+              }}
             />
           </Box>
           {mutation.error && (
@@ -118,7 +136,7 @@ export const Finished = () => {
             <Button href={routes.sessions} variant="outlined">
               <Msg id="sessions.steps.finished.button.skip" />
             </Button>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" disabled={disabled}>
               <Msg id="sessions.steps.finished.button.schedule" />
             </Button>
           </ControlsContainer>

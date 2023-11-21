@@ -46,6 +46,8 @@ import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
 import { P } from "../Typography";
 import { Score } from "../Score";
+import { useMsg } from "../Msg/Msg";
+import { FieldError } from "./validations";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -539,6 +541,8 @@ export const DatePickerField = ({
   rules,
   inputFormat: inputFormatProp,
   textFieldProps,
+  clearable = false,
+  ...rest
 }) => {
   const { i18n } = useContext(I18nContext);
   const inputFormat = useMemo(
@@ -554,22 +558,31 @@ export const DatePickerField = ({
         control={control || methods?.control}
         name={name}
         rules={rules}
-        render={({ field, fieldState }) => (
-          <ErrorBoundary extraInfo={field?.value}>
-            <DesktopDatePicker
-              slotProps={{
-                textField: {
-                  size: "small",
-                  error: !!fieldState.error,
-                  helperText: getError(fieldState.error, rules),
-                  ...textFieldProps,
-                },
-              }}
-              format={inputFormat}
-              {...field}
-            />
-          </ErrorBoundary>
-        )}
+        render={({ field, fieldState }) =>
+          console.log("[DPF]", { field, fieldState }) || (
+            <ErrorBoundary extraInfo={field?.value}>
+              <DesktopDatePicker
+                slotProps={{
+                  field: {
+                    clearable,
+                    // onClear: () => console.log("DatePickerField cleared"),
+                  },
+                  textField: {
+                    size: "small",
+                    error: !!fieldState.error,
+                    helperText: (
+                      <FieldError {...{ field, fieldState, rules, name }} />
+                    ),
+                    ...textFieldProps,
+                  },
+                }}
+                format={inputFormat}
+                {...rest}
+                {...field}
+              />
+            </ErrorBoundary>
+          )
+        }
       />
     </ErrorBoundary>
   );
@@ -583,10 +596,16 @@ export const TimePicker = ({ control, name, rules, ...props }) => {
       control={control || methods?.control}
       name={name}
       rules={rules}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <MuiTimePicker
           slotProps={{
-            textField: { size: "small" },
+            textField: {
+              size: "small",
+              error: !!fieldState.error,
+              helperText: (
+                <FieldError {...{ field, fieldState, rules, name }} />
+              ),
+            },
           }}
           {...field}
         />
@@ -623,8 +642,7 @@ export const RHFTextField = ({
         // debugLog({ ...debug, data: { fieldState, field } }) ||
         <TextField
           error={!!fieldState.error}
-          helperText={getError(fieldState.error, rules)}
-          // helperText={fieldState.error}
+          helperText={<FieldError {...{ field, fieldState, rules, name }} />}
           size={size}
           {...props}
           {...field}
@@ -857,7 +875,9 @@ export const AutocompleteSelect = ({
               label={label}
               placeholder={placeholder}
               error={!!fieldState.error}
-              helperText={getError(fieldState.error, rules)}
+              helperText={
+                <FieldError {...{ field, fieldState, rules, name }} />
+              }
               inputProps={{
                 // TODO: profile language autocomplete
                 ...params.inputProps, // should contain value, but after form init it is ""
@@ -892,105 +912,6 @@ export const AutocompleteSelect = ({
   );
 };
 
-// const MyInput = styled(OutlinedInput)(({ theme }) => ({
-//   "label + &": {
-//     marginTop: theme.spacing(3),
-//   },
-//   "& .MuiInputBase-input": {
-//     // borderRadius: 4,
-//     // position: "relative",
-//     // backgroundColor: theme.palette.mode === "light" ? "#fcfcfb" : "#2b2b2b",
-//     // border: "1px solid #ced4da",
-//     // fontSize: 16,
-//     // width: "auto",
-//     // padding: "10px 12px",
-//     // transition: theme.transitions.create([
-//     //   "border-color",
-//     //   "background-color",
-//     //   "box-shadow",
-//     // ]),
-//     // "&:focus": {
-//     //   boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.2rem`,
-//     //   borderColor: theme.palette.primary.main,
-//     // },
-//   },
-// }));
-
-// const OutlinedField = ({ label, id = label, size = "small", shrink }) => {
-//   // return null
-//   return (
-//     <FormControl variant="outlined">
-//       <InputLabel shrink={shrink} variant="outlined" size={size} htmlFor={id}>
-//         {label}
-//       </InputLabel>
-//       <OutlinedInput notched={shrink} label={label} id={id} size={size} />
-//     </FormControl>
-//   );
-//   return (
-//     <FormControl variant="outlined">
-//       <InputLabel htmlFor="adornment-3">Label</InputLabel>
-//       <OutlinedInput
-//         label="Password"
-//         id="adornment-3"
-//         size="small"
-//         endAdornment={
-//           <InputAdornment position="end">
-//             <IconButton
-//               color="primary"
-//               // onClick={handleClickShowPassword}
-//               // onMouseDown={handleMouseDownPassword}
-//               edge="end"
-//             >
-//               <Icon name="ArrowForward" />
-//             </IconButton>
-//           </InputAdornment>
-//         }
-//       />
-//     </FormControl>
-//   );
-//   return (
-//     <FormControl variant="outlined">
-//       <InputLabel htmlFor="adornment-2">Label</InputLabel>
-//       <OutlinedInput
-//         id="adornment-2"
-//         size="small"
-//         endAdornment={
-//           <InputAdornment position="end">
-//             <Icon name="ArrowForward" />
-//           </InputAdornment>
-//         }
-//       />
-//     </FormControl>
-//   );
-// };
-
-const validationMessages = defineMessages({
-  "dict.validation.required": {
-    id: "dict.validation.required",
-    defaultMessage: "Required",
-  },
-  "dict.validation.notBlank": {
-    id: "dict.validation.notBlank",
-    defaultMessage: "Cannot be blank",
-  },
-});
-
-const getError = (error, rules) => {
-  const tsKey = `dict.validation.${error?.type}`;
-  const translated = validationMessages[tsKey]?.defaultMessage;
-  const errorMsg =
-    translated ||
-    error?.message ||
-    [error?.type, rules?.[error?.type]].filter(Boolean).join(": ");
-
-  if (errorMsg) {
-    console.log("getError", { error, rules, tsKey, translated, errorMsg });
-    // debugger;
-  }
-
-  return errorMsg;
-};
-
 export const StyledOutlinedInput = styled(OutlinedInput)({
   backgroundColor: "white",
 });
@@ -1011,7 +932,6 @@ export const BareInputField = ({
         <Box width="100%" position="relative">
           <StyledOutlinedInput
             error={!!fieldState.error}
-            // helperText={getError(fieldState.error)}
             size={size}
             id={name}
             fullWidth={fullWidth}
@@ -1026,7 +946,7 @@ export const BareInputField = ({
               left: "8px",
             }}
           >
-            {getError(fieldState.error, rules)}
+            <FieldError {...{ field, fieldState, rules, name }} />
           </P>
         </Box>
       )}

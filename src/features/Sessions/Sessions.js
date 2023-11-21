@@ -223,7 +223,7 @@ function Sessions() {
         <Header text={<Msg id="sessions.heading" />} />
         <ErrorBoundary>
           {sel.all?.map((session) => (
-            <SessionCard session={session} />
+            <SessionCard key={session.id} session={session} />
           ))}
           {/* {sel.selected && <SessionCard session={sel.selected} />} */}
         </ErrorBoundary>

@@ -1,11 +1,11 @@
-import { Box, TextField } from "@mui/material";
+import { Box } from "@mui/material";
 import { identity } from "ramda";
 import { useForm } from "react-hook-form";
-import { notBlank } from "../EditSession.page";
+import { RHFTextField } from "../../../components/Forms";
+import { notBlank } from "../../../components/Forms/validations";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { SESSION_FIELDS } from "./constants";
-import { RHFTextField } from "../../../components/Forms";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({

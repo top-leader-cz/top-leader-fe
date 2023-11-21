@@ -132,7 +132,7 @@
     "defaultMessage": "Welcome to TopLeader"
   },
   "availability-calendar.confirm-reservation.desc": {
-    "defaultMessage": "By booking this time slot tou are confirming if want to proceed coaching sessions with {name}."
+    "defaultMessage": "By booking this time slot you are confirming if want to proceed coaching sessions with {name}."
   },
   "availability-calendar.confirm-reservation.title": {
     "defaultMessage": "Confirm reservation {date}"
@@ -245,6 +245,9 @@
   "coaches.coach.experience": {
     "defaultMessage": "Experience: {experience} years"
   },
+  "coaches.coach.introduction-link": {
+    "defaultMessage": "See video introduction"
+  },
   "coaches.coach.languages": {
     "defaultMessage": "Languages"
   },
@@ -274,6 +277,9 @@
   },
   "coaches.contact.subject.label": {
     "defaultMessage": "Subject"
+  },
+  "coaches.contact.success": {
+    "defaultMessage": "Your message has been sent, your coach will contact you as soon as possible"
   },
   "coaches.contact.title": {
     "defaultMessage": "Contact {name}"
@@ -1575,6 +1581,21 @@
   "dict.user_status.pending.label": {
     "defaultMessage": "Pending"
   },
+  "dict.validation.invalidDate": {
+    "defaultMessage": "Invalid date"
+  },
+  "dict.validation.invalidTime": {
+    "defaultMessage": "Invalid time"
+  },
+  "dict.validation.notBlank": {
+    "defaultMessage": "Cannot be blank"
+  },
+  "dict.validation.required": {
+    "defaultMessage": "Required"
+  },
+  "dict.validation.todayOrFuture": {
+    "defaultMessage": "Must be in the future"
+  },
   "dict.values.accountability.description": {
     "defaultMessage": "Being accountable is about creating a culture where people value responsibility. Your goals are constantly reinforced with accountability. Creating accountability increases your dedication to complete your goals, and it forces you to follow through on commitments. Accountability keeps you engaged. You can become personally accountable for your success. Just go for it!"
   },
@@ -2310,6 +2331,12 @@
   "settings.profile.field.timezone": {
     "defaultMessage": "Timezone"
   },
+  "settings.profile.field.webLink": {
+    "defaultMessage": "Video introduction"
+  },
+  "settings.profile.field.webLink.placeholder": {
+    "defaultMessage": "https://"
+  },
   "settings.profile.heading": {
     "defaultMessage": "Personal Info"
   },
@@ -2393,6 +2420,12 @@
   },
   "team.credit.add-member.submit": {
     "defaultMessage": "Send invite"
+  },
+  "team.credit.edit-member.modal.title": {
+    "defaultMessage": "Edit member"
+  },
+  "team.credit.edit-member.submit": {
+    "defaultMessage": "Save"
   },
   "team.credit.topup": {
     "defaultMessage": "Top up credit"

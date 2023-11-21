@@ -15,11 +15,6 @@ import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 import { Finished } from "./steps/Finished";
 import { useEditSteps, useSteps } from "./steps/useSessionSteps";
 
-export const notBlank =
-  (gtLen = 0) =>
-  (v) =>
-    v?.trim?.()?.length > gtLen;
-
 function EditSessionPageInner() {
   const msg = useMsg();
   const { id } = useParams();

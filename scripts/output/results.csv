@@ -560,7 +560,7 @@ settings.profile.heading,340,Personal info,Osobní informace,Information personn
 ,374,Transformations,Transformace,Transformations,Verwandlungen,dict.fields.transformations.label,,,Transformations,,,,
 ,375,Wellbeing,Wellbeing,Bien-être,Wohlbefinden,dict.fields.wellbeing.label,,,Wellbeing,,,,
 ,376,Women,Ženy,Femmes,Frauen,dict.fields.women.label,,,Women,,,,
-,377,Save,Uložit,Enregistrer,Speichern,assessment.button.save|settings.admin.member.submit.edit|settings.availability.aside.save|settings.profile.aside.save,,,Save,,,,
+,377,Save,Uložit,Enregistrer,Speichern,assessment.button.save|settings.admin.member.submit.edit|settings.availability.aside.save|settings.profile.aside.save|team.credit.edit-member.submit,,,Save,,,,
 ,378,Your coach profile preview,Náhled vašeho profilu kouče,Aperçu du profil de votre coach,Vorschau auf Ihr Trainerprofil,settings.profile.aside.title,,,Your coach profile preview,,,,
 ,379,Preview,Náhled,Aperçu,Vorschau,settings.availability.aside.title,,,Preview,,,,
 ,380,Set your availability here,Nastavte svou dostupnost zde,Définissez votre disponibilité ici,Legen Sie hier Ihre Verfügbarkeit fest,settings.availability.perex,,,Set your availability here,,,,
@@ -569,7 +569,7 @@ settings.profile.heading,340,Personal info,Osobní informace,Information personn
 ,383,Tuesday,Úterý,Mardi,Dienstag,,Performed,Found,Tuesday,Due date,0.3333333333333333,action-steps.due-date.label,
 ,384,Wednesday,Středa,Mercredi,Mittwoch,,Performed,Found,Wednesday,Due date,0.2857142857142857,action-steps.due-date.label,
 ,385,Thursday,Čtvrtek,Jeudi,Donnerstag,,Performed,Found,Thursday,"Today, {date}",0.2222222222222222,dashboard.rightmenu.today,dashboard.rightmenu.today
-,386,Friday,Pátek,Vendredi,Freitag,,Performed,Found,Friday,"Today, {date}",0.25,dashboard.rightmenu.today,dashboard.rightmenu.today
+,386,Friday,Pátek,Vendredi,Freitag,,Performed,Found,Friday,Invalid date,0.26666666666666666,dict.validation.invalidDate,dict.validation.invalidDate
 ,387,Saturday,Sobota,Samedi,Samstag,,Performed,Found,Saturday,"Today, {date}",0.3333333333333333,dashboard.rightmenu.today,dashboard.rightmenu.today
 ,388,Sunday,Neděle,Dimanche,Sonntag,,Performed,Found,Sunday,Send again,0.3076923076923077,auth.check-email.resend.action,auth.check-email.resend.action
 ,389,Unavailable,Nedostupné,Indisponible,Nicht verfügbar,settings.availability.unavailable,,,Unavailable,,,,
@@ -657,7 +657,7 @@ coaches.coach.languages,,Languages,Jazyky,Langues,Sprachen,coaches.coach.languag
 dashboard.header,,"Hello, {user}","Ahoj, {user}","Salut, {user}","Hallo, {Benutzer}",,Performed,Found,"Hello, {user}","Hello, {user}!",0.9565217391304348,dashboard.header,
 coaches.contact.title,,Contact {name},Kontaktovat {name},Contacter {name},Ansprechpartner {Name},coaches.contact.title,,,Contact {name},,,,
 auth.login.email.validation.pattern,,The email is not valid,Email je neplatný,L'adresse email n'est pas valide,Die E-Mail-Adresse ist ungültig,auth.login.email.validation.pattern,,,The email is not valid,,,,
-auth.login.email.validation.required,,Required,Požadované,Requis,Erforderlich,auth.login.email.validation.required|feedback.create.stats.required,,,Required,,,,
+auth.login.email.validation.required,,Required,Požadované,Requis,Erforderlich,auth.login.email.validation.required|dict.validation.required|feedback.create.stats.required,,,Required,,,,
 auth.login.validation.invalid-credentials,,Invalid credentials,Neplatné údaje,Les informations d'identification invalides,Ungültige Anmeldedaten,auth.login.validation.invalid-credentials,,,Invalid credentials,,,,
 coaches.contact.message.label,,Message,Zpráva,Message,Nachricht,coaches.contact.message.label,,,Message,,,,
 dashboard.cards.strengths.title.empty,,Find my strengths,Poznat své silné stránky,Connaissez mes points forts,Meine Stärken finden,dashboard.cards.strengths.title.empty,,,Find my strengths,,,,
