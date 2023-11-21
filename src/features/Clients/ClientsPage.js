@@ -35,7 +35,7 @@ import { clientsMessages } from "./messages";
 export const gray500 = "#667085";
 export const gray900 = "#101828";
 
-const ScheduledSession = ({ data, canCancel }) => {
+const ScheduledSession = ({ data, canCancel, type }) => {
   const {
     time,
     username,
@@ -47,7 +47,7 @@ const ScheduledSession = ({ data, canCancel }) => {
   const parsed = i18n.parseUTCLocal(time);
   const msg = useMsg({ dict: clientsMessages });
 
-  const _declineSessionMutation = useDeclineSessionMutation();
+  const _declineSessionMutation = useDeclineSessionMutation({ type });
   const cancelMutation = canCancel ? _declineSessionMutation : undefined;
   const modal = useMemo(() => {
     return {
@@ -136,7 +136,16 @@ const ScheduledSession = ({ data, canCancel }) => {
           {name || username}
         </P>
       </Box>
-      {cancelButton}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          flexGrow: 2,
+        }}
+      >
+        {cancelButton}
+      </Box>
     </Box>
   );
 };
@@ -147,6 +156,7 @@ export const ScheduledSessionsTableRow = ({
   colSpan = columns.length,
   name,
   canCancel = true,
+  type, // "coach" || "user"
   sx = {},
 }) => {
   const msg = useMsg({ dict: clientsMessages });
@@ -169,6 +179,7 @@ export const ScheduledSessionsTableRow = ({
             key={session.time + session.username}
             data={session}
             canCancel={canCancel}
+            type={type}
           />
         ))}
       </StyledTableCell>
@@ -250,6 +261,7 @@ function ClientsPageInner() {
           columns={columns}
           name={row.username}
           canCancel
+          type="coach"
         />
       );
     },
@@ -300,7 +312,11 @@ function ClientsPageInner() {
           <QueryRenderer
             {...upcomingSessionsQuery}
             success={({ data }) => (
-              <ScheduledSessionsTableRow data={data} columns={columns} />
+              <ScheduledSessionsTableRow
+                data={data}
+                columns={columns}
+                type="coach"
+              />
             )}
           />
         }

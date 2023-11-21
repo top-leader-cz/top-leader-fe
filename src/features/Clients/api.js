@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useAuth } from "../Authorization";
 import { formatName } from "../Coaches/CoachCard";
+import { useRef } from "react";
 
 export const useClientsQuery = ({ ...queryParams } = {}) => {
   const { authFetch } = useAuth();
@@ -37,26 +38,31 @@ export const useUpcomingCoachSessionsQuery = (params = {}) => {
   });
 };
 
-export const useDeclineSessionMutation = ({ onSuccess, ...rest } = {}) => {
+const getSessionId = (upcomingSession) => {
+  const id = upcomingSession?.id || upcomingSession?.sessionId;
+
+  if (!id)
+    throw new Error(
+      `No session id provided, "id" or "sessionId" accepted on upcoming session object`
+    );
+
+  return id;
+};
+
+const useDeclineCoachSessionMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (upcomingSession) => {
-      const id = upcomingSession?.id || upcomingSession?.sessionId;
-
-      if (!id)
-        throw new Error(
-          `No session id provided, "id" or "sessionId" accepted on upcoming session object`
-        );
+      const id = getSessionId(upcomingSession);
 
       return authFetch({
         method: "DELETE",
-        url: `/api/latest/user-info/upcoming-sessions/${id}`,
+        url: `/api/latest/coach-info/upcoming-sessions/${id}`,
       });
     },
     onSuccess: (data) => {
-      // TODO: also for user?
       queryClient.invalidateQueries({
         exact: false,
         queryKey: ["coach-info", "upcoming-sessions"],
@@ -65,6 +71,38 @@ export const useDeclineSessionMutation = ({ onSuccess, ...rest } = {}) => {
     },
     ...rest,
   });
+};
+const useDeclineUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (upcomingSession) => {
+      const id = getSessionId(upcomingSession);
+      return authFetch({
+        method: "DELETE",
+        url: `/api/latest/user-info/upcoming-sessions/${id}`,
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        exact: false,
+        queryKey: ["user-info", "upcoming-sessions"],
+      });
+      onSuccess?.(data);
+    },
+    ...rest,
+  });
+};
+
+export const useDeclineSessionMutation = ({ type, ...rest } = {}) => {
+  if (!type)
+    throw new Error(`No type provided, valid types are "coach" or "user"`);
+  const typeRef = useRef(type);
+  return {
+    user: useDeclineUserSessionMutation,
+    coach: useDeclineCoachSessionMutation,
+  }[typeRef.current](rest);
 };
 
 export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {

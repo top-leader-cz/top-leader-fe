@@ -23,6 +23,7 @@ export const ScheduledSessionsCard = ({ data }) => {
           data={data}
           colSpan={1}
           sx={{ bgcolor: "white" }}
+          type="user"
         />
         //   )}
         // />
