@@ -5,6 +5,7 @@ import { notBlank } from "../EditSession.page";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { SESSION_FIELDS } from "./constants";
+import { RHFTextField } from "../../../components/Forms";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
@@ -17,7 +18,8 @@ export const TextAreaStep = ({
   ...props
 }) => {
   const field = fieldDefMap[textAreaName];
-  const { register, handleSubmit, watch, formState } = useForm({
+  const { control, watch, formState } = useForm({
+    mode: "all",
     defaultValues: data,
   });
   const map = field?.map || identity;
@@ -37,20 +39,19 @@ export const TextAreaStep = ({
         // onSubmit={handleSubmit(submit)}
         sx={{ mt: 1 }}
       >
-        <TextField
+        <RHFTextField
+          control={control}
+          name={textAreaName}
+          rules={{
+            required: "Required",
+            validate: { ...(field.validate ?? { notBlank: notBlank(0) }) },
+          }}
           placeholder={"Type your own " + textAreaName}
           autoFocus
           size="small"
           hiddenLabel
           multiline
           rows={4}
-          {...register(textAreaName, {
-            required: "Required",
-            validate: {
-              notBlank: notBlank(0),
-              ...field?.validate,
-            },
-          })}
           sx={{ my: 4 }}
           fullWidth
         />
