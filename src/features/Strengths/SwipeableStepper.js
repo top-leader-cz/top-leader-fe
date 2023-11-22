@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import MobileStepper from "@mui/material/MobileStepper";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
-import SwipeableViews from "react-swipeable-views";
+import SwipeableViews from "react-swipeable-views-react-18-fix";
 import { Icon } from "../../components/Icon";
 // import { autoPlay } from "react-swipeable-views-utils";
 
