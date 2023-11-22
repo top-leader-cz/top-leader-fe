@@ -1,6 +1,6 @@
-import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Box, Button } from "@mui/material";
 import { defineMessages } from "react-intl";
+import { Icon } from "../../../components/Icon";
 import { MsgProvider } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 
@@ -37,7 +37,7 @@ const ControlsInner = ({
     <ControlsContainer>
       <Button
         variant="outlined"
-        endIcon={<ArrowBack />}
+        endIcon={<Icon name="ArrowBack" />}
         onClick={() => handleBack(data)}
       >
         {msg("controls.back")}
@@ -46,7 +46,7 @@ const ControlsInner = ({
       <Button
         type="button"
         variant="contained"
-        endIcon={<ArrowForward />}
+        endIcon={<Icon name="ArrowForward" />}
         onClick={(e) => {
           console.log(
             "%c[ControlsInner.submit] e.preventDefault()",

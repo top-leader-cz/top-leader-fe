@@ -1,23 +1,22 @@
-import { ArrowBack, Star } from "@mui/icons-material";
 import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
 import React, { useContext } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-
 import { ChipsCard } from "../../components/ChipsCard";
+import { Icon } from "../../components/Icon";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
+import { primary25 } from "../../theme";
 import { useAuth } from "../Authorization";
+import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { SwipeableStepper } from "./SwipeableStepper";
 import { messages } from "./messages";
 import { useTalentsDict } from "./talents";
-import { primary25 } from "../../theme";
-import { I18nContext } from "../I18n/I18nProvider";
 
 const AssessmentRightMenu = ({
   history,
@@ -48,6 +47,7 @@ const AssessmentRightMenu = ({
         </P>
         {history.map((entry) => (
           <Button
+            key={entry.timestamp}
             onClick={(e) =>
               console.log({ e }) || (onRemove && e.metaKey && e.shiftKey)
                 ? onRemove(entry)
@@ -114,7 +114,7 @@ const SelectedStregth = ({
         }}
       >
         <SwipeableStepper
-          key={JSON.stringify(tips)}
+          key={JSON.stringify(tips)} // reset to first step when tips change
           steps={tips.map((text) => ({ key: text, text }))}
         />
       </InfoBox>
@@ -175,7 +175,7 @@ export function StrengthsPage() {
             flexDirection="row"
           >
             <Button href={routes.dashboard}>
-              <ArrowBack />
+              <Icon name="ArrowBack" />
               <H2>
                 <Msg id="strengths.header.back" />
               </H2>
@@ -204,7 +204,7 @@ export function StrengthsPage() {
                         <Chip
                           sx={{ borderRadius: 0.5 }}
                           label="Top"
-                          icon={<Star />}
+                          icon={<Icon name="Star" />}
                           size="small"
                           color="warning"
                         />

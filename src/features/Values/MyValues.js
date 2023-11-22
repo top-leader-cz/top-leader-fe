@@ -1,10 +1,10 @@
-import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, CardContent, Divider } from "@mui/material";
 import React, { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
+import { Icon } from "../../components/Icon";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -111,7 +111,7 @@ export function MyValuesPage() {
             flexDirection="row"
           >
             <Button href={routes.dashboard}>
-              <ArrowBack />
+              <Icon name="ArrowBack" />
               <H2>
                 <Msg id="values.header.back" />
               </H2>

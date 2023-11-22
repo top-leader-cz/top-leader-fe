@@ -1,4 +1,3 @@
-import { Add } from "@mui/icons-material";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { Icon } from "../../components/Icon";
@@ -208,7 +207,7 @@ function AdminSettingsInner() {
         action={
           <Button
             variant="contained"
-            startIcon={<Add />}
+            startIcon={<Icon name="Add" />}
             aria-label="add member"
             onClick={() => {
               setUser({});

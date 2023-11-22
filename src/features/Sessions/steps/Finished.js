@@ -1,4 +1,3 @@
-import { EmojiEvents } from "@mui/icons-material";
 import { Alert, Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
 import { useContext } from "react";
@@ -23,6 +22,7 @@ import {
   todayOrFuture,
   invalidTime,
 } from "../../../components/Forms/validations";
+import { Icon } from "../../../components/Icon";
 
 export const useSchedulePrivateSessionMutation = (params = {}) => {
   const { authFetch } = useAuth();
@@ -87,7 +87,10 @@ export const Finished = () => {
                 variant="circular"
                 sx={{ width: 60, height: 60, bgcolor: "#EAECF0" }}
               >
-                <EmojiEvents sx={{ fontSize: 30, color: "#667085" }} />
+                <Icon
+                  name="EmojiEvents"
+                  sx={{ fontSize: 30, color: "#667085" }}
+                />
               </Avatar>
             </Avatar>
           </Box>

@@ -1,7 +1,9 @@
-import { Add } from "@mui/icons-material";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { omit } from "ramda";
 import { useState } from "react";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { Header } from "../../components/Header";
+import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -11,15 +13,12 @@ import {
 } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
+import { gray500 } from "../../theme";
+import { useAuth } from "../Authorization";
 import { AddMemberModal } from "./AddMemberModal";
 import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useHrUsersQuery } from "./api";
 import { messages } from "./messages";
-import { useAuth } from "../Authorization";
-import { gray500 } from "../../theme";
-import { Icon } from "../../components/Icon";
-import { omit } from "ramda";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 export const ActionsCell = ({ buttons = [], ...props }) => {
   const renderButton = ({ Component = Button, ...button }) => (
@@ -166,7 +165,7 @@ function TeamPageInner() {
           action: (
             <Button
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Icon name="Add" />}
               aria-label="add member"
               onClick={() => {
                 setMember({});

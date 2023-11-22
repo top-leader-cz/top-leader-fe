@@ -1,8 +1,7 @@
-import { Box, Card, CardContent, Divider } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { filter } from "ramda";
 import { useContext, useState } from "react";
 import { useQuery } from "react-query";
-
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -10,14 +9,14 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H1, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
+import { useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { CoachCard } from "./CoachCard";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
-import { messages } from "./messages";
 import { ScheduledSessionsCard } from "./ScheduledSessions";
 import { useUserUpcomingSessionsQuery } from "./api";
-import { useMyQuery } from "../Authorization/AuthProvider";
+import { messages } from "./messages";
 
 export const formatName = ({ firstName, lastName }) =>
   `${firstName} ${lastName}`;
@@ -133,6 +132,7 @@ export function CoachesPageInner() {
           ))
         }
       />
+      <Box sx={{ height: "1px" }} />
     </Layout>
   );
 }

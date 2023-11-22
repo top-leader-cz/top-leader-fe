@@ -1,5 +1,5 @@
-import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
+import { Icon } from "./Icon";
 import { Notifications } from "./Notifications/Notifications";
 import { H1, H2 } from "./Typography";
 
@@ -13,7 +13,7 @@ export const Header = ({
 }) => {
   const renderInner = () =>
     back ? (
-      <Button color="inherit" href={back.href} startIcon={<ArrowBack />}>
+      <Button color="inherit" href={back.href} startIcon={<Icon name="ArrowBack" />}>
         <H2>{text}</H2>
       </Button>
     ) : (

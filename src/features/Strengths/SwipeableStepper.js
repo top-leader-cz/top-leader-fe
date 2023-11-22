@@ -1,11 +1,10 @@
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import MobileStepper from "@mui/material/MobileStepper";
 import { useTheme } from "@mui/material/styles";
 import * as React from "react";
 import SwipeableViews from "react-swipeable-views";
+import { Icon } from "../../components/Icon";
 // import { autoPlay } from "react-swipeable-views-utils";
 
 export function SwipeableStepper({ steps }) {
@@ -83,18 +82,18 @@ export function SwipeableStepper({ steps }) {
           >
             {/* Next */}
             {theme.direction === "rtl" ? (
-              <KeyboardArrowLeft />
+              <Icon name="KeyboardArrowLeft" />
             ) : (
-              <KeyboardArrowRight />
+              <Icon name="KeyboardArrowRight" />
             )}
           </Button>
         }
         backButton={
           <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
             {theme.direction === "rtl" ? (
-              <KeyboardArrowRight />
+              <Icon name="KeyboardArrowRight" />
             ) : (
-              <KeyboardArrowLeft />
+              <Icon name="KeyboardArrowLeft" />
             )}
             {/* Back */}
           </Button>

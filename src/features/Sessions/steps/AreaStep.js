@@ -1,7 +1,7 @@
-import { ArrowForward } from "@mui/icons-material";
 import { Box, Button, TextField } from "@mui/material";
 import { identity } from "ramda";
 import { useMemo, useState } from "react";
+import { Icon } from "../../../components/Icon";
 import { Msg } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 import { SelectableChip } from "../../../components/SelectableChip";
@@ -133,7 +133,7 @@ export const AreaStep = ({
         <Button
           type="submit"
           variant="contained"
-          endIcon={<ArrowForward />}
+          endIcon={<Icon name="ArrowForward" />}
           onClick={next}
           disabled={!newArea}
         >

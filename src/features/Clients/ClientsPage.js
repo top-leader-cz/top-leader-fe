@@ -1,8 +1,8 @@
-import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Tooltip } from "@mui/material";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { Header } from "../../components/Header";
+import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { LinkBehavior } from "../../components/LinkBehavior";
 import { MsgProvider } from "../../components/Msg";
@@ -344,7 +344,7 @@ function ClientsPageInner() {
         action={
           <Button
             variant="contained"
-            startIcon={<Add />}
+            startIcon={<Icon name="Add" />}
             aria-label="add member"
             onClick={() => {
               setAddMemberVisible(true);

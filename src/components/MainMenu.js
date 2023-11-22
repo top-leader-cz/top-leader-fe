@@ -1,15 +1,4 @@
 import {
-  DescriptionOutlined,
-  ForumOutlined,
-  HelpOutlined,
-  HomeOutlined,
-  LogoutOutlined,
-  People,
-  PersonOutlined,
-  SettingsOutlined,
-  ChatBubbleOutlineOutlined,
-} from "@mui/icons-material";
-import {
   Divider,
   List,
   ListItem,
@@ -21,13 +10,14 @@ import {
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import * as React from "react";
+import { defineMessages } from "react-intl";
 import { useMatch } from "react-router-dom";
 import { useAuth } from "../features/Authorization";
 import { routes } from "../routes";
-import { Msg, MsgProvider } from "./Msg";
-import { defineMessages } from "react-intl";
-import { LinkBehavior } from "./LinkBehavior";
 import theme from "../theme";
+import { Icon } from "./Icon";
+import { LinkBehavior } from "./LinkBehavior";
+import { Msg, MsgProvider } from "./Msg";
 import { P } from "./Typography";
 
 const messages = defineMessages({
@@ -122,22 +112,6 @@ const LogoImg = ({ mobile, text }) => {
       <P sx={{ position: "absolute", bottom: 8, right: 0 }}>{text}</P>
     </Box>
   );
-
-  return (
-    <Box
-      component="img"
-      src="/topleader-big.png"
-      sx={{
-        width: "100%",
-        height: 42,
-        px: 2,
-        my: 2,
-        // maxHeight: { xs: 233, md: 167 },
-        // maxWidth: { xs: 350, md: 250 },
-      }}
-      alt="Topleader"
-    />
-  );
 };
 
 // TODO: LinkBehavior -> NavLink:
@@ -187,32 +161,32 @@ export const MainMenu = ({ open }) => {
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.dashboard" />}
-              icon={<HomeOutlined />}
+              icon={<Icon name="HomeOutlined" />}
               to={routes.dashboard}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.sessions" />}
-              icon={<DescriptionOutlined />}
+              icon={<Icon name="DescriptionOutlined" />}
               to={routes.sessions}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.coaches" />}
-              icon={<PersonOutlined />}
+              icon={<Icon name="PersonOutlined" />}
               to={routes.coaches}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.getFeedback" />}
-              icon={<ForumOutlined />}
+              icon={<Icon name="ForumOutlined" />}
               to={routes.getFeedback}
             />
             {/* {isHR ? ( */}
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.team" />}
-              icon={<People />}
+              icon={<Icon name="People" />}
               to={routes.team}
             />
             {/* ) : null} */}
@@ -220,14 +194,14 @@ export const MainMenu = ({ open }) => {
               <ListItemLink
                 mobile={mobile}
                 text={<Msg id="main-menu.items.clients" />}
-                icon={<People />}
+                icon={<Icon name="People" />}
                 to={routes.clients}
               />
             ) : null}
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.messages" />}
-              icon={<ChatBubbleOutlineOutlined />}
+              icon={<Icon name="ChatBubbleOutlineOutlined" />}
               to={routes.messages}
             />
           </List>
@@ -236,19 +210,19 @@ export const MainMenu = ({ open }) => {
           <ListItemLink
             mobile={mobile}
             text={<Msg id="main-menu.items.settings" />}
-            icon={<SettingsOutlined />}
+            icon={<Icon name="SettingsOutlined" />}
             to={routes.settings}
           />
           <ListItemLink
             mobile={mobile}
             text={<Msg id="main-menu.items.help" />}
-            icon={<HelpOutlined />}
+            icon={<Icon name="HelpOutlined" />}
           />
           <Divider sx={{ my: 2 }} />
           <ListItemLink
             mobile={mobile}
             text={<Msg id="main-menu.items.logout" />}
-            icon={<LogoutOutlined />}
+            icon={<Icon name="LogoutOutlined" />}
             onClick={() => {
               signout();
               // auth.signout(() => navigate("/"));

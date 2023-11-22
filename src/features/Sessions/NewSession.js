@@ -1,7 +1,7 @@
-import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -132,7 +132,7 @@ function NewSessionPageInner() {
           <Button
             color="inherit"
             href={routes.sessions}
-            startIcon={<ArrowBack />}
+            startIcon={<Icon name="ArrowBack" />}
           >
             <H2>
               <Msg id="sessions.new.header" />

@@ -1,8 +1,8 @@
-import { ArrowBack } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
 import React, { useCallback } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "../../components/Icon";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -100,7 +100,7 @@ export function SetValuesPage() {
           <Button
             color="inherit"
             href={routes.dashboard}
-            startIcon={<ArrowBack />}
+            startIcon={<Icon name="ArrowBack" />}
           >
             <H2>
               <Msg id="values.header.back" />

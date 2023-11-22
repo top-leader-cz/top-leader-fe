@@ -1,4 +1,3 @@
-import { Close } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -20,8 +19,6 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
 
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import { I18nContext, defaultLanguage } from "../I18n/I18nProvider";
 
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
@@ -72,8 +69,6 @@ const Rates = ({ msg, rates = RATES }) => {
   );
 };
 
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
   const { language } = useContext(I18nContext);
   const msg = useMsg();
@@ -199,7 +194,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <Button
               onClick={onClearFilters}
               variant="text"
-              startIcon={<Close />}
+              startIcon={<Icon name="Close" />}
               sx={{ p: 1 }}
             >
               <Msg id="coaches.filter.clear-button" />

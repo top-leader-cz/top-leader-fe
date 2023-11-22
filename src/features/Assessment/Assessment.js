@@ -1,4 +1,3 @@
-import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Box, Button, Divider } from "@mui/material";
 import { groupBy, sort } from "ramda";
 import React, {
@@ -10,13 +9,16 @@ import React, {
 } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { Score } from "../../components/Score";
 import { H1, H2, P } from "../../components/Typography";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
+import { ConfirmModal } from "../Modal/ConfirmModal";
 import { AssessmentRightMenu } from "./AssessmentRightMenu";
 import {
   useAnswerMutation,
@@ -26,8 +28,6 @@ import {
 } from "./api";
 import { messages } from "./messages";
 import { useQuestionsDict } from "./questions";
-import { ConfirmModal } from "../Modal/ConfirmModal";
-import { useMsg } from "../../components/Msg/Msg";
 
 const ProgressItem = ({ value, active }) => {
   const Component = active ? "b" : "span";
@@ -377,7 +377,7 @@ function Assessment() {
             flexDirection="row"
           >
             <Button href={routes.dashboard}>
-              <ArrowBack />
+              <Icon name="ArrowBack" />
               <H2>
                 <Msg id="assessment.header.back" />
               </H2>
@@ -422,7 +422,7 @@ function Assessment() {
                 variant="outlined"
                 disabled={pagination.currentIndex <= 0}
                 onClick={pagination.back}
-                startIcon={<ArrowBack />}
+                startIcon={<Icon name="ArrowBack" />}
               >
                 <Msg id="assessment.button.back" />
               </Button>
@@ -432,7 +432,7 @@ function Assessment() {
                 variant="contained"
                 disabled={submitDisabled}
                 onClick={nextWithSave}
-                endIcon={<ArrowForward />}
+                endIcon={<Icon name="ArrowForward" />}
               >
                 {pagination.currentIndex >= pagination.totalCount - 1 ? (
                   <Msg id="assessment.button.save" />
