@@ -45,12 +45,15 @@
     "generate-translations": "npm run extract-translations && npm run translations-match-csv",
     "convert-translations-from-windows-1250": "node ./scripts/win1250toutf8.js",
     "convert-translations-to-windows-1250": "node ./scripts/utf8towin1250.js",
-    "analyze-build": "craco build"
+    "analyze-build": "craco build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
+      "react-app/jest",
+      "plugin:storybook/recommended"
     ]
   },
   "browserslist": {
@@ -70,9 +73,23 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@formatjs/cli": "^6.0.1",
+    "@storybook/addon-essentials": "^7.5.3",
+    "@storybook/addon-interactions": "^7.5.3",
+    "@storybook/addon-links": "^7.5.3",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/blocks": "^7.5.3",
+    "@storybook/preset-create-react-app": "^7.5.3",
+    "@storybook/react": "^7.5.3",
+    "@storybook/react-webpack5": "^7.5.3",
+    "@storybook/testing-library": "^0.2.2",
+    "babel-plugin-named-exports-order": "^0.0.2",
     "circular-dependency-plugin": "^5.2.2",
     "circular-dependency-plugin-visualizer": "^1.2.3",
+    "eslint-plugin-storybook": "^0.6.15",
+    "prop-types": "^15.8.1",
+    "storybook": "^7.5.3",
     "string-similarity": "^4.0.4",
+    "webpack": "^5.89.0",
     "webpack-bundle-analyzer": "^4.10.1"
   }
 }

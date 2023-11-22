@@ -44,7 +44,8 @@ function ResetAll({ error, resetErrorBoundary }) {
   );
 }
 
-export default function App() {
+export default function App({ children = <RouterProvider router={router} /> }) {
+  // TODO: extract contexts to be injectable in storybook stories?
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
       <ThemeProvider theme={theme}>
@@ -67,7 +68,7 @@ export default function App() {
                     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
                       <RightMenuProvider>
                         <CssBaseline />
-                        <RouterProvider router={router} />
+                        {children}
                       </RightMenuProvider>
                     </ErrorBoundary>
                   </StackProvider>

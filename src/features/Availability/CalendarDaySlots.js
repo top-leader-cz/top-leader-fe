@@ -27,7 +27,7 @@ export const TimeSlot = ({ hour, isLoading, isFree, onClick, sx = {} }) => {
 export const CalendarDaySlots = ({
   date,
   dayIntervals,
-  slotsCount,
+  slotsCount = 1,
   firstHour,
   onTimeslotClick,
   sx = { flexDirection: "column" },

@@ -10,6 +10,7 @@ import { usePickCoach } from "./api";
 import { messages } from "./messages";
 import { certificatesOptions } from "../Settings/ProfileSettings";
 import { Icon } from "../../components/Icon";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 export const ShowMore = ({
   text = "",
@@ -186,17 +187,19 @@ export const CoachCard = ({
               width: "100%",
             }}
           >
-            <CoachInfo
-              coach={{ name, role, experience, languages, rate, bio, fields }}
-              maxBioChars={50}
-              sx={{
-                // maxWidth: "50%",
-                flexGrow: 2,
-                // minWidth: "200px",
-                maxWidth: "400px",
-                // width: "fit-content",
-              }}
-            />
+            <ErrorBoundary>
+              <CoachInfo
+                coach={{ name, role, experience, languages, rate, bio, fields }}
+                maxBioChars={50}
+                sx={{
+                  // maxWidth: "50%",
+                  flexGrow: 2,
+                  // minWidth: "200px",
+                  maxWidth: "400px",
+                  // width: "fit-content",
+                }}
+              />
+            </ErrorBoundary>
 
             <Box
               sx={{
@@ -205,13 +208,15 @@ export const CoachCard = ({
                 // width: "100%",
               }}
             >
-              <AvailabilityCalendar
-                coach={coach}
-                onContact={withContact && handleContact}
-                onPick={pickCoach.onPick}
-                pickPending={pickCoach.pickPending}
-                sx={{ flexShrink: 0 }}
-              />
+              <ErrorBoundary>
+                <AvailabilityCalendar
+                  coach={coach}
+                  onContact={withContact && handleContact}
+                  onPick={pickCoach.onPick}
+                  pickPending={pickCoach.pickPending}
+                  sx={{ flexShrink: 0 }}
+                />
+              </ErrorBoundary>
             </Box>
           </Box>
         </CardContent>
