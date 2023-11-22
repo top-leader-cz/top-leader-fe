@@ -113,7 +113,10 @@ const SelectedStregth = ({
           flexDirection: "column",
         }}
       >
-        <SwipeableStepper steps={tips.map((text) => ({ key: text, text }))} />
+        <SwipeableStepper
+          key={JSON.stringify(tips)}
+          steps={tips.map((text) => ({ key: text, text }))}
+        />
       </InfoBox>
     </CardContent>
   );
