@@ -8,7 +8,7 @@ export const useFeedbackOptionsQuery = (params = {}) => {
     retry: 1,
     refetchOnWindowFocus: false,
     queryKey: ["feedback", "options"],
-    fetchDef: { url: `/api/latest/feedback/options`, isPublicApi: true },
+    fetchDef: { url: `/api/public/latest/feedback/options`, isPublicApi: true },
     ...params,
   });
   return query;
