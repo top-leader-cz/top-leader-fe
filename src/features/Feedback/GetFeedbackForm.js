@@ -170,7 +170,7 @@ const FormBuilderFields = ({ name, feedbackOptions }) => {
     rules: { required: true, minLength: 1 },
   });
   console.log({ fields });
-  const tsMissing = missingTranslations?.length && (
+  const tsMissing = !!missingTranslations?.length && (
     <>
       Missing translations:
       {missingTranslations?.some?.(({ apiKey } = {}) => apiKey?.startsWith("1"))
