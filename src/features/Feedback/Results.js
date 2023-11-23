@@ -1,10 +1,11 @@
 import { Box, Card, CardContent, Divider } from "@mui/material";
 import { useMemo } from "react";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { getLabel } from "../../components/Forms";
 import { useRightMenu } from "../../components/Layout";
 import { H2, P } from "../../components/Typography";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
-import { FIELDS, INPUT_TYPES } from "./GetFeedbackForm";
+import { FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
 
 // TODO: useFeedbackQuestionOptionsDict
 const QUESTION_TITLE_OPTIONS = [
@@ -101,15 +102,18 @@ const FieldResults = ({ field }) => {
 
 const FieldResultsCard = ({ index, field, sx }) => {
   return (
-    <Card elevation={0} sx={sx}>
-      <CardContent>
-        <H2 sx={{ mb: 2 }}>
-          {index + 1}. {getLabel(QUESTION_TITLE_OPTIONS)(field[FIELDS.title])}
-        </H2>
+    <ErrorBoundary>
+      <Card elevation={0} sx={sx}>
+        <CardContent>
+          <H2 sx={{ mb: 2 }}>
+            {index + 1}.{" "}
+            {getLabel(QUESTION_TITLE_OPTIONS)(field[FEEDBACK_FIELDS.title])}
+          </H2>
 
-        <FieldResults field={field} />
-      </CardContent>
-    </Card>
+          <FieldResults field={field} />
+        </CardContent>
+      </Card>
+    </ErrorBoundary>
   );
 };
 

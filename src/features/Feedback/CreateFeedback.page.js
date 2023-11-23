@@ -36,7 +36,7 @@ const from = ({ shareFormValues, formBuilderValues, username, language }) => {
     recipients: shareFormValues.emailList.map(({ email, role }) => ({
       username: email,
     })),
-    locale: language?.substring(0, 2) || "en",
+    locale: language?.substring(0, 2) || "en", // TODO: just 4 supported languages - BE
   };
   return payload;
 };

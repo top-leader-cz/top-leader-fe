@@ -13,7 +13,7 @@ import { gray200 } from "../../theme";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { INPUT_TYPES } from "./GetFeedbackForm";
+import { EXTERNAL_FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
 import {
   useExternalFeedbackMutation,
   useExternalFeedbackQuery,
@@ -22,10 +22,6 @@ import {
 } from "./api";
 import { messages } from "./messages";
 import { useFeedbackQuestionOptionsDict } from "./useFeedbackQuestionOptionsDict";
-
-export const FIELDS = {
-  answers: "answers",
-};
 
 const SUBFIELDS = {
   question: "question",
@@ -184,7 +180,7 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
   const feedbackOptionsQuery = useFeedbackOptionsQuery({ retry: 1 });
   const form = useForm({
     defaultValues: {
-      [FIELDS.answers]: data.questions.map((question) => ({
+      [EXTERNAL_FEEDBACK_FIELDS.answers]: data.questions.map((question) => ({
         [SUBFIELDS.question]: question.key,
         [SUBFIELDS.type]: question.type,
         [SUBFIELDS.required]: question.required,
@@ -193,7 +189,7 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
     },
   });
   const { fields } = useFieldArray({
-    name: FIELDS.answers,
+    name: EXTERNAL_FEEDBACK_FIELDS.answers,
     control: form.control,
   });
 
@@ -205,7 +201,9 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
           key={id}
           index={i}
           feedbackOptions={feedbackOptions}
-          getName={(fieldName) => `${FIELDS.answers}.${i}.${fieldName}`}
+          getName={(fieldName) =>
+            `${EXTERNAL_FEEDBACK_FIELDS.answers}.${i}.${fieldName}`
+          }
           sx={{ mt: 3 }}
         />
       ))}

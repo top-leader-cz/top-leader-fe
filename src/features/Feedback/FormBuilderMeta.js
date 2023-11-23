@@ -1,14 +1,14 @@
 import { Card, CardContent, TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
-import { FIELDS } from "./GetFeedbackForm";
+import { FEEDBACK_FIELDS } from "./constants";
 
 export const FormBuilderMeta = ({}) => {
   return (
     <Card>
       <CardContent>
         <Controller
-          name={FIELDS.title}
+          name={FEEDBACK_FIELDS.title}
           rules={{ required: true }}
           render={({ field, fieldState, formState }) => {
             // console.log("[FormBuilderMeta.title]", { field, fieldState });
@@ -28,7 +28,7 @@ export const FormBuilderMeta = ({}) => {
           }}
         />
         <RHFTextField
-          name={FIELDS.description}
+          name={FEEDBACK_FIELDS.description}
           placeholder={"Description (optional)"}
           rules={{}}
           variant="standard"

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "react-query";
 import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
 import { evolve, map, pick } from "ramda";
-import { FIELDS } from "./ExternalFeedbackPage";
+import { EXTERNAL_FEEDBACK_FIELDS } from "./constants";
 
 export const useFeedbackOptionsQuery = (params = {}) => {
   const query = useMyQuery({
@@ -59,7 +59,9 @@ export const useExternalFeedbackMutation = ({
         data: (() => {
           // debugger;
           return evolve({
-            [FIELDS.answers]: map(pick(["question", "answer"])),
+            [EXTERNAL_FEEDBACK_FIELDS.answers]: map(
+              pick(["question", "answer"])
+            ),
           })(data);
         })(),
       }),
