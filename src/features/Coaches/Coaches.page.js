@@ -15,7 +15,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { CoachCard } from "./CoachCard";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
 import { ScheduledSessionsCard } from "./ScheduledSessions";
-import { useUserUpcomingSessionsQuery } from "./api";
+import { useUserUpcomingSessionsQuery, useYourCoachQuery } from "./api";
 import { messages } from "./messages";
 
 export const formatName = ({ firstName, lastName }) =>
@@ -137,14 +137,9 @@ export function CoachesPageInner() {
   );
 }
 
-const YourCoachPageInner = ({ username }) => {
+const YourCoachPageInner = () => {
   const msg = useMsg();
-  const { authFetch } = useAuth();
-  const yourCoachQuery = useQuery({
-    queryKey: ["coaches", username],
-    queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
-    // refetchOnWindowFocus: false,
-  });
+  const yourCoachQuery = useYourCoachQuery();
   const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery();
   const EXPECT_ITEMS = [
     // {
@@ -217,11 +212,7 @@ export function CoachesPage() {
 
   return (
     <MsgProvider messages={messages}>
-      {user.data.coach ? (
-        <YourCoachPageInner username={user.data.coach} />
-      ) : (
-        <CoachesPageInner />
-      )}
+      {user.data.coach ? <YourCoachPageInner /> : <CoachesPageInner />}
     </MsgProvider>
   );
 }

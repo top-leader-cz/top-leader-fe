@@ -108,7 +108,7 @@ const DashboardCardNotes = () => {
             position: "absolute",
             top: 16,
             right: 16,
-            opacity: isFetchingUser ? 0.1 : noteMutation.isLoading ? 1 : 0,
+            opacity: noteMutation.isLoading ? 1 : isFetchingUser ? 0.1 : 0,
           }}
         />
       </CardContent>

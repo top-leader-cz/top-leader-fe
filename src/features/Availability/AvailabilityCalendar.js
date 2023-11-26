@@ -126,18 +126,18 @@ export const AvailabilityCalendar = ({
     reset();
   }, [reset]);
 
-  console.log(
-    "%c[AvailabilityCalendar.rndr]",
-    "color:deeppink",
-    coach.username,
-    {
-      calendarInterval,
-      someResultsQuery,
-      onPick,
-      pickedCoach,
-      coach,
-    }
-  );
+  // console.log(
+  //   "%c[AvailabilityCalendar.rndr]",
+  //   "color:deeppink",
+  //   coach.username,
+  //   {
+  //     calendarInterval,
+  //     someResultsQuery,
+  //     onPick,
+  //     pickedCoach,
+  //     coach,
+  //   }
+  // );
 
   return (
     <Box
@@ -215,7 +215,7 @@ export const AvailabilityCalendar = ({
           {...someResultsQuery}
           loaderName="Block"
           success={({ data: availabilityIntervals }) => {
-            console.log({ availabilityIntervals });
+            // console.log({ availabilityIntervals });
             // debugger;
             if (!Array.isArray(availabilityIntervals)) return null;
             const { slotsCount, firstHour } = computeSlotStats(

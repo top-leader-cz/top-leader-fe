@@ -3,6 +3,7 @@ import { useAuth } from "../Authorization";
 import { getFirstDayOfTheWeek } from "../I18n/utils/date";
 import {
   always,
+  applySpec,
   converge,
   identity,
   map,
@@ -11,6 +12,7 @@ import {
   pipe,
   prop,
 } from "ramda";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 
 const useCoachAvailabilityQuery = ({ username }) => {
   const { authFetch } = useAuth();
@@ -69,20 +71,20 @@ export const useUserUpcomingSessionsQuery = (params = {}) => {
 };
 
 export const usePickCoach = ({ coach }) => {
-  const { authFetch } = useAuth();
   const queryClient = useQueryClient();
-  const pickCoachMutation = useMutation({
-    mutationFn: async (username) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user-info/coach`,
-        data: {
-          coach:
-            typeof username === "string" || username === null
-              ? username
-              : coach.username,
-        },
+  const pickCoachMutation = useMyMutation({
+    debug: true,
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user-info/coach`,
+      from: (username) => ({
+        coach:
+          typeof username === "string" || username === null
+            ? username
+            : coach.username,
       }),
+    },
+    snackbar: { success: false, error: true },
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["user-info"] });
       queryClient.refetchQueries({ queryKey: ["coaches"] });
@@ -94,4 +96,18 @@ export const usePickCoach = ({ coach }) => {
     onPick: coach ? pickCoachMutation.mutate : undefined,
     pickPending: pickCoachMutation.isLoading,
   };
+};
+
+export const useYourCoachQuery = (rest = {}) => {
+  const { authFetch } = useAuth();
+  const { user } = useAuth();
+  const username = user?.data?.coach;
+
+  const yourCoachQuery = useMyQuery({
+    queryKey: ["coaches", username],
+    queryFn: () => authFetch({ url: `/api/latest/coaches/${username}` }),
+    enabled: !!username,
+    ...rest,
+  });
+  return yourCoachQuery;
 };

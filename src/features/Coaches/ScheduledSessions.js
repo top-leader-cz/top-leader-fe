@@ -10,7 +10,7 @@ import { ScheduledSessionsTableRow } from "../Clients/ClientsPage";
 //   },
 // });
 
-export const ScheduledSessionsCard = ({ data }) => {
+export const ScheduledSessionsCard = ({ data, ...rest }) => {
   //   const msg = useMsg({ dict: myCoachMessages });
   if (!data?.length) return null;
   return (
@@ -24,6 +24,7 @@ export const ScheduledSessionsCard = ({ data }) => {
           colSpan={1}
           sx={{ bgcolor: "white" }}
           type="user"
+          {...rest}
         />
         //   )}
         // />

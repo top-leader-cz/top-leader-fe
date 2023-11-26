@@ -541,7 +541,7 @@ export const DatePickerField = ({
   rules,
   inputFormat: inputFormatProp,
   textFieldProps,
-  clearable = false,
+  clearable = !rules?.required,
   ...rest
 }) => {
   const { i18n } = useContext(I18nContext);

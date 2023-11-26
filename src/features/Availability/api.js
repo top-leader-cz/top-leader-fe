@@ -35,6 +35,7 @@ import {
 } from "../I18n/utils/date";
 import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
 import * as tz from "date-fns-tz";
+import { useMyMutation } from "../Authorization/AuthProvider";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -299,54 +300,25 @@ export const padLeft = (char = "0", num) => {
   return str.padStart(2, char);
 };
 
-export const usePickSlotMutation = ({
-  username,
-  onSuccess,
-  ...mutationProps
-}) => {
+export const usePickSlotMutation = ({ username, ...mutationProps }) => {
   const { i18n, userTz } = useContext(I18nContext);
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  const pickSlotMutation = useMutation({
-    mutationFn: async ({ interval }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/coaches/${username}/schedule`,
-        data: (() => {
-          // Clicked on "12:00 +02:00" === 10:00 UTC (DST - letni cas)
-          // const localStart = interval.start; // just toJSON(): "2023-09-26T10:00:00.000Z"
-          // const firstDayOfTheWeek = getFirstDayOfTheWeek(localStart); // "firstDayOfTheWeek": "2023-09-24",
-          // const day = INDEX_TO_DAY[getDay(localStart)]; // 0 - Sun
-          // const utcHours = i18n.formatUtcLocal(localStart, "kk");
-          // const data = {
-          //   // interval: map(toUtcFix, interval),
-          //   firstDayOfTheWeek,
-          //   day,
-          //   time: `${padLeft("0", utcHours)}:00:00`,
-          //   // time: { hour: getHours(localStart), minute: 0, second: 0, nano: 0, },
-          // };
-          // const data = { time: interval.start.toJSON() };
-          // const data = { time: interval.start.toJSON().replace(/\.\d{3}Z$/, "") };
-          const data = {
-            time: i18n.formatLocal(interval.start, API_DATETIME_LOCAL_FORMAT),
-          };
-          // debugger;
-          return data;
-        })(),
+  const pickSlotMutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/coaches/${username}/schedule`,
+      from: applySpec({
+        time: ({ interval }) =>
+          i18n.formatLocal(interval.start, API_DATETIME_LOCAL_FORMAT),
       }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
-        queryKey: ["coaches", username, "availability"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["user-info"],
-      });
-      onSuccess?.(data);
     },
+    snackbar: { success: true, error: true },
+    invalidate: [
+      { queryKey: ["coaches", username, "availability"] },
+      { queryKey: ["user-info"] },
+    ],
     ...mutationProps,
   });
-  console.log({ pickSlotMutation });
+  // console.log("[usePickSlotMutation.rndr]", { pickSlotMutation });
 
   return pickSlotMutation;
 };

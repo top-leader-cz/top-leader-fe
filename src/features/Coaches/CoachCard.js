@@ -48,6 +48,7 @@ export const CoachInfo = ({
       sx={{
         display: "flex",
         flexDirection: "column",
+        textAlign: "left",
         ...sx,
       }}
     >
@@ -149,9 +150,9 @@ export const CoachCard = ({
   const handleContact = useCallback(() => setContactCoach(coach), [coach]);
   const pickCoach = usePickCoach({ coach });
 
-  console.log("[CoachCard.rndr]", name, {
-    coach,
-  });
+  // console.log("[CoachCard.rndr]", name, {
+  //   coach,
+  // });
 
   return (
     <>
