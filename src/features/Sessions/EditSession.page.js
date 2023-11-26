@@ -99,7 +99,7 @@ function EditSessionPageInner() {
         text={<Msg id="sessions.new.header" />}
         back={{ href: routes.sessions }}
       />
-      {finished || "TODO: remove me" ? (
+      {finished ? (
         <Finished />
       ) : (
         <StepComponent
