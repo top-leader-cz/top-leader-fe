@@ -1,6 +1,6 @@
 import { useCallback, useContext, useState } from "react";
 import { useQueryClient } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -11,12 +11,18 @@ import { useAuth } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { CreateFeedbackForm } from "./CreateFeedbackForm";
-import { ShareFeedbackModal } from "./ShareFeedbackModal";
-import { useFeedbackOptionsQuery, usePostFeedbackFormMutation } from "./api";
+import { FIELD_DEFAULT_VALUES, ShareFeedbackModal } from "./ShareFeedbackModal";
+import {
+  useFeedbackOptionsQuery,
+  useFeedbackQuery,
+  usePostFeedbackFormMutation,
+  useSaveFeedbackFormMutation,
+} from "./api";
 import { messages } from "./messages";
+import { FEEDBACK_FIELDS } from "./constants";
 
 const from = ({ shareFormValues, formBuilderValues, username, language }) => {
-  const validTo = shareFormValues.validTo || "2023-12-20T23:10:46.567Z"; // TODO
+  const validTo = shareFormValues.validTo;
   const payload = {
     // id: 0,
     title: formBuilderValues.title,
@@ -41,22 +47,44 @@ const from = ({ shareFormValues, formBuilderValues, username, language }) => {
   return payload;
 };
 
-function CreateFeedbackPageInner() {
+function CreateFeedbackPageInner({ data }) {
+  const isEdit = !!data;
+  const { i18n } = useContext(I18nContext);
+  // if (data) debugger;
+  const initialValues = data
+    ? {
+        ...data,
+        [FEEDBACK_FIELDS.fields]: data.questions.map(
+          ({ key, type, required }) => ({
+            title: key,
+            inputType: type,
+            required,
+          })
+        ),
+        validTo: i18n.parseUTCLocal(data.validTo),
+        emailList: data.recipients.length
+          ? data.recipients.map(({ username, id, submitted }) => ({
+              email: username,
+            }))
+          : [FIELD_DEFAULT_VALUES],
+      }
+    : undefined;
+
   const msg = useMsg();
   const { language } = useContext(I18nContext);
   const { authFetch, user } = useAuth();
   const [formBuilderValues, setFormBuilderValues] = useState();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const feedbackOptionsQuery = useFeedbackOptionsQuery();
-  const postFeedbackFormMutation = usePostFeedbackFormMutation({
+  const saveMutation = useSaveFeedbackFormMutation({
     onSuccess: () => {
-      queryClient.invalidateQueries({ exact: false, queryKey: ["feedback"] });
       setFormBuilderValues();
       navigate(routes.getFeedback);
     },
   });
+
+  console.log("CreateFeedbackPageInner.rndr", { isEdit, data, initialValues });
 
   const handleNext = useCallback((values) => {
     console.log("[CreateFeedbackPageInner.handleNext]", { values });
@@ -71,11 +99,11 @@ function CreateFeedbackPageInner() {
         username: user.data.username,
       });
       //   debugger;
-      postFeedbackFormMutation.mutate(payload);
+      saveMutation.mutate(payload);
     },
-    [formBuilderValues, user.data.username, language, postFeedbackFormMutation]
+    [formBuilderValues, user.data.username, language, saveMutation]
   );
-  const error = postFeedbackFormMutation.error;
+  const error = saveMutation.error;
 
   return (
     <Layout>
@@ -90,6 +118,7 @@ function CreateFeedbackPageInner() {
         success={({ data }) => {
           return (
             <CreateFeedbackForm
+              initialValues={initialValues}
               feedbackOptions={data}
               onShareForm={handleNext}
             />
@@ -104,7 +133,8 @@ function CreateFeedbackPageInner() {
           //   link="http://topleader.io/juRcHHx7r8QTPYP"
           link=""
           error={error}
-          isLoading={postFeedbackFormMutation.isLoading}
+          isLoading={saveMutation.isLoading}
+          initialValues={initialValues}
         />
       )}
     </Layout>
@@ -112,9 +142,24 @@ function CreateFeedbackPageInner() {
 }
 
 export function CreateFeedbackPage() {
+  const { id } = useParams();
+  const query = useFeedbackQuery({ params: { id }, enabled: !!id });
+
+  // console.log({ id });
+
+  if (!id)
+    return (
+      <MsgProvider messages={messages}>
+        <CreateFeedbackPageInner />
+      </MsgProvider>
+    );
+
   return (
     <MsgProvider messages={messages}>
-      <CreateFeedbackPageInner />
+      <QueryRenderer
+        query={query}
+        success={({ data }) => <CreateFeedbackPageInner data={data} />}
+      />
     </MsgProvider>
   );
 }

@@ -25,6 +25,7 @@ export const routes = {
   settings: "/settings",
   getFeedback: "/get-feedback",
   createFeedbackForm: "/get-feedback/create",
+  editFeedbackForm: "/get-feedback/edit/:id",
   feedbackResults: "/get-feedback/results/:id",
   externalFeedbackPage: "/feedback/:formId?/:username?/:token?",
   team: "/team",
@@ -38,6 +39,7 @@ export const routes = {
 export const parametrizedRoutes = {
   editSession: ({ id }) => generatePath(routes.editSession, { id }),
   feedbackResults: ({ id }) => generatePath(routes.feedbackResults, { id }),
+  editFeedbackForm: ({ id }) => generatePath(routes.editFeedbackForm, { id }),
   checkEmail: ({ email } = {}) => generatePath(routes.checkEmail, { email }),
   forgotPassword: ({ email } = {}) =>
     generatePath(routes.forgotPassword, { email }),

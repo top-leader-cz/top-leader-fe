@@ -234,6 +234,14 @@ export const router = createHashRouter([
         ),
       },
       {
+        path: routes.editFeedbackForm,
+        element: (
+          <RequireAuth>
+            <CreateFeedbackPage />
+          </RequireAuth>
+        ),
+      },
+      {
         path: routes.feedbackResults,
         element: (
           <RequireAuth>

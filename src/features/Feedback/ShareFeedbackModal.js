@@ -18,7 +18,7 @@ import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { messages } from "./messages";
 
-const FIELDS = {
+export const SHARE_FIELDS = {
   validTo: "validTo",
   emailList: "emailList",
 };
@@ -28,8 +28,8 @@ const FIELD_FIELDS = {
   // role: "role",
 };
 
-const FIELD_DEFAULT_VALUES = {
-  email: "email1@gmail.com",
+export const FIELD_DEFAULT_VALUES = {
+  // email: "email1@gmail.com",
   email: "",
   // role: null,
 };
@@ -107,14 +107,21 @@ export const ShareFeedbackModal = ({
   link,
   error,
   isLoading,
+  initialValues,
 }) => {
   const msg = useMsg({ dict: messages });
   const form = useForm({
     mode: "onSubmit",
     // mode: "all",¯
-    defaultValues: {
-      [FIELDS.validTo]: null,
-      [FIELDS.emailList]: [FIELD_DEFAULT_VALUES],
+    // defaultValues: {
+    //   [SHARE_FIELDS.validTo]: initialValues?.validTo ?? null,
+    //   [SHARE_FIELDS.emailList]: initialValues?.emailList?.length
+    //     ? initialValues?.emailList
+    //     : [FIELD_DEFAULT_VALUES],
+    // },
+    defaultValues: initialValues || {
+      [SHARE_FIELDS.validTo]: null,
+      [SHARE_FIELDS.emailList]: [FIELD_DEFAULT_VALUES],
     },
   });
 
@@ -212,13 +219,13 @@ export const ShareFeedbackModal = ({
                   {msg("feedback.create.share-modal.deadline")}
                 </P>
                 <DatePickerField
-                  name={FIELDS.validTo}
+                  name={SHARE_FIELDS.validTo}
                   rules={{ required: "Required" }}
                 />
               </Box>
               <Divider flexItem />
               <EmailList
-                name={"emailList"}
+                name={SHARE_FIELDS.emailList}
                 addLabel={msg("feedback.create.share-modal.add-email")}
               />
               <Divider flexItem />

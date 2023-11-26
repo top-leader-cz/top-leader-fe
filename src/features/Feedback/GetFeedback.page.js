@@ -22,6 +22,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { EmptyTemplate } from "./EmptyTemplate";
 import { useDeleteFeedbackFormMutation, useFeedbackFormsQuery } from "./api";
 import { messages } from "./messages";
+import { useNavigate } from "react-router-dom";
 
 const EmptyFeedbacks = () => {
   const msg = useMsg();
@@ -41,6 +42,7 @@ const EmptyFeedbacks = () => {
 
 const FeedbackListCard = ({ feedback }) => {
   const { id, title, createdAt, recipients } = feedback;
+  const navigate = useNavigate();
   const deleteFeedbackMutation = useDeleteFeedbackFormMutation();
 
   const msg = useMsg();
@@ -76,6 +78,15 @@ const FeedbackListCard = ({ feedback }) => {
               justifyContent: "flex-end",
             }}
           >
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                navigate(parametrizedRoutes.editFeedbackForm({ id }));
+              }}
+            >
+              <Icon name="ContentCopy" sx={{ color: primary500 }} />
+            </IconButton>
             <IconButton
               onClick={(e) => {
                 e.stopPropagation();

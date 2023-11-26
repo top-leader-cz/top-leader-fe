@@ -6,6 +6,7 @@ import {
 } from "../Authorization/AuthProvider";
 import { ascend, descend, evolve, map, pick, prop, sort, sortBy } from "ramda";
 import { EXTERNAL_FEEDBACK_FIELDS } from "./constants";
+import { useRef } from "react";
 
 export const useFeedbackOptionsQuery = (rest = {}) => {
   const query = useMyQuery({
@@ -105,18 +106,47 @@ export const usePostFeedbackFormMutation = (rest = {}) => {
   return mutation;
 };
 
-export const usePutFeedbackFormMutation = (rest = {}) => {
+export const usePutFeedbackFormMutation = ({
+  params: { id },
+  ...rest
+} = {}) => {
   const username = useAuth().user.data.username;
   const mutation = useMyMutation({
     debug: true,
     fetchDef: {
       method: "PUT",
-      url: "/api/latest/feedback",
+      url: `/api/latest/feedback/${id}`,
     },
-    invalidate: { queryKey: ["feedback", { username }] },
+    invalidate: [
+      { queryKey: ["feedback", { username }] },
+      { exact: false, queryKey: ["feedback"] },
+    ],
     ...rest,
   });
   return mutation;
+};
+
+export const useSaveFeedbackFormMutation = ({ id, ...rest } = {}) => {
+  const idRef = useRef(id);
+
+  if (idRef.current) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return usePutFeedbackFormMutation({
+      params: { id: idRef.current },
+      ...rest,
+    });
+  }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return usePostFeedbackFormMutation(rest);
+};
+
+export const useFeedbackQuery = ({ params: { id }, ...rest } = {}) => {
+  const query = useMyQuery({
+    queryKey: ["feedback", id],
+    fetchDef: { url: `/api/latest/feedback/${id}` },
+    ...rest,
+  });
+  return query;
 };
 
 export const useDeleteFeedbackFormMutation = (rest = {}) => {
@@ -161,7 +191,7 @@ export const useFeedbackFormsQuery = ({ ...rest } = {}) => {
 export const useFeedbackResultsQuery = ({ params: { id }, ...rest } = {}) => {
   const query = useMyQuery({
     queryKey: ["feedback", "results"],
-    fetchDef: { url: `/api/latest/feedback/${id}` },
+    fetchDef: { url: `/api/latest/feedback/${id}` }, // TODO: currently same as useFeedbackQuery
     ...rest,
   });
   return query;

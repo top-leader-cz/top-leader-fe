@@ -76,7 +76,7 @@ const DashboardCardNotes = () => {
   // useEffect(() => { setNote?.(user.data.notes); }, [user.data.notes])
 
   const { isLoading, isFetching, isPending } = noteMutation;
-  console.log({ isLoading, isFetching, isPending, noteMutation });
+  // console.log({ isLoading, isFetching, isPending, noteMutation });
 
   return (
     <Card>

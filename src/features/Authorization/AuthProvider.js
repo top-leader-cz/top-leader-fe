@@ -362,7 +362,11 @@ export const useMyMutation = ({
           ...args
         );
       if (invalidate) {
-        queryClient.invalidateQueries(invalidate);
+        if (Array.isArray(invalidate))
+          invalidate.forEach((queryKey) =>
+            queryClient.invalidateQueries(queryKey)
+          );
+        else queryClient.invalidateQueries(invalidate);
       }
       onSuccessProp?.(...args);
     },

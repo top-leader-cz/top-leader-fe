@@ -10,7 +10,7 @@ import { DEFAULT_VALUES, FEEDBACK_FIELDS } from "./constants";
 import { messages } from "./messages";
 
 // const onSubmit = (data, e) => console.log("[onSubmit]", data, e);
-const onError = (errors, e) => console.log("[onError]", errors, e);
+const onError = (errors, e) => console.log("[onError]", { errors, e });
 
 const collected = {
   // TODO
@@ -18,11 +18,15 @@ const collected = {
   total: 10,
 };
 
-export const CreateFeedbackForm = ({ feedbackOptions, onShareForm }) => {
+export const CreateFeedbackForm = ({
+  initialValues,
+  feedbackOptions,
+  onShareForm,
+}) => {
   const msg = useMsg({ dict: messages });
   const form = useForm({
     shouldFocusError: true, // TODO: ref not working
-    defaultValues: DEFAULT_VALUES,
+    defaultValues: initialValues || DEFAULT_VALUES,
   });
   const fields = form.watch(FEEDBACK_FIELDS.fields);
   const count = fields?.length;

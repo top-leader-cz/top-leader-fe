@@ -163,3 +163,5 @@ export const Icon = ({ name, fallback, ...props }) => {
 //     </React.Suspense>
 //   );
 // };
+
+Icon.Icons = Icons;
