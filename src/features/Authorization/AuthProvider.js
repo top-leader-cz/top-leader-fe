@@ -9,7 +9,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
-import { always, tryCatch } from "ramda";
+import { always, identity, pipe, tap, tryCatch } from "ramda";
 
 export const AuthContext = createContext(null);
 
@@ -61,46 +61,8 @@ const _resetPass = ({ authFetch, password, token }) =>
 const _fetchUser = ({ authFetch }) =>
   authFetch({ url: "/api/latest/user-info" });
 
-const throwOnError = async ({ response, type }) => {
-  console.log("FETCH ERR START", { response });
-  let jsonMaybe, parsingError, textMaybe;
-  try {
-    if (response.headers.get("content-type")?.includes("application/json"))
-      jsonMaybe = await response.json();
-    else if (response.headers.get("content-type")?.includes("text/html"))
-      textMaybe = await response.text();
-  } catch (e) {
-    parsingError = e;
-    console.log("FETCH ERR NOT PARSED", { response, parsingError });
-  } finally {
-    console.log("FETCH ERR FINALLY", {
-      response,
-      jsonMaybe,
-      textMaybe,
-      parsingError,
-    });
-
-    // TODO: get message from response
-    const generalErrorMessage = `Something went wrong. (${
-      response?.status || ""
-    })`;
-    const message =
-      process.env.NODE_ENV === "production" || !jsonMaybe
-        ? generalErrorMessage
-        : JSON.stringify({ status: response?.status, response: jsonMaybe });
-    const error = new Error(message);
-    error.response = response;
-    error.jsonMaybe = jsonMaybe;
-    error.textMaybe = textMaybe;
-    throw error;
-    // TODO: compare stacktrace
-    // throw response;
-  }
-};
-
 export const FETCH_TYPE = {
   JSON: "JSON",
-  JSON_WITH_META: "JSON_WITH_META",
   FORMDATA: "FORMDATA",
 };
 
@@ -119,6 +81,35 @@ export const qstr = (url, query) => {
   const qStr = typeof query === "string" ? query : qs.stringify(query);
   return [url, qStr].filter(Boolean).join("?");
 };
+
+const throwOnError = ({ response, jsonMaybe, textMaybe }) => {
+  console.log("FETCH ERR", { response });
+  // TODO: get message from response
+  const generalErrorMessage = `Something went wrong. (${
+    response?.status || ""
+  })`;
+  const customMessage = ""; // TODO: error handling
+  const message =
+    customMessage || process.env.NODE_ENV === "production"
+      ? generalErrorMessage
+      : JSON.stringify({
+          status: response?.status,
+          response:
+            jsonMaybe ||
+            textMaybe ||
+            // parsingError?.message ||
+            "[Response not ok, no response]",
+        });
+  const error = new Error(message);
+  error.response = response;
+  error.jsonMaybe = jsonMaybe;
+  error.textMaybe = textMaybe;
+  // error.parsingError = parsingError;
+  throw error;
+};
+
+const hasContentType = (type, res) =>
+  res.headers.get("content-type")?.includes(type);
 
 export function AuthProvider({ children }) {
   // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS):
@@ -140,30 +131,46 @@ export function AuthProvider({ children }) {
       method = "GET",
       type = FETCH_TYPE.JSON,
       data,
-      isPublicApi = false,
+      isPublicApi = url?.includes("/api/public/"),
     }) =>
-      console.log("authFetch ", method, url, { query, data }) ||
+      console.log("[authFetch] ", method, url, { data, query }) ||
       fetch(qstr(url, query), getInit({ method, data }))
         .then(async (response) => {
-          if (!response.ok) await throwOnError({ response, type });
+          let jsonMaybe, parsingError, textMaybe;
           try {
-            // TODO: parse response first
-            if (type === FETCH_TYPE.JSON) return await response.json();
-            if (type === FETCH_TYPE.JSON_WITH_META)
-              return { response, json: await response.json() };
-            return { response };
+            if (hasContentType("application/json", response))
+              jsonMaybe = await response.json();
+            else if (hasContentType("text/html", response))
+              textMaybe = await response.text();
           } catch (e) {
+            parsingError = e;
+            console.log("FETCH ERR NOT PARSED", { response, parsingError });
+          }
+
+          if (parsingError) {
+            // prettier-ignore
+            console.log("TODO: check and remove ", method, ": ", url, { response, parsingError, });
+            debugger;
             return { response };
           }
+
+          if (!response.ok) {
+            throwOnError({ response, jsonMaybe, textMaybe });
+          }
+          if (type === FETCH_TYPE.JSON) return jsonMaybe;
+
+          return { response };
         })
         .catch((e) => {
           if (e?.response?.status === 401 && !isPublicApi) {
-            console.error(
-              "[authFetch] ",
-              isPublicApi ? "" : "removing queries and logging out",
-              { e, url, method }
-            );
+            console.error("[authFetch] removing queries and logging out", {
+              e,
+              url,
+              method,
+            });
             signout();
+          } else {
+            // console.log("[authFetch] fetch error", { e, url, method });
           }
 
           throw e;
@@ -230,7 +237,8 @@ const noop = () => {};
 // https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
 // https://github.com/TanStack/query/discussions/5279
 export const useMyQuery = ({
-  fetchDef,
+  fetchDef: { to = identity, ...fetchDef } = {},
+  debug,
   onSuccess,
   onError,
   queryFn,
@@ -238,7 +246,17 @@ export const useMyQuery = ({
 }) => {
   const { authFetch } = useAuth();
   const query = useQuery({
-    queryFn: queryFn ?? (() => authFetch(fetchDef)),
+    queryFn:
+      queryFn ??
+      (() =>
+        authFetch(fetchDef).then((data) =>
+          logAndThrowTryCatch(
+            to || identity,
+            "[useMyQuery]: Error during 'to' execution: " +
+              JSON.stringify(fetchDef),
+            data
+          )
+        )),
     ...rest,
   });
 
@@ -255,4 +273,101 @@ export const useMyQuery = ({
   }, [error, eCurrent]);
 
   return query;
+};
+
+// const debugMaybe = ({ debug, fetchDef, data, response }) => { }
+
+const logAndThrowTryCatch = (fn, msg, rawData) =>
+  tryCatch(fn, (e) => {
+    console.log(msg, { e, rawData });
+    throw e;
+  })(rawData);
+
+const withDebug = ({
+  debug,
+  fetchDef: { from = identity, to = identity, ...fetchDef } = {}, // TODO: to authFetch?
+  mutationFn: mutationFnProp,
+  authFetch,
+}) => {
+  return async (...args) => {
+    const [rawData, ...restArgs] = args;
+    if (debug) {
+      console.log(`[withDebug] start ${fetchDef.method} ${fetchDef.url}`, {
+        rawData,
+      });
+      if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
+    }
+    try {
+      const data = logAndThrowTryCatch(
+        from,
+        "TODO: Error during 'from' execution",
+        rawData
+      );
+      const rawResponseData = await (mutationFnProp?.(data, ...restArgs) ??
+        authFetch({ data, ...fetchDef }));
+      const resData = logAndThrowTryCatch(
+        to,
+        "TODO: Error during 'to' execution",
+        rawResponseData
+      );
+
+      if (debug) {
+        console.log(`[withDebug] success ${fetchDef.method} ${fetchDef.url}`, {
+          data,
+          rawResponseData,
+          ...(to === identity ? {} : { to, rawResponseData }),
+          ...(from === identity ? {} : { from, rawData }),
+        });
+        if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
+      }
+      return resData;
+    } catch (e) {
+      if (debug) {
+        console.log(`[withDebug] error ${fetchDef.method} ${fetchDef.url}`, {
+          rawData,
+          e,
+          ...(to === identity ? {} : { to }),
+          ...(from === identity ? {} : { from, rawData }),
+        });
+        if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
+      }
+      throw e;
+    }
+  };
+};
+
+export const useMyMutation = ({
+  fetchDef,
+  mutationFn: mutationFnProp,
+  invalidate,
+  onSuccess: onSuccessProp,
+  debug, // true || "debugger" === "break" === "d" === "b"
+  ...rest
+}) => {
+  const { authFetch } = useAuth();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: withDebug({
+      debug,
+      fetchDef,
+      mutationFn: mutationFnProp,
+      authFetch,
+    }),
+    onSuccess: (...args) => {
+      if (debug)
+        console.log(
+          `[useMyMutation.onSuccess] ${
+            invalidate ? "invalidating: " + JSON.stringify(invalidate) : ""
+          }`,
+          ...args
+        );
+      if (invalidate) {
+        queryClient.invalidateQueries(invalidate);
+      }
+      onSuccessProp?.(...args);
+    },
+    ...rest,
+  });
+
+  return mutation;
 };

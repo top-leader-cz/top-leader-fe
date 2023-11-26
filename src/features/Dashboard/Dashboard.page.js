@@ -24,9 +24,10 @@ import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu, JourneyRightMenu_ } from "./JourneyRightMenu";
 import { messages } from "./messages";
 import { useAreas } from "../Sessions/steps/AreaStep";
-import { useMyQuery } from "../Authorization/AuthProvider";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { useIsFetching, useMutation, useQueryClient } from "react-query";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { pick } from "ramda";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -53,45 +54,17 @@ const sx = {
   height: "100%",
 };
 
-const useNoteQuery = () => {
-  return useMyQuery({
-    queryKey: ["note"],
+const useNoteMutation = () =>
+  useMyMutation({
+    // debug: "d",
+    debug: true,
     fetchDef: {
-      url: "/api/latest/note",
+      method: "POST",
+      url: `/api/latest/user-info/notes`,
+      from: pick(["notes"]),
     },
+    invalidate: { queryKey: ["user-info"] },
   });
-};
-const useNoteMutation = () => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ notes, previousNotes }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user-info/notes`,
-        data: (() => {
-          console.log("[useNoteMutation]", { notes });
-          return {
-            notes,
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["user-info"] });
-    },
-  });
-};
-
-const NotesLoader = () => {
-  return (
-    <Box sx={{ position: "relative", height: 0, overflow: "visible" }}>
-      <Skeleton variant="text" sx={{ mb: 1 }} />
-      <Skeleton variant="text" sx={{ mb: 1 }} />
-      <Skeleton variant="text" sx={{ mb: 1 }} />
-    </Box>
-  );
-};
 
 const DashboardCardNotes = () => {
   // const [note, setNote] = useLocalStorage("dashboard_note", "");

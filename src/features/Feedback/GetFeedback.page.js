@@ -7,7 +7,6 @@ import {
   IconButton,
 } from "@mui/material";
 import { useContext } from "react";
-import { useMutation, useQueryClient } from "react-query";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -17,10 +16,11 @@ import { H1, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { parametrizedRoutes } from "../../routes/constants";
 import { gray500, primary500 } from "../../theme";
-import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
+import { useAuth } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { EmptyTemplate } from "./EmptyTemplate";
+import { useDeleteFeedbackFormMutation, useFeedbackFormsQuery } from "./api";
 import { messages } from "./messages";
 
 const EmptyFeedbacks = () => {
@@ -39,26 +39,9 @@ const EmptyFeedbacks = () => {
   );
 };
 
-const useDeleteFeedbackMutation = (params = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ feedback }) =>
-      authFetch({
-        method: "DELETE",
-        url: `/api/latest/feedback/${feedback.id}`,
-      }),
-    ...params,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ exact: false, queryKey: ["feedback"] });
-    },
-  });
-};
-
 const FeedbackListCard = ({ feedback }) => {
   const { id, title, createdAt, recipients } = feedback;
-  const deleteFeedbackMutation = useDeleteFeedbackMutation();
+  const deleteFeedbackMutation = useDeleteFeedbackFormMutation();
 
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
@@ -112,30 +95,7 @@ const FeedbackListCard = ({ feedback }) => {
 
 function GetFeedbackPageInner() {
   const msg = useMsg();
-  const { authFetch, user } = useAuth();
-  const username = user.data.username;
-  const feedbacksQuery = useMyQuery({
-    /*
-    [
-      {
-        "id": 0,
-        "title": "string",
-        "createdAt": "2023-11-11T20:18:53.134Z",
-        "recipients": [
-          {
-            "id": 0,
-            "username": "string",
-            "submitted": true
-          }
-        ]
-      }
-    ]
-    */
-    queryKey: ["feedback", { username }],
-    fetchDef: {
-      url: `/api/latest/feedback/user/${username}`,
-    },
-  });
+  const feedbacksQuery = useFeedbackFormsQuery();
 
   return (
     <Layout>

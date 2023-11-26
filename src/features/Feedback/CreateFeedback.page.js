@@ -1,19 +1,19 @@
 import { useCallback, useContext, useState } from "react";
+import { useQueryClient } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H1 } from "../../components/Typography";
 import { routes } from "../../routes";
-import { GetFeedbackForm } from "./GetFeedbackForm";
-import { ShareFeedbackModal } from "./ShareFeedbackModal";
-import { messages } from "./messages";
-import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { useMutation, useQueryClient } from "react-query";
+import { useAuth } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
-import { useNavigate } from "react-router-dom";
-import { useFeedbackOptionsQuery } from "./api";
+import { QueryRenderer } from "../QM/QueryRenderer";
+import { CreateFeedbackForm } from "./CreateFeedbackForm";
+import { ShareFeedbackModal } from "./ShareFeedbackModal";
+import { useFeedbackOptionsQuery, usePostFeedbackFormMutation } from "./api";
+import { messages } from "./messages";
 
 const from = ({ shareFormValues, formBuilderValues, username, language }) => {
   const validTo = shareFormValues.validTo || "2023-12-20T23:10:46.567Z"; // TODO
@@ -50,14 +50,7 @@ function CreateFeedbackPageInner() {
   const navigate = useNavigate();
 
   const feedbackOptionsQuery = useFeedbackOptionsQuery();
-  const postFeedbackFormMutation = useMutation({
-    mutationFn: async (data) =>
-      console.log("mutating", { data }) ||
-      authFetch({
-        method: "POST",
-        url: "/api/latest/feedback",
-        data,
-      }),
+  const postFeedbackFormMutation = usePostFeedbackFormMutation({
     onSuccess: () => {
       queryClient.invalidateQueries({ exact: false, queryKey: ["feedback"] });
       setFormBuilderValues();
@@ -96,7 +89,10 @@ function CreateFeedbackPageInner() {
         {...feedbackOptionsQuery}
         success={({ data }) => {
           return (
-            <GetFeedbackForm feedbackOptions={data} onShareForm={handleNext} />
+            <CreateFeedbackForm
+              feedbackOptions={data}
+              onShareForm={handleNext}
+            />
           );
         }}
       />

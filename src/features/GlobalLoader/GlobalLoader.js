@@ -18,7 +18,10 @@ export const GlobalLoader = ({ children }) => {
     [globalLoaderWithChildrenDisplayed]
   );
 
+  if (!auth) debugger;
+
   const renderInner = () => {
+    if (!auth) debugger;
     if (auth.isLoggedIn && !auth.user.data)
       return (
         <Backdrop

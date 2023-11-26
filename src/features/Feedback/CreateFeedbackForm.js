@@ -18,7 +18,7 @@ const collected = {
   total: 10,
 };
 
-export const GetFeedbackForm = ({ feedbackOptions, onShareForm }) => {
+export const CreateFeedbackForm = ({ feedbackOptions, onShareForm }) => {
   const msg = useMsg({ dict: messages });
   const form = useForm({
     shouldFocusError: true, // TODO: ref not working
@@ -50,7 +50,7 @@ export const GetFeedbackForm = ({ feedbackOptions, onShareForm }) => {
     )
   );
 
-  console.log("[GetFeedbackPage.rndr]", {});
+  // console.log("[CreateFeedbackForm.rndr]", {});
 
   return (
     <FormProvider {...form}>
