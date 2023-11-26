@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Header } from "../../components/Header";
@@ -20,6 +20,7 @@ import {
 } from "./api";
 import { messages } from "./messages";
 import { FEEDBACK_FIELDS } from "./constants";
+import { getCollectedMaybe } from "./GetFeedback.page";
 
 const from = ({ shareFormValues, formBuilderValues, username, language }) => {
   const validTo = shareFormValues.validTo;
@@ -69,6 +70,10 @@ function CreateFeedbackPageInner({ data }) {
           : [FIELD_DEFAULT_VALUES],
       }
     : undefined;
+  const collected = useMemo(
+    () => getCollectedMaybe(data?.recipients),
+    [data?.recipients]
+  );
 
   const msg = useMsg();
   const { language } = useContext(I18nContext);
@@ -121,6 +126,7 @@ function CreateFeedbackPageInner({ data }) {
               initialValues={initialValues}
               feedbackOptions={data}
               onShareForm={handleNext}
+              collected={collected}
             />
           );
         }}

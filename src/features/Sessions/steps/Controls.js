@@ -63,13 +63,13 @@ const ControlsInner = ({
   );
 };
 
-const messages = defineMessages({
+export const controlsMessages = defineMessages({
   "controls.back": { id: "controls.back", defaultMessage: "Back" },
   "controls.next": { id: "controls.next", defaultMessage: "Next" },
 });
 
 export const Controls = (props) => (
-  <MsgProvider messages={messages}>
+  <MsgProvider messages={controlsMessages}>
     <ControlsInner {...props} />
   </MsgProvider>
 );

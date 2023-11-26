@@ -2,7 +2,7 @@ import { Alert, Box, Button, Card, CardContent } from "@mui/material";
 import { prop } from "ramda";
 import { useCallback, useContext, useState } from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RHFTextField, ScoreField, getLabel } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
 import { Header } from "../../components/Header";
@@ -22,6 +22,7 @@ import {
 } from "./api";
 import { messages } from "./messages";
 import { useFeedbackQuestionOptionsDict } from "./useFeedbackQuestionOptionsDict";
+import { routes } from "../../routes";
 
 const SUBFIELDS = {
   question: "question",
@@ -261,7 +262,7 @@ const FinishedModal = ({ visible, onConfirm, onClose, data, msg }) => (
   />
 );
 
-const RequestAccessModal = ({ visible, onClose, params }) => {
+const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
   const msg = useMsg();
   const form = useForm({
     defaultValues: {
@@ -272,7 +273,12 @@ const RequestAccessModal = ({ visible, onClose, params }) => {
       hrEmail: "",
     },
   });
-  const mutation = useRequestAccessMutation({ params, onSuccess: onClose });
+  const mutation = useRequestAccessMutation({
+    params,
+    onSuccess: () => {
+      onSuccess();
+    },
+  });
 
   return (
     <ConfirmModal
@@ -392,12 +398,12 @@ const MOCK = {
 const ExternalFeedbackPageInner = () => {
   const msg = useMsg();
   const { formId, username, token } = useParams();
+  const navigate = useNavigate();
 
   const [finishedModalVisible, setFinishedModalVisible] = useState();
   const [requestAccessModalVisible, setRequestAccessModalVisible] = useState();
 
   const enabled = !!formId && !!username && !!token;
-  // const enabled = false;
   const externalFeedbackQuery = useExternalFeedbackQuery({
     params: { formId, username, token },
     enabled,
@@ -413,6 +419,12 @@ const ExternalFeedbackPageInner = () => {
     (values) => mutation.mutateAsync(values),
     [mutation]
   );
+
+  const handleFinished = useCallback(() => {
+    setFinishedModalVisible();
+    setRequestAccessModalVisible();
+    navigate(routes.signIn); // TODO?
+  }, [navigate]);
 
   console.log("[ExternalFeedbackPageInner.rndr]", {
     params: { formId, username, token },
@@ -438,51 +450,22 @@ const ExternalFeedbackPageInner = () => {
             return (
               <>
                 <ExternalFeedbackForm data={data} onSubmit={onSubmit} />
-                {
-                  <FinishedModal
-                    visible={finishedModalVisible}
-                    onConfirm={() => {
-                      setFinishedModalVisible();
-                      setRequestAccessModalVisible(true);
-                    }}
-                    msg={msg}
-                    onClose={() => setFinishedModalVisible()}
-                    data={data}
-                  />
-                }
+                <FinishedModal
+                  visible={finishedModalVisible}
+                  onConfirm={() => {
+                    setFinishedModalVisible();
+                    setRequestAccessModalVisible(true);
+                  }}
+                  msg={msg}
+                  onClose={() => setFinishedModalVisible()}
+                  data={data}
+                />
                 <RequestAccessModal
                   data={data}
                   params={{ formId, username, token }}
                   visible={requestAccessModalVisible}
                   onClose={() => setRequestAccessModalVisible()}
-                />
-              </>
-            );
-          }}
-          errored={({ error }) => {
-            return (
-              <>
-                <Alert severity="error" sx={{ my: 3 }}>
-                  Fetch error, displaying mock. {error?.message}
-                </Alert>
-                <ExternalFeedbackForm data={MOCK} onSubmit={onSubmit} />;
-                {
-                  <FinishedModal
-                    visible={finishedModalVisible}
-                    onConfirm={() => {
-                      setFinishedModalVisible();
-                      setRequestAccessModalVisible(true);
-                    }}
-                    msg={msg}
-                    onClose={() => setFinishedModalVisible()}
-                    data={MOCK}
-                  />
-                }
-                <RequestAccessModal
-                  data={MOCK}
-                  params={{ formId, username, token }}
-                  visible={requestAccessModalVisible}
-                  onClose={() => setRequestAccessModalVisible()}
+                  onSuccess={handleFinished}
                 />
               </>
             );

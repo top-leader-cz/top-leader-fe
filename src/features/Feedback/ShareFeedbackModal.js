@@ -13,6 +13,7 @@ import {
 import { useCallback } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { DatePickerField, RHFTextField } from "../../components/Forms";
+import { invalidDate, todayOrFuture } from "../../components/Forms/validations";
 import { Icon } from "../../components/Icon";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
@@ -220,7 +221,9 @@ export const ShareFeedbackModal = ({
                 </P>
                 <DatePickerField
                   name={SHARE_FIELDS.validTo}
-                  rules={{ required: "Required" }}
+                  rules={{ validate: { invalidDate, todayOrFuture } }}
+                  disablePast
+                  clearable
                 />
               </Box>
               <Divider flexItem />

@@ -40,6 +40,15 @@ const EmptyFeedbacks = () => {
   );
 };
 
+export const getCollectedMaybe = (recipients) =>
+  !recipients
+    ? undefined
+    : {
+        total: recipients.length,
+        count: recipients.filter(({ id, username, submitted }) => submitted)
+          .length,
+      };
+
 const FeedbackListCard = ({ feedback }) => {
   const { id, title, createdAt, recipients } = feedback;
   const navigate = useNavigate();
@@ -49,6 +58,8 @@ const FeedbackListCard = ({ feedback }) => {
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(createdAt);
   const formattedDate = i18n.formatLocalMaybe(parsed, "P");
+
+  const { count: responsesCount } = getCollectedMaybe(recipients);
 
   const txtSx = { fontSize: 16, fontWeight: 500 };
 
@@ -63,7 +74,9 @@ const FeedbackListCard = ({ feedback }) => {
           <P sx={{ ...txtSx, color: gray500 }}>
             {msg("feedback.list.card.created-at", { createdAt: formattedDate })}
           </P>
-          {/* <P sx={{...txtSx, color: "black"}}>{msg("feedback.list.card.responses-count", { responsesCount })}</P> */}
+          <P sx={{ ...txtSx, color: "black" }}>
+            {msg("feedback.list.card.responses-count", { responsesCount })}
+          </P>
           <P sx={{ ...txtSx, color: "black" }}>
             {msg("feedback.list.card.shared-count", {
               sharedCount: recipients.length,

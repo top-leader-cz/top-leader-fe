@@ -12,16 +12,11 @@ import { messages } from "./messages";
 // const onSubmit = (data, e) => console.log("[onSubmit]", data, e);
 const onError = (errors, e) => console.log("[onError]", { errors, e });
 
-const collected = {
-  // TODO
-  count: 1,
-  total: 10,
-};
-
 export const CreateFeedbackForm = ({
   initialValues,
   feedbackOptions,
   onShareForm,
+  collected,
 }) => {
   const msg = useMsg({ dict: messages });
   const form = useForm({
@@ -50,7 +45,7 @@ export const CreateFeedbackForm = ({
           }}
         />
       ),
-      [count, form, msg, onShareForm, requiredCount]
+      [collected, count, form, msg, onShareForm, requiredCount]
     )
   );
 

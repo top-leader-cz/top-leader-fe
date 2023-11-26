@@ -6,6 +6,7 @@ import { useRightMenu } from "../../components/Layout";
 import { H2, P } from "../../components/Typography";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
 import { FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
+import { getCollectedMaybe } from "./GetFeedback.page";
 
 // TODO: useFeedbackQuestionOptionsDict
 const QUESTION_TITLE_OPTIONS = [
@@ -117,20 +118,22 @@ const FieldResultsCard = ({ index, field, sx }) => {
   );
 };
 
-const collected = {
-  count: 1,
-  total: 10,
-};
-
 export const Results = ({ feedbackResults }) => {
+  const collected = useMemo(
+    () => getCollectedMaybe(feedbackResults?.recipients),
+    [feedbackResults]
+  );
+  console.log("[GetFeedbackPage]", { feedbackResults, collected });
+  // debugger;
+
   useRightMenu(
     useMemo(
       () => (
         <FeedbackRightMenu
           collected={collected}
           stats={[
-            { label: "Views", value: TODO },
-            { label: "Submitted", value: TODO },
+            // { label: "Views", value: TODO },
+            { label: "Submitted", value: collected?.count ?? 0 },
           ]}
           // buttonProps={{
           //   children: "Share form",
@@ -138,7 +141,7 @@ export const Results = ({ feedbackResults }) => {
           // }}
         />
       ),
-      []
+      [collected]
     )
   );
 

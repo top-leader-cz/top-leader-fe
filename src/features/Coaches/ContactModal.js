@@ -50,22 +50,15 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
     defaultValues: DEFAULT_VALUES,
   });
   const { reset } = methods;
-  const { show: showSnackbar } = useSnackbar();
   const sendMutation = useSendMessageMutation({
+    snackbar: {
+      success: { message: msg("coaches.contact.success") },
+      error: {},
+    },
     onSuccess: useCallback(() => {
-      showSnackbar({
-        type: "success",
-        message: msg("coaches.contact.success"),
-      });
       reset(DEFAULT_VALUES);
       onClose();
-    }, [msg, onClose, reset, showSnackbar]),
-    onError: (e) => {
-      showSnackbar({
-        type: "error",
-        message: e?.message || "Oops",
-      });
-    },
+    }, [onClose, reset]),
   });
   const onSubmit = (data, e) => {
     const { subject, message } = data;

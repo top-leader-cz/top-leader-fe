@@ -9,22 +9,26 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { Results } from "./Results";
 import { useFeedbackResultsQuery } from "./api";
 import { messages } from "./messages";
+import { controlsMessages } from "../Sessions/steps/Controls";
 
 function FeedbackResultsPageInner() {
   const { id } = useParams();
   const msg = useMsg();
   const query = useFeedbackResultsQuery({ params: { id } });
+  const controlsMsg = useMsg({ dict: controlsMessages });
 
   return (
     <Layout>
       <Header
-        text={msg("feedback.create.heading")}
-        back={{ href: routes.dashboard }}
+        // back={{ href: routes.dashboard }}
+        // text={msg("feedback.create.heading")} // TODO: change textation and use this
+        text={controlsMsg("controls.back")}
+        back={{ href: routes.getFeedback }}
       />
       <H1 mb={4}>{msg("feedback.heading")}</H1>
       <QueryRenderer
-        data={{}}
-        // {...query}
+        // data={{}}
+        {...query}
         success={({ data }) => {
           return <Results feedbackResults={data} />;
         }}

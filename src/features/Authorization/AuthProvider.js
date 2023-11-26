@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { always, identity, pipe, tap, tryCatch } from "ramda";
+import { useSnackbar } from "../Modal/ConfirmModal";
 
 export const AuthContext = createContext(null);
 
@@ -130,7 +131,8 @@ export function AuthProvider({ children }) {
       query,
       method = "GET",
       type = FETCH_TYPE.JSON,
-      data,
+      payload,
+      data = payload, // TODO: data is too ambiguous, rename to payload
       isPublicApi = url?.includes("/api/public/"),
     }) =>
       console.log("[authFetch] ", method, url, { data, query }) ||
@@ -290,21 +292,21 @@ const withDebug = ({
   authFetch,
 }) => {
   return async (...args) => {
-    const [rawData, ...restArgs] = args;
+    const [rawPayload, ...restArgs] = args;
     if (debug) {
       console.log(`[withDebug] start ${fetchDef.method} ${fetchDef.url}`, {
-        rawData,
+        rawPayload,
       });
       if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
     }
     try {
-      const data = logAndThrowTryCatch(
+      const payload = logAndThrowTryCatch(
         from,
         "TODO: Error during 'from' execution",
-        rawData
+        rawPayload
       );
-      const rawResponseData = await (mutationFnProp?.(data, ...restArgs) ??
-        authFetch({ data, ...fetchDef }));
+      const rawResponseData = await (mutationFnProp?.(payload, ...restArgs) ??
+        authFetch({ payload, ...fetchDef }));
       const resData = logAndThrowTryCatch(
         to,
         "TODO: Error during 'to' execution",
@@ -313,10 +315,10 @@ const withDebug = ({
 
       if (debug) {
         console.log(`[withDebug] success ${fetchDef.method} ${fetchDef.url}`, {
-          data,
-          rawResponseData,
-          ...(to === identity ? {} : { to, rawResponseData }),
-          ...(from === identity ? {} : { from, rawData }),
+          payload,
+          ...(from !== identity ? { from, rawPayload } : {}),
+          resData,
+          ...(to !== identity ? { to, rawResponseData } : {}),
         });
         if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
       }
@@ -324,10 +326,10 @@ const withDebug = ({
     } catch (e) {
       if (debug) {
         console.log(`[withDebug] error ${fetchDef.method} ${fetchDef.url}`, {
-          rawData,
+          rawPayload,
           e,
           ...(to === identity ? {} : { to }),
-          ...(from === identity ? {} : { from, rawData }),
+          ...(from === identity ? {} : { from, rawPayload }),
         });
         if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
       }
@@ -336,15 +338,28 @@ const withDebug = ({
   };
 };
 
+const mapSnackBarProps = (snackbar = {}, args = [], defaultMessage) => {
+  // TODO: tsKey
+  const { message, getMessage, ...rest } = snackbar;
+
+  return {
+    message: message || getMessage?.(...args) || defaultMessage,
+    ...rest,
+  };
+};
+
 export const useMyMutation = ({
   fetchDef,
   mutationFn: mutationFnProp,
   invalidate,
   onSuccess: onSuccessProp,
+  onError: onErrorProp,
   debug, // true || "debugger" === "break" === "d" === "b"
+  snackbar,
   ...rest
 }) => {
   const { authFetch } = useAuth();
+  const { show } = useSnackbar();
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: withDebug({
@@ -354,21 +369,53 @@ export const useMyMutation = ({
       authFetch,
     }),
     onSuccess: (...args) => {
-      if (debug)
-        console.log(
-          `[useMyMutation.onSuccess] ${
-            invalidate ? "invalidating: " + JSON.stringify(invalidate) : ""
-          }`,
-          ...args
-        );
-      if (invalidate) {
-        if (Array.isArray(invalidate))
-          invalidate.forEach((queryKey) =>
-            queryClient.invalidateQueries(queryKey)
+      try {
+        if (debug)
+          console.log(
+            `[useMyMutation.onSuccess] ${
+              invalidate ? "invalidating: " + JSON.stringify(invalidate) : ""
+            }`,
+            args,
+            rest,
+            onSuccessProp,
+            onErrorProp
           );
-        else queryClient.invalidateQueries(invalidate);
+        if (invalidate) {
+          if (Array.isArray(invalidate))
+            invalidate.forEach((queryKey) =>
+              queryClient.invalidateQueries(queryKey)
+            );
+          else queryClient.invalidateQueries(invalidate);
+        }
+
+        if (snackbar?.success) {
+          const props = mapSnackBarProps({ ...snackbar.success }, args, "👍");
+          show({
+            type: "success",
+            ...props,
+          });
+        }
+        onSuccessProp?.(...args);
+      } catch (e) {
+        console.log("UMM", { e });
+        debugger;
       }
-      onSuccessProp?.(...args);
+    },
+    onError: (...args) => {
+      if (debug) console.log("[useMyMutation.onError]", ...args);
+
+      if (snackbar?.error) {
+        const props = mapSnackBarProps(
+          { ...snackbar.error },
+          args,
+          args[0]?.message
+        );
+        show({
+          type: "error",
+          ...props,
+        });
+      }
+      onErrorProp?.(...args);
     },
     ...rest,
   });

@@ -56,14 +56,15 @@ const sx = {
 
 const useNoteMutation = () =>
   useMyMutation({
-    // debug: "d",
     debug: true,
+    // debug: "d",
     fetchDef: {
       method: "POST",
       url: `/api/latest/user-info/notes`,
       from: pick(["notes"]),
     },
     invalidate: { queryKey: ["user-info"] },
+    snackbar: { success: false, error: true },
   });
 
 const DashboardCardNotes = () => {

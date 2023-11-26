@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "react-query";
 import { useAuth } from "../Authorization";
-import { useMyQuery } from "../Authorization/AuthProvider";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { pick } from "ramda";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
   const { authFetch } = useAuth();
@@ -78,18 +79,13 @@ export const useConversationMessagesQuery = ({ addressee, ...rest } = {}) => {
   return messagesQuery;
 };
 
-export const useSendMessageMutation = ({ onSuccess, ...rest } = {}) => {
-  const { authFetch } = useAuth();
-  const sendMutation = useMutation({
-    mutationFn: async ({ userTo, messageData }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/messages`,
-        data: { userTo, messageData },
-      }),
-    onSuccess: (data) => {
-      console.log("[useSendMessageMutation.onSuccess]", { data });
-      onSuccess?.(data);
+export const useSendMessageMutation = ({ ...rest } = {}) => {
+  const sendMutation = useMyMutation({
+    debug: true,
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/messages`,
+      from: pick(["userTo", "messageData"]),
     },
     ...rest,
   });

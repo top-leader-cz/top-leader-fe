@@ -20,19 +20,23 @@ export const FeedbackRightMenu = ({ buttonProps, stats, collected }) => {
         <Msg id="feedback.aside.perex" />
       </P>
       <Divider sx={{ my: 3 }} />
-      <ProgressStats items={stats} />
-      <Divider sx={{ my: 3 }} />
-      <P gutterBottom emphasized>
-        <Msg id="feedback.aside.collected" />
-      </P>
-      <LinearProgressStyled
-        variant="determinate"
-        value={(100 * collected.count) / collected.total}
-        sx={{ my: 2 }}
-      />
-      <P>
-        {collected.count}/{collected.total}
-      </P>
+      {stats ? <ProgressStats items={stats} /> : null}
+      {collected ? (
+        <>
+          <Divider sx={{ my: 3 }} />
+          <P gutterBottom emphasized>
+            <Msg id="feedback.aside.collected" />
+          </P>
+          <LinearProgressStyled
+            variant="determinate"
+            value={(100 * collected.count) / collected.total}
+            sx={{ my: 2 }}
+          />
+          <P>
+            {collected.count}/{collected.total}
+          </P>
+        </>
+      ) : null}
     </ScrollableRightMenu>
   );
 };
