@@ -354,8 +354,8 @@ export const useMyMutation = ({
   invalidate,
   onSuccess: onSuccessProp,
   onError: onErrorProp,
-  debug, // true || "debugger" === "break" === "d" === "b"
-  snackbar,
+  debug, // true || "debugger" == "break" == "d" == "b"
+  snackbar = { success: false, error: true },
   ...rest
 }) => {
   const { authFetch } = useAuth();
@@ -371,15 +371,14 @@ export const useMyMutation = ({
     onSuccess: (...args) => {
       try {
         if (debug)
-          console.log(
-            `[useMyMutation.onSuccess] ${
-              invalidate ? "invalidating: " + JSON.stringify(invalidate) : ""
-            }`,
+          console.log(`[useMyMutation.onSuccess]`, {
             args,
+            fetchDef,
+            invalidate,
+            snackbar: snackbar.success,
+            mutationFnProp,
             rest,
-            onSuccessProp,
-            onErrorProp
-          );
+          });
         if (invalidate) {
           if (Array.isArray(invalidate))
             invalidate.forEach((queryKey) =>
@@ -388,7 +387,7 @@ export const useMyMutation = ({
           else queryClient.invalidateQueries(invalidate);
         }
 
-        if (snackbar?.success) {
+        if (snackbar.success) {
           const props = mapSnackBarProps({ ...snackbar.success }, args, "👍");
           show({
             type: "success",
@@ -402,9 +401,16 @@ export const useMyMutation = ({
       }
     },
     onError: (...args) => {
-      if (debug) console.log("[useMyMutation.onError]", ...args);
+      if (debug)
+        console.log(`[useMyMutation.onError]`, {
+          args,
+          fetchDef,
+          snackbar: snackbar.error,
+          mutationFnProp,
+          rest,
+        });
 
-      if (snackbar?.error) {
+      if (snackbar.error) {
         const props = mapSnackBarProps(
           { ...snackbar.error },
           args,

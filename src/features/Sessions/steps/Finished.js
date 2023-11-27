@@ -38,7 +38,7 @@ export const useSchedulePrivateSessionMutation = (params = {}) => {
   return useMutation({
     mutationFn: async ({ date, time }) =>
       authFetch({
-        url: `/api/latest/coaches/schedule`,
+        url: `/api/latest/user-info/private-session`,
         method: "POST",
         data: (() => {
           const dateTime = anchorTime(date, time);
