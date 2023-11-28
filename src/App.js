@@ -25,6 +25,8 @@ import {
 
 const queryClient = new QueryClient();
 
+if (process.env.NODE_ENV !== "production") window.queryClient = queryClient;
+
 const RESET = () => {
   sessionStorage.clear();
   localStorage.clear();

@@ -30,24 +30,27 @@ import {
 } from "../../Coaches/api";
 import { CoachCard } from "../../Coaches/CoachCard";
 import { ScheduledSessionsCard } from "../../Coaches/ScheduledSessions";
+import { useMyMutation } from "../../Authorization/AuthProvider";
+import { applySpec } from "ramda";
 
 export const useSchedulePrivateSessionMutation = (params = {}) => {
-  const { authFetch } = useAuth();
   const { i18n } = useContext(I18nContext);
 
-  return useMutation({
-    mutationFn: async ({ date, time }) =>
-      authFetch({
-        url: `/api/latest/user-info/private-session`,
-        method: "POST",
-        data: (() => {
+  return useMyMutation({
+    fetchDef: {
+      url: `/api/latest/user-info/private-session`,
+      method: "POST",
+      from: applySpec({
+        time: ({ date, time }) => {
           const dateTime = anchorTime(date, time);
           // debugger;
           return {
             time: i18n.formatLocal(dateTime, API_DATETIME_LOCAL_FORMAT),
           };
-        })(),
+        },
       }),
+    },
+    snackbar: { success: true, error: true },
     ...params,
   });
 };

@@ -77,7 +77,9 @@ export const ActionStepsReadOnly = ({
                 textDecoration: checked ? "line-through" : "none",
               }}
             >
-              <P>{label}</P>
+              <P sx={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}>
+                {label}
+              </P>
             </li>
           );
         })}

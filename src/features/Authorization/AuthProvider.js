@@ -1,4 +1,5 @@
 import * as qs from "qs";
+import { identity, tryCatch } from "ramda";
 import {
   createContext,
   useCallback,
@@ -9,7 +10,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
-import { always, identity, pipe, tap, tryCatch } from "ramda";
 import { useSnackbar } from "../Modal/ConfirmModal";
 
 export const AuthContext = createContext(null);
@@ -46,7 +46,7 @@ const _login = ({ authFetch, username, password }) =>
       const formData = new FormData();
       formData.append("username", username);
       formData.append("password", password);
-      console.log("_login", { formData, username, password });
+      // console.log("_login", { formData, username, password });
       return formData;
     })(),
   });
@@ -74,8 +74,6 @@ export const Authority = {
   ADMIN: "ADMIN",
   HR: "HR",
 };
-
-console.log({ qs });
 
 export const qstr = (url, query) => {
   if (!query) return url;
@@ -151,7 +149,7 @@ export function AuthProvider({ children }) {
 
           if (parsingError) {
             // prettier-ignore
-            console.log("TODO: check and remove ", method, ": ", url, { response, parsingError, });
+            console.log("Response not parsed. TODO: remove this.", method + url, { response, parsingError, });
             debugger;
             return { response };
           }
@@ -171,8 +169,6 @@ export function AuthProvider({ children }) {
               method,
             });
             signout();
-          } else {
-            // console.log("[authFetch] fetch error", { e, url, method });
           }
 
           throw e;
@@ -281,20 +277,31 @@ export const useMyQuery = ({
 
 const logAndThrowTryCatch = (fn, msg, rawData) =>
   tryCatch(fn, (e) => {
-    console.log(msg, { e, rawData });
+    console.error(msg, { e, rawData });
     throw e;
   })(rawData);
 
 const withDebug = ({
   debug,
-  fetchDef: { from = identity, to = identity, ...fetchDef } = {}, // TODO: to authFetch?
+  fetchDef: {
+    from = identity,
+    to = identity,
+    url: urlMaybe,
+    getUrl: getUrlMaybe,
+    ...fetchDef
+  } = {}, // TODO: to authFetch?
   mutationFn: mutationFnProp,
   authFetch,
 }) => {
   return async (...args) => {
     const [rawPayload, ...restArgs] = args;
+    const url = logAndThrowTryCatch(
+      (payload) => getUrlMaybe?.(payload) || urlMaybe,
+      "Error durign getUrlMaybe execution: " + getUrlMaybe?.toString(),
+      args[0]
+    );
     if (debug) {
-      console.log(`[withDebug] start ${fetchDef.method} ${fetchDef.url}`, {
+      console.log(`[withDebug] start ${fetchDef.method} ${url}`, {
         rawPayload,
       });
       if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
@@ -302,19 +309,25 @@ const withDebug = ({
     try {
       const payload = logAndThrowTryCatch(
         from,
-        "TODO: Error during 'from' execution",
+        `Error during 'from' execution: ${JSON.stringify({
+          fetchDef: { url, ...fetchDef },
+          rawPayload,
+        })}`,
         rawPayload
       );
       const rawResponseData = await (mutationFnProp?.(payload, ...restArgs) ??
-        authFetch({ payload, ...fetchDef }));
+        authFetch({ payload, url, ...fetchDef }));
       const resData = logAndThrowTryCatch(
         to,
-        "TODO: Error during 'to' execution",
+        `Error during 'to' execution: ${JSON.stringify({
+          fetchDef: { url, ...fetchDef },
+          rawResponseData,
+        })}`,
         rawResponseData
       );
 
       if (debug) {
-        console.log(`[withDebug] success ${fetchDef.method} ${fetchDef.url}`, {
+        console.log(`[withDebug] success ${fetchDef.method} ${url}`, {
           payload,
           ...(from !== identity ? { from, rawPayload } : {}),
           resData,
@@ -325,7 +338,7 @@ const withDebug = ({
       return resData;
     } catch (e) {
       if (debug) {
-        console.log(`[withDebug] error ${fetchDef.method} ${fetchDef.url}`, {
+        console.log(`[withDebug] error ${fetchDef.method} ${url}`, {
           rawPayload,
           e,
           ...(to === identity ? {} : { to }),

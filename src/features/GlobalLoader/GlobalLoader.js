@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
-import { useAuth } from "../Authorization";
 import { Backdrop, CircularProgress } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { gray200 } from "../../theme";
+import { useAuth } from "../Authorization";
 
 export const GlobalLoaderCtx = React.createContext({});
 
@@ -22,13 +23,13 @@ export const GlobalLoader = ({ children }) => {
 
   const renderInner = () => {
     if (!auth) debugger;
-    if (auth.isLoggedIn && !auth.user.data)
+    if (auth?.isLoggedIn && !auth?.user.data)
       return (
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open
         >
-          <CircularProgress color="inherit" />
+          <CircularProgress sx={{ color: gray200, opacity: 0.5 }} />
         </Backdrop>
       );
     else if (globalLoaderWithChildrenDisplayed)
@@ -37,7 +38,7 @@ export const GlobalLoader = ({ children }) => {
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open
         >
-          <CircularProgress color="inherit" />
+          <CircularProgress sx={{ color: gray200, opacity: 0.5 }} />
         </Backdrop>
       );
     else return children;

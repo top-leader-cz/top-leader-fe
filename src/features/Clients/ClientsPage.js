@@ -48,7 +48,7 @@ const ScheduledSession = ({ data, canCancel, type }) => {
   const msg = useMsg({ dict: clientsMessages });
 
   const _declineSessionMutation = useDeclineSessionMutation({ type });
-  const cancelMutation = canCancel ? _declineSessionMutation : undefined;
+  const cancelMutationMaybe = canCancel ? _declineSessionMutation : undefined;
   const modal = useMemo(() => {
     return {
       iconName: "RocketLaunch",
@@ -58,7 +58,7 @@ const ScheduledSession = ({ data, canCancel, type }) => {
         username,
       }),
       desc: "",
-      error: cancelMutation.error,
+      // error: cancelMutationMaybe.error,
       getButtons: ({ onClose }) => [
         {
           variant: "outlined",
@@ -72,17 +72,17 @@ const ScheduledSession = ({ data, canCancel, type }) => {
           color: "error",
           type: "button",
           children: "Decline",
-          disabled: cancelMutation.isLoading,
-          loading: cancelMutation.isLoading,
-          onClick: () => cancelMutation.mutate(data),
+          disabled: cancelMutationMaybe.isLoading,
+          loading: cancelMutationMaybe.isLoading,
+          onClick: () => cancelMutationMaybe.mutate(data),
         },
       ],
     };
-  }, [cancelMutation, data, i18n, msg, name, parsed, username]);
+  }, [cancelMutationMaybe, data, i18n, msg, name, parsed, username]);
   const { show } = ConfirmModal.useModal(modal);
 
   const renderCancelButton = () => {
-    if (!cancelMutation) return null;
+    if (!cancelMutationMaybe) return null;
     return (
       <LoadingButton
         // size="small"
@@ -90,15 +90,15 @@ const ScheduledSession = ({ data, canCancel, type }) => {
         variant="outlined"
         color="error"
         onClick={() => show()}
-        loading={cancelMutation.isLoading}
+        loading={cancelMutationMaybe.isLoading}
       >
         {msg("clients.upcoming.decline-session")}
       </LoadingButton>
     );
   };
-  const cancelButton = cancelMutation?.error ? (
+  const cancelButton = cancelMutationMaybe?.error ? (
     <Tooltip
-      title={cancelMutation.error?.message}
+      title={cancelMutationMaybe.error?.message}
       placement="top"
       // sx={{ color: "red" }}
     >

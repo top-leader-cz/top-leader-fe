@@ -210,7 +210,7 @@ const parseAndFormat = ({ utcStr, i18n, defaultStr = "" }) => {
     // const formattedDate = new Date(utcStr).toLocaleDateString();
     const parsed = i18n.parseUTCLocal(utcStr);
     const formattedDate = i18n.formatLocal(parsed, "Pp");
-    console.log("[parseAndFormat]", { parsed, formattedDate });
+    // console.log("[parseAndFormat]", { parsed, formattedDate });
     return formattedDate;
   } catch (e) {
     console.error("[parseAndFormat]", { e, utcStr, i18n, defaultStr });
@@ -222,7 +222,7 @@ export const DateCell = ({ utcStr, defaultStr = utcStr || "", ...props }) => {
   const { i18n } = useContext(I18nContext);
   const formattedDate = parseAndFormat({ utcStr, i18n, defaultStr });
   // const formattedDate = utcStr;
-  console.log("DateCellInner", { utcStr, formattedDate, defaultStr });
+  // console.log("DateCellInner", { utcStr, formattedDate, defaultStr });
 
   return (
     <StyledTableCell {...props} title={utcStr}>

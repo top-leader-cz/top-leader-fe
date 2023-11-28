@@ -6,12 +6,13 @@ import {
   CardContent,
   Chip,
   CircularProgress,
-  Skeleton,
   TextField,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { pick } from "ramda";
+import React, { useMemo, useState } from "react";
+import { useIsFetching } from "react-query";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
@@ -19,15 +20,12 @@ import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
+import { useAreas } from "../Sessions/steps/AreaStep";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
-import { JourneyRightMenu, JourneyRightMenu_ } from "./JourneyRightMenu";
+import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
-import { useAreas } from "../Sessions/steps/AreaStep";
-import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
-import { useIsFetching, useMutation, useQueryClient } from "react-query";
-import { QueryRenderer } from "../QM/QueryRenderer";
-import { pick } from "ramda";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -71,7 +69,7 @@ const DashboardCardNotes = () => {
   // const [note, setNote] = useLocalStorage("dashboard_note", "");
   const msg = useMsg();
   const { user } = useAuth();
-  const [note, setNote] = useState(user.data.notes);
+  const [note, setNote] = useState(user.data.notes || "");
   const noteMutation = useNoteMutation();
   const isFetchingUser = useIsFetching({ queryKey: ["user-info"] });
   // useEffect(() => { setNote?.(user.data.notes); }, [user.data.notes])
@@ -288,7 +286,7 @@ const DashboardCardSession = ({ selectedKeys = [] }) => {
 export function DashboardPage() {
   const { user, isCoach } = useAuth();
   const username = user.data.username;
-  console.log("[Dashboard.rndr]", { user });
+  // console.log("[Dashboard.rndr]", { user });
 
   return (
     <MsgProvider messages={messages}>

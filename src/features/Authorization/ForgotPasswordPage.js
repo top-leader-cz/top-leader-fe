@@ -1,29 +1,28 @@
 import { Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import * as React from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useNavigate, useParams } from "react-router-dom";
 import { RHFTextField } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
 import { Icon } from "../../components/Icon";
 import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { useAuth } from "./AuthProvider";
+import { routes } from "../../routes";
+import { parametrizedRoutes } from "../../routes/constants";
+import { I18nContext } from "../I18n/I18nProvider";
+import { useMyMutation } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
-import { routes } from "../../routes";
-import { useNavigate, useParams } from "react-router-dom";
-import { parametrizedRoutes } from "../../routes/constants";
 
 export const useForgotPasswordMutation = (params = {}) => {
-  const { authFetch } = useAuth();
-  const mutation = useMutation({
-    mutationFn: ({ username, locale = "cs" }) =>
-      authFetch({
-        method: "POST",
-        url: "/api/public/reset-password-link",
-        data: { username, locale },
-      }),
+  const mutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: "/api/public/reset-password-link",
+      // from: evolve({ username: trim, locale: identity }),
+    },
     ...params,
   });
 
@@ -35,24 +34,21 @@ export const ForgotPasswordPage = () => {
   const { email } = useParams();
   const navigate = useNavigate();
   const forgotPasswordMutation = useForgotPasswordMutation();
-
+  const { language } = useContext(I18nContext);
   const form = useForm({
     defaultValues: { username: email || "" },
   });
   const handleSubmit = async ({ username }, e) => {
-    console.log("[submit]", { username });
-    // if (password !== passwordConfirm) {
-    //   form.setError("passwordConfirm", { message: "Must match" });
-    //   return;
-    // }
-
-    await forgotPasswordMutation.mutateAsync({ username });
+    await forgotPasswordMutation.mutateAsync({
+      username,
+      locale: language.substring(0, 2),
+    });
     // .catch((e) => { form.setError("password", { message: "Error" }); });
     navigate(parametrizedRoutes.checkEmail({ email: username }));
   };
 
   const disabled = forgotPasswordMutation.isLoading;
-  const errorMsg = forgotPasswordMutation.error ? "Oops!" : "";
+  const errorMsg = forgotPasswordMutation.error?.message;
 
   console.log("[ForgotPasswordPage.rndr]", {
     disabled,

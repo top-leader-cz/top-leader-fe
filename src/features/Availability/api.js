@@ -1,4 +1,5 @@
 import { pipeP } from "composable-fetch";
+import * as tz from "date-fns-tz";
 import { formatInTimeZone } from "date-fns-tz/fp";
 import {
   addDays,
@@ -21,21 +22,13 @@ import {
   path,
   pipe,
   prop,
-  replace,
-  tap,
 } from "ramda";
 import { useContext, useMemo } from "react";
-import { useMutation, useQueries, useQueryClient } from "react-query";
+import { useQueries } from "react-query";
 import { useAuth } from "../Authorization";
-import { I18nContext } from "../I18n/I18nProvider";
-import {
-  fixEnd,
-  getFirstDayOfTheWeek,
-  parseUTCZoned,
-} from "../I18n/utils/date";
-import { INDEX_TO_DAY } from "../Settings/AvailabilitySettings";
-import * as tz from "date-fns-tz";
 import { useMyMutation } from "../Authorization/AuthProvider";
+import { I18nContext } from "../I18n/I18nProvider";
+import { fixEnd } from "../I18n/utils/date";
 
 const handleIntervalOverlapping = ({
   overlapping,

@@ -31,6 +31,7 @@ const ActionCard = ({ heading, children, button, sx = {} }) => {
       sx={{
         display: "flex",
         flexDirection: "column",
+        minHeight: "250px",
         ...sx,
       }}
     >
@@ -91,13 +92,14 @@ const Actions = ({ canFetch = true, ...props }) => {
     refetchOnReconnect: true,
   });
 
-  console.log("[Actions.rndr]", { sessionQuery });
+  // console.log("[Actions.rndr]", { sessionQuery });
 
   return (
     <Box {...props}>
       <QueryRenderer
         {...sessionQuery}
-        loaderName="Block"
+        loaderProps={{ sx: { my: 2 } }}
+        loaderName="Skeleton"
         success={({
           data: {
             actionSteps = [],
@@ -231,7 +233,8 @@ const UpcomingSessionsCard = ({}) => {
     >
       <QueryRenderer
         {...query}
-        loaderName="Block"
+        loaderProps={{ sx: { my: 2 } }}
+        loaderName="Skeleton"
         errored={() => emptySessions}
         success={({ data }) => {
           if (!data?.length) return emptySessions;
@@ -278,10 +281,7 @@ const SessionsActionCards = ({ ...rest }) => {
             perex={<Msg id="dashboard.rightmenu.actions.perex.empty" />}
           />
         ) : (
-          <Actions
-            canFetch={!!areaOfDevelopment?.length}
-            sx={{ py: 0.5, minHeight: "140px" }}
-          />
+          <Actions canFetch={!!areaOfDevelopment?.length} sx={{ py: 0.5 }} />
         )}
       </ActionCard>
     </Box>
@@ -289,7 +289,7 @@ const SessionsActionCards = ({ ...rest }) => {
 };
 
 export const JourneyRightMenu = ({ user }) => {
-  console.log("[JourneyRightMenu]", { user });
+  // console.log("[JourneyRightMenu]", { user });
 
   return (
     <ScrollableRightMenu heading={<Msg id={"dashboard.rightmenu.title"} />}>

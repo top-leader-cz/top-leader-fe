@@ -1,4 +1,10 @@
-import { Alert, Backdrop, Box, CircularProgress } from "@mui/material";
+import {
+  Alert,
+  Backdrop,
+  Box,
+  CircularProgress,
+  Skeleton,
+} from "@mui/material";
 
 export const Loaders = {
   Backdrop: () => (
@@ -24,6 +30,16 @@ export const Loaders = {
       <CircularProgress color="inherit" />
     </Box>
   ),
+  Skeleton: (_, loaderProps = {}) => {
+    const { rows = 5, ...rest } = loaderProps;
+    return (
+      <Box {...rest}>
+        {[...Array(rows)].map((_, i) => (
+          <Skeleton key={i} />
+        ))}
+      </Box>
+    );
+  },
   // INLINE
 };
 
@@ -40,6 +56,7 @@ export const QueryRenderer = ({
     ),
   // errored = (e) => <pre>{JSON.stringify(e, null, 2)}</pre>,
   loaderName = "Backdrop",
+  loaderProps,
   loading = Loaders[loaderName],
   query: queryProp,
   // queries,
@@ -48,6 +65,6 @@ export const QueryRenderer = ({
   const query = queryProp || queryRest; // TODO: migrate to separate prop, add queries renderer
 
   if (query.data) return success?.(query);
-  if (query.isLoading) return loading?.(query);
+  if (query.isLoading) return loading?.(query, loaderProps);
   if (query.error) return errored?.(query);
 };
