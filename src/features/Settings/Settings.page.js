@@ -12,6 +12,7 @@ import { TLTabs } from "./Tabs";
 import { AdminSettings } from "./AdminSettings";
 import { prop } from "ramda";
 import { ErrorBoundary } from "react-error-boundary";
+import { CompaniesSettings } from "./CompaniesSettings";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
@@ -20,6 +21,7 @@ const TABS = {
   GENERAL: "GENERAL",
   AVAILABILITY: "AVAILABILITY",
   ADMIN: "ADMIN",
+  COMPANIES: "COMPANIES",
 };
 
 function SettingsPageInner() {
@@ -54,6 +56,13 @@ function SettingsPageInner() {
         key: TABS.ADMIN,
         label: msg("settings.tabs.admin.label"),
         Component: AdminSettings,
+      },
+      {
+        visible: isAdmin,
+        key: TABS.COMPANIES,
+        // label: msg("settings.tabs.admin.companies"),
+        label: "Companies",
+        Component: CompaniesSettings,
       },
     ].filter(prop("visible"));
     return tabs;

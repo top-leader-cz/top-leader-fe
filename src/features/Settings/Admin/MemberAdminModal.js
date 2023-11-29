@@ -7,8 +7,8 @@ import {
   IconButton,
   Modal,
   Paper,
-  Tooltip,
 } from "@mui/material";
+import { identity, map, pipe, prop } from "ramda";
 import { useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
@@ -23,13 +23,16 @@ import { useMsg } from "../../../components/Msg/Msg";
 import { H2, P } from "../../../components/Typography";
 import { gray500 } from "../../../theme";
 import { Authority } from "../../Authorization/AuthProvider";
+import { formatName } from "../../Coaches/CoachCard";
+import { useCoachesQuery } from "../../Coaches/Coaches.page";
+import { INITIAL_FILTER } from "../../Coaches/CoachesFilter";
 import { I18nContext } from "../../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../../Settings/GeneralSettings";
-import { useAdminCreateUserMutation, useAdminEditUserMutation } from "./api";
-import { INITIAL_FILTER } from "../../Coaches/CoachesFilter";
-import { useCoachesQuery } from "../../Coaches/Coaches.page";
-import { identity, map, pipe, prop } from "ramda";
-import { formatName } from "../../Coaches/CoachCard";
+import {
+  useAdminCreateUserMutation,
+  useAdminEditUserMutation,
+  useCompaniesQuery,
+} from "./api";
 
 export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
@@ -51,6 +54,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
   const msg = useMsg();
 
   const coachesQuery = useCoachesQuery({ filter: INITIAL_FILTER() });
+  const companiesQuery = useCompaniesQuery({ to: useCompaniesQuery.toOpts });
 
   const isEdit = !!initialValues && !!Object.values(initialValues).length;
   const editUserMutation = useAdminEditUserMutation({ onSuccess: onClose });
@@ -75,7 +79,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
     coach: initialValues.coach,
     credit: initialValues.credit,
 
-    locale: initialValues.locale || language?.substring(0, 2) || "en",
+    locale: initialValues.locale || language?.substring(0, 2),
   };
   const methods = useForm({
     mode: "onSubmit",
@@ -106,8 +110,6 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           display: "flex",
           flexDirection: "column",
           gap: 3,
-          // border: "2px solid #000",
-          // boxShadow: 24,
         }}
       >
         <FormProvider {...methods}>
@@ -155,21 +157,14 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             fullWidth
             disabled={isEdit}
           />
-
-          <Tooltip
-            title={"TODO: where to get list of companies?"}
-            placement="top"
-          >
-            <div>
-              <RHFTextField
-                disabled
-                name="companyId"
-                label={msg("settings.admin.member.modal.fields.companyId")}
-                fullWidth
-              />
-            </div>
-          </Tooltip>
-
+          <AutocompleteSelect
+            name="companyId"
+            label={msg("settings.admin.member.modal.fields.companyId")}
+            placeholder="TBD free input + string proximity (copy-paste in external feedback form)"
+            // freeSolo
+            fullWidth
+            {...getLoadableOptions({ query: companiesQuery })}
+          />
           <AutocompleteSelect
             multiple
             disableCloseOnSelect

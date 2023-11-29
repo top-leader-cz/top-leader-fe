@@ -54,7 +54,7 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
       lastName: "",
       username: "",
       authorities: ["USER"],
-      locale: language?.substring(0, 2) ?? "en",
+      locale: language?.substring(0, 2),
       timeZone: userTz,
       trialUser: false,
     }),

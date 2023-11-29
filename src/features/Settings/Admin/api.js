@@ -1,51 +1,65 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAuth, useMyQuery } from "../../Authorization/AuthProvider";
-import { prop } from "ramda";
+import {
+  useAuth,
+  useMyMutation,
+  useMyQuery,
+} from "../../Authorization/AuthProvider";
+import { applySpec, map, pick, prop } from "ramda";
 
 export const useUsersQuery = () => {
-  const { authFetch } = useAuth();
   return useMyQuery({
     queryKey: ["admin", "users"],
-    queryFn: () =>
-      authFetch({
-        url: `/api/latest/admin/users`,
-        query: {
-          size: 10000,
-          sort: "username,asc",
-        },
-      }).then(prop("content")),
+    fetchDef: {
+      url: `/api/latest/admin/users`,
+      query: {
+        size: 10000,
+        sort: "username,asc",
+      },
+      to: prop("content"),
+    },
   });
 };
 
-export const useAdminCreateUserMutation = ({ onSuccess, ...params } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
+export const useCompaniesQuery = ({ to, ...rest } = {}) => {
+  return useMyQuery({
+    queryKey: ["companies"],
+    fetchDef: { url: `/api/latest/companies`, to },
+    ...rest,
+  });
+};
+useCompaniesQuery.toOpts = map(
+  applySpec({ value: prop("id"), label: prop("name") })
+);
 
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/admin/users`,
-        data: (() => {
-          console.log("[useAdminCreateUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-            companyId: values.companyId,
-            isTrial: values.isTrial,
-            authorities: values.authorities,
-            timeZone: values.timeZone,
-
-            locale: values.locale,
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["admin"], exact: false });
-      onSuccess?.(data);
+export const useCompanyMutation = (rest = {}) => {
+  return useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/companies`,
+      from: pick(["name"]),
     },
-    ...params,
+    invalidate: [{ queryKey: ["companies"] }],
+    ...rest,
+  });
+};
+export const useAdminCreateUserMutation = (rest = {}) => {
+  return useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/admin/users`,
+      from: pick([
+        "firstName",
+        "lastName",
+        "username",
+        "companyId",
+        "isTrial",
+        "authorities",
+        "timeZone",
+        "locale",
+      ]),
+    },
+    invalidate: [{ queryKey: ["admin"], exact: false }],
+    ...rest,
   });
 };
 

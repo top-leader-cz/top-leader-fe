@@ -2,7 +2,6 @@ import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/system";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import * as qs from "qs";
 
 export function TabPanel({ children, Component, value, tabName, props = {} }) {
   return (

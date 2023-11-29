@@ -2,17 +2,39 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./";
 import { useEffect, useState } from "react";
 import { routes } from "../../routes";
-import { intersection } from "ramda";
+import { intersection, last, pipe, split } from "ramda";
+import * as qs from "qs";
 
 export const AuthRedirect = () => {
   let auth = useAuth();
   console.log("[AuthRedirect]", { auth });
 
   if (!auth.isLoggedIn) {
-    return <Navigate to={routes.signIn} replace />;
+    return <MyNavigate to={routes.signIn} replace />;
   } else {
-    return <Navigate to={routes.dashboard} replace />;
+    return <MyNavigate to={routes.dashboard} replace />;
   }
+};
+
+const omitQuery = (str) => str.replace(/\?[^\?]*/, "");
+const extractQuery = pipe(split("?"), (segments) => {
+  if (segments.length > 2)
+    throw new Error("Invalid query string. TODO:fixme12345");
+  if (segments.length === 2) return last(segments);
+  return "";
+});
+const parseQuery = pipe(extractQuery, qs.parse);
+// TODO: part of redirect state?
+export const MyNavigate = ({ to, ...rest }) => {
+  // const locationQ = parseQuery(window.location.href);
+  // const toQ = parseQuery(to);
+  // const newQstr = qs.stringify({ ...locationQ, ...toQ });
+
+  // const newTo = omitQuery(to) + (newQstr ? "?" + newQstr : "");
+  const newTo = to;
+  // debugger;
+
+  return <Navigate to={newTo} {...rest} />;
 };
 
 export const RequireAuth = ({ children, someRequired = [] }) => {
@@ -29,6 +51,7 @@ export const RequireAuth = ({ children, someRequired = [] }) => {
     auth,
     location,
   });
+  // debugger;
 
   if (!auth.isLoggedIn) {
     // Redirect them to the /login page, but save the current location they were
@@ -36,7 +59,7 @@ export const RequireAuth = ({ children, someRequired = [] }) => {
     // along to that page after they login, which is a nicer user experience
     // than dropping them off on the home page.
     return (
-      <Navigate
+      <MyNavigate
         to={routes.signIn}
         state={{ from: location, lastUsername }}
         replace
@@ -49,17 +72,20 @@ export const RequireAuth = ({ children, someRequired = [] }) => {
       // intersection(auth.user.data?.userRoles, someRequired).length !== someRequired.length
       intersection(auth.user.data?.userRoles, someRequired).length < 1
     )
-      return <Navigate to={routes.dashboard} replace />;
+      return <MyNavigate to={routes.dashboard} replace />;
   }
 
   return children;
 };
 
 const getAuthorizedLocationRedirect = ({ locationState, currentUsername }) => {
-  const isSavedPathValid = true; // TODO: discuss
   // const isSavedPathValid = locationState.lastUsername === currentUsername;
-  const savedPathname = isSavedPathValid ? locationState.from?.pathname : "";
-
+  const savedPathname = [
+    locationState.from?.pathname || "",
+    locationState.from?.search || "",
+  ].join("");
+  // const savedPathname = isSavedPathValid ? locationState.from?.pathname : "";
+  // debugger;
   return savedPathname || routes.dashboard;
 };
 
@@ -78,7 +104,7 @@ export const ForbidAuth = ({ children }) => {
       currentUsername: auth.user.data.username, // depends on GlobalLoader
     });
 
-    return <Navigate to={to} state={{ from: location }} replace />;
+    return <MyNavigate to={to} state={{ from: location }} replace />;
   }
 
   return children;
