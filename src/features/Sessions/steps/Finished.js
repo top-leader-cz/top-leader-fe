@@ -44,9 +44,7 @@ export const useSchedulePrivateSessionMutation = (params = {}) => {
         time: ({ date, time }) => {
           const dateTime = anchorTime(date, time);
           // debugger;
-          return {
-            time: i18n.formatLocal(dateTime, API_DATETIME_LOCAL_FORMAT),
-          };
+          return i18n.formatLocal(dateTime, API_DATETIME_LOCAL_FORMAT);
         },
       }),
     },
