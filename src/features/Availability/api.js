@@ -293,6 +293,18 @@ export const padLeft = (char = "0", num) => {
   return str.padStart(2, char);
 };
 
+const exampleErr = [
+  {
+    errorCode: "not.enough.credits",
+    fields: [
+      {
+        name: "user",
+        value: "no-credit-user",
+      },
+    ],
+    errorMessage: "User does not have enough credit",
+  },
+];
 export const usePickSlotMutation = ({ username, ...mutationProps }) => {
   const { i18n, userTz } = useContext(I18nContext);
   const pickSlotMutation = useMyMutation({

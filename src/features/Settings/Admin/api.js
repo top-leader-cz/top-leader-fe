@@ -75,7 +75,7 @@ export const useAdminEditUserMutation = ({ onSuccess, ...rest } = {}) => {
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMyMutation({
     mutationFn: async (values) =>
       authFetch({
         method: "POST",
@@ -120,7 +120,7 @@ export const useConfirmRequestedCreditMutation = ({
   const { authFetch } = useAuth();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMyMutation({
     mutationFn: async ({ username }) =>
       authFetch({
         method: "POST",

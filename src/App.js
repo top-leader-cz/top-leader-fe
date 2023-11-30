@@ -6,7 +6,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./features/Authorization/AuthProvider";
-import { I18nProvider } from "./features/I18n/I18nProvider";
+import { I18nProvider, TLIntlProvider } from "./features/I18n/I18nProvider";
 import "./index.css";
 import { router } from "./routes";
 import theme from "./theme";
@@ -51,34 +51,39 @@ export default function App({ children = <RouterProvider router={router} /> }) {
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
       <ThemeProvider theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <GlobalLoader>
-              <I18nProvider>
-                <StackProvider
-                  logAs="ModalProvider"
-                  Ctx={ModalCtx}
-                  ItemComponent={ConfirmModal}
-                  mapExtraProps={mapModalExtraProps}
-                >
+        <TLIntlProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <GlobalLoader>
+                <I18nProvider>
                   <StackProvider
-                    logAs="SnackbarProvider"
-                    Ctx={SnackbarCtx}
-                    ItemComponent={TLSnackbar}
-                    mapExtraProps={mapSnackbarExtraProps}
+                    logAs="ModalProvider"
+                    Ctx={ModalCtx}
+                    ItemComponent={ConfirmModal}
+                    mapExtraProps={mapModalExtraProps}
                   >
-                    <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-                      <RightMenuProvider>
-                        <CssBaseline />
-                        {children}
-                      </RightMenuProvider>
-                    </ErrorBoundary>
+                    <StackProvider
+                      logAs="SnackbarProvider"
+                      Ctx={SnackbarCtx}
+                      ItemComponent={TLSnackbar}
+                      mapExtraProps={mapSnackbarExtraProps}
+                    >
+                      <ErrorBoundary
+                        FallbackComponent={ResetAll}
+                        onReset={RESET}
+                      >
+                        <RightMenuProvider>
+                          <CssBaseline />
+                          {children}
+                        </RightMenuProvider>
+                      </ErrorBoundary>
+                    </StackProvider>
                   </StackProvider>
-                </StackProvider>
-              </I18nProvider>
-            </GlobalLoader>
-          </AuthProvider>
-        </QueryClientProvider>
+                </I18nProvider>
+              </GlobalLoader>
+            </AuthProvider>
+          </QueryClientProvider>
+        </TLIntlProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -1,6 +1,7 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/system";
-import { useEffect, useMemo, useState } from "react";
+import { curryN, filter, find, pipe, prop } from "ramda";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export function TabPanel({ children, Component, value, tabName, props = {} }) {
@@ -75,12 +76,20 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
 
 const queryParamName = "tab";
 
+const findTab = curryN(2, (tabs, key) =>
+  pipe(
+    filter(prop("visible")),
+    find((t) => t.key === key)
+  )(tabs)
+);
+
 export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
   let [searchParams, setSearchParams] = useSearchParams();
   const queryTabKey = searchParams.get(queryParamName);
   const defaultTabKey = useMemo(() => {
-    const key = initialTabKey || queryTabKey || tabs[0]?.key;
-    return tabs.some((t) => t.key === key) ? key : tabs[0]?.key;
+    const key =
+      [queryTabKey, initialTabKey].filter(findTab(tabs))?.[0] || tabs[0]?.key;
+    return key;
   }, [initialTabKey, queryTabKey, tabs]);
   const [tabName, setTab] = useState(defaultTabKey);
   const handleChange = (event, newValue) => {
@@ -97,9 +106,14 @@ export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
       // debugger;
     }
   };
+  const tabsRef = useRef(tabs);
   useEffect(() => {
     // console.log("TAB SYNC EFF START", { queryTabKey, current: tabName });
-    if (queryTabKey && queryTabKey !== tabName) {
+    if (
+      queryTabKey &&
+      queryTabKey !== tabName &&
+      findTab(tabsRef.current, queryTabKey)
+    ) {
       // console.log("TAB SYNC EFF RUN", { queryTabKey, current: tabName });
       setTab(queryTabKey);
     }

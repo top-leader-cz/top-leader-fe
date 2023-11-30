@@ -414,6 +414,33 @@
   "dict.areas.9": {
     "defaultMessage": "Apply critical thinking"
   },
+  "dict.error.already.existing.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.email.used.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.event.longer.that.24.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.field.outside.of.frame.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.invalid.password.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.not.enough.credits.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.not.part.of.company.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.session.in.past.message": {
+    "defaultMessage": "{apiMessage}"
+  },
+  "dict.error.time.not.available.message": {
+    "defaultMessage": "{apiMessage}"
+  },
   "dict.feedback.question.communication.ask-for-more-information.label": {
     "defaultMessage": "Does the employee ask for more information if they do not understand something?"
   },

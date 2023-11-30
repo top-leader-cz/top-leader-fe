@@ -7,6 +7,7 @@ import fr from "date-fns/locale/fr";
 import {
   createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -98,7 +99,10 @@ function renderResetLang({ error, resetErrorBoundary }) {
 
 export const I18nContext = createContext();
 
-export const I18nProvider = ({ children }) => {
+export const LocaleCtx = createContext();
+
+// Needed in AuthProvider to translate errors, separated from I18nProvider which needs AuthProvider
+export const TLIntlProvider = ({ children }) => {
   // let date = new Intl.DateTimeFormat(navigator.language).format(new Date());
   const browserLocale = Intl.DateTimeFormat()
     .resolvedOptions()
@@ -120,7 +124,23 @@ export const I18nProvider = ({ children }) => {
     window.localStorage.setItem("language", lang);
   }, []);
 
+  return (
+    <LocaleCtx.Provider value={{ language, setLanguage }}>
+      <IntlProvider
+        locale={language}
+        defaultLocale={defaultLanguage}
+        messages={messages[language] || {}}
+        // messages={{ exampleMessageId: "Example message" }}
+      >
+        {children}
+      </IntlProvider>
+    </LocaleCtx.Provider>
+  );
+};
+
+export const I18nProvider = ({ children }) => {
   const { authFetch, user, fetchUser } = useAuth();
+  const { language, setLanguage } = useContext(LocaleCtx);
 
   const browserTz = getBrowserTz();
   const userTz = useMemo(
@@ -193,19 +213,12 @@ export const I18nProvider = ({ children }) => {
       <I18nContext.Provider
         value={{ language, setLanguage, userTz, userTzMutation, locale, i18n }}
       >
-        <IntlProvider
-          locale={language}
-          defaultLocale={defaultLanguage}
-          messages={messages[language] || {}}
-          // messages={{ exampleMessageId: "Example message" }}
+        <LocalizationProvider
+          dateAdapter={AdapterDateFns}
+          adapterLocale={locale}
         >
-          <LocalizationProvider
-            dateAdapter={AdapterDateFns}
-            adapterLocale={locale}
-          >
-            {children}
-          </LocalizationProvider>
-        </IntlProvider>
+          {children}
+        </LocalizationProvider>
       </I18nContext.Provider>
     </ErrorBoundary>
   );

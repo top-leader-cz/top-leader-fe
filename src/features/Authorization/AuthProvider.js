@@ -1,5 +1,5 @@
 import * as qs from "qs";
-import { identity, tryCatch } from "ramda";
+import { identity, prop, tryCatch } from "ramda";
 import {
   createContext,
   useCallback,
@@ -11,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { useSnackbar } from "../Modal/ConfirmModal";
+import { defineMessage, defineMessages, useIntl } from "react-intl";
 
 export const AuthContext = createContext(null);
 
@@ -81,29 +82,138 @@ export const qstr = (url, query) => {
   return [url, qStr].filter(Boolean).join("?");
 };
 
-const throwOnError = ({ response, jsonMaybe, textMaybe }) => {
-  console.log("FETCH ERR", { response });
-  // TODO: get message from response
-  const generalErrorMessage = `Something went wrong. (${
-    response?.status || ""
-  })`;
-  const customMessage = ""; // TODO: error handling
+const ERROR_CODES = {
+  FIELD_OUTSIDE_OF_FRAME: "field.outside.of.frame",
+  MORE_THEN_24_EVENT: "event.longer.that.24",
+
+  SESSION_IN_PAST: "session.in.past",
+  TIME_NOT_AVAILABLE: "time.not.available",
+
+  NOT_ENOUGH_CREDITS: "not.enough.credits",
+
+  EMAIL_USED: "email.used",
+  NOT_PART_OF_COMPANY: "not.part.of.company",
+
+  INVALID_PASSWORD: "invalid.password",
+
+  ALREADY_EXISTING: "already.existing",
+};
+
+const getTsKey = (code = "", prop = "message") => `dict.error.${code}.${prop}`;
+
+const errMessages = defineMessages({
+  [getTsKey(ERROR_CODES.FIELD_OUTSIDE_OF_FRAME)]: {
+    // id: getTsKey(ERROR_CODES.FIELD_OUTSIDE_OF_FRAME), // not working, extraction of messages is static analysis
+    id: "dict.error.field.outside.of.frame.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.MORE_THEN_24_EVENT)]: {
+    // id: getTsKey(ERROR_CODES.MORE_THEN_24_EVENT),
+    id: "dict.error.event.longer.that.24.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.SESSION_IN_PAST)]: {
+    // id: getTsKey(ERROR_CODES.SESSION_IN_PAST),
+    id: "dict.error.session.in.past.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.TIME_NOT_AVAILABLE)]: {
+    // id: getTsKey(ERROR_CODES.TIME_NOT_AVAILABLE),
+    id: "dict.error.time.not.available.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.NOT_ENOUGH_CREDITS)]: {
+    // id: getTsKey(ERROR_CODES.NOT_ENOUGH_CREDITS),
+    id: "dict.error.not.enough.credits.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.EMAIL_USED)]: {
+    // id: getTsKey(ERROR_CODES.EMAIL_USED),
+    id: "dict.error.email.used.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.NOT_PART_OF_COMPANY)]: {
+    // id: getTsKey(ERROR_CODES.NOT_PART_OF_COMPANY),
+    id: "dict.error.not.part.of.company.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.INVALID_PASSWORD)]: {
+    // id: getTsKey(ERROR_CODES.INVALID_PASSWORD),
+    id: "dict.error.invalid.password.message",
+    defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.ALREADY_EXISTING)]: {
+    // id: getTsKey(ERROR_CODES.ALREADY_EXISTING),
+    id: "dict.error.already.existing.message",
+    defaultMessage: "{apiMessage}",
+  },
+});
+
+const aErr = (jsonMaybe) => [].concat(jsonMaybe).filter(Boolean);
+
+// https://github.com/top-leader-cz/top-leader-be/blob/main/src/main/java/com/topleader/topleader/exception/ErrorCodeConstants.java
+const exampleJsonMaybe = [
+  {
+    errorCode: "not.enough.credits",
+    fields: [{ name: "user", value: "no-credit-user" }],
+    errorMessage: "User does not have enough credit",
+  },
+];
+const translateErrorsMaybe = ({ response, jsonMaybe, intl }) => {
+  const errArr = aErr(jsonMaybe); // just for sure, TODO: move to authFetch?
+  const msgObjArr = errArr
+    .filter(prop("errorCode"))
+    .map((errMaybe) => ({
+      errMaybe,
+      msgObj: errMessages[getTsKey(errMaybe?.errorCode)],
+      translated: intl.formatMessage(
+        errMessages[getTsKey(errMaybe?.errorCode)],
+        { apiMessage: errMaybe?.errorMessage }
+      ),
+    }))
+    .filter(prop("msgObj"));
+  // debugger;
+
+  if (msgObjArr.length !== errArr.length) {
+    console.log("TODO: untranslated err", {
+      msgObjArr,
+      errArr,
+      jsonMaybe,
+      response,
+    });
+    debugger;
+  }
+
+  if (!msgObjArr.length) return undefined;
+
+  return msgObjArr.map(({ translated }) => `${translated}`).join(". ");
+};
+
+const throwResponse = ({ response, jsonMaybe, textMaybe, intl }) => {
+  console.log("[throwResponse]", { response });
+  const apiMsg = aErr(jsonMaybe)
+    .map(prop("errorMessage"))
+    .filter(Boolean)
+    .join(". ");
+  const generalErrorMessage = apiMsg || `Something went wrong.`;
+  const translatedMessageMaybe = translateErrorsMaybe({
+    response,
+    jsonMaybe,
+    intl,
+  });
   const message =
-    customMessage || process.env.NODE_ENV === "production"
+    translatedMessageMaybe ||
+    (process.env.NODE_ENV === "production"
       ? generalErrorMessage
       : JSON.stringify({
           status: response?.status,
-          response:
-            jsonMaybe ||
-            textMaybe ||
-            // parsingError?.message ||
-            "[Response not ok, no response]",
-        });
+          response: jsonMaybe || textMaybe || "[Response not ok, no response]",
+        }));
   const error = new Error(message);
   error.response = response;
   error.jsonMaybe = jsonMaybe;
   error.textMaybe = textMaybe;
-  // error.parsingError = parsingError;
+  // debugger;
   throw error;
 };
 
@@ -113,8 +223,8 @@ const hasContentType = (type, res) =>
 export function AuthProvider({ children }) {
   // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS):
   const [isLoggedIn, setIsLoggedIn] = useSessionStorage(false);
-
   const queryClient = useQueryClient();
+  const intl = useIntl();
 
   const qcRef = useRef(queryClient);
   qcRef.current = queryClient;
@@ -155,7 +265,7 @@ export function AuthProvider({ children }) {
           }
 
           if (!response.ok) {
-            throwOnError({ response, jsonMaybe, textMaybe });
+            throwResponse({ response, jsonMaybe, textMaybe, intl });
           }
           if (type === FETCH_TYPE.JSON) return jsonMaybe;
 
