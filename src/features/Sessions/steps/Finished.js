@@ -1,8 +1,8 @@
 import { Alert, Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
+import { applySpec } from "ramda";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import {
   DatePickerField,
@@ -10,28 +10,27 @@ import {
   anchorTime,
 } from "../../../components/Forms";
 import { RHForm } from "../../../components/Forms/Form";
+import {
+  invalidDate,
+  invalidTime,
+  todayOrFuture,
+} from "../../../components/Forms/validations";
+import { Icon } from "../../../components/Icon";
 import { Msg } from "../../../components/Msg";
 import { H1, P } from "../../../components/Typography";
 import { routes } from "../../../routes";
 import { useAuth } from "../../Authorization";
+import { useMyMutation } from "../../Authorization/AuthProvider";
 import { API_DATETIME_LOCAL_FORMAT } from "../../Availability/api";
-import { I18nContext } from "../../I18n/I18nProvider";
-import { ControlsContainer } from "./Controls";
-import {
-  invalidDate,
-  todayOrFuture,
-  invalidTime,
-} from "../../../components/Forms/validations";
-import { Icon } from "../../../components/Icon";
-import { QueryRenderer } from "../../QM/QueryRenderer";
+import { CoachCard } from "../../Coaches/CoachCard";
+import { ScheduledSessionsCard } from "../../Coaches/ScheduledSessions";
 import {
   useUserUpcomingSessionsQuery,
   useYourCoachQuery,
 } from "../../Coaches/api";
-import { CoachCard } from "../../Coaches/CoachCard";
-import { ScheduledSessionsCard } from "../../Coaches/ScheduledSessions";
-import { useMyMutation } from "../../Authorization/AuthProvider";
-import { applySpec } from "ramda";
+import { I18nContext } from "../../I18n/I18nProvider";
+import { QueryRenderer } from "../../QM/QueryRenderer";
+import { ControlsContainer } from "./Controls";
 
 export const useSchedulePrivateSessionMutation = (params = {}) => {
   const { i18n } = useContext(I18nContext);

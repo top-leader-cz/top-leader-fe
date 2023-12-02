@@ -7,7 +7,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -18,6 +17,7 @@ import { H1, H2, P } from "../../components/Typography";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { AssessmentRightMenu } from "./AssessmentRightMenu";
 import {
@@ -90,32 +90,29 @@ const createAssessmentEntry = ({ questions, scores }) => {
 };
 
 const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
-  const queryClient = useQueryClient();
   const { authFetch, fetchUser } = useAuth();
 
-  const deleteAnswersMutation = useMutation({
+  const deleteAnswersMutation = useMyMutation({
     mutationFn: async () => {
       return authFetch({
         method: "DELETE",
         url: `/api/latest/user-assessments`,
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ exact: false, queryKey: ["assessment"] });
-    },
+    invalidate: [{ exact: false, queryKey: ["assessment"] }],
   });
 
-  const strengthsMutation = useMutation({
+  const strengthsMutation = useMyMutation({
     mutationFn: async ({ orderedTalents }) =>
       authFetch({
         method: "POST",
         url: `/api/latest/user-info/strengths`,
         data: { data: orderedTalents },
       }),
+    invalidate: [{ exact: false, queryKey: ["strengths"] }],
     onSuccess: () => {
       deleteAnswersMutation.mutate();
       fetchUser();
-      queryClient.invalidateQueries({ exact: false, queryKey: ["strengths"] });
       onSuccess?.();
     },
   });

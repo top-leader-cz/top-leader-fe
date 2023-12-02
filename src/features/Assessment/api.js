@@ -1,6 +1,7 @@
 import { pipeP } from "composable-fetch";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
 
 export const useAnswersQuery = ({ onSuccess, ...params } = {}) => {
   const { authFetch } = useAuth();
@@ -29,7 +30,7 @@ export const useAnswersQuery = ({ onSuccess, ...params } = {}) => {
 };
 export const useDeleteAnswersMutation = (mutationParams = {}) => {
   const { authFetch } = useAuth();
-  return useMutation({
+  return useMyMutation({
     mutationFn: async () =>
       authFetch({
         method: "DELETE",
@@ -40,7 +41,7 @@ export const useDeleteAnswersMutation = (mutationParams = {}) => {
 };
 export const useAnswerMutation = (mutationParams = {}) => {
   const { authFetch } = useAuth();
-  return useMutation({
+  return useMyMutation({
     mutationFn: async ({ questionId, answer }) =>
       authFetch({
         method: "POST",
@@ -52,7 +53,7 @@ export const useAnswerMutation = (mutationParams = {}) => {
 };
 export const useAnswersMutation = (mutationParams = {}) => {
   const { authFetch } = useAuth();
-  return useMutation({
+  return useMyMutation({
     mutationFn: async (scores) => {
       console.log("answersMutation", { scores });
       // const diff = // TODO: fetch current state, diff, modify

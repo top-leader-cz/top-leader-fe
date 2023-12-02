@@ -2,6 +2,8 @@ import { Button } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
+import { format } from "date-fns-tz";
+import { applySpec, prop } from "ramda";
 import { LANGUAGE_OPTIONS, renderLanguageOption } from "../../components/Forms";
 import {
   AutocompleteSelect,
@@ -10,13 +12,11 @@ import {
 import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
+import { useMyMutation } from "../Authorization/AuthProvider";
+import { I18nContext } from "../I18n/I18nProvider";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
-import { useMutation } from "react-query";
-import { useAuth } from "../Authorization";
-import { format } from "date-fns-tz";
-import { I18nContext } from "../I18n/I18nProvider";
 
 const FIELDS_GENERAL = {
   language: "language",
@@ -39,25 +39,20 @@ export const TIMEZONE_OPTIONS = timeZones.map((value) => ({
 }));
 
 export const GeneralSettings = () => {
-  const { authFetch } = useAuth();
-  const passwordMutation = useMutation({
-    mutationFn: (values) =>
-      console.log("PSSSWORD POST", values) ||
-      authFetch({
-        method: "POST",
-        url: "/api/latest/password",
-        data: {
-          oldPassword: values[FIELDS_GENERAL.currentPassword],
-          newPassword: values[FIELDS_GENERAL.newPassword],
-        },
+  const passwordMutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: "/api/latest/password",
+      from: applySpec({
+        oldPassword: prop(FIELDS_GENERAL.currentPassword),
+        newPassword: prop(FIELDS_GENERAL.newPassword),
       }),
+    },
   });
   const msg = useMsg();
   const { language, setLanguage, userTz, userTzMutation } =
     useContext(I18nContext);
   const form = useForm({
-    // mode: "onSubmit",
-    // mode: "all",¯
     defaultValues: {
       language,
       timeZone: userTz,

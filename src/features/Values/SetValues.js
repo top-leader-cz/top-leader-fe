@@ -1,6 +1,7 @@
 import { Box, Button, Divider } from "@mui/material";
+import { applySpec, prop } from "ramda";
 import React, { useCallback } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import { InfoBox } from "../../components/InfoBox";
@@ -12,6 +13,7 @@ import { H1, H2, P } from "../../components/Typography";
 import { useSelection } from "../../hooks/useSelection";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
 
@@ -46,19 +48,17 @@ const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
 
 const useMyValues = () => {
   const valuesDict = useValuesDict();
-  const { user, fetchUser, authFetch } = useAuth();
+  const { user, fetchUser } = useAuth();
   const { selectedKeys, toggleItem } = useSelection({
     initialValue: user?.data?.values,
   });
 
   const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: async ({ selectedKeys }) => {
-      return authFetch({
-        method: "POST",
-        url: `/api/latest/user-info/values`,
-        data: { data: selectedKeys },
-      });
+  const mutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user-info/values`,
+      from: applySpec({ data: prop("selectedKeys") }),
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["values"] });

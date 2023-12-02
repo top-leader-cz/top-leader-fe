@@ -11,9 +11,9 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useContext, useEffect, useRef } from "react";
-import { useMutation } from "react-query";
-import { useAuth } from "../../features/Authorization";
 
+import { always } from "ramda";
+import { useMyMutation } from "../../features/Authorization/AuthProvider";
 import { I18nContext } from "../../features/I18n/I18nProvider";
 import { routes } from "../../routes";
 import { LinkBehavior } from "../LinkBehavior";
@@ -28,13 +28,12 @@ export const NotificationsPopover = ({
 }) => {
   const msg = useMsg({ dict: generalMessages });
   const { i18n } = useContext(I18nContext);
-  const { authFetch } = useAuth();
-  const { mutate: markAsRead } = useMutation({
-    mutationFn: async () =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/notifications/mark-as-read`,
-      }),
+  const { mutate: markAsRead } = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/notifications/mark-as-read`,
+      from: always(undefined),
+    },
   });
 
   // run eff just once on close with current notifications

@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { descend, evolve, map, pick, prop, sort } from "ramda";
+import { useRef } from "react";
+import { useQuery, useQueryClient } from "react-query";
 import {
   useAuth,
   useMyMutation,
   useMyQuery,
 } from "../Authorization/AuthProvider";
-import { ascend, descend, evolve, map, pick, prop, sort, sortBy } from "ramda";
 import { EXTERNAL_FEEDBACK_FIELDS } from "./constants";
-import { useRef } from "react";
 
 export const useFeedbackOptionsQuery = (rest = {}) => {
   const query = useMyQuery({
@@ -52,22 +52,14 @@ export const useExternalFeedbackMutation = ({
   params: { formId, username, token },
   ...rest
 } = {}) => {
-  const { authFetch } = useAuth();
-  const mutation = useMutation({
-    mutationFn: async (data) =>
-      console.log("mutating", { data }) ||
-      authFetch({
-        method: "POST",
-        url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
-        data: (() => {
-          // debugger;
-          return evolve({
-            [EXTERNAL_FEEDBACK_FIELDS.answers]: map(
-              pick(["question", "answer"])
-            ),
-          })(data);
-        })(),
+  const mutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
+      from: evolve({
+        [EXTERNAL_FEEDBACK_FIELDS.answers]: map(pick(["question", "answer"])),
       }),
+    },
     ...rest,
   });
   return mutation;
@@ -77,30 +69,19 @@ export const useRequestAccessMutation = ({
   params: { formId, username, token },
   ...rest
 } = {}) => {
-  const { authFetch } = useAuth();
-  const mutation = useMutation({
-    mutationFn: async (data) =>
-      console.log("mutating", { data }) ||
-      authFetch({
-        method: "POST",
-        url: `/api/public/latest/feedback/request-access/${formId}/${username}/${token}`,
-        data,
-      }),
+  const mutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/public/latest/feedback/request-access/${formId}/${username}/${token}`,
+    },
     ...rest,
   });
   return mutation;
 };
 
 export const usePostFeedbackFormMutation = (rest = {}) => {
-  const { authFetch } = useAuth();
-  const mutation = useMutation({
-    mutationFn: async (data) =>
-      console.log("mutating", { data }) ||
-      authFetch({
-        method: "POST",
-        url: "/api/latest/feedback",
-        data,
-      }),
+  const mutation = useMyMutation({
+    fetchDef: { method: "POST", url: "/api/latest/feedback" },
     ...rest,
   });
   return mutation;
@@ -113,10 +94,7 @@ export const usePutFeedbackFormMutation = ({
   const username = useAuth().user.data.username;
   const mutation = useMyMutation({
     debug: true,
-    fetchDef: {
-      method: "PUT",
-      url: `/api/latest/feedback/${id}`,
-    },
+    fetchDef: { method: "PUT", url: `/api/latest/feedback/${id}` },
     invalidate: [
       { queryKey: ["feedback", { username }] },
       { exact: false, queryKey: ["feedback"] },
@@ -150,19 +128,13 @@ export const useFeedbackQuery = ({ params: { id }, ...rest } = {}) => {
 };
 
 export const useDeleteFeedbackFormMutation = (rest = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ feedback }) =>
-      authFetch({
-        method: "DELETE",
-        url: `/api/latest/feedback/${feedback.id}`,
-      }),
-    ...rest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ exact: false, queryKey: ["feedback"] });
+  return useMyMutation({
+    fetchDef: {
+      method: "DELETE",
+      getUrl: ({ feedback }) => `/api/latest/feedback/${feedback.id}`,
     },
+    invalidate: [{ exact: false, queryKey: ["feedback"] }],
+    ...rest,
   });
 };
 

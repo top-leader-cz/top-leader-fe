@@ -10,7 +10,7 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
-import { Msg, useMsg } from "../../components/Msg/Msg";
+import { Msg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useCreditRequestMutation } from "./api";
 
@@ -19,7 +19,6 @@ const TOPUP_FIELDS = {
 };
 
 export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
-  const msg = useMsg();
   const mutation = useCreditRequestMutation({
     onSuccess: () => {
       onClose();

@@ -1,11 +1,8 @@
-import { useMutation, useQuery } from "react-query";
+import { pick } from "ramda";
 import { useAuth } from "../Authorization";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
-import { pick } from "ramda";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
-  const { authFetch } = useAuth();
-
   return useMyQuery({
     enabled: !!username,
     queryKey: ["coach", username],
@@ -20,7 +17,7 @@ export const useCoachQuery = ({ username, onError, onSuccess }) => {
 };
 export const useConversationsQuery = (params = {}) => {
   const { authFetch } = useAuth();
-  const conversationsQuery = useQuery({
+  const conversationsQuery = useMyQuery({
     queryKey: ["messages"],
     queryFn: () =>
       authFetch({ url: `/api/latest/messages` }).then((data) => {
@@ -45,7 +42,7 @@ export const useConversationMessagesQuery = ({ addressee, ...rest } = {}) => {
   const currentUsername = user.data.username;
   const { authFetch } = useAuth();
 
-  const messagesQuery = useQuery({
+  const messagesQuery = useMyQuery({
     enabled: !!addressee,
     refetchInterval: 5 * 1000, // TODO
     queryKey: ["messages", addressee],

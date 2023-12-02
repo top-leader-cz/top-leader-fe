@@ -1,4 +1,5 @@
 import { Alert, Box, Chip } from "@mui/material";
+import { formatInTimeZone } from "date-fns-tz/fp";
 import { isValid, parse } from "date-fns/fp";
 import {
   useCallback,
@@ -9,7 +10,7 @@ import {
   useState,
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutation, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { getCoachLanguagesOptions, getLabel } from "../../components/Forms";
 import {
   AutocompleteSelect,
@@ -25,15 +26,14 @@ import { useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
+import { IntroLink } from "../Coaches/CoachCard";
 import { I18nContext } from "../I18n/I18nProvider";
 import { API_DATE_FORMAT } from "../I18n/utils/date";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
-import * as tz from "date-fns-tz";
-import { formatInTimeZone } from "date-fns-tz/fp";
-import { IntroLink } from "../Coaches/CoachCard";
 
 const FIELDS = {
   firstName: "firstName",
@@ -72,7 +72,7 @@ const to = (data, { userLocale, userTz }) => {
   return initialValues;
 };
 
-const from = async (values, { userTz }) => {
+const from = (values, { userTz }) => {
   const { imageSrc, rate, certificates, experienceSince, ...rest } = values;
   const payload = {
     ...rest,
@@ -128,13 +128,12 @@ export const ProfileSettings = () => {
     retry: 1,
   });
 
-  const saveMutation = useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        url: "/api/latest/coach-info",
-        method: "POST",
-        data: await from(values, { userTz }),
-      }),
+  const saveMutation = useMyMutation({
+    fetchDef: {
+      url: "/api/latest/coach-info",
+      method: "POST",
+      from: (values) => from(values, { userTz }),
+    },
     onSuccess: (data) => {
       console.log("[save success]", { data });
       resetForm(data);
@@ -142,7 +141,7 @@ export const ProfileSettings = () => {
   });
 
   const [reloadPhotoToken, reloadPhoto] = useReducer((i) => i + 1, 0);
-  const postPhotoMutation = useMutation({
+  const postPhotoMutation = useMyMutation({
     mutationFn: async ({ file }) => {
       // const photo = await getBase64(file);
       const formData = new FormData();

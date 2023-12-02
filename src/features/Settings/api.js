@@ -1,6 +1,23 @@
-import { useMutation, useQueryClient } from "react-query";
-import { useAuth, useMyQuery } from "../Authorization/AuthProvider";
+import { formatInTimeZone } from "date-fns-tz/fp";
+import { format, getDay, isValid, startOfDay } from "date-fns/fp";
+import {
+  all,
+  allPass,
+  applySpec,
+  chain,
+  map,
+  pick,
+  pipe,
+  prop,
+  splitEvery,
+  tap,
+  when,
+} from "ramda";
 import { useCallback, useContext } from "react";
+import { useQueryClient } from "react-query";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { API_DATETIME_LOCAL_FORMAT, padLeft } from "../Availability/api";
+import { I18nContext } from "../I18n/I18nProvider";
 import {
   DAY_NAMES,
   FIELDS_AVAILABILITY,
@@ -8,24 +25,6 @@ import {
   dayRangesName,
   enabledName,
 } from "./AvailabilitySettings";
-import { API_TIME_FORMAT } from "../I18n/utils/date";
-import { I18nContext } from "../I18n/I18nProvider";
-import {
-  T,
-  addIndex,
-  all,
-  allPass,
-  chain,
-  map,
-  pipe,
-  splitEvery,
-  tap,
-  values,
-  when,
-} from "ramda";
-import { formatISO, getDay, isValid, startOfDay, format } from "date-fns/fp";
-import { API_DATETIME_LOCAL_FORMAT, padLeft } from "../Availability/api";
-import { formatInTimeZone } from "date-fns-tz/fp";
 
 const AVAILABILITY_TYPE = {
   RECURRING: "recurring",
@@ -122,7 +121,7 @@ const createApiDayTimeObj =
     };
   };
 
-const toApiIntervals = ({ formValues, i18n, userTz, mapper }) => {
+const toApiIntervals = ({ formValues, mapper }) => {
   const byDay = DAY_NAMES.map((dayName) => ({
     dayName,
     enabled: formValues[enabledName(dayName)],
@@ -150,11 +149,11 @@ const toApiIntervals = ({ formValues, i18n, userTz, mapper }) => {
     }),
     tap(log("toApiIntervals - 1")), // TODO: adjust intervals overlapping weeks
     map(mapper),
-    tap(log("toApiIntervals - 2")), // TODO: adjust intervals overlapping weeks
+    tap(log("toApiIntervals - 2")),
     splitEvery(2),
-    tap(log("toApiIntervals - 3")), // TODO: adjust intervals overlapping weeks
+    tap(log("toApiIntervals - 3")),
     map(([from, to]) => ({ from, to })),
-    tap(log("toApiIntervals - 4")) // TODO: adjust intervals overlapping weeks
+    tap(log("toApiIntervals - 4"))
   )(byDay);
   // debugger;
 
@@ -163,23 +162,14 @@ const toApiIntervals = ({ formValues, i18n, userTz, mapper }) => {
 
 export const useRecurringAvailabilityMutation = () => {
   const { i18n, userTz } = useContext(I18nContext);
-  const { authFetch } = useAuth();
   const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (values) => {
-      const payload = toApiIntervals({
-        formValues: values,
-        i18n,
-        userTz,
-        mapper: createApiDayTimeObj({ i18n }),
-      });
-
-      console.log("%cMUTATION", "color:lime", { values, payload });
-      return authFetch({
-        method: "POST",
-        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.RECURRING}`,
-        data: payload,
-      });
+  const mutation = useMyMutation({
+    debug: true,
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.RECURRING}`,
+      from: (formValues) =>
+        toApiIntervals({ formValues, mapper: createApiDayTimeObj({ i18n }) }),
     },
     onSuccess: useCallback(
       (data) => {
@@ -194,8 +184,7 @@ export const useRecurringAvailabilityMutation = () => {
   return mutation;
 };
 
-/*
-{
+/* {
   "timeFrame": {
     "from": "2023-10-15T20:27:38.006Z",
     "to": "2023-10-15T20:27:38.006Z"
@@ -204,43 +193,28 @@ export const useRecurringAvailabilityMutation = () => {
     {
       "from": "2023-10-15T20:27:38.006Z",
       "to": "2023-10-15T20:27:38.006Z"
-    }
-  ]
-}
-*/
+    } ] } */
 
 export const useNonRecurringAvailabilityMutation = () => {
   const { i18n, userTz } = useContext(I18nContext);
-  const { authFetch } = useAuth();
   const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (values) => {
-      const { from, to } = values[FIELDS_AVAILABILITY.recurrenceRange];
-      const payload = {
-        timeFrame: map(
-          pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })) // TODO: validate
-        )({ from, to }),
-        events: toApiIntervals({
-          formValues: values,
-          i18n,
-          userTz,
-          mapper: createApiDayTimeStr({ timeZone: userTz }),
-        }),
-      };
-
-      console.log("%cMUTATION", "color:lime", { values, from, to, payload });
-      console.log("TODO: validate timeFrame - startOfDay", {
-        timeFrame: payload.timeFrame,
-        from,
-        to,
-      });
-      // debugger;
-
-      return authFetch({
-        method: "POST",
-        url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
-        data: payload,
-      });
+  const mutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
+      // from: (values) => { const { from, to } = values[FIELDS_AVAILABILITY.recurrenceRange]; return { timeFrame: map( pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })) // TODO: validate )({ from, to }), events: toApiIntervals({ formValues: values, i18n, userTz, mapper: createApiDayTimeStr({ timeZone: userTz }), }), }; },
+      from: applySpec({
+        timeFrame: pipe(
+          prop(FIELDS_AVAILABILITY.recurrenceRange),
+          pick(["from", "to"]),
+          map(pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })))
+        ),
+        events: (formValues) =>
+          toApiIntervals({
+            formValues,
+            mapper: createApiDayTimeStr({ timeZone: userTz }),
+          }),
+      }),
     },
     onSuccess: useCallback(
       (data) => {

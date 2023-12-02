@@ -1,10 +1,10 @@
-import { useMutation, useQueryClient } from "react-query";
+import { applySpec, map, pick, prop } from "ramda";
+import { useQueryClient } from "react-query";
 import {
   useAuth,
   useMyMutation,
   useMyQuery,
 } from "../../Authorization/AuthProvider";
-import { applySpec, map, pick, prop } from "ramda";
 
 export const useUsersQuery = () => {
   return useMyQuery({

@@ -1,5 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  always,
+  applySpec,
+  concat,
+  converge,
+  defaultTo,
+  ifElse,
+  mergeAll,
+  pick,
+  pipe,
+  prop,
+  take,
+  unapply,
+} from "ramda";
+import { useQuery } from "react-query";
 import { useAuth } from "../Authorization";
+import { useMyMutation } from "../Authorization/AuthProvider";
 
 export const useHrUsersQuery = (params = {}) => {
   const { authFetch } = useAuth();
@@ -33,84 +48,63 @@ export const useHrUsersQuery = (params = {}) => {
   });
 };
 
-export const useCreateUserMutation = ({ onSuccess, ...rest } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
+export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
 
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/user`,
-        data: (() => {
-          console.log("[useCreateUserMutation]", { values });
-          // debugger;
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-            authorities: values.authorities,
-            locale: values.locale?.substring?.(0, 2) ?? "en",
-            timeZone: values.timeZone,
-            status: values.trialUser ? "AUTHORIZED" : "PENDING",
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["hr-users"] });
-      onSuccess?.(data);
+export const useCreateUserMutation = ({ onSuccess, ...rest } = {}) => {
+  return useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user`,
+      from: converge(unapply(mergeAll), [
+        pick(["firstName", "lastName", "username", "authorities", "timeZone"]),
+        applySpec({
+          locale: toApiLocale,
+          status: ifElse(
+            prop("trialUser"),
+            always("AUTHORIZED"),
+            always("PENDING")
+          ),
+        }),
+      ]),
     },
+    invalidate: [{ queryKey: ["hr-users"] }],
     ...rest,
   });
 };
 
 export const useEditUserMutation = ({ onSuccess, ...rest } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "PUT",
-        url: `/api/latest/user/${values.username}`,
-        data: (() => {
-          console.log("[useEditUserMutation]", { values });
-          // debugger;
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            username: values.username,
-            authorities: values.authorities,
-            locale: values.locale?.substring?.(0, 2) ?? "en",
-            timeZone: values.timeZone,
-            status: values.trialUser ? "AUTHORIZED" : "PENDING",
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["hr-users"] });
-      onSuccess?.(data);
+  return useMyMutation({
+    fetchDef: {
+      method: "PUT",
+      getUrl: pipe(prop("username"), concat(`/api/latest/user/`)),
+      from: converge(unapply(mergeAll), [
+        pick(["firstName", "lastName", "username", "authorities", "timeZone"]),
+        applySpec({
+          locale: toApiLocale,
+          status: ifElse(
+            prop("trialUser"),
+            always("AUTHORIZED"),
+            always("PENDING")
+          ),
+        }),
+      ]),
     },
+    invalidate: [{ queryKey: ["hr-users"] }],
     ...rest,
   });
 };
 
 export const useCreditRequestMutation = ({ onSuccess, ...rest } = {}) => {
-  const { authFetch, fetchUser } = useAuth();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ username, credit }) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/hr-users/${username}/credit-request`,
-        data: {
-          credit,
-        },
-      }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["hr-users"] });
-      onSuccess?.(data);
+  return useMyMutation({
+    fetchDef: {
+      method: "POST",
+      getUrl: pipe(
+        prop("username"),
+        (username) => `/api/latest/hr-users/${username}/credit-request`
+      ),
+      from: pick(["credit"]),
     },
+    invalidate: [{ queryKey: ["hr-users"] }],
     ...rest,
   });
 };
