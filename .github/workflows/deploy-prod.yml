@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    name: Build top-leader-fe
+    name: Build prod top-leader-fe
     runs-on: ubuntu-latest
     environment: prod
     strategy:
@@ -55,7 +55,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    name: Deploy top-leader-fe
+    name: Deploy prod top-leader-fe
     if: github.ref == 'refs/heads/prod'
     needs: [ build ]
     runs-on: ubuntu-latest
