@@ -14,8 +14,7 @@ name: Build
 
 on:
   push:
-    tags:
-      - '.*-release'
+    tags: ['*-release']
 jobs:
   build:
     name: Build prod top-leader-fe
