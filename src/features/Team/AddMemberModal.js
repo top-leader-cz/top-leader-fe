@@ -18,15 +18,15 @@ import {
   renderLanguageOption,
 } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
-import { Msg, useMsg } from "../../components/Msg/Msg";
+import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
+import { gray500 } from "../../theme";
 import { Authority } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
-import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
-import { useCreateUserMutation, useEditUserMutation } from "./api";
-import { messages } from "./messages";
-import { gray500 } from "../../theme";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
+import { useUserMutation } from "./api";
+import { messages } from "./messages";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
 
@@ -38,15 +38,11 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
   const msg = useMsg({ dict: messages });
   const { userTz, language } = useContext(I18nContext);
 
-  const addUserMutation = useCreateUserMutation({ onSuccess: onClose });
-  const editUserMutation = useEditUserMutation({ onSuccess: onClose });
-  const mutation = isEdit ? editUserMutation : addUserMutation;
-  const { reset: resetAdd } = addUserMutation;
-  const { reset: resetEdit } = editUserMutation;
+  const mutation = useUserMutation({ isEdit, onSuccess: onClose });
+  const { reset } = mutation;
   const resetMutation = useCallback(() => {
-    resetAdd();
-    resetEdit();
-  }, [resetAdd, resetEdit]);
+    reset();
+  }, [reset]);
 
   const defaultValues = useMemo(
     () => ({
@@ -54,7 +50,7 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
       lastName: "",
       username: "",
       authorities: ["USER"],
-      locale: language?.substring(0, 2),
+      locale: language,
       timeZone: userTz,
       trialUser: false,
     }),
@@ -183,10 +179,12 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
               label={msg("team.credit.add-member.fields.timeZone")}
               // TODO: translations? should be always populated
             />
-            <FormControlLabel
-              control={<CheckboxField name="trialUser" />}
-              label={msg("team.credit.add-member.fields.trial-user")}
-            />
+            {!isEdit ? (
+              <FormControlLabel
+                control={<CheckboxField name="trialUser" />}
+                label={msg("team.credit.add-member.fields.trial-user")}
+              />
+            ) : null}
 
             <Divider flexItem sx={{ mt: 3 }} />
             <Box display="flex" flexDirection="row" gap={3}>

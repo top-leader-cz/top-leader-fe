@@ -28,11 +28,7 @@ import { useCoachesQuery } from "../../Coaches/Coaches.page";
 import { INITIAL_FILTER } from "../../Coaches/CoachesFilter";
 import { I18nContext } from "../../I18n/I18nProvider";
 import { TIMEZONE_OPTIONS } from "../../Settings/GeneralSettings";
-import {
-  useAdminCreateUserMutation,
-  useAdminEditUserMutation,
-  useCompaniesQuery,
-} from "./api";
+import { useUserMutation } from "../../Team/api";
 
 export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
@@ -50,36 +46,35 @@ export const getLoadableOptions = ({ query, map = identity }) => {
 };
 
 export const MemberAdminForm = ({ onClose, initialValues }) => {
-  const { userTz, language } = useContext(I18nContext);
+  const { userTz } = useContext(I18nContext);
   const msg = useMsg();
 
   const coachesQuery = useCoachesQuery({ filter: INITIAL_FILTER() });
-  const companiesQuery = useCompaniesQuery({ to: useCompaniesQuery.toOpts });
-
   const isEdit = !!initialValues && !!Object.values(initialValues).length;
-  const editUserMutation = useAdminEditUserMutation({ onSuccess: onClose });
-  const addUserMutation = useAdminCreateUserMutation({ onSuccess: onClose });
-  const mutation = isEdit ? editUserMutation : addUserMutation;
+  const mutation = useUserMutation({
+    isEdit,
+    isAdmin: true,
+    onSuccess: onClose,
+  });
 
   const defaultValues = {
     firstName: initialValues.firstName || "",
     lastName: initialValues.lastName || "",
     username: initialValues.username || "",
-
-    companyId: initialValues.companyId || null,
-    isTrial: initialValues.isTrial ?? false,
-
     authorities: initialValues.authorities?.length
       ? initialValues.authorities
       : ["USER"],
+    locale: initialValues.locale,
     timeZone: initialValues.timeZone || userTz,
+    trialUser: false, // just new user
 
-    // Edit
-    status: initialValues.status,
-    coach: initialValues.coach,
-    credit: initialValues.credit,
-
-    locale: initialValues.locale || language?.substring(0, 2),
+    ...(isEdit
+      ? {
+          status: initialValues.status,
+          coach: initialValues.coach, // TODO: BE
+          credit: initialValues.credit, // TODO: BE
+        }
+      : {}),
   };
   const methods = useForm({
     mode: "onSubmit",
@@ -158,14 +153,6 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             disabled={isEdit}
           />
           <AutocompleteSelect
-            name="companyId"
-            label={msg("settings.admin.member.modal.fields.companyId")}
-            placeholder="TBD free input + string proximity (copy-paste in external feedback form)"
-            // freeSolo
-            fullWidth
-            {...getLoadableOptions({ query: companiesQuery })}
-          />
-          <AutocompleteSelect
             multiple
             disableCloseOnSelect
             name="authorities"
@@ -219,10 +206,12 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             label={msg("settings.admin.member.modal.fields.timeZone")}
             options={TIMEZONE_OPTIONS}
           />
-          <FormControlLabel
-            control={<CheckboxField name="isTrial" />}
-            label={msg("settings.admin.member.trial")}
-          />
+          {!isEdit ? (
+            <FormControlLabel
+              control={<CheckboxField name="trialUser" />}
+              label={msg("settings.admin.member.trial")}
+            />
+          ) : null}
 
           <Divider flexItem sx={{ mt: 3 }} />
           <Box display="flex" flexDirection="row" gap={3}>

@@ -1,4 +1,14 @@
-import { applySpec, map, pick, prop } from "ramda";
+import {
+  applySpec,
+  concat,
+  converge,
+  map,
+  mergeAll,
+  pick,
+  pipe,
+  prop,
+  unapply,
+} from "ramda";
 import { useQueryClient } from "react-query";
 import {
   useAuth,
@@ -39,76 +49,6 @@ export const useCompanyMutation = (rest = {}) => {
       from: pick(["name"]),
     },
     invalidate: [{ queryKey: ["companies"] }],
-    ...rest,
-  });
-};
-export const useAdminCreateUserMutation = (rest = {}) => {
-  return useMyMutation({
-    fetchDef: {
-      method: "POST",
-      url: `/api/latest/admin/users`,
-      from: pick([
-        "firstName",
-        "lastName",
-        "username",
-        "companyId",
-        "isTrial",
-        "authorities",
-        "timeZone",
-        "locale",
-      ]),
-    },
-    invalidate: [{ queryKey: ["admin"], exact: false }],
-    ...rest,
-  });
-};
-
-const creditFrom = (credit) => {
-  const num = Number(credit);
-  const nan = isNaN(num);
-  console.log("[creditFrom]", { credit, num, nan });
-  if (credit === null || nan) return null;
-  return num;
-};
-
-export const useAdminEditUserMutation = ({ onSuccess, ...rest } = {}) => {
-  const { authFetch } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMyMutation({
-    mutationFn: async (values) =>
-      authFetch({
-        method: "POST",
-        url: `/api/latest/admin/users/${values.username}`,
-        data: (() => {
-          console.log("[useAdminEditUserMutation]", { values });
-          return {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            // username: values.username, // new only
-            companyId: values.companyId,
-            isTrial: values.isTrial,
-            authorities: values.authorities,
-            timeZone: values.timeZone,
-
-            locale: values.locale,
-
-            // TODO: mui error for conditional autocomplete
-            status:
-              values.status || values.isAuthorized ? "AUTHORIZED" : "PENDING",
-            coach: values.coach,
-            credit: creditFrom(values.credit),
-          };
-        })(),
-      }),
-    onSuccess: (data) => {
-      queryClient.refetchQueries({
-        // queryKey: ["admin"], // Not working for some reason
-        queryKey: ["admin", "users"],
-        exact: false,
-      });
-      onSuccess?.(data);
-    },
     ...rest,
   });
 };

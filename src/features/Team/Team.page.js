@@ -130,7 +130,7 @@ function TeamPageInner() {
             {
               tooltip: msg("settings.admin.table.edit.tooltip"),
               Component: IconButton,
-              onClick: () => setMember(row),
+              onClick: () => console.log("mmm", { row }) || setMember(row),
               children: <Icon name="BorderColorOutlined" />,
               sx: { color: gray500 },
             },

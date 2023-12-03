@@ -1,9 +1,13 @@
 import {
+  allPass,
   always,
+  anyPass,
   applySpec,
+  complement,
   concat,
   converge,
   defaultTo,
+  identity,
   ifElse,
   mergeAll,
   pick,
@@ -48,48 +52,50 @@ export const useHrUsersQuery = (params = {}) => {
   });
 };
 
-export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
-
-export const useCreateUserMutation = ({ onSuccess, ...rest } = {}) => {
-  return useMyMutation({
-    fetchDef: {
-      method: "POST",
-      url: `/api/latest/user`,
-      from: converge(unapply(mergeAll), [
-        pick(["firstName", "lastName", "username", "authorities", "timeZone"]),
-        applySpec({
-          locale: toApiLocale,
-          status: ifElse(
-            prop("trialUser"),
-            always("AUTHORIZED"),
-            always("PENDING")
-          ),
-        }),
-      ]),
-    },
-    invalidate: [{ queryKey: ["hr-users"] }],
-    ...rest,
-  });
+const creditFrom = (credit) => {
+  const num = Number(credit);
+  const nan = isNaN(num);
+  console.log("[creditFrom]", { credit, num, nan });
+  if (credit === null || nan) return null;
+  return num;
 };
 
-export const useEditUserMutation = ({ onSuccess, ...rest } = {}) => {
+export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
+
+export const useUserMutation = ({ isEdit, isAdmin, ...rest } = {}) => {
   return useMyMutation({
     fetchDef: {
-      method: "PUT",
-      getUrl: pipe(prop("username"), concat(`/api/latest/user/`)),
+      ...(isEdit
+        ? {
+            method: "PUT",
+            getUrl: pipe(prop("username"), concat(`/api/latest/user/`)),
+          }
+        : { method: "POST", url: `/api/latest/user` }),
       from: converge(unapply(mergeAll), [
-        pick(["firstName", "lastName", "username", "authorities", "timeZone"]),
+        pick(["username", "firstName", "lastName", "authorities", "timeZone"]),
         applySpec({
-          locale: toApiLocale,
+          locale: toApiLocale, // just create?
           status: ifElse(
-            prop("trialUser"),
-            always("AUTHORIZED"),
-            always("PENDING")
+            always(isEdit),
+            pipe(prop("status"), defaultTo("AUTHORIZED")),
+            ifElse(prop("trialUser"), always("AUTHORIZED"), always("PENDING"))
           ),
         }),
+        ifElse(
+          allPass([always(isAdmin), always(isEdit)]),
+          applySpec({
+            // TODO: BE?
+            coach: prop("coach"),
+            credit: pipe(prop("credit"), creditFrom),
+          }),
+          always({})
+        ),
       ]),
     },
-    invalidate: [{ queryKey: ["hr-users"] }],
+    invalidate: [
+      { queryKey: ["hr-users"] },
+      { queryKey: ["admin"], exact: false },
+    ],
     ...rest,
   });
 };

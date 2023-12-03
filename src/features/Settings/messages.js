@@ -273,10 +273,6 @@ export const messages = defineMessages({
     id: "settings.admin.member.modal.fields.username",
     defaultMessage: "Email",
   },
-  "settings.admin.member.modal.fields.companyId": {
-    id: "settings.admin.member.modal.fields.companyId",
-    defaultMessage: "Company",
-  },
   "settings.admin.member.modal.fields.authorities": {
     id: "settings.admin.member.modal.fields.authorities",
     defaultMessage: "Roles",
