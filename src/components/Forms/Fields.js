@@ -22,11 +22,12 @@ import { getDay, isSameDay, isValid } from "date-fns/fp";
 import {
   chain,
   curryN,
+  identity,
   map,
   pipe,
   remove,
-  sort,
   splitEvery,
+  tap,
   uniq,
   when,
 } from "ramda";
@@ -44,9 +45,8 @@ import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { ErrorBoundary } from "../ErrorBoundary";
 import { Icon } from "../Icon";
 import { Msg, MsgProvider } from "../Msg";
-import { P } from "../Typography";
 import { Score } from "../Score";
-import { useMsg } from "../Msg/Msg";
+import { P } from "../Typography";
 import { FieldError } from "./validations";
 
 // import { DateRangePicker } from "@mui/lab";
@@ -906,6 +906,118 @@ export const AutocompleteSelect = ({
           //   });
           //   field.onChange(event, newInputValue);
           // }}
+        />
+      )}
+    />
+  );
+};
+
+const pipeMaybe = (...fns) =>
+  fns.some((fn) => !fn) ? undefined : pipe(...fns);
+
+const log =
+  (...args) =>
+  (data) =>
+    console.log(...args, data);
+
+export const optionEqStrategies = {
+  default: "default",
+  optionValue: "optionValue",
+  equals: "equals",
+};
+
+export const FreeSoloField = ({
+  name,
+  id = name,
+  rules,
+  label,
+  options,
+  optionEqStrategy = "optionValue",
+  placeholder = "Type your own and hit enter or select from the list",
+  onChange,
+  selectOnFocus = true,
+  clearOnBlur = true,
+  debug = true,
+  inputProps = {},
+  ...props
+}) => {
+  const isOptionEqualToValue = useMemo(() => {
+    const predicateFns = {
+      [optionEqStrategies.default]: undefined,
+      [optionEqStrategies.optionValue]: (opt, val) => opt.value === val,
+      [optionEqStrategies.equals]: (opt, val) => opt === val,
+    };
+    return pipeMaybe(
+      // tap(debug ? log(`[isOptionEqualToValue] ${optionEqStrategy}`) : identity),
+      predicateFns[optionEqStrategy]
+    );
+  }, [optionEqStrategy]);
+  const from = useCallback(
+    ({ data, action }) => {
+      if (action === "createOption") return data; // isUserInput(value)? {isUserInput: true, inputText: value}
+      if (action === "selectOption") return data?.value ?? null;
+
+      // TODO: multiple
+      return props.multiple
+        ? (data) => uniq(data?.map((item) => item?.value ?? item) ?? [])
+        : (data) => data?.value ?? null;
+    },
+    [props.multiple]
+  );
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field, fieldState }) => (
+        <Autocomplete
+          freeSolo
+          // https://mui.com/material-ui/react-autocomplete/#creatable
+          selectOnFocus={selectOnFocus}
+          clearOnBlur={clearOnBlur}
+          name={name}
+          autoHighlight
+          fullWidth
+          id={id}
+          {...field}
+          options={options}
+          isOptionEqualToValue={isOptionEqualToValue}
+          getOptionLabel={(optionOrValue) =>
+            optionOrValue?.label ||
+            getOption(options, optionOrValue)?.label ||
+            optionOrValue
+          }
+          size="small"
+          onChange={(event, data, action, other) => {
+            // prettier-ignore
+            console.log(...color("blue", "[FreeSoloField.onChange]"), { name, data, field, action, other });
+            if (typeof debug === "string") debugger; // debugger, break, d, b
+            const value = from({ data, action });
+            onChange?.(value);
+            field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
+          }}
+          // onBlur={(event, reason, ...rest) => {
+          //   // prettier-ignore
+          //   console.log(...color("blue", "[FreeSoloField.onBlur]"), { name, field, event, reason, rest });
+          //   if (typeof debug === "string") debugger; // debugger, break, d, b
+          //   field.onBlur(event, reason, ...rest);
+          // }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              placeholder={placeholder}
+              error={!!fieldState.error}
+              helperText={
+                <FieldError {...{ field, fieldState, rules, name }} />
+              }
+              InputLabelProps={{ shrink: !!label }}
+              inputProps={{
+                ...params.inputProps,
+                ...inputProps,
+              }}
+            />
+          )}
+          {...props}
         />
       )}
     />

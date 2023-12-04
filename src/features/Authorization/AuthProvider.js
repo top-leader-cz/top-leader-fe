@@ -149,7 +149,7 @@ const errMessages = defineMessages({
   },
 });
 
-const aErr = (jsonMaybe) => [].concat(jsonMaybe).filter(Boolean);
+const aErr = (jsonMaybe) => [].concat(jsonMaybe || []).filter(Boolean);
 
 // https://github.com/top-leader-cz/top-leader-be/blob/main/src/main/java/com/topleader/topleader/exception/ErrorCodeConstants.java
 const exampleJsonMaybe = [
@@ -159,56 +159,117 @@ const exampleJsonMaybe = [
     errorMessage: "User does not have enough credit",
   },
 ];
-const translateErrorsMaybe = ({ response, jsonMaybe, intl }) => {
+const feedbackExample = [
+  {
+    errorCode: "NotNull", // TODO: BE, not listed
+    fields: [
+      {
+        name: "validTo",
+        value: "null",
+      },
+    ],
+    errorMessage: "must not be null",
+  },
+];
+
+const extractApiMsg = (error) => {
+  const fieldsMsgMaybe = error?.fields
+    ?.map(({ name, value }) => name)
+    ?.join(", ");
+  const apiMessage = [
+    error?.errorMessage,
+    fieldsMsgMaybe,
+    error?.error,
+    error?.message,
+  ]
+    .filter(Boolean)
+    .join(" - ");
+  return apiMessage;
+};
+
+const translateErr = ({ intl, error }) => {
+  const apiMessage = extractApiMsg(error);
+  try {
+    if (!error?.errorCode)
+      return { translated: "", info: "No errorCode", apiMessage };
+
+    const tsKey = getTsKey(error?.errorCode);
+    const msgObj = errMessages[tsKey];
+    if (!msgObj?.id) {
+      return {
+        translated: "",
+        info: !msgObj
+          ? "Missing translation for key: " + tsKey
+          : "No id in translation object for key: " + tsKey,
+        apiMessage,
+        tsKey,
+      };
+    }
+    return {
+      translated: intl.formatMessage(msgObj, { apiMessage }),
+      apiMessage,
+      tsKey,
+      info: "",
+    };
+  } catch (e) {
+    debugger;
+    console.log("[translateErr er]", { e, error });
+    return { translated: "", info: "Error during translation", apiMessage };
+  }
+};
+
+const DEFAULT_ERROR_MESSAGE = "Oops!";
+
+const stringifySensitive = (data, defaultMsg = DEFAULT_ERROR_MESSAGE) => {
+  return process.env.NODE_ENV === "production"
+    ? defaultMsg
+    : JSON.stringify(data);
+};
+
+const translateErrors = ({ response, jsonMaybe, textMaybe, intl }) => {
   const errArr = aErr(jsonMaybe); // just for sure, TODO: move to authFetch?
-  const msgObjArr = errArr
-    .filter(prop("errorCode"))
-    .map((errMaybe) => ({
-      errMaybe,
-      msgObj: errMessages[getTsKey(errMaybe?.errorCode)],
-      translated: intl.formatMessage(
-        errMessages[getTsKey(errMaybe?.errorCode)],
-        { apiMessage: errMaybe?.errorMessage }
-      ),
-    }))
-    .filter(prop("msgObj"));
+  if (!errArr.length) {
+    return stringifySensitive({
+      status: response?.status,
+      textMaybe,
+      jsonMaybe,
+    });
+  }
+  const translatedArr = errArr.map((error) => {
+    const { translated, info, apiMessage } = translateErr({ intl, error });
+
+    return { error, info, translated, apiMessage };
+  });
+
   // debugger;
 
-  if (msgObjArr.length !== errArr.length) {
-    console.log("TODO: untranslated err", {
-      msgObjArr,
-      errArr,
-      jsonMaybe,
-      response,
-    });
+  if (translatedArr.filter(prop("translated")).length !== errArr.length) {
+    // prettier-ignore
+    console.log("TODO: untranslated error", { errArr, translatedArr, jsonMaybe, response, });
     debugger;
   }
 
-  if (!msgObjArr.length) return undefined;
+  return translatedArr
+    .map(({ translated, apiMessage, error, info }) => {
+      if (translated) return translated;
+      if (apiMessage) {
+        if (info && process.env.NODE_ENV !== "production")
+          return `${apiMessage} [DEV info - using API message: ${info}]`;
 
-  return msgObjArr.map(({ translated }) => `${translated}`).join(". ");
+        return apiMessage;
+      }
+      return stringifySensitive({ error, info });
+    })
+    .join(". ");
 };
 
 const throwResponse = ({ response, jsonMaybe, textMaybe, intl }) => {
-  console.log("[throwResponse]", { response });
-  const apiMsg = aErr(jsonMaybe)
-    .map(prop("errorMessage"))
-    .filter(Boolean)
-    .join(". ");
-  const generalErrorMessage = apiMsg || `Something went wrong.`;
-  const translatedMessageMaybe = translateErrorsMaybe({
+  const message = translateErrors({
     response,
     jsonMaybe,
+    textMaybe,
     intl,
   });
-  const message =
-    translatedMessageMaybe ||
-    (process.env.NODE_ENV === "production"
-      ? generalErrorMessage
-      : JSON.stringify({
-          status: response?.status,
-          response: jsonMaybe || textMaybe || "[Response not ok, no response]",
-        }));
   const error = new Error(message);
   error.response = response;
   error.jsonMaybe = jsonMaybe;

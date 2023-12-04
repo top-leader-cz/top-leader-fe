@@ -71,6 +71,7 @@
   "proxy_bak": "https://topleader.hasura.app",
   "proxy": "https://topleader-394306.ey.r.appspot.com",
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^7.1.0",
     "@formatjs/cli": "^6.0.1",
     "@storybook/addon-essentials": "^7.5.3",

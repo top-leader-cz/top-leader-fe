@@ -221,7 +221,10 @@ export const ShareFeedbackModal = ({
                 </P>
                 <DatePickerField
                   name={SHARE_FIELDS.validTo}
-                  rules={{ validate: { invalidDate, todayOrFuture } }}
+                  rules={{
+                    required: "Required",
+                    validate: { invalidDate, todayOrFuture },
+                  }}
                   disablePast
                   clearable
                 />

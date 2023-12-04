@@ -14,6 +14,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import {
   AutocompleteSelect,
   CheckboxField,
+  FreeSoloField,
   getLabel,
 } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
@@ -32,18 +33,18 @@ export const FEEDBACK_INPUT_TYPE_OPTIONS = [
 ];
 
 export const InputPreview = ({ inputType, index }) => {
-  if (inputType === INPUT_TYPES.TEXT)
-    return (
-      <TextField
-        // name={`_example_i_${index}`}
-        placeholder={"Type your answer here"}
-        // rules={{ required: true }}
-        variant="standard"
-        // fullWidth
-        sx={{ mt: 3, width: "50%" }}
-        disabled
-      />
-    );
+  if (inputType === INPUT_TYPES.TEXT) return null;
+  // return (
+  //   <TextField
+  //     // name={`_example_i_${index}`}
+  //     placeholder={"Type your answer here"}
+  //     // rules={{ required: true }}
+  //     variant="standard"
+  //     // fullWidth
+  //     sx={{ mt: 3, width: "50%" }}
+  //     disabled
+  //   />
+  // );
 
   if (inputType === INPUT_TYPES.SCALE)
     return (
@@ -90,7 +91,7 @@ const FormBuilderField = ({
         <InputPreview inputType={inputType} index={index} />
         <Divider sx={{ my: 3 }} />
         <Box display="flex" flexDirection="row" gap={3}>
-          <AutocompleteSelect
+          <FreeSoloField
             name={titleName}
             rules={{ required: "Required" }}
             options={feedbackQuestionOptions}

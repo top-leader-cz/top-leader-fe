@@ -1,6 +1,8 @@
 import { always } from "ramda";
 import { AuthContext } from "../src/features/Authorization/AuthProvider";
 
+// TODO: https://storybook.js.org/docs/writing-stories/loaders
+
 export const mockAuthFetch =
   ({ mockData, delay = 500 }) =>
   (fetchDef) =>
