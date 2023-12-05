@@ -157,4 +157,41 @@ export const messages = defineMessages({
     id: "feedback.external.request-access-modal.request",
     defaultMessage: "Request access",
   },
+
+  "dict.feedback-questions-categories.general": {
+    id: "dict.feedback-questions-categories.general",
+    defaultMessage: "General",
+  },
+  "dict.feedback-questions-categories.consider-other-team-members": {
+    id: "dict.feedback-questions-categories.consider-other-team-members",
+    defaultMessage: "Consider other team members",
+  },
+  "dict.feedback-questions-categories.leadership": {
+    id: "dict.feedback-questions-categories.leadership",
+    defaultMessage: "Leadership",
+  },
+  "dict.feedback-questions-categories.communication": {
+    id: "dict.feedback-questions-categories.communication",
+    defaultMessage: "Communication",
+  },
+  "dict.feedback-questions-categories.interpersonal": {
+    id: "dict.feedback-questions-categories.interpersonal",
+    defaultMessage: "Interpersonal",
+  },
+  "dict.feedback-questions-categories.problemsolving": {
+    id: "dict.feedback-questions-categories.problemsolving",
+    defaultMessage: "Problemsolving",
+  },
+  "dict.feedback-questions-categories.organizational": {
+    id: "dict.feedback-questions-categories.organizational",
+    defaultMessage: "Organizational",
+  },
+  "dict.feedback-questions-categories.motivation": {
+    id: "dict.feedback-questions-categories.motivation",
+    defaultMessage: "Motivation",
+  },
+  "dict.feedback-questions-categories.efficiency": {
+    id: "dict.feedback-questions-categories.efficiency",
+    defaultMessage: "Efficiency",
+  },
 });

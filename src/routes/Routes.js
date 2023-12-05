@@ -17,27 +17,27 @@ import {
   SignInPage,
 } from "../features/Authorization";
 import { Authority } from "../features/Authorization/AuthProvider";
+import { CheckEmailPage } from "../features/Authorization/CheckEmailPage";
+import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
+import { PasswordChangedPage } from "../features/Authorization/PasswordChangedPage";
 import { SetPasswordPage } from "../features/Authorization/SetPasswordPage";
+import { ClientsPage } from "../features/Clients/ClientsPage";
 import { CoachesPage } from "../features/Coaches/Coaches.page";
 import { DashboardPage } from "../features/Dashboard";
+import { CreateFeedbackPage } from "../features/Feedback/CreateFeedback.page";
+import { ExternalFeedbackPage } from "../features/Feedback/ExternalFeedbackPage";
+import { FeedbackResultsPage } from "../features/Feedback/FeedbackResults.page";
 import { GetFeedbackPage } from "../features/Feedback/GetFeedback.page";
 import { MessagesPage } from "../features/Messages/Messages.page";
 import { NewSessionPage, SessionsPage } from "../features/Sessions";
 import { EditSessionPage } from "../features/Sessions/EditSession.page";
+import { StartSessionPage } from "../features/Sessions/StartSession.page";
 import { SettingsPage } from "../features/Settings/Settings.page";
 import { StrengthsPage } from "../features/Strengths";
 import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
-import { ClientsPage } from "../features/Clients/ClientsPage";
-import { StartSessionPage } from "../features/Sessions/StartSession.page";
-import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
-import { CreateFeedbackPage } from "../features/Feedback/CreateFeedback.page";
-import { FeedbackResultsPage } from "../features/Feedback/FeedbackResults.page";
-import { CheckEmailPage } from "../features/Authorization/CheckEmailPage";
-import { PasswordChangedPage } from "../features/Authorization/PasswordChangedPage";
-import { ExternalFeedbackPage } from "../features/Feedback/ExternalFeedbackPage";
 
 const GlobalSpinner = () => {
   return (

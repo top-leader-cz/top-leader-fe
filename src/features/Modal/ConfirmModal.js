@@ -9,6 +9,18 @@ import {
   Paper,
   Snackbar,
 } from "@mui/material";
+import {
+  adjust,
+  always,
+  applySpec,
+  evolve,
+  findIndex,
+  identity,
+  pick,
+  pipe,
+  propEq,
+  reject,
+} from "ramda";
 import React, {
   useCallback,
   useContext,
@@ -16,33 +28,10 @@ import React, {
   useMemo,
   useReducer,
   useRef,
-  useState,
 } from "react";
+import { v4 as uuid } from "uuid";
 import { Icon } from "../../components/Icon";
 import { H2, P } from "../../components/Typography";
-import {
-  adjust,
-  always,
-  applySpec,
-  assoc,
-  concat,
-  evolve,
-  find,
-  findIndex,
-  identity,
-  ifElse,
-  lte,
-  map,
-  pick,
-  pipe,
-  prop,
-  propEq,
-  reject,
-  update,
-  when,
-} from "ramda";
-import { v4 as uuid } from "uuid";
-import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 // const CONFIRM_MODAL_TYPE = {
 //   INFO: "INFO",

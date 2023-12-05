@@ -1,4 +1,4 @@
-import { Alert, Avatar, Box, Button, Card, CardContent } from "@mui/material";
+import { Avatar, Box, Button, Card, CardContent } from "@mui/material";
 import { addDays, parse } from "date-fns/fp";
 import { applySpec } from "ramda";
 import { useContext } from "react";
@@ -55,10 +55,7 @@ export const useSchedulePrivateSessionMutation = (params = {}) => {
 const SchedulePrivateForm = () => {
   const navigate = useNavigate();
   const mutation = useSchedulePrivateSessionMutation({
-    onSuccess: (data) => {
-      console.log("[PrivateFinished.mutation.onSuccess]", { data });
-      navigate(routes.sessions);
-    },
+    onSuccess: () => navigate(routes.sessions),
   });
   const form = useForm({
     mode: "all",
@@ -70,10 +67,7 @@ const SchedulePrivateForm = () => {
   const { control, formState } = form;
   const disabled = mutation.isLoading || !formState.isValid;
 
-  console.log("[PrivateFinished.rndr]", {
-    disabled,
-    formState,
-  });
+  // console.log("[PrivateFinished.rndr]", { disabled, formState });
 
   return (
     <RHForm form={form} onSubmit={mutation.mutateAsync}>
@@ -109,9 +103,6 @@ const SchedulePrivateForm = () => {
           }}
         />
       </Box>
-      {mutation.error && (
-        <Alert severity="error"> {mutation.error?.message} </Alert>
-      )}
       <ControlsContainer sx={{ mt: 3 }}>
         <Button href={routes.sessions} variant="outlined">
           <Msg id="sessions.steps.finished.button.skip" />

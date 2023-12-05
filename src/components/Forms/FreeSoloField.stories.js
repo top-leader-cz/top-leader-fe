@@ -1,4 +1,4 @@
-import { values } from "ramda";
+import { omit, values } from "ramda";
 import App from "../../App";
 import { MockForm } from "./AutocompleteSelect.stories";
 import { FreeSoloField, optionEqStrategies } from "./Fields";
@@ -12,6 +12,15 @@ export default {
   },
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/react/writing-docs/autodocs
   tags: ["autodocs"],
+  argTypes: {
+    selectOnFocus: { control: "boolean" },
+    clearOnBlur: { control: "boolean" },
+    debug: { control: "select", options: [false, true, "debugger"] },
+    optionEqStrategy: {
+      control: "inline-radio",
+      options: values(optionEqStrategies),
+    },
+  },
   decorators: [
     (Story) => (
       <App>
@@ -39,13 +48,22 @@ export const Basic = {
     debug: true,
     sx: { width: "100%" },
   },
-  argTypes: {
-    selectOnFocus: { control: "boolean" },
-    clearOnBlur: { control: "boolean" },
-    debug: { control: "select", options: [false, true, "debugger"] },
-    optionEqStrategy: {
-      control: "inline-radio",
-      options: values(optionEqStrategies),
+};
+export const GroupedOptionsObject = {
+  args: {
+    ...omit(["options"], Basic.args),
+    groupedOptions: {
+      "Group 1": options,
+      "Group 2": [{ value: 4, label: "Fourth" }],
     },
+  },
+};
+export const GroupedOptionsArray = {
+  args: {
+    ...omit(["options"], Basic.args),
+    groupedOptions: options.map((option, i) => ({
+      ...option,
+      __group: (i + 1) % 2 ? "odd" : "even",
+    })),
   },
 };

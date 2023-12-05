@@ -1,5 +1,4 @@
 import { useCallback, useContext, useMemo, useState } from "react";
-import { useQueryClient } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { Layout } from "../../components/Layout";
@@ -11,16 +10,15 @@ import { useAuth } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { CreateFeedbackForm } from "./CreateFeedbackForm";
+import { getCollectedMaybe } from "./GetFeedback.page";
 import { FIELD_DEFAULT_VALUES, ShareFeedbackModal } from "./ShareFeedbackModal";
 import {
   useFeedbackOptionsQuery,
   useFeedbackQuery,
-  usePostFeedbackFormMutation,
   useSaveFeedbackFormMutation,
 } from "./api";
-import { messages } from "./messages";
 import { FEEDBACK_FIELDS } from "./constants";
-import { getCollectedMaybe } from "./GetFeedback.page";
+import { messages } from "./messages";
 
 const from = ({ shareFormValues, formBuilderValues, username, language }) => {
   const validTo = shareFormValues.validTo;
@@ -77,7 +75,7 @@ function CreateFeedbackPageInner({ data }) {
 
   const msg = useMsg();
   const { language } = useContext(I18nContext);
-  const { authFetch, user } = useAuth();
+  const { user } = useAuth();
   const [formBuilderValues, setFormBuilderValues] = useState();
   const navigate = useNavigate();
 
@@ -108,7 +106,6 @@ function CreateFeedbackPageInner({ data }) {
     },
     [formBuilderValues, user.data.username, language, saveMutation]
   );
-  const error = saveMutation.error;
 
   return (
     <Layout>
@@ -138,7 +135,6 @@ function CreateFeedbackPageInner({ data }) {
           onClose={() => setFormBuilderValues()}
           //   link="http://topleader.io/juRcHHx7r8QTPYP"
           link=""
-          error={error}
           isLoading={saveMutation.isLoading}
           initialValues={initialValues}
         />

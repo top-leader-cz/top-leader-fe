@@ -106,7 +106,6 @@ export const ShareFeedbackModal = ({
   onSubmit,
   onClose,
   link,
-  error,
   isLoading,
   initialValues,
 }) => {
@@ -180,7 +179,6 @@ export const ShareFeedbackModal = ({
               <P id="modal-modal-description">
                 {msg("feedback.create.share-modal.desc")}
               </P>
-              {error && <Alert severity="error">{error.message}</Alert>}
               <Box
                 display="flex"
                 flexDirection="row"

@@ -20,15 +20,22 @@ import {
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import { getDay, isSameDay, isValid } from "date-fns/fp";
 import {
+  assoc,
   chain,
   curryN,
   identity,
+  lensProp,
   map,
   pipe,
+  prop,
   remove,
+  set,
+  sortBy,
   splitEvery,
   tap,
+  toPairs,
   uniq,
+  view,
   when,
 } from "ramda";
 import React, {
@@ -931,7 +938,8 @@ export const FreeSoloField = ({
   id = name,
   rules,
   label,
-  options,
+  options: optionsProp,
+  groupedOptions,
   optionEqStrategy = "optionValue",
   placeholder = "Type your own and hit enter or select from the list",
   onChange,
@@ -941,6 +949,25 @@ export const FreeSoloField = ({
   inputProps = {},
   ...props
 }) => {
+  const optionsProps = useMemo(() => {
+    if (!groupedOptions) return { options: optionsProp };
+
+    const groupLens = lensProp("__group");
+
+    if (Array.isArray(groupedOptions))
+      return {
+        groupBy: view(groupLens),
+        options: sortBy(view(groupLens), groupedOptions),
+      };
+
+    return {
+      groupBy: view(groupLens),
+      options: pipe(
+        toPairs,
+        chain(([key, options]) => map(set(groupLens, key), options))
+      )(groupedOptions),
+    };
+  }, [groupedOptions, optionsProp]);
   const isOptionEqualToValue = useMemo(() => {
     const predicateFns = {
       [optionEqStrategies.default]: undefined,
@@ -964,6 +991,7 @@ export const FreeSoloField = ({
     },
     [props.multiple]
   );
+  const { options } = optionsProps;
   return (
     <Controller
       name={name}
@@ -979,7 +1007,7 @@ export const FreeSoloField = ({
           fullWidth
           id={id}
           {...field}
-          options={options}
+          {...optionsProps}
           isOptionEqualToValue={isOptionEqualToValue}
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||

@@ -9,7 +9,17 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
-import { prop } from "ramda";
+import {
+  adjust,
+  groupBy,
+  join,
+  keys,
+  pipe,
+  prop,
+  replace,
+  split,
+  toUpper,
+} from "ramda";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import {
   AutocompleteSelect,
@@ -67,6 +77,7 @@ const FormBuilderField = ({
   remove,
   sx,
 }) => {
+  const msg = useMsg({ dict: messages });
   const form = useFormContext();
 
   const titleName = getName(SUBFIELDS.title);
@@ -78,9 +89,15 @@ const FormBuilderField = ({
   const requiredName = getName(SUBFIELDS.required);
   const required = form.watch(requiredName);
 
-  console.log("FormBuilderField.rndr", {
-    feedbackQuestionOptions,
-  });
+  const groupedOptions = groupBy(({ value }) => {
+    const cat = value?.split(".")?.[1] ?? "";
+    return cat
+      ? msg.maybe(`dict.feedback-questions-categories.${cat}`) ||
+          pipe(split(""), adjust(0, toUpper), join(""), replace(/-/g, " "))(cat)
+      : "";
+  }, feedbackQuestionOptions);
+
+  // console.log("FormBuilderField.rndr", { feedbackQuestionOptions, groupedOptions });
 
   return (
     <Card sx={sx}>
@@ -94,7 +111,8 @@ const FormBuilderField = ({
           <FreeSoloField
             name={titleName}
             rules={{ required: "Required" }}
-            options={feedbackQuestionOptions}
+            // options={feedbackQuestionOptions}
+            groupedOptions={groupedOptions}
             sx={{ maxWidth: "50%", flex: "0 1 auto" }}
           />
           <AutocompleteSelect
