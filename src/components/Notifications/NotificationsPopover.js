@@ -19,7 +19,7 @@ import { routes } from "../../routes";
 import { LinkBehavior } from "../LinkBehavior";
 import { useMsg } from "../Msg/Msg";
 import { H2 } from "../Typography";
-import { messages as generalMessages } from "../messages";
+import { generalMessages } from "../messages";
 
 export const NotificationsPopover = ({
   notifications = [],

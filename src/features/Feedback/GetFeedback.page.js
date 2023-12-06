@@ -5,6 +5,7 @@ import {
   CardContent,
   Divider,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useContext } from "react";
 import { Header } from "../../components/Header";
@@ -23,6 +24,7 @@ import { EmptyTemplate } from "./EmptyTemplate";
 import { useDeleteFeedbackFormMutation, useFeedbackFormsQuery } from "./api";
 import { messages } from "./messages";
 import { useNavigate } from "react-router-dom";
+import { generalMessages } from "../../components/messages";
 
 const EmptyFeedbacks = () => {
   const msg = useMsg();
@@ -55,6 +57,7 @@ const FeedbackListCard = ({ feedback }) => {
   const deleteFeedbackMutation = useDeleteFeedbackFormMutation();
 
   const msg = useMsg();
+  const generalMsg = useMsg({ dict: generalMessages });
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(createdAt);
   const formattedDate = i18n.formatLocalMaybe(parsed, "P");
@@ -91,25 +94,29 @@ const FeedbackListCard = ({ feedback }) => {
               justifyContent: "flex-end",
             }}
           >
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                navigate(parametrizedRoutes.editFeedbackForm({ id }));
-              }}
-            >
-              <Icon name="ContentCopy" sx={{ color: primary500 }} />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                deleteFeedbackMutation.mutate({ feedback });
-              }}
-              disabled={deleteFeedbackMutation.isLoading}
-            >
-              <Icon name="DeleteOutlined" sx={{ color: primary500 }} />
-            </IconButton>
+            <Tooltip title={generalMsg("general.copy")}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  navigate(parametrizedRoutes.editFeedbackForm({ id }));
+                }}
+              >
+                <Icon name="ContentCopy" sx={{ color: primary500 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={generalMsg("general.delete")}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  deleteFeedbackMutation.mutate(feedback);
+                }}
+                disabled={deleteFeedbackMutation.isLoading}
+              >
+                <Icon name="DeleteOutlined" sx={{ color: primary500 }} />
+              </IconButton>
+            </Tooltip>
           </Box>
         </CardContent>
       </CardActionArea>

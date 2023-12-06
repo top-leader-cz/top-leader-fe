@@ -5,6 +5,7 @@ import {
   CircularProgress,
   Skeleton,
 } from "@mui/material";
+import { all } from "ramda";
 
 export const Loaders = {
   Backdrop: () => (
@@ -59,10 +60,11 @@ export const QueryRenderer = ({
   loaderProps,
   loading = Loaders[loaderName],
   query: queryProp,
-  // queries,
+  // queries: queriesProp,
   ...queryRest
 }) => {
   const query = queryProp || queryRest; // TODO: migrate to separate prop, add queries renderer
+  // const queries = queriesProp || [query];
 
   if (query.data) return success?.(query);
   if (query.isLoading) return loading?.(query, loaderProps);

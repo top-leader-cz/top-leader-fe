@@ -1,6 +1,8 @@
-import { map, pipe } from "ramda";
+import { curryN, map, pipe, prop } from "ramda";
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
+import { useFeedbackOptionsQuery } from "./api";
+import { getLoadableOptions } from "../Settings/Admin/MemberAdminModal";
 
 const messages = defineMessages({
   "dict.feedback.question.general.work-in-respectful-manners.label": {
@@ -267,7 +269,7 @@ const messages = defineMessages({
   },
 });
 
-const translateQuestion = (intl, apiKey) => {
+const translateOption = curryN(2, (intl, apiKey) => {
   const getId = (prop) => `dict.feedback.${apiKey}.${prop}`;
   const tsKey = getId("label");
   const tsObj = messages[tsKey];
@@ -285,12 +287,12 @@ const translateQuestion = (intl, apiKey) => {
     value: apiKey,
     label: intl.formatMessage({ ...tsObj }),
   };
-};
+});
 
 export const useFeedbackQuestionOptionsDict = ({ apiKeys = [] }) => {
   const intl = useIntl();
   const feedbackQuestionOptions = useMemo(
-    () => pipe(map((k) => translateQuestion(intl, k)))(apiKeys),
+    () => pipe(map((k) => translateOption(intl, k)))(apiKeys),
     [apiKeys, intl]
   );
 
@@ -298,4 +300,15 @@ export const useFeedbackQuestionOptionsDict = ({ apiKeys = [] }) => {
     () => ({ feedbackQuestionOptions }),
     [feedbackQuestionOptions]
   );
+};
+
+// TODO: use everywhere
+export const useFeedbackOptions = () => {
+  const intl = useIntl();
+  const query = useFeedbackOptionsQuery();
+  const optionsProps = getLoadableOptions({
+    query,
+    map: pipe(prop("options"), map(prop("key")), map(translateOption(intl))),
+  });
+  return { query, optionsProps };
 };

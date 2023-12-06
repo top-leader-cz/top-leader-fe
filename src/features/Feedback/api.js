@@ -131,7 +131,7 @@ export const useDeleteFeedbackFormMutation = (rest = {}) => {
   return useMyMutation({
     fetchDef: {
       method: "DELETE",
-      getUrl: ({ feedback }) => `/api/latest/feedback/${feedback.id}`,
+      getUrl: ({ id }) => `/api/latest/feedback/${id}`,
     },
     invalidate: [{ exact: false, queryKey: ["feedback"] }],
     ...rest,

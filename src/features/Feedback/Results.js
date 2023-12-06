@@ -1,44 +1,9 @@
-import { Box, Card, CardContent, Divider } from "@mui/material";
-import { useMemo } from "react";
+import { Alert, Box, Card, CardContent, Divider } from "@mui/material";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { getLabel } from "../../components/Forms";
-import { useRightMenu } from "../../components/Layout";
 import { H2, P } from "../../components/Typography";
-import { FeedbackRightMenu } from "./FeedbackRightMenu";
-import { FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
-import { getCollectedMaybe } from "./GetFeedback.page";
-
-// TODO: useFeedbackQuestionOptionsDict
-const QUESTION_TITLE_OPTIONS = [
-  {
-    value: "$id_style_rating",
-    label: "What do you consider good about my leadership style?",
-  },
-  {
-    value: "$id_public_speak_rating",
-    label: "How good am I at public speaking?",
-  },
-];
-
-const TODO = 2;
-
-const MOCK_TEXT_RESULTS = [
-  "Asperiores dolores temporibus voluptas facere a illum ducimus explicabo nostrum. Dolores dolorem ab qui voluptatem. Ut in minima ut quo expedita. Unde et ut voluptate amet quis omnis.",
-  "Placeat officiis unde quia qui nobis ipsum omnis. Eos quas quasi dolores libero nemo ad eligendi. Eveniet placeat repellendus modi soluta repellat. Labore eveniet enim nostrum. Ut rerum dolore quis. Quas quae sunt quo id ex.",
-];
-const MOCK_SCALE_RESULTS = [0, 0, 0, 0, 0, 0, 0, 0, 50, 50];
-const MOCK_RESULTS = [
-  {
-    title: QUESTION_TITLE_OPTIONS[0].value,
-    inputType: INPUT_TYPES.TEXT,
-    data: MOCK_TEXT_RESULTS,
-  },
-  {
-    title: QUESTION_TITLE_OPTIONS[1].value,
-    inputType: INPUT_TYPES.SCALE,
-    data: MOCK_SCALE_RESULTS,
-  },
-];
+import { INPUT_TYPES } from "./constants";
+import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
 
 const TextResults = ({ data }) => {
   return (
@@ -93,67 +58,60 @@ const ScaleResults = ({ data }) => {
   );
 };
 
-const FieldResults = ({ field }) => {
-  if (field.inputType === INPUT_TYPES.TEXT)
-    return <TextResults data={field.data} />;
-  if (field.inputType === INPUT_TYPES.SCALE)
-    return <ScaleResults data={field.data} />;
+const FieldResults = ({ question, results }) => {
+  if (!results) return <Alert severity="error">Missing results</Alert>;
+  if (question.type === INPUT_TYPES.TEXT) return <TextResults data={results} />;
+  if (question.type === INPUT_TYPES.SCALE)
+    return <ScaleResults data={results} />;
   return null;
 };
 
-const FieldResultsCard = ({ index, field, sx }) => {
+const FieldResultsCard = ({ index, question, feedback, sx }) => {
+  const { query, optionsProps } = useFeedbackOptions();
+
   return (
     <ErrorBoundary>
       <Card elevation={0} sx={sx}>
         <CardContent>
           <H2 sx={{ mb: 2 }}>
-            {index + 1}.{" "}
-            {getLabel(QUESTION_TITLE_OPTIONS)(field[FEEDBACK_FIELDS.title])}
+            {index + 1}. {getLabel(optionsProps.options, question.key)}
           </H2>
-
-          <FieldResults field={field} />
+          <FieldResults question={question} results={feedback?.results} />
         </CardContent>
       </Card>
     </ErrorBoundary>
   );
 };
 
-export const Results = ({ feedbackResults }) => {
-  const collected = useMemo(
-    () => getCollectedMaybe(feedbackResults?.recipients),
-    [feedbackResults]
-  );
-  console.log("[GetFeedbackPage]", { feedbackResults, collected });
-  // debugger;
+/* {
+    "id": 74,
+    "title": "MMFDBCK",
+    "description": "Desc",
+    "username": "slavik.dan12@gmail.com",
+    "validTo": "2023-12-06T23:00:00",
+    "questions": [
+        {
+            "key": "question.general.work-in-respectful-manners",
+            "type": "PARAGRAPH",
+            "required": true
+        }
+    ],
+    "recipients": [
+        {
+            "id": 45,
+            "username": "matej.matiasko@gmail.com",
+            "submitted": false
+        } ] } */
 
-  useRightMenu(
-    useMemo(
-      () => (
-        <FeedbackRightMenu
-          collected={collected}
-          stats={[
-            // { label: "Views", value: TODO },
-            { label: "Submitted", value: collected?.count ?? 0 },
-          ]}
-          // buttonProps={{
-          //   children: "Share form",
-          //   onClick: onShareForm,
-          // }}
-        />
-      ),
-      [collected]
-    )
-  );
-
-  console.log("[GetFeedbackPage.rndr]", {});
-
+export const Results = ({ feedback }) => {
   return (
     <>
-      {MOCK_RESULTS.map((field, i) => (
+      {feedback?.questions?.map((question, i) => (
         <FieldResultsCard
-          key={field.id ?? i}
+          key={question.id ?? i}
           index={i}
-          field={field}
+          question={question}
+          feedback={feedback}
           sx={{ mt: 3 }}
         />
       ))}

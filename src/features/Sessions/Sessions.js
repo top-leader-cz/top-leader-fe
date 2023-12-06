@@ -122,7 +122,7 @@ const SessionCard = ({
       <CardActionArea
         sx={{ height: "100%" }}
         disableRipple
-        href={id ? parametrizedRoutes.editSession({ id }) : undefined}
+        // href={id ? parametrizedRoutes.editSession({ id }) : undefined}
       >
         <CardContent sx={{ display: "flex", flexDirection: "row" }}>
           <Box>
