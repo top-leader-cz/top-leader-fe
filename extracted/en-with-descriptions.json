@@ -441,6 +441,33 @@
   "dict.error.time.not.available.message": {
     "defaultMessage": "{apiMessage}"
   },
+  "dict.feedback-questions-categories.communication": {
+    "defaultMessage": "Communication"
+  },
+  "dict.feedback-questions-categories.consider-other-team-members": {
+    "defaultMessage": "Consider other team members"
+  },
+  "dict.feedback-questions-categories.efficiency": {
+    "defaultMessage": "Efficiency"
+  },
+  "dict.feedback-questions-categories.general": {
+    "defaultMessage": "General"
+  },
+  "dict.feedback-questions-categories.interpersonal": {
+    "defaultMessage": "Interpersonal"
+  },
+  "dict.feedback-questions-categories.leadership": {
+    "defaultMessage": "Leadership"
+  },
+  "dict.feedback-questions-categories.motivation": {
+    "defaultMessage": "Motivation"
+  },
+  "dict.feedback-questions-categories.organizational": {
+    "defaultMessage": "Organizational"
+  },
+  "dict.feedback-questions-categories.problemsolving": {
+    "defaultMessage": "Problemsolving"
+  },
   "dict.feedback.question.communication.ask-for-more-information.label": {
     "defaultMessage": "Does the employee ask for more information if they do not understand something?"
   },
@@ -1920,6 +1947,15 @@
   "focused-list.show-another-question": {
     "defaultMessage": "Show another example"
   },
+  "general.copy": {
+    "defaultMessage": "Copy"
+  },
+  "general.delete": {
+    "defaultMessage": "Delete"
+  },
+  "general.edit": {
+    "defaultMessage": "Edit"
+  },
   "general.message-from": {
     "defaultMessage": "Message from {from}"
   },
@@ -2162,9 +2198,6 @@
   },
   "settings.admin.member.modal.fields.coach": {
     "defaultMessage": "Current coach"
-  },
-  "settings.admin.member.modal.fields.companyId": {
-    "defaultMessage": "Company"
   },
   "settings.admin.member.modal.fields.credit": {
     "defaultMessage": "Credit"
