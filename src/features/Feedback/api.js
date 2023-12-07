@@ -23,25 +23,13 @@ export const useExternalFeedbackQuery = ({
   params: { formId, username, token },
   ...rest
 } = {}) => {
-  const { authFetch } = useAuth();
   const externalFeedbackQuery = useQuery({
+    queryKey: ["feedback", "external"],
+    fetchDef: {
+      url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
+    },
     retry: 1,
     refetchOnWindowFocus: false,
-    queryKey: ["feedback", "external"],
-    queryFn: async () => {
-      try {
-        const res = await authFetch({
-          url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
-        });
-        // debugger;
-        return res;
-      } catch (e) {
-        console.log("[ExternalFeedbackPageInner.catch]", { e });
-        // debugger;
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-        throw e;
-      }
-    },
     ...rest,
   });
 

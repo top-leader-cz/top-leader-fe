@@ -1,13 +1,13 @@
+import { Button } from "@mui/material";
 import { useState } from "react";
+import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { TLCell } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
-import { useCompaniesQuery, useCompanyMutation } from "./Admin/api";
-import { messages } from "./messages";
-import { Button } from "@mui/material";
-import { Icon } from "../../components/Icon";
 import { CompanyModal } from "./Admin/CompanyModal";
+import { useCompaniesQuery } from "./Admin/api";
+import { messages } from "./messages";
 
 function CompaniesSettingsInner() {
   const [company, setCompany] = useState();

@@ -1,3 +1,4 @@
+import { LoadingButton } from "@mui/lab";
 import {
   Avatar,
   Box,
@@ -9,11 +10,12 @@ import {
   Paper,
 } from "@mui/material";
 import { identity, map, pipe, prop } from "ramda";
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AutocompleteSelect,
   CheckboxField,
+  FreeSoloField,
   LANGUAGE_OPTIONS,
   RHFTextField,
   renderLanguageOption,
@@ -27,13 +29,38 @@ import { formatName } from "../../Coaches/CoachCard";
 import { useCoachesQuery } from "../../Coaches/Coaches.page";
 import { INITIAL_FILTER } from "../../Coaches/CoachesFilter";
 import { I18nContext } from "../../I18n/I18nProvider";
+import { ConfirmModal } from "../../Modal/ConfirmModal";
 import { TIMEZONE_OPTIONS } from "../../Settings/GeneralSettings";
-import { useUserMutation } from "../../Team/api";
+import {
+  useAdminUserMutation,
+  useCompaniesQuery,
+  useCompanyMutation,
+} from "./api";
+import stringSimilarity from "string-similarity";
 
 export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
   { label: "Pending", value: "PENDING" },
 ];
+
+const PreventSubmission = ({ children }) => {
+  const preventHandler = (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  return (
+    <div
+      onKeyDown={preventHandler}
+      onKeyUp={preventHandler}
+      onKeyPress={preventHandler}
+      onSubmit={preventHandler}
+    >
+      {children}
+    </div>
+  );
+};
 
 export const getLoadableOptions = ({ query, map = identity }) => {
   if (query.data) return { options: map(query.data) };
@@ -48,13 +75,17 @@ export const getLoadableOptions = ({ query, map = identity }) => {
 export const MemberAdminForm = ({ onClose, initialValues }) => {
   const { userTz } = useContext(I18nContext);
   const msg = useMsg();
+  const [createValues, setCreateValues] = useState();
 
   const coachesQuery = useCoachesQuery({ filter: INITIAL_FILTER() });
+  const companiesQuery = useCompaniesQuery();
   const isEdit = !!initialValues && !!Object.values(initialValues).length;
-  const mutation = useUserMutation({
+  const mutation = useAdminUserMutation({
     isEdit,
-    isAdmin: true,
-    onSuccess: onClose,
+    onSuccess: () => {
+      setCreateValues(null);
+      onClose();
+    },
   });
 
   const defaultValues = {
@@ -66,13 +97,15 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
       : ["USER"],
     locale: initialValues.locale,
     timeZone: initialValues.timeZone || userTz,
-    trialUser: false, // just new user
+    companyId: initialValues.companyId || null, // TODO
+    isTrial: false,
 
     ...(isEdit
       ? {
           status: initialValues.status,
-          coach: initialValues.coach, // TODO: BE
-          credit: initialValues.credit, // TODO: BE
+          coach: initialValues.coach,
+          credit: initialValues.credit,
+          // freeCoach, // TODO?
         }
       : {}),
   };
@@ -81,7 +114,74 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
     defaultValues,
   });
 
-  const onSubmit = (values, e) => mutation.mutateAsync(values);
+  const createCompanyMutation = useCompanyMutation({
+    onSuccess: async ({ id }) => {
+      const values = { ...createValues, companyId: id };
+      await mutation.mutateAsync(values);
+      setCreateValues(null);
+      // debugger;
+    },
+  });
+  const maybeBestMatchMsg = useMemo(() => {
+    if (!createValues) return undefined;
+    try {
+      const companyNames = companiesQuery.data?.map?.(prop("name"));
+      const bestMatch = stringSimilarity.findBestMatch(
+        createValues?.companyId || "",
+        companyNames || []
+      );
+      return (
+        <P>
+          You entered "<b>{createValues?.companyId}</b>", the most similar name
+          among existing companies: "<b>{bestMatch.bestMatch.target}</b>"
+          (similarity score: {bestMatch.bestMatch.rating.toFixed(2)})
+        </P>
+      );
+    } catch (e) {
+      console.error(e);
+      debugger;
+      return undefined;
+    }
+  }, [companiesQuery.data, createValues]);
+  ConfirmModal.useModal(
+    useMemo(
+      () => ({
+        open: !!createValues,
+        onClose: () => setCreateValues(null),
+        iconName: "RocketLaunch",
+        title: "Create new company?",
+        desc: maybeBestMatchMsg || "",
+        // error: createCompanyMutation.error,
+        getButtons: ({ onClose }) => [
+          {
+            variant: "outlined",
+            type: "button",
+            children: "Cancel",
+            onClick: () => onClose(),
+          },
+          {
+            component: LoadingButton,
+            variant: "contained",
+            type: "button",
+            children: "These two are different companies, create new",
+            disabled: createCompanyMutation.isLoading,
+            loading: createCompanyMutation.isLoading,
+            onClick: () =>
+              createCompanyMutation.mutate({ name: createValues?.companyId }),
+          },
+        ],
+      }),
+      [createCompanyMutation, createValues, maybeBestMatchMsg]
+    )
+  );
+
+  const onSubmit = async (values, e) => {
+    if (typeof values.companyId === "string") {
+      setCreateValues(values);
+    } else {
+      mutation.mutateAsync(values);
+    }
+  };
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
   console.log("[MemberAdminModal.rndr]", {
@@ -152,6 +252,17 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             fullWidth
             disabled={isEdit}
           />
+          <PreventSubmission>
+            <FreeSoloField
+              name="companyId"
+              label={msg("settings.admin.member.modal.fields.companyId")}
+              fullWidth
+              {...getLoadableOptions({
+                query: companiesQuery,
+                map: useCompaniesQuery.toOpts,
+              })}
+            />
+          </PreventSubmission>
           <AutocompleteSelect
             multiple
             disableCloseOnSelect
@@ -208,7 +319,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           />
           {!isEdit ? (
             <FormControlLabel
-              control={<CheckboxField name="trialUser" />}
+              control={<CheckboxField name="isTrial" />}
               label={msg("settings.admin.member.trial")}
             />
           ) : null}

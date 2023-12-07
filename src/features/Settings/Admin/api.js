@@ -1,7 +1,9 @@
 import {
+  always,
   applySpec,
   concat,
   converge,
+  ifElse,
   map,
   mergeAll,
   pick,
@@ -15,6 +17,7 @@ import {
   useMyMutation,
   useMyQuery,
 } from "../../Authorization/AuthProvider";
+import { creditFrom, toApiLocale } from "../../Team/api";
 
 export const useUsersQuery = () => {
   return useMyQuery({
@@ -30,10 +33,10 @@ export const useUsersQuery = () => {
   });
 };
 
-export const useCompaniesQuery = ({ to, ...rest } = {}) => {
+export const useCompaniesQuery = (rest = {}) => {
   return useMyQuery({
     queryKey: ["companies"],
-    fetchDef: { url: `/api/latest/companies`, to },
+    fetchDef: { url: `/api/latest/companies` },
     ...rest,
   });
 };
@@ -72,5 +75,43 @@ export const useConfirmRequestedCreditMutation = ({
       onSuccess?.(data);
     },
     ...params,
+  });
+};
+
+export const useAdminUserMutation = ({ isEdit, ...rest } = {}) => {
+  return useMyMutation({
+    fetchDef: {
+      method: "POST",
+      getUrl: isEdit
+        ? pipe(prop("username"), concat(`/api/latest/admin/users/`))
+        : always(`/api/latest/admin/users`),
+      from: converge(unapply(mergeAll), [
+        pick([
+          "username",
+          "firstName",
+          "lastName",
+          "authorities",
+          "timeZone",
+          "companyId",
+          "isTrial",
+        ]),
+        applySpec({ locale: toApiLocale }), // TODO: BE?
+        ifElse(
+          always(isEdit),
+          applySpec({
+            status: prop("status"), // TODO: trial or status?
+            coach: prop("coach"),
+            credit: pipe(prop("credit"), creditFrom),
+            // freeCoach, // TODO?
+          }),
+          always({})
+        ),
+      ]),
+    },
+    invalidate: [
+      { queryKey: ["hr-users"] },
+      { queryKey: ["admin"], exact: false },
+    ],
+    ...rest,
   });
 };

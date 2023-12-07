@@ -7,9 +7,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext } from "react";
-import { useQuery } from "react-query";
 import { Navigate, useNavigate } from "react-router-dom";
 
+import { descend, prop, sort } from "ramda";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { Header } from "../../components/Header";
 import { HistoryRightMenu } from "../../components/HistoryRightMenu";
@@ -19,8 +19,7 @@ import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { P } from "../../components/Typography";
 import { routes } from "../../routes";
-import { parametrizedRoutes } from "../../routes/constants";
-import { useAuth } from "../Authorization";
+import { useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
@@ -159,23 +158,17 @@ const SessionCard = ({
   );
 };
 
-export const useSessionsQuery = (qParams = {}) => {
-  const { authFetch } = useAuth();
-  const { language } = useContext(I18nContext);
-
-  const sessionsQuery = useQuery({
+// const sortAlphaNum = ({ createdAt: a }, { createdAt: b }) => b.localeCompare(a, language, { numeric: true });
+export const useSessionsQuery = (rest = {}) => {
+  const query = useMyQuery({
     queryKey: ["user-sessions", "history"],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/history/USER_SESSION` }).then((data) => {
-        const sortAlphaNum = ({ createdAt: a }, { createdAt: b }) =>
-          b.localeCompare(a, language, { numeric: true });
-        console.log({ data });
-        return data.sort(sortAlphaNum);
-      }),
-    ...qParams,
-    // {"areaOfDevelopment":[],"longTermGoal":null,"motivation":null,"actionSteps":[]}
+    fetchDef: {
+      url: `/api/latest/history/USER_SESSION`,
+      to: sort(descend(prop("createdAt"))),
+    },
+    ...rest,
   });
-  return sessionsQuery;
+  return query;
 };
 
 function Sessions() {

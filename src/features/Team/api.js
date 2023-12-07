@@ -13,43 +13,20 @@ import {
   take,
   unapply,
 } from "ramda";
-import { useQuery } from "react-query";
-import { useAuth } from "../Authorization";
-import { useMyMutation } from "../Authorization/AuthProvider";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 
 export const useHrUsersQuery = (params = {}) => {
-  const { authFetch } = useAuth();
-  return useQuery({
+  return useMyQuery({
     queryKey: ["hr-users"],
-    queryFn: () => authFetch({ url: `/api/latest/hr-users` }),
-    select: (data) => {
-      return data.map(
-        ({
-          coach,
-          username,
-          credit,
-          paidCredit,
-          requestedCredit,
-          scheduledCredit,
-          state,
-        }) => {
-          return {
-            username,
-            coach,
-            credit,
-            paidCredit,
-            requestedCredit,
-            scheduledCredit,
-            state,
-          };
-        }
-      );
+    fetchDef: {
+      url: `/api/latest/hr-users`,
+      // to: pick([ "coach", "username", "credit", "paidCredit", "requestedCredit", "scheduledCredit", "state" ]),
     },
     ...params,
   });
 };
 
-const creditFrom = (credit) => {
+export const creditFrom = (credit) => {
   const num = Number(credit);
   const nan = isNaN(num);
   console.log("[creditFrom]", { credit, num, nan });
