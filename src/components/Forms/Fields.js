@@ -1029,22 +1029,26 @@ export const FreeSoloField = ({
           //   if (typeof debug === "string") debugger; // debugger, break, d, b
           //   field.onBlur(event, reason, ...rest);
           // }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={label}
-              placeholder={placeholder}
-              error={!!fieldState.error}
-              helperText={
-                <FieldError {...{ field, fieldState, rules, name }} />
-              }
-              InputLabelProps={{ shrink: !!label }}
-              inputProps={{
-                ...params.inputProps,
-                ...inputProps,
-              }}
-            />
-          )}
+          renderInput={(params) => {
+            // when initially rendered with value but without options, stays displayed with option key instead of label
+            if (debug) console.log("[FreeSoloField.renderInput]", { name, field, params, optionsProps }); // prettier-ignore
+            return (
+              <TextField
+                {...params}
+                label={label}
+                placeholder={placeholder}
+                error={!!fieldState.error}
+                helperText={
+                  <FieldError {...{ field, fieldState, rules, name }} />
+                }
+                InputLabelProps={{ shrink: !!label }}
+                inputProps={{
+                  ...params.inputProps,
+                  ...inputProps,
+                }}
+              />
+            );
+          }}
           {...props}
         />
       )}

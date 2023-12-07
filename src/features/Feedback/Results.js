@@ -67,7 +67,7 @@ const FieldResults = ({ question, results }) => {
 };
 
 const FieldResultsCard = ({ index, question, feedback, sx }) => {
-  const { query, optionsProps } = useFeedbackOptions();
+  const { optionsProps } = useFeedbackOptions();
 
   return (
     <ErrorBoundary>

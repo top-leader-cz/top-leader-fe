@@ -1,8 +1,20 @@
-import { curryN, map, pipe, prop } from "ramda";
+import {
+  adjust,
+  curryN,
+  groupBy,
+  join,
+  map,
+  pipe,
+  prop,
+  replace,
+  split,
+  toUpper,
+} from "ramda";
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 import { useFeedbackOptionsQuery } from "./api";
 import { getLoadableOptions } from "../Settings/Admin/MemberAdminModal";
+import { useMsg } from "../../components/Msg/Msg";
 
 const messages = defineMessages({
   "dict.feedback.question.general.work-in-respectful-manners.label": {
@@ -267,6 +279,43 @@ const messages = defineMessages({
     defaultMessage:
       "Does the employee improve processes to make them more effective?",
   },
+
+  "dict.feedback-questions-categories.general": {
+    id: "dict.feedback-questions-categories.general",
+    defaultMessage: "General",
+  },
+  "dict.feedback-questions-categories.consider-other-team-members": {
+    id: "dict.feedback-questions-categories.consider-other-team-members",
+    defaultMessage: "Consider other team members",
+  },
+  "dict.feedback-questions-categories.leadership": {
+    id: "dict.feedback-questions-categories.leadership",
+    defaultMessage: "Leadership",
+  },
+  "dict.feedback-questions-categories.communication": {
+    id: "dict.feedback-questions-categories.communication",
+    defaultMessage: "Communication",
+  },
+  "dict.feedback-questions-categories.interpersonal": {
+    id: "dict.feedback-questions-categories.interpersonal",
+    defaultMessage: "Interpersonal",
+  },
+  "dict.feedback-questions-categories.problemsolving": {
+    id: "dict.feedback-questions-categories.problemsolving",
+    defaultMessage: "Problemsolving",
+  },
+  "dict.feedback-questions-categories.organizational": {
+    id: "dict.feedback-questions-categories.organizational",
+    defaultMessage: "Organizational",
+  },
+  "dict.feedback-questions-categories.motivation": {
+    id: "dict.feedback-questions-categories.motivation",
+    defaultMessage: "Motivation",
+  },
+  "dict.feedback-questions-categories.efficiency": {
+    id: "dict.feedback-questions-categories.efficiency",
+    defaultMessage: "Efficiency",
+  },
 });
 
 const translateOption = curryN(2, (intl, apiKey) => {
@@ -302,13 +351,33 @@ export const useFeedbackQuestionOptionsDict = ({ apiKeys = [] }) => {
   );
 };
 
+const formatOptionsCategory = pipe(
+  split(""),
+  adjust(0, toUpper),
+  join(""),
+  replace(/-/g, " ")
+);
+
 // TODO: use everywhere
 export const useFeedbackOptions = () => {
+  const msg = useMsg({ dict: messages });
   const intl = useIntl();
   const query = useFeedbackOptionsQuery();
-  const optionsProps = getLoadableOptions({
-    query,
-    map: pipe(prop("options"), map(prop("key")), map(translateOption(intl))),
-  });
+
+  const optionsProps = useMemo(() => {
+    const props = getLoadableOptions({
+      query,
+      map: pipe(prop("options"), map(prop("key")), map(translateOption(intl))),
+    });
+    const groupedOptions = groupBy(({ value }) => {
+      const cat = value?.split(".")?.[1] ?? "";
+      return cat
+        ? msg.maybe(`dict.feedback-questions-categories.${cat}`) ||
+            formatOptionsCategory(cat)
+        : "";
+    }, props.options);
+    return { ...props, groupedOptions };
+  }, [intl, msg, query]);
+
   return { query, optionsProps };
 };

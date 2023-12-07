@@ -1,6 +1,6 @@
 import { descend, evolve, map, pick, prop, sort } from "ramda";
 import { useRef } from "react";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery } from "react-query";
 import {
   useAuth,
   useMyMutation,
@@ -150,7 +150,7 @@ export const useFeedbackFormsQuery = ({ ...rest } = {}) => {
         "id": 0,
         "username": "string",
         "submitted": true } ] } ] */
-    queryKey: ["feedback", { username }],
+    queryKey: ["feedback", username],
     fetchDef: {
       url: `/api/latest/feedback/user/${username}`,
       to: sort(descend(prop("createdAt"))),
@@ -162,7 +162,7 @@ export const useFeedbackFormsQuery = ({ ...rest } = {}) => {
 
 export const useFeedbackResultsQuery = ({ params: { id }, ...rest } = {}) => {
   const query = useMyQuery({
-    queryKey: ["feedback", "results"],
+    queryKey: ["feedback", "results", id],
     fetchDef: { url: `/api/latest/feedback/${id}` }, // TODO: currently same as useFeedbackQuery
     ...rest,
   });

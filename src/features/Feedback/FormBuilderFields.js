@@ -7,20 +7,10 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
-  TextField,
 } from "@mui/material";
-import {
-  adjust,
-  groupBy,
-  join,
-  keys,
-  pipe,
-  prop,
-  replace,
-  split,
-  toUpper,
-} from "ramda";
+import { prop } from "ramda";
 import { useFieldArray, useFormContext } from "react-hook-form";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import {
   AutocompleteSelect,
   CheckboxField,
@@ -31,11 +21,14 @@ import { Icon } from "../../components/Icon";
 import { useMsg } from "../../components/Msg/Msg";
 import { Score } from "../../components/Score";
 import { H2 } from "../../components/Typography";
-import { FEEDBACK_FIELDS } from "./constants";
-import { SUBFIELD_DEFAULT_VALUES, INPUT_TYPES, SUBFIELDS } from "./constants";
+import {
+  FEEDBACK_FIELDS,
+  INPUT_TYPES,
+  SUBFIELDS,
+  SUBFIELD_DEFAULT_VALUES,
+} from "./constants";
 import { messages } from "./messages";
-import { useFeedbackQuestionOptionsDict } from "./useFeedbackQuestionOptionsDict";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
 
 export const FEEDBACK_INPUT_TYPE_OPTIONS = [
   { value: INPUT_TYPES.TEXT, label: "Paragraph" },
@@ -70,14 +63,7 @@ export const InputPreview = ({ inputType, index }) => {
   //   throw new Error("Missing inputType:" + inputType);
 };
 
-const FormBuilderField = ({
-  feedbackQuestionOptions = [],
-  getName,
-  index,
-  remove,
-  sx,
-}) => {
-  const msg = useMsg({ dict: messages });
+const FormBuilderField = ({ getName, index, remove, sx }) => {
   const form = useFormContext();
 
   const titleName = getName(SUBFIELDS.title);
@@ -89,21 +75,15 @@ const FormBuilderField = ({
   const requiredName = getName(SUBFIELDS.required);
   const required = form.watch(requiredName);
 
-  const groupedOptions = groupBy(({ value }) => {
-    const cat = value?.split(".")?.[1] ?? "";
-    return cat
-      ? msg.maybe(`dict.feedback-questions-categories.${cat}`) ||
-          pipe(split(""), adjust(0, toUpper), join(""), replace(/-/g, " "))(cat)
-      : "";
-  }, feedbackQuestionOptions);
+  const { optionsProps } = useFeedbackOptions();
 
-  // console.log("FormBuilderField.rndr", { feedbackQuestionOptions, groupedOptions });
+  console.log("FormBuilderField.rndr", { optionsProps, titleName, title });
 
   return (
     <Card sx={sx}>
       <CardContent>
         <H2>
-          {index + 1}.&nbsp;{getLabel(feedbackQuestionOptions, title)}
+          {index + 1}.&nbsp;{getLabel(optionsProps.options, title)}
         </H2>
         <InputPreview inputType={inputType} index={index} />
         <Divider sx={{ my: 3 }} />
@@ -111,9 +91,8 @@ const FormBuilderField = ({
           <FreeSoloField
             name={titleName}
             rules={{ required: "Required" }}
-            // options={feedbackQuestionOptions}
-            groupedOptions={groupedOptions}
             sx={{ maxWidth: "50%", flex: "0 1 auto" }}
+            {...optionsProps}
           />
           <AutocompleteSelect
             name={inputTypeName}
@@ -139,18 +118,16 @@ const FormBuilderField = ({
   );
 };
 
-export const FormBuilderFields = ({ name, feedbackOptions }) => {
+export const FormBuilderFields = ({ name }) => {
   const msg = useMsg({ dict: messages });
 
   const { fields, append, remove } = useFieldArray({
     name: FEEDBACK_FIELDS.fields,
     rules: { required: true, minLength: 1 },
   });
+  const { query, optionsProps } = useFeedbackOptions();
 
-  const { feedbackQuestionOptions } = useFeedbackQuestionOptionsDict({
-    apiKeys: feedbackOptions?.options?.map(prop("key")) || [],
-  });
-  const missingTranslations = feedbackQuestionOptions
+  const missingTranslations = optionsProps.options
     ?.map(prop("missing"))
     ?.filter(Boolean);
   const tsMissing = !!missingTranslations?.length && (
@@ -159,6 +136,9 @@ export const FormBuilderFields = ({ name, feedbackOptions }) => {
       <pre>{JSON.stringify(missingTranslations, null, 2)}</pre>
     </>
   );
+
+  // TODO: with initial values (edit) and without this row, autocomplete is rendered without options, containing just key, not label
+  if (!query.data) return null;
 
   return (
     <>
@@ -171,7 +151,6 @@ export const FormBuilderFields = ({ name, feedbackOptions }) => {
             remove={remove}
             getName={(fieldName) => `${name}.${i}.${fieldName}`}
             sx={{ mt: 3 }}
-            feedbackQuestionOptions={feedbackQuestionOptions}
           />
         </ErrorBoundary>
       ))}

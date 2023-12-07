@@ -1,7 +1,6 @@
 import { Box, Divider } from "@mui/material";
 import { filter } from "ramda";
 import { useContext, useState } from "react";
-import { useQuery } from "react-query";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";

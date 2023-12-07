@@ -12,11 +12,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { CreateFeedbackForm } from "./CreateFeedbackForm";
 import { getCollectedMaybe } from "./GetFeedback.page";
 import { FIELD_DEFAULT_VALUES, ShareFeedbackModal } from "./ShareFeedbackModal";
-import {
-  useFeedbackOptionsQuery,
-  useFeedbackQuery,
-  useSaveFeedbackFormMutation,
-} from "./api";
+import { useFeedbackQuery, useSaveFeedbackFormMutation } from "./api";
 import { FEEDBACK_FIELDS } from "./constants";
 import { messages } from "./messages";
 
@@ -74,12 +70,11 @@ function CreateFeedbackPageInner({ data }) {
   );
 
   const msg = useMsg();
-  const { language } = useContext(I18nContext);
   const { user } = useAuth();
-  const [formBuilderValues, setFormBuilderValues] = useState();
   const navigate = useNavigate();
+  const { language } = useContext(I18nContext);
+  const [formBuilderValues, setFormBuilderValues] = useState();
 
-  const feedbackOptionsQuery = useFeedbackOptionsQuery();
   const saveMutation = useSaveFeedbackFormMutation({
     onSuccess: () => {
       setFormBuilderValues();
@@ -114,19 +109,10 @@ function CreateFeedbackPageInner({ data }) {
         back={{ href: routes.dashboard }}
       />
       <H1 mb={4}>{msg("feedback.heading")}</H1>
-      <QueryRenderer // TODO: move to FormBuilderFields
-        // loaderName="ContentBackdrop" // TODO
-        {...feedbackOptionsQuery}
-        success={({ data }) => {
-          return (
-            <CreateFeedbackForm
-              initialValues={initialValues}
-              feedbackOptions={data}
-              onShareForm={handleNext}
-              collected={collected}
-            />
-          );
-        }}
+      <CreateFeedbackForm
+        initialValues={initialValues}
+        onShareForm={handleNext}
+        collected={collected}
       />
       {!!formBuilderValues && ( // TODO: Modal with form reinit
         <ShareFeedbackModal

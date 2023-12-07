@@ -14,7 +14,6 @@ const onError = (errors, e) => console.log("[onError]", { errors, e });
 
 export const CreateFeedbackForm = ({
   initialValues,
-  feedbackOptions,
   onShareForm,
   collected,
 }) => {
@@ -49,13 +48,13 @@ export const CreateFeedbackForm = ({
     )
   );
 
-  // console.log("[CreateFeedbackForm.rndr]", {});
+  console.log("[CreateFeedbackForm.rndr]", { initialValues });
 
   return (
     <FormProvider {...form}>
       <FormBuilderMeta />
       <Divider sx={{ my: 3 }} />
-      <FormBuilderFields feedbackOptions={feedbackOptions} name="fields" />
+      <FormBuilderFields name="fields" />
     </FormProvider>
   );
 };

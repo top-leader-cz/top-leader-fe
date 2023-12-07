@@ -1,5 +1,5 @@
 import * as qs from "qs";
-import { identity, prop, tryCatch } from "ramda";
+import { always, identity, prop, tryCatch } from "ramda";
 import {
   createContext,
   useCallback,
@@ -283,7 +283,7 @@ const hasContentType = (type, res) =>
 
 export function AuthProvider({ children }) {
   // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS):
-  const [isLoggedIn, setIsLoggedIn] = useSessionStorage(false);
+  const [isLoggedIn, setIsLoggedIn] = useSessionStorage("isLoggedIn", false);
   const queryClient = useQueryClient();
   const intl = useIntl();
 
@@ -294,6 +294,8 @@ export function AuthProvider({ children }) {
     setIsLoggedIn(false);
   }, [setIsLoggedIn]);
 
+  const intlRef = useRef(intl);
+  intlRef.current = intl;
   const authFetch = useCallback(
     ({
       url,
@@ -304,7 +306,7 @@ export function AuthProvider({ children }) {
       data = payload, // TODO: data is too ambiguous, rename to payload
       isPublicApi = url?.includes("/api/public/"),
     }) =>
-      console.log("[authFetch] ", method, url, { data, query }) ||
+      // console.log("[authFetch] ", method, url, { data, query }) ||
       fetch(qstr(url, query), getInit({ method, data }))
         .then(async (response) => {
           let jsonMaybe, parsingError, textMaybe;
@@ -326,7 +328,12 @@ export function AuthProvider({ children }) {
           }
 
           if (!response.ok) {
-            throwResponse({ response, jsonMaybe, textMaybe, intl });
+            throwResponse({
+              response,
+              jsonMaybe,
+              textMaybe,
+              intl: intlRef.current,
+            });
           }
           if (type === FETCH_TYPE.JSON) return jsonMaybe;
 
@@ -406,7 +413,7 @@ const noop = () => {};
 // https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
 // https://github.com/TanStack/query/discussions/5279
 export const useMyQuery = ({
-  fetchDef: { to = identity, ...fetchDef } = {},
+  fetchDef: { from: fromProp, to = identity, ...restFD } = {},
   debug,
   onSuccess,
   onError,
@@ -415,17 +422,12 @@ export const useMyQuery = ({
 }) => {
   const { authFetch } = useAuth();
   const query = useQuery({
-    queryFn:
-      queryFn ??
-      (() =>
-        authFetch(fetchDef).then((data) =>
-          logAndThrowTryCatch(
-            to || identity,
-            "[useMyQuery]: Error during 'to' execution: " +
-              JSON.stringify(fetchDef),
-            data
-          )
-        )),
+    queryFn: performCall({
+      debug,
+      fetchDef: { ...restFD, from: fromProp ?? always(undefined), to },
+      performCallFnMaybe: queryFn,
+      authFetch,
+    }),
     ...rest,
   });
 
@@ -444,15 +446,13 @@ export const useMyQuery = ({
   return query;
 };
 
-// const debugMaybe = ({ debug, fetchDef, data, response }) => { }
-
 const logAndThrowTryCatch = (fn, msg, rawData) =>
   tryCatch(fn, (e) => {
     console.error(msg, { e, rawData });
     throw e;
   })(rawData);
 
-const withDebug = ({
+const performCall = ({
   debug,
   fetchDef: {
     from = identity,
@@ -461,18 +461,19 @@ const withDebug = ({
     getUrl: getUrlMaybe,
     ...fetchDef
   } = {}, // TODO: to authFetch?
-  mutationFn: mutationFnProp,
+  performCallFnMaybe,
   authFetch,
 }) => {
   return async (...args) => {
     const [rawPayload, ...restArgs] = args;
     const url = logAndThrowTryCatch(
       (payload) => getUrlMaybe?.(payload) || urlMaybe,
-      "Error durign getUrlMaybe execution: " + getUrlMaybe?.toString(),
-      args[0]
+      "Error durign getUrlMaybe execution, note - called with raw payload: " +
+        getUrlMaybe?.toString(),
+      rawPayload // TODO: payload vs rawPayload
     );
     if (debug) {
-      console.log(`[withDebug] start ${fetchDef.method} ${url}`, {
+      console.log(`[performCall] start ${fetchDef.method} ${url}`, {
         rawPayload,
       });
       if (typeof debug === "string") debugger; // "debugger", "break", "d", "b"
@@ -480,25 +481,21 @@ const withDebug = ({
     try {
       const payload = logAndThrowTryCatch(
         from,
-        `Error during 'from' execution: ${JSON.stringify({
-          fetchDef: { url, ...fetchDef },
-          rawPayload,
-        })}`,
+        `Error during 'from' execution: ${JSON.stringify({ fetchDef: { url, ...fetchDef }, rawPayload })}`, // prettier-ignore
         rawPayload
       );
-      const rawResponseData = await (mutationFnProp?.(payload, ...restArgs) ??
-        authFetch({ payload, url, ...fetchDef }));
+      const rawResponseData = await (performCallFnMaybe?.(
+        payload,
+        ...restArgs
+      ) ?? authFetch({ payload, url, ...fetchDef }));
       const resData = logAndThrowTryCatch(
         to,
-        `Error during 'to' execution: ${JSON.stringify({
-          fetchDef: { url, ...fetchDef },
-          rawResponseData,
-        })}`,
+        `Error during 'to' execution: ${JSON.stringify({ fetchDef: { url, ...fetchDef }, rawResponseData })}`, // prettier-ignore
         rawResponseData
       );
 
       if (debug) {
-        console.log(`[withDebug] success ${fetchDef.method} ${url}`, {
+        console.log(`[performCall] success ${fetchDef.method} ${url}`, {
           payload,
           ...(from !== identity ? { from, rawPayload } : {}),
           resData,
@@ -509,7 +506,7 @@ const withDebug = ({
       return resData;
     } catch (e) {
       if (debug) {
-        console.log(`[withDebug] error ${fetchDef.method} ${url}`, {
+        console.log(`[performCall] error ${fetchDef.method} ${url}`, {
           rawPayload,
           e,
           ...(to === identity ? {} : { to }),
@@ -546,23 +543,16 @@ export const useMyMutation = ({
   const { show } = useSnackbar();
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: withDebug({
+    mutationFn: performCall({
       debug,
       fetchDef,
-      mutationFn: mutationFnProp,
+      performCallFnMaybe: mutationFnProp,
       authFetch,
     }),
     onSuccess: (...args) => {
       try {
-        if (debug)
-          console.log(`[useMyMutation.onSuccess]`, {
-            args,
-            fetchDef,
-            invalidate,
-            snackbar: snackbar.success,
-            mutationFnProp,
-            rest,
-          });
+        if (debug) console.log(`[useMyMutation.onSuccess]`, { args, fetchDef, invalidate, snackbar: snackbar.success, mutationFnProp, rest }); // prettier-ignore
+
         if (invalidate) {
           if (Array.isArray(invalidate))
             invalidate.forEach((queryKey) =>
@@ -573,10 +563,7 @@ export const useMyMutation = ({
 
         if (snackbar.success) {
           const props = mapSnackBarProps({ ...snackbar.success }, args, "👍");
-          show({
-            type: "success",
-            ...props,
-          });
+          show({ type: "success", ...props });
         }
         onSuccessProp?.(...args);
       } catch (e) {
@@ -585,14 +572,7 @@ export const useMyMutation = ({
       }
     },
     onError: (...args) => {
-      if (debug)
-        console.log(`[useMyMutation.onError]`, {
-          args,
-          fetchDef,
-          snackbar: snackbar.error,
-          mutationFnProp,
-          rest,
-        });
+      if (debug) console.log(`[useMyMutation.onError]`, { args, fetchDef, snackbar: snackbar.error, mutationFnProp, rest }); // prettier-ignore
 
       if (snackbar.error) {
         const props = mapSnackBarProps(
@@ -600,10 +580,7 @@ export const useMyMutation = ({
           args,
           args[0]?.message
         );
-        show({
-          type: "error",
-          ...props,
-        });
+        show({ type: "error", ...props });
       }
       onErrorProp?.(...args);
     },

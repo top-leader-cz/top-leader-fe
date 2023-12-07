@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { Layout, useRightMenu } from "../../components/Layout";
@@ -6,13 +7,12 @@ import { useMsg } from "../../components/Msg/Msg";
 import { H1 } from "../../components/Typography";
 import { routes } from "../../routes";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { Results } from "./Results";
-import { useFeedbackOptionsQuery, useFeedbackResultsQuery } from "./api";
-import { messages } from "./messages";
 import { controlsMessages } from "../Sessions/steps/Controls";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
-import { useMemo } from "react";
 import { getCollectedMaybe } from "./GetFeedback.page";
+import { Results } from "./Results";
+import { useFeedbackResultsQuery } from "./api";
+import { messages } from "./messages";
 
 function FeedbackResultsPageInner() {
   const { id } = useParams();
@@ -20,9 +20,7 @@ function FeedbackResultsPageInner() {
   const query = useFeedbackResultsQuery({ params: { id } });
   const controlsMsg = useMsg({ dict: controlsMessages });
 
-  const feedbackOptionsQuery = useFeedbackOptionsQuery({});
-
-  console.log("[GetFeedbackPage]", {});
+  // console.log("[GetFeedbackPage]", {});
   // debugger;
 
   useRightMenu(
@@ -36,10 +34,7 @@ function FeedbackResultsPageInner() {
             // { label: "Views", value: TODO },
             { label: "Submitted", value: collected?.count ?? 0 },
           ]}
-          // buttonProps={{
-          //   children: "Share form",
-          //   onClick: onShareForm,
-          // }}
+          // buttonProps={{ children: "Share form", onClick: onShareForm, }}
         />
       );
     }, [query.data])
@@ -55,20 +50,10 @@ function FeedbackResultsPageInner() {
       />
       <H1 mb={4}>{msg("feedback.heading")}</H1>
       <QueryRenderer
-        query={feedbackOptionsQuery}
-        success={({ data: feedbackOptions }) => (
-          <QueryRenderer
-            query={query}
-            success={({ data: feedback }) => {
-              return (
-                <Results
-                  feedback={feedback}
-                  // feedbackOptions={feedbackOptions}
-                />
-              );
-            }}
-          />
-        )}
+        query={query}
+        success={({ data: feedback }) => {
+          return <Results feedback={feedback} />;
+        }}
       />
     </Layout>
   );

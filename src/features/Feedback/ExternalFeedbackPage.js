@@ -1,5 +1,4 @@
 import { Alert, Box, Button, Card, CardContent } from "@mui/material";
-import { prop } from "ramda";
 import { useCallback, useContext, useState } from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,20 +8,19 @@ import { Header } from "../../components/Header";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
+import { routes } from "../../routes";
 import { gray200 } from "../../theme";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { EXTERNAL_FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
 import {
   useExternalFeedbackMutation,
   useExternalFeedbackQuery,
-  useFeedbackOptionsQuery,
   useRequestAccessMutation,
 } from "./api";
+import { EXTERNAL_FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
 import { messages } from "./messages";
-import { useFeedbackQuestionOptionsDict } from "./useFeedbackQuestionOptionsDict";
-import { routes } from "../../routes";
+import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
 
 const SUBFIELDS = {
   question: "question",
@@ -31,26 +29,7 @@ const SUBFIELDS = {
   required: "required",
 };
 
-const DEFAULT_SCALE_KEYS = [
-  "scale.1",
-  "scale.2",
-  "scale.3",
-  "scale.4",
-  "scale.5",
-  "scale.6",
-  "scale.7",
-  "scale.8",
-  "scale.9",
-  "scale.10",
-];
-
-export const FeedbackField = ({
-  name,
-  inputType,
-  index,
-  required,
-  scaleKeys = DEFAULT_SCALE_KEYS,
-}) => {
+export const FeedbackField = ({ index, name, required, inputType, scales }) => {
   if (inputType === INPUT_TYPES.TEXT)
     return (
       <RHFTextField
@@ -71,9 +50,8 @@ export const FeedbackField = ({
         left={null}
         right={null}
         sx={{ mt: 3, justifyContent: "flex-start" }}
-        options={scaleKeys.map((key, i) => ({
+        options={scales.map((key, i) => ({
           label: i + 1,
-          // label: key,
           value: key,
         }))}
       />
@@ -82,16 +60,8 @@ export const FeedbackField = ({
   throw new Error("Missing inputType:" + inputType);
 };
 
-const FeedbackFieldCard = ({
-  feedbackOptions: { options = [], scales = [] } = {},
-  getName,
-  index,
-  sx,
-}) => {
-  const { feedbackQuestionOptions } = useFeedbackQuestionOptionsDict({
-    apiKeys: options?.map(prop("key")) || [],
-  });
-
+const FeedbackFieldCard = ({ getName, index, sx }) => {
+  const { query, optionsProps } = useFeedbackOptions();
   const form = useFormContext();
 
   const question = form.watch(getName(SUBFIELDS.question));
@@ -100,25 +70,27 @@ const FeedbackFieldCard = ({
   const required = form.watch(getName(SUBFIELDS.required));
 
   console.log("FeedbackFieldCard.rndr", {
-    feedbackQuestionOptions,
+    optionsProps,
   });
 
   return (
     <Card sx={sx}>
       <CardContent>
         <H2>
-          {index + 1}.&nbsp;{getLabel(feedbackQuestionOptions, question)}
+          {index + 1}.&nbsp;{getLabel(optionsProps.options, question)}
           {required && <>&nbsp;*</>}
         </H2>
-        <FeedbackField
-          index={index}
-          name={getName(SUBFIELDS.answer)}
-          required={required}
-          inputType={type}
-          options={scales.map((key, i) => ({
-            label: i + 1,
-            value: key,
-          }))}
+        <QueryRenderer
+          query={query}
+          success={({ data }) => (
+            <FeedbackField
+              index={index}
+              name={getName(SUBFIELDS.answer)}
+              required={required}
+              inputType={type}
+              scales={data.scales}
+            />
+          )}
         />
       </CardContent>
     </Card>
@@ -160,25 +132,8 @@ const FeedbackMeta = ({ data, sx = {} }) => {
   );
 };
 
-const DEFAULT_FEEDBACK_OPTIONS = {
-  // options: [ { key: "question.general.work-in-respectful-manners", type: "PARAGRAPH", }, ],
-  scales: [
-    "scale.1",
-    "scale.2",
-    "scale.3",
-    "scale.4",
-    "scale.5",
-    "scale.6",
-    "scale.7",
-    "scale.8",
-    "scale.9",
-    "scale.10",
-  ],
-};
-
 const ExternalFeedbackForm = ({ data, onSubmit }) => {
   const msg = useMsg();
-  const feedbackOptionsQuery = useFeedbackOptionsQuery({ retry: 1 });
   const form = useForm({
     defaultValues: {
       [EXTERNAL_FEEDBACK_FIELDS.answers]: data.questions.map((question) => ({
@@ -194,14 +149,13 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
     control: form.control,
   });
 
-  const renderForm = ({ data: feedbackOptions }) => (
+  return (
     <RHForm form={form} onSubmit={onSubmit}>
       <FeedbackMeta data={data} />
       {fields.map(({ id }, i) => (
         <FeedbackFieldCard
           key={id}
           index={i}
-          feedbackOptions={feedbackOptions}
           getName={(fieldName) =>
             `${EXTERNAL_FEEDBACK_FIELDS.answers}.${i}.${fieldName}`
           }
@@ -214,24 +168,6 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
         </Button>
       </Box>
     </RHForm>
-  );
-
-  return (
-    <QueryRenderer
-      {...feedbackOptionsQuery}
-      loaderName="Block"
-      success={({ data }) => renderForm({ data })}
-      errored={({ error }) => {
-        return (
-          <>
-            <Alert severity="error" sx={{ my: 3 }}>
-              Options fetch error, using mock. {error?.message}
-            </Alert>
-            {renderForm({ data: DEFAULT_FEEDBACK_OPTIONS })}
-          </>
-        );
-      }}
-    />
   );
 };
 
@@ -273,12 +209,7 @@ const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
       hrEmail: "",
     },
   });
-  const mutation = useRequestAccessMutation({
-    params,
-    onSuccess: () => {
-      onSuccess();
-    },
-  });
+  const mutation = useRequestAccessMutation({ params, onSuccess });
 
   return (
     <ConfirmModal
@@ -356,43 +287,6 @@ const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
       </RHForm>
     </ConfirmModal>
   );
-};
-
-const MOCK = {
-  id: 0,
-  title: "Mock title string123",
-  description: "Mock desc string123",
-  username: "mockusername@string.cz",
-  validTo: "2023-11-15T21:39:52.264Z",
-  questions: [
-    {
-      key: "mock_string1",
-      type: "PARAGRAPH",
-      required: true,
-    },
-    {
-      key: "mock_string123",
-      type: "PARAGRAPH",
-      required: false,
-    },
-    {
-      key: "mock_scale1",
-      type: "SCALE",
-      required: true,
-    },
-    {
-      key: "mock_scale123",
-      type: "SCALE",
-      required: false,
-    },
-  ],
-  recipients: [
-    {
-      id: 0,
-      username: "mock_string",
-      submitted: true,
-    },
-  ],
 };
 
 const ExternalFeedbackPageInner = () => {
