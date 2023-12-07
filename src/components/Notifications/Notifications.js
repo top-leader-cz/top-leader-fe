@@ -1,40 +1,12 @@
 import { Badge, IconButton, Popover } from "@mui/material";
-import { useContext, useState } from "react";
-import { useQuery } from "react-query";
-import { useAuth } from "../../features/Authorization";
+import { useState } from "react";
 import { Icon } from "../Icon";
 import { NotificationsPopover } from "./NotificationsPopover";
-import { map, pathOr, pipe, sort } from "ramda";
-import { I18nContext } from "../../features/I18n/I18nProvider";
+import { useNotificationsQuery } from "./api";
 
 export const Notifications = ({ tooltip = "Notifications" }) => {
-  const { i18n } = useContext(I18nContext);
-  const { authFetch } = useAuth();
-  const query = useQuery({
-    queryKey: ["notifications"],
-    queryFn: () =>
-      authFetch({
-        url: `/api/latest/notifications`,
-        query: {
-          page: 0,
-          size: 10000,
-          sort: "createdAt,asc",
-        },
-      }),
-  });
-
-  const notifications = pipe(
-    pathOr([], ["data", "content"]),
-    // prettier-ignore
-    map(({ id, username, type, read, createdAt, context: { type: ctxType, fromUser, message } }) =>
-      ({ key: id,
-         from: fromUser,
-         text: message,
-         unread: !read,
-         createdAt: createdAt && i18n.parseUTCLocal(createdAt) })
-    ),
-    sort((a, b) => +b.createdAt - a.createdAt)
-  )(query);
+  const query = useNotificationsQuery();
+  const notifications = query.data ?? [];
 
   const [anchorEl, setAnchorEl] = useState(null);
 

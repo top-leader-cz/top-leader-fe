@@ -183,22 +183,14 @@ export const useAvailabilityQueries = ({
   // const query = useQuery();
 
   const { authFetch } = useAuth();
-  const { i18n, userTz } = useContext(I18nContext);
+  const { userTz } = useContext(I18nContext);
   const fetchFrameKeys = getFetchFrameKeys({ calendarInterval, userTz });
   // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
   // console.log(".....", { calendarInterval, fetchFrameKeys });
 
   const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
-    retry: false,
-    refetchOnWindowFocus: false,
-    // refetchOnReconnect: false,
     enabled: !!username && !!timeZone,
-    queryKey: [
-      "coaches",
-      username,
-      "availability",
-      { userTz, fetchFrameKey }, // calendarInterval
-    ],
+    queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey }], // prettier-ignore
     queryFn: async () => ({
       params: { userTz, fetchFrameKey, username, calendarInterval },
       weekData: await fetchAvailabilityWeekIntervals({

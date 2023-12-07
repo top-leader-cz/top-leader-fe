@@ -16,7 +16,6 @@ export const ReflectStep = ({
   setData,
   handleNext,
   handleBack,
-  onFinish,
   motivationOrReflection = "",
   previousActionSteps = [],
 }) => {

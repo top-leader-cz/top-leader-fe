@@ -120,7 +120,7 @@ const SessionCard = ({
   return (
     <Card sx={{ ...sx }}>
       <CardActionArea
-        sx={{ height: "100%" }}
+        sx={{ height: "100%", cursor: "auto" }}
         disableRipple
         // href={id ? parametrizedRoutes.editSession({ id }) : undefined}
       >

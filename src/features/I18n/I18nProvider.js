@@ -141,16 +141,11 @@ export const TLIntlProvider = ({ children }) => {
 export const I18nProvider = ({ children }) => {
   const { authFetch, user, fetchUser } = useAuth();
   const { language, setLanguage } = useContext(LocaleCtx);
-
   const browserTz = getBrowserTz();
   const userTz = useMemo(
     () => user.data?.timeZone || browserTz,
     [browserTz, user.data?.timeZone]
   );
-  // const [userTz, setUserTz] = useState(browserTz);
-  // useEffect(() => {
-  //   if (user.data?.timeZone) setUserTz(user.data?.timeZone)
-  // }, [user.data?.timeZone]);
   const userTzMutation = useMutation({
     mutationFn: (timezone) =>
       authFetch({
@@ -168,11 +163,7 @@ export const I18nProvider = ({ children }) => {
   );
   useEffect(() => {
     if (shouldSaveUserTz) {
-      console.log(
-        "%c[saveUserTz] initializing user tz (autosave)",
-        "color:coral",
-        { shouldSaveUserTz }
-      );
+      console.log( "%c[saveUserTz] initializing user tz (autosave)", "color:coral", { shouldSaveUserTz } ); // prettier-ignore
       saveUserTz();
     }
   }, [saveUserTz, shouldSaveUserTz]);

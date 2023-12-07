@@ -1,10 +1,19 @@
-import { defaultTo, evolve, map, pick, pipe } from "ramda";
+import {
+  applySpec,
+  defaultTo,
+  evolve,
+  filter,
+  map,
+  pick,
+  pipe,
+  prop,
+} from "ramda";
 import { useContext } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { UTC_DATE_FORMAT } from "../I18n/utils/date";
 
-export const useUserSessionQuery = ({ ...rest } = {}) => {
+export const useUserSessionQuery = (rest = {}) => {
   const query = useMyQuery({
     queryKey: ["user-sessions"],
     fetchDef: { url: `/api/latest/user-sessions` },
@@ -18,11 +27,10 @@ export const useUserSessionQuery = ({ ...rest } = {}) => {
   return query;
 };
 
-export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
+export const useUserSessionMutation = (rest = {}) => {
   const { i18n } = useContext(I18nContext);
   const formatFP = (date) => i18n.formatLocalMaybe(date, UTC_DATE_FORMAT);
   const mutation = useMyMutation({
-    debug: true,
     fetchDef: {
       method: "POST",
       url: "/api/latest/user-sessions",
@@ -40,24 +48,26 @@ export const useUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
   return mutation;
 };
 
-export const useUserReflectionMutation = ({ onSuccess, ...rest } = {}) => {
+export const useUserReflectionMutation = (rest = {}) => {
   const { i18n } = useContext(I18nContext);
   const formatFP = (date) => i18n.formatLocalMaybe(date, UTC_DATE_FORMAT);
   const mutation = useMyMutation({
-    debug: true,
     fetchDef: {
       method: "POST",
       url: "/api/latest/user-sessions-reflection",
-      from: ({ actionSteps = [], previousActionSteps = [], ...data }) => ({
-        ...data,
-        // newActionSteps: map( applySpec({ label: prop("label"), date: pipe(prop("date"), formatFP), }), actionSteps ),
-        newActionSteps2: actionSteps.map(({ label, date }) => ({
-          label,
-          date: i18n.formatLocalMaybe(date, UTC_DATE_FORMAT),
-        })),
-        checked: previousActionSteps
-          .filter(({ checked }) => checked)
-          .map(({ id }) => id),
+      from: applySpec({
+        newActionSteps: pipe(
+          prop("actionSteps"),
+          defaultTo([]),
+          map(pick(["label", "date"])),
+          map(evolve({ date: formatFP }))
+        ),
+        checked: pipe(
+          prop("previousActionSteps"),
+          defaultTo([]),
+          filter(prop("checked")),
+          map(prop("id"))
+        ),
       }),
     },
     invalidate: [{ queryKey: ["user-sessions"] }, { queryKey: ["user-info"] }],
