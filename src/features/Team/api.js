@@ -1,13 +1,10 @@
 import {
   allPass,
   always,
-  anyPass,
   applySpec,
-  complement,
   concat,
   converge,
   defaultTo,
-  identity,
   ifElse,
   mergeAll,
   pick,

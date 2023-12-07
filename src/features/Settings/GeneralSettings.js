@@ -48,6 +48,14 @@ export const GeneralSettings = () => {
         newPassword: prop(FIELDS_GENERAL.newPassword),
       }),
     },
+    snackbar: { success: true, error: true },
+    onSuccess: () => {
+      form.reset({
+        [FIELDS_GENERAL.currentPassword]: "",
+        [FIELDS_GENERAL.newPassword]: "",
+        [FIELDS_GENERAL.newPasswordConfirm]: "",
+      });
+    },
   });
   const msg = useMsg();
   const { language, setLanguage, userTz, userTzMutation } =

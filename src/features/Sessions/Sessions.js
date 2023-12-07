@@ -207,7 +207,10 @@ function Sessions() {
     sel,
   });
 
-  const renderSuccess = () => (
+  if (!sel.all?.length && !!sessionsQuery.data)
+    return <Navigate to={routes.newSession} replace />;
+
+  return (
     <MsgProvider messages={messages}>
       <Layout
         rightMenuContent={
@@ -223,20 +226,19 @@ function Sessions() {
         }
       >
         <Header text={<Msg id="sessions.heading" />} />
-        <ErrorBoundary>
-          {sel.all?.map((session) => (
-            <SessionCard key={session.id} session={session} />
-          ))}
-          {/* {sel.selected && <SessionCard session={sel.selected} />} */}
-        </ErrorBoundary>
+        <QueryRenderer
+          query={sessionsQuery}
+          success={() => (
+            <ErrorBoundary>
+              {sel.all?.map((session) => (
+                <SessionCard key={session.id} session={session} />
+              ))}
+            </ErrorBoundary>
+          )}
+        />
       </Layout>
     </MsgProvider>
   );
-
-  if (!sel.all?.length && !!sessionsQuery.data)
-    return <Navigate to={routes.newSession} replace />;
-
-  return <QueryRenderer {...sessionsQuery} success={renderSuccess} />;
 }
 
 export default Sessions;
