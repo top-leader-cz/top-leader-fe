@@ -42,7 +42,9 @@ export const ReflectStep = ({
     >
       <SessionTodosFields name={SESSION_FIELDS.PREV_ACTION_STEPS} />
       <Box sx={{ ...userInputSx }}>
-        <P>{lastReflection || motivation}</P>
+        <P sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
+          {lastReflection || motivation}
+        </P>
       </Box>
       <FocusedList items={hints} />
       <RHFTextField
