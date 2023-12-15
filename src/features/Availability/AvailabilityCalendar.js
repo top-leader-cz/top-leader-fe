@@ -78,6 +78,7 @@ export const AvailabilityCalendar = ({
   disablePickSlot = false,
 }) => {
   const { downLg } = useContext(LayoutCtx);
+  // const visibleDaysCount = 7;
   const visibleDaysCount = visibleDaysCountProp || downLg ? 3 : 7;
   const msg = useMsg({ dict: messages });
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
@@ -126,18 +127,20 @@ export const AvailabilityCalendar = ({
     reset();
   }, [reset]);
 
-  // console.log(
-  //   "%c[AvailabilityCalendar.rndr]",
-  //   "color:deeppink",
-  //   coach.username,
-  //   {
-  //     calendarInterval,
-  //     someResultsQuery,
-  //     onPick,
-  //     pickedCoach,
-  //     coach,
-  //   }
-  // );
+  console.log(
+    "%c[AvailabilityCalendar.rndr]",
+    "color:deeppink",
+    coach.username,
+    {
+      calendarInterval,
+      someResultsQuery,
+      queries,
+      onPick,
+      pickedCoach,
+      coach,
+      visibleDaysCount,
+    }
+  );
 
   return (
     <Box

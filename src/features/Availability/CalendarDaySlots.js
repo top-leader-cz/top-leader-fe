@@ -48,6 +48,7 @@ export const CalendarDaySlots = ({
 
     if (isFree) {
       if (intervals.length !== 1) {
+        console.log({ date, dayIntervals, freeHours, hour, isFree, intervals });
         throw new Error("Missing intervals, check");
       }
       // console.log( `%c[CalendarDaySlots] ${intervals.length} intervals found`, intervals.length > 1 ? "color:red" : "color:salmon", { isFree, intervals, hour, date, startDateTime, } );

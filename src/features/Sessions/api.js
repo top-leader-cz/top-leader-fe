@@ -12,6 +12,7 @@ import { useContext } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { UTC_DATE_FORMAT } from "../I18n/utils/date";
+import { SESSION_FIELDS } from "./steps/constants";
 
 export const useUserSessionQuery = (rest = {}) => {
   const query = useMyQuery({
@@ -48,7 +49,7 @@ export const useUserSessionMutation = (rest = {}) => {
   return mutation;
 };
 
-export const useUserReflectionMutation = (rest = {}) => {
+export const useUserReflectionMutation = ({ adjust, ...rest } = {}) => {
   const { i18n } = useContext(I18nContext);
   const formatFP = (date) => i18n.formatLocalMaybe(date, UTC_DATE_FORMAT);
   const mutation = useMyMutation({
@@ -56,6 +57,16 @@ export const useUserReflectionMutation = (rest = {}) => {
       method: "POST",
       url: "/api/latest/user-sessions-reflection",
       from: applySpec({
+        ...(adjust
+          ? {
+              [SESSION_FIELDS.AREA_OF_DEVELOPMENT]: prop(
+                SESSION_FIELDS.AREA_OF_DEVELOPMENT
+              ),
+              [SESSION_FIELDS.LONG_TERM_GOAL]: prop(
+                SESSION_FIELDS.LONG_TERM_GOAL
+              ),
+            }
+          : {}),
         reflection: prop("reflection"),
         newActionSteps: pipe(
           prop("actionSteps"),

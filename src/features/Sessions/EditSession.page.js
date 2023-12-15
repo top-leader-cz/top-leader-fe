@@ -48,6 +48,7 @@ function EditSessionPageInner() {
   activeStepIndexRef.current = activeStepIndex;
 
   const mutation = useUserReflectionMutation({
+    adjust,
     onSuccess: () =>
       console.log("mutation.onSuccess", data) || setFinished(true),
   });

@@ -179,7 +179,7 @@ export const I18nProvider = ({ children }) => {
       userTzWarningConfirmedRef.current = true;
       console.log({ userTz: userDataRef.current?.timeZone, browserTz });
       alert(
-        "Timezone on your machine seems different than in your profile. You can change it in Menu -> Settings"
+        `Timezone on your machine (${browserTz}) seems different than in your profile (${user.data?.timeZone}). You can change it in Menu -> Settings`
       );
     }
   }, [userTzWarning]);
