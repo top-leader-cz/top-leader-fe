@@ -179,7 +179,7 @@ export const Finished = () => {
         <P>
           <Msg id="sessions.steps.finished.perex" />
         </P>
-        {!currentCoach ? null : (
+        {!currentCoach ? null : ( // TODO? https://topleader.atlassian.net/browse/TOP-116
           <>
             <ScheduleCoached />
             <P sx={{ my: 5 }}>Or you can schedule your private session</P>

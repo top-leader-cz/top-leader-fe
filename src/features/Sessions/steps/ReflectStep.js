@@ -16,7 +16,8 @@ export const ReflectStep = ({
   setData,
   handleNext,
   handleBack,
-  motivationOrReflection = "",
+  motivation = "",
+  lastReflection = "",
   previousActionSteps = [],
 }) => {
   const reflectionField = step.fieldDefMap[SESSION_FIELDS.REFLECTION];
@@ -41,7 +42,7 @@ export const ReflectStep = ({
     >
       <SessionTodosFields name={SESSION_FIELDS.PREV_ACTION_STEPS} />
       <Box sx={{ ...userInputSx }}>
-        <P>{motivationOrReflection}</P>
+        <P>{lastReflection || motivation}</P>
       </Box>
       <FocusedList items={hints} />
       <RHFTextField

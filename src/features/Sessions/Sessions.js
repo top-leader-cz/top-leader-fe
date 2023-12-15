@@ -99,6 +99,7 @@ const SessionCard = ({
     areaOfDevelopment,
     longTermGoal,
     motivation,
+    lastReflection,
     reflection,
     actionSteps,
   } = {},
@@ -145,7 +146,7 @@ const SessionCard = ({
               />
             </Box>
             <P sx={{ my: 3, whiteSpace: "pre-wrap", lineHeight: 2 }}>
-              {reflection || motivation}
+              {reflection || lastReflection || motivation}
             </P>
             <ActionStepsReadOnly
               steps={actionSteps}
@@ -189,7 +190,8 @@ function Sessions() {
       areaOfDevelopment: el.data.areaOfDevelopment,
       longTermGoal: el.data.longTermGoal,
       motivation: el.data.motivation,
-      reflection: el.data.reflection,
+      lastReflection: el.data.lastReflection,
+      reflection: el.data.reflection, // TODO?
       actionSteps: el.data.actionSteps,
     }),
   });

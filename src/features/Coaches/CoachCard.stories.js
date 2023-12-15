@@ -69,10 +69,11 @@ export default {
 const coach = {
   username: "testuser",
   name: "name",
-  experience: "experience",
+  experience: "7",
   languages: ["en"],
   rate: "",
   fields: ["field"],
+  bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, nisl eget ultricies ultricies, nunc nisl aliquam nunc, vitae aliquam nisl nunc vitae nisl. Donec auctor, nisl eget ultricies ultricies, nunc nisl aliquam nunc, vitae aliquam nisl nunc vitae nisl.",
 };
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args

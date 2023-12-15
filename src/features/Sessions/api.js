@@ -56,6 +56,7 @@ export const useUserReflectionMutation = (rest = {}) => {
       method: "POST",
       url: "/api/latest/user-sessions-reflection",
       from: applySpec({
+        reflection: prop("reflection"),
         newActionSteps: pipe(
           prop("actionSteps"),
           defaultTo([]),

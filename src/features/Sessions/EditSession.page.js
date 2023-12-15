@@ -110,7 +110,8 @@ function EditSessionPageInner() {
           handleNext={handleNext}
           handleBack={handleBack}
           onFinish={handleFinish}
-          motivationOrReflection={sessionQuery.data?.motivation}
+          motivation={sessionQuery.data?.motivation}
+          lastReflection={sessionQuery.data?.lastReflection}
           previousActionSteps={sessionQuery.data?.actionSteps ?? []}
           previousArea={sessionQuery.data?.areaOfDevelopment ?? ""}
           previousGoal={sessionQuery.data?.longTermGoal ?? ""}
