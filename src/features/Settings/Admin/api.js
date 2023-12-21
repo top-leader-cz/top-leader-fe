@@ -95,11 +95,15 @@ export const useAdminUserMutation = ({ isEdit, ...rest } = {}) => {
           "companyId",
           "isTrial",
         ]),
-        applySpec({ locale: toApiLocale }), // TODO: BE?
+        applySpec({
+          locale: toApiLocale,
+          status: pipe(prop("isTrial"), (isTrial) =>
+            isTrial ? "AUTHORIZED" : "PENDING"
+          ),
+        }),
         ifElse(
           always(isEdit),
           applySpec({
-            status: prop("status"), // TODO: trial or status?
             coach: prop("coach"),
             credit: pipe(prop("credit"), creditFrom),
             // freeCoach, // TODO?

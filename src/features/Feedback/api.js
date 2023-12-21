@@ -1,6 +1,5 @@
 import { descend, evolve, map, pick, prop, sort } from "ramda";
 import { useRef } from "react";
-import { useQuery } from "react-query";
 import {
   useAuth,
   useMyMutation,
@@ -23,7 +22,7 @@ export const useExternalFeedbackQuery = ({
   params: { formId, username, token },
   ...rest
 } = {}) => {
-  const externalFeedbackQuery = useQuery({
+  const externalFeedbackQuery = useMyQuery({
     queryKey: ["feedback", "external"],
     fetchDef: {
       url: `/api/public/latest/feedback/${formId}/${username}/${token}`,

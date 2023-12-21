@@ -95,6 +95,10 @@ export const clientsMessages = defineMessages({
     id: "clients.add-client.fields.email",
     defaultMessage: "Email",
   },
+  "clients.add-client.fields.locale": {
+    id: "clients.add-client.fields.locale",
+    defaultMessage: "Locale",
+  },
   "clients.add-client.fields.isTrial": {
     id: "clients.add-client.fields.isTrial",
     defaultMessage: "Trial user",

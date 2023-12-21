@@ -2,6 +2,7 @@ import { Card, CardContent, TextField } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { FEEDBACK_FIELDS } from "./constants";
+import { notBlank } from "../../components/Forms/validations";
 
 export const FormBuilderMeta = ({}) => {
   return (
@@ -9,7 +10,10 @@ export const FormBuilderMeta = ({}) => {
       <CardContent>
         <Controller
           name={FEEDBACK_FIELDS.title}
-          rules={{ required: true }}
+          rules={{
+            required: true,
+            validate: { notBlank: notBlank(0) },
+          }}
           render={({ field, fieldState, formState }) => {
             // console.log("[FormBuilderMeta.title]", { field, fieldState });
             return (

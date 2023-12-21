@@ -1,6 +1,7 @@
-import { concat, pipe, prop } from "ramda";
-import { useRef } from "react";
+import { concat, mergeLeft, mergeRight, pipe, prop } from "ramda";
+import { useContext, useRef } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { I18nContext } from "../I18n/I18nProvider";
 
 export const useClientsQuery = (rest = {}) => {
   return useMyQuery({
@@ -59,8 +60,13 @@ export const useDeclineSessionMutation = ({ type, ...rest } = {}) => {
 
 export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
   /* { "email": "string", "firstName": "string", "lastName": "string", "isTrial": true } */
+  const { language } = useContext(I18nContext);
   return useMyMutation({
-    fetchDef: { method: "POST", url: `/api/latest/coach-clients` },
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/coach-clients`,
+      // from: mergeRight({ locale: language.substring(0, 2) }),
+    },
     invalidate: { exact: false, queryKey: ["coach-clients"] },
     ...rest,
   });

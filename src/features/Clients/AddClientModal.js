@@ -9,7 +9,13 @@ import {
   Paper,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { CheckboxField, RHFTextField } from "../../components/Forms";
+import {
+  AutocompleteSelect,
+  CheckboxField,
+  LANGUAGE_OPTIONS,
+  RHFTextField,
+  renderLanguageOption,
+} from "../../components/Forms";
 import { Icon } from "../../components/Icon";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
@@ -17,15 +23,20 @@ import { gray500 } from "../../theme";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useAddClientMutation } from "./api";
 import { clientsMessages as messages } from "./messages";
+import { useContext } from "react";
+import { I18nContext } from "../I18n/I18nProvider";
+import { toApiLocale } from "../Team/api";
 
 export const AddClientModal = ({ onClose: onCloseProp, open }) => {
   const msg = useMsg({ dict: messages });
+  const { language } = useContext(I18nContext);
   const form = useForm({
     mode: "onSubmit",
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
+      locale: language,
       isTrial: false,
       //   company?
     },
@@ -37,7 +48,11 @@ export const AddClientModal = ({ onClose: onCloseProp, open }) => {
   };
   const addClientMutation = useAddClientMutation({ onSuccess: onClose });
   //   const { userTz, language } = useContext(I18nContext);
-  const onSubmit = (values, e) => addClientMutation.mutateAsync(values);
+  const onSubmit = ({ locale, ...values }, e) =>
+    addClientMutation.mutateAsync({
+      locale: toApiLocale(locale),
+      ...values,
+    });
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
   console.log("[AddClientModal.rndr]", { ...addClientMutation });
@@ -112,6 +127,14 @@ export const AddClientModal = ({ onClose: onCloseProp, open }) => {
               autoFocus
               size="small"
               fullWidth
+            />
+            <AutocompleteSelect
+              disableClearable
+              name="locale"
+              rules={{ required: true }}
+              label={msg("clients.add-client.fields.locale")}
+              options={LANGUAGE_OPTIONS}
+              renderOption={renderLanguageOption}
             />
             <FormControlLabel
               control={<CheckboxField name="isTrial" />}
