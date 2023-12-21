@@ -115,4 +115,8 @@ export const messages = defineMessages({
     id: "auth.reset-password.submit",
     defaultMessage: "Change password",
   },
+  "auth.set-password.submit": {
+    id: "auth.set-password.submit",
+    defaultMessage: "Set password",
+  },
 });

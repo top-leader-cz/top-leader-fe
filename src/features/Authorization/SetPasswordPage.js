@@ -122,7 +122,7 @@ export const SetPasswordPage = ({ isExistingUser }) => {
           {isExistingUser ? (
             <Msg id="auth.reset-password.submit" />
           ) : (
-            <Msg id="auth.login.login" />
+            <Msg id="auth.set-password.submit" />
           )}
         </Button>
         {isExistingUser && (

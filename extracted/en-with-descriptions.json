@@ -125,6 +125,9 @@
   "auth.set-password.perex": {
     "defaultMessage": "You’ve been invited to join TopLeader. Please set a password to complete the registration"
   },
+  "auth.set-password.submit": {
+    "defaultMessage": "Set password"
+  },
   "auth.unauthorized.perex": {
     "defaultMessage": "Please enter your details"
   },
@@ -154,6 +157,9 @@
   },
   "clients.add-client.fields.lastName": {
     "defaultMessage": "Last name"
+  },
+  "clients.add-client.fields.locale": {
+    "defaultMessage": "Locale"
   },
   "clients.add-client.modal.desc": {
     "defaultMessage": ""
@@ -2198,6 +2204,9 @@
   },
   "settings.admin.member.modal.fields.coach": {
     "defaultMessage": "Current coach"
+  },
+  "settings.admin.member.modal.fields.companyId": {
+    "defaultMessage": "Company"
   },
   "settings.admin.member.modal.fields.credit": {
     "defaultMessage": "Credit"
