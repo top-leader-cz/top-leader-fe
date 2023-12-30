@@ -217,6 +217,7 @@ export const MainMenu = ({ open }) => {
             mobile={mobile}
             text={<Msg id="main-menu.items.help" />}
             icon={<Icon name="HelpOutlined" />}
+            to={routes.help}
           />
           <Divider sx={{ my: 2 }} />
           <ListItemLink

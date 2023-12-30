@@ -12,6 +12,38 @@ import { messages } from "./messages";
 const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";
 
+export const EmailTo = ({
+  email = EMAIL,
+  subject = "MessageFromTLPlatform",
+  withIcon = true,
+  sx = {},
+}) => {
+  return (
+    <P
+      component="a"
+      href={`mailto:${email}?subject=${subject}`}
+      target="_blank"
+      sx={{
+        color: "#475467",
+        fontWeight: 500,
+        textDecoration: "none",
+        display: "inline-flex",
+        ...sx,
+      }}
+    >
+      {withIcon ? (
+        <>
+          <Icon name="MailOutline" sx={{ fontSize: "16px" }} />
+          &nbsp;
+        </>
+      ) : (
+        ""
+      )}
+      {email}
+    </P>
+  );
+};
+
 export const WelcomeScreenTemplate = ({
   title = <Msg id="auth.unauthorized.title" />,
   perex = (
@@ -76,20 +108,7 @@ export const WelcomeScreenTemplate = ({
             {/* </Box> */}
           </Box>
           <Box sx={{ position: "absolute", right: "24px", bottom: "24px" }}>
-            <P
-              component="a"
-              href={`mailto:${EMAIL}?subject=${EMAIL_SUBJECT}`}
-              target="_blank"
-              sx={{
-                color: "#475467",
-                fontWeight: 500,
-                textDecoration: "none",
-                display: "inline-flex",
-              }}
-            >
-              <Icon name="MailOutline" sx={{ fontSize: "16px" }} />
-              &nbsp;{EMAIL}
-            </P>
+            <EmailTo email={EMAIL} subject={EMAIL_SUBJECT} />
           </Box>
         </Grid>
         <Grid

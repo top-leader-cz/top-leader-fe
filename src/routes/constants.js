@@ -23,6 +23,7 @@ export const routes = {
   startSession: "/start-session",
   coaches: "/coaches",
   settings: "/settings",
+  help: "/help",
   getFeedback: "/get-feedback",
   createFeedbackForm: "/get-feedback/create",
   editFeedbackForm: "/get-feedback/edit/:id",

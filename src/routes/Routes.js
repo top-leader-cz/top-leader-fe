@@ -38,6 +38,7 @@ import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
+import { HelpPage } from "../features/Help/Help.page";
 
 const GlobalSpinner = () => {
   return (
@@ -214,6 +215,14 @@ export const router = createHashRouter([
         element: (
           <RequireAuth>
             <SettingsPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.help,
+        element: (
+          <RequireAuth>
+            <HelpPage />
           </RequireAuth>
         ),
       },
