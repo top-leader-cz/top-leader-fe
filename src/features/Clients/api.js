@@ -1,4 +1,4 @@
-import { concat, mergeLeft, mergeRight, pipe, prop } from "ramda";
+import { concat, pipe, prop } from "ramda";
 import { useContext, useRef } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -37,7 +37,7 @@ const useDeclineCoachSessionMutation = (rest = {}) => {
     ...rest,
   });
 };
-const useDeclineUserSessionMutation = ({ onSuccess, ...rest } = {}) => {
+const useDeclineUserSessionMutation = ({ ...rest } = {}) => {
   return useMyMutation({
     fetchDef: {
       method: "DELETE",
@@ -58,7 +58,7 @@ export const useDeclineSessionMutation = ({ type, ...rest } = {}) => {
   return mutation;
 };
 
-export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
+export const useAddClientMutation = ({ ...rest } = {}) => {
   /* { "email": "string", "firstName": "string", "lastName": "string", "isTrial": true } */
   const { language } = useContext(I18nContext);
   return useMyMutation({
@@ -72,7 +72,7 @@ export const useAddClientMutation = ({ onSuccess, ...rest } = {}) => {
   });
 };
 
-export const useDeclineMutation = ({ onSuccess, ...rest } = {}) => {
+export const useDeclineMutation = ({ ...rest } = {}) => {
   return useMyMutation({
     fetchDef: {
       method: "DELETE",

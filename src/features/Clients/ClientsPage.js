@@ -31,6 +31,7 @@ import {
   useUpcomingCoachSessionsQuery,
 } from "./api";
 import { clientsMessages } from "./messages";
+import { generalMessages } from "../../components/messages";
 
 export const gray500 = "#667085";
 export const gray900 = "#101828";
@@ -46,6 +47,7 @@ const ScheduledSession = ({ data, canCancel, type }) => {
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(time);
   const msg = useMsg({ dict: clientsMessages });
+  const generalMsg = useMsg({ dict: generalMessages });
 
   const _declineSessionMutation = useDeclineSessionMutation({ type });
   const cancelMutationMaybe = canCancel ? _declineSessionMutation : undefined;
@@ -63,7 +65,7 @@ const ScheduledSession = ({ data, canCancel, type }) => {
         {
           variant: "outlined",
           type: "button",
-          children: "Cancel",
+          children: generalMsg("general.cancel"),
           onClick: () => onClose(),
         },
         {
@@ -71,14 +73,23 @@ const ScheduledSession = ({ data, canCancel, type }) => {
           variant: "contained",
           color: "error",
           type: "button",
-          children: "Decline",
+          children: generalMsg("general.decline"),
           disabled: cancelMutationMaybe.isLoading,
           loading: cancelMutationMaybe.isLoading,
           onClick: () => cancelMutationMaybe.mutate(data),
         },
       ],
     };
-  }, [cancelMutationMaybe, data, i18n, msg, name, parsed, username]);
+  }, [
+    cancelMutationMaybe,
+    data,
+    generalMsg,
+    i18n,
+    msg,
+    name,
+    parsed,
+    username,
+  ]);
   const { show } = ConfirmModal.useModal(modal);
 
   const renderCancelButton = () => {

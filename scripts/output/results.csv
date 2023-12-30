@@ -32,7 +32,7 @@ dashboard.rightmenu.upcoming.start,27,Start session,Spustit osobní rozvoj,Déma
 dashboard.rightmenu.upcoming.perex.empty,30,"Once you set a goal, actions will apear here","Jakmile si stanovíte cíl, aktivity se zobrazí zde","Dès lors que vous établissez un objectif, les actions/tâches apparaîtront ici.","Sobald Sie ein Ziel festgelegt haben, werden Aktionen hier angezeigt",dashboard.rightmenu.actions.perex.empty,,,"Once you set a goal, actions will apear here",,,,
 ,31,Notifications,Oznámení,Les notifications,Benachrichtigungen,general.notifications,,,Notifications,,,,
 ,32,Chat with,Chatovat s,Échanger avec,Unterhalten mit,,Performed,Found,Chat with,What were you happy with?,0.4444444444444444,sessions.edit.steps.reflect.hints.2,
-,33,Cancel,Zrušit,Annuler,Abbrechen,clients.add-client.cancel|clients.upcoming.decline-session|coaches.contact.button.cancel|feedback.create.share-modal.cancel|settings.admin.member.cancel|settings.general.button.cancel,,,Cancel,,,,
+,33,Cancel,Zrušit,Annuler,Abbrechen,clients.add-client.cancel|clients.upcoming.decline-session|coaches.contact.button.cancel|feedback.create.share-modal.cancel|general.cancel|settings.admin.member.cancel|settings.general.button.cancel,,,Cancel,,,,
 ,34,Send,Poslat,Envoyer,Senden,coaches.contact.button.send|messages.conversation.send,,,Send,,,,
 ,35,Back to the dashboard,Zpět na přehled,Retour au tableau de board.,Zurück zur Übersicht,assessment.header.back|feedback.create.heading|strengths.header.back|values.header.back,,,Back to the dashboard,,,,
 ,36,Back,"Zpět  ",Revenir,"Zurück  ",assessment.button.back|controls.back,,,Back,,,,

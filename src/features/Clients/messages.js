@@ -97,7 +97,7 @@ export const clientsMessages = defineMessages({
   },
   "clients.add-client.fields.locale": {
     id: "clients.add-client.fields.locale",
-    defaultMessage: "Locale",
+    defaultMessage: "Select language",
   },
   "clients.add-client.fields.isTrial": {
     id: "clients.add-client.fields.isTrial",

@@ -390,6 +390,7 @@
   "clients.upcoming.decline-session": "Cancel",
   "coaches.contact.button.cancel": "Cancel",
   "feedback.create.share-modal.cancel": "Cancel",
+  "general.cancel": "Cancel",
   "settings.admin.member.cancel": "Cancel",
   "settings.general.button.cancel": "Cancel",
   "coaches.contact.button.send": "Send",

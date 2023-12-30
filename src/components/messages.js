@@ -25,4 +25,12 @@ export const generalMessages = defineMessages({
     id: "general.delete",
     defaultMessage: "Delete",
   },
+  "general.cancel": {
+    id: "general.cancel",
+    defaultMessage: "Cancel",
+  },
+  "general.decline": {
+    id: "general.decline",
+    defaultMessage: "Decline",
+  },
 });

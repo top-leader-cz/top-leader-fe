@@ -159,7 +159,7 @@
     "defaultMessage": "Last name"
   },
   "clients.add-client.fields.locale": {
-    "defaultMessage": "Locale"
+    "defaultMessage": "Select language"
   },
   "clients.add-client.modal.desc": {
     "defaultMessage": ""
@@ -1953,8 +1953,14 @@
   "focused-list.show-another-question": {
     "defaultMessage": "Show another example"
   },
+  "general.cancel": {
+    "defaultMessage": "Cancel"
+  },
   "general.copy": {
     "defaultMessage": "Copy"
+  },
+  "general.decline": {
+    "defaultMessage": "Decline"
   },
   "general.delete": {
     "defaultMessage": "Delete"
@@ -1970,6 +1976,15 @@
   },
   "general.notifications": {
     "defaultMessage": "Notifications"
+  },
+  "help.back-to-dashboard": {
+    "defaultMessage": "Back to dashboard"
+  },
+  "help.description": {
+    "defaultMessage": "If you need help, please email us at {emailLink}"
+  },
+  "help.title": {
+    "defaultMessage": "Get help"
   },
   "main-menu.items.clients": {
     "defaultMessage": "Clients"
