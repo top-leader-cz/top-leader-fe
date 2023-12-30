@@ -215,10 +215,7 @@ function ClientsPageInner() {
     {
       label: msg("clients.table.col.name"),
       key: "name",
-      render: (row) => (
-        <UserCell email={row.username} name={formatName(row)} />
-        // <TLCell component="th" scope="row" name={row.name} sub={row.username} />
-      ),
+      render: (row) => <UserCell email={row.username} name={formatName(row)} />,
     },
     {
       label: msg("clients.table.col.lastSession"),

@@ -10,6 +10,7 @@ import { Msg, useMsg } from "../../components/Msg/Msg";
 import {
   StyledTableCell,
   TLCell,
+  UserCell,
 } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
@@ -19,6 +20,7 @@ import { AddMemberModal } from "./AddMemberModal";
 import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useHrUsersQuery } from "./api";
 import { messages } from "./messages";
+import { formatName } from "../Coaches/CoachCard";
 
 export const ActionsCell = ({ buttons = [], ...props }) => {
   const renderButton = ({ Component = Button, ...button }) => (
@@ -77,14 +79,7 @@ function TeamPageInner() {
     {
       label: msg("team.members.table.col.name"),
       key: "name",
-      render: (row) => (
-        <TLCell
-          component="th"
-          scope="row"
-          name={row.username}
-          sub={row.username}
-        />
-      ),
+      render: (row) => <UserCell email={row.username} name={formatName(row)} />,
     },
     {
       label: msg("team.members.table.col.coach"),
