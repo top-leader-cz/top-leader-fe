@@ -80,6 +80,7 @@ export const useConfirmRequestedCreditMutation = ({
 
 export const useAdminUserMutation = ({ isEdit, ...rest } = {}) => {
   return useMyMutation({
+    debug: true,
     fetchDef: {
       method: "POST",
       getUrl: isEdit
@@ -93,13 +94,11 @@ export const useAdminUserMutation = ({ isEdit, ...rest } = {}) => {
           "authorities",
           "timeZone",
           "companyId",
-          "isTrial",
+          "status",
         ]),
         applySpec({
           locale: toApiLocale,
-          status: pipe(prop("isTrial"), (isTrial) =>
-            isTrial ? "AUTHORIZED" : "PENDING"
-          ),
+          isTrial: ({ status }) => (status === "PENDING" ? false : true),
         }),
         ifElse(
           always(isEdit),

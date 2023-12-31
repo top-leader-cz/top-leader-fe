@@ -98,11 +98,9 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
     locale: initialValues.locale,
     timeZone: initialValues.timeZone || userTz,
     companyId: initialValues.companyId || null, // TODO
-    isTrial: false,
-
+    status: initialValues.status,
     ...(isEdit
       ? {
-          status: initialValues.status,
           coach: initialValues.coach,
           credit: initialValues.credit,
           // freeCoach, // TODO?
@@ -297,13 +295,12 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
               fullWidth
             />
           ) : null}
-          {isEdit ? (
-            <AutocompleteSelect
-              name="status"
-              label={msg("settings.admin.member.modal.fields.status")}
-              options={USER_STATUS_OPTIONS}
-            />
-          ) : null}
+          <AutocompleteSelect
+            name="status"
+            label={msg("settings.admin.member.modal.fields.status")}
+            rules={{ required: true }}
+            options={USER_STATUS_OPTIONS}
+          />
           <AutocompleteSelect
             disableClearable
             name="locale"
@@ -317,12 +314,6 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             label={msg("settings.admin.member.modal.fields.timeZone")}
             options={TIMEZONE_OPTIONS}
           />
-          {!isEdit ? (
-            <FormControlLabel
-              control={<CheckboxField name="isTrial" />}
-              label={msg("settings.admin.member.trial")}
-            />
-          ) : null}
 
           <Divider flexItem sx={{ mt: 3 }} />
           <Box display="flex" flexDirection="row" gap={3}>

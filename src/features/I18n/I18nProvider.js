@@ -146,6 +146,10 @@ export const I18nProvider = ({ children }) => {
     () => user.data?.timeZone || browserTz,
     [browserTz, user.data?.timeZone]
   );
+  // const userLanguage = useMemo(
+  //   () => user.data?. || language,
+  //   [browserTz, user.data?.timeZone]
+  // );
   const userTzMutation = useMutation({
     mutationFn: (timezone) =>
       authFetch({
