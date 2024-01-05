@@ -55,6 +55,7 @@ import { Msg, MsgProvider } from "../Msg";
 import { Score } from "../Score";
 import { P } from "../Typography";
 import { FieldError } from "./validations";
+import { useMsg } from "../Msg/Msg";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -933,6 +934,13 @@ export const optionEqStrategies = {
   equals: "equals",
 };
 
+const freeSoloMessages = defineMessages({
+  "general.freeSolo.placeholder": {
+    id: "general.freeSolo.placeholder",
+    defaultMessage: "Type your own and hit enter or select from the list",
+  },
+});
+
 export const FreeSoloField = ({
   name,
   id = name,
@@ -941,7 +949,7 @@ export const FreeSoloField = ({
   options: optionsProp,
   groupedOptions,
   optionEqStrategy = "optionValue",
-  placeholder = "Type your own and hit enter or select from the list",
+  placeholder: placeholderProp,
   onChange,
   selectOnFocus = true,
   clearOnBlur = true,
@@ -949,6 +957,12 @@ export const FreeSoloField = ({
   inputProps = {},
   ...props
 }) => {
+  const msg = useMsg({ dict: freeSoloMessages });
+  const placeholder = useMemo(
+    () => placeholderProp || msg("general.freeSolo.placeholder"),
+    [placeholderProp, msg]
+  );
+
   const optionsProps = useMemo(() => {
     if (!groupedOptions) return { options: optionsProp };
 

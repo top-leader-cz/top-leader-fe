@@ -134,7 +134,7 @@ function GetFeedbackPageInner() {
         text={msg("feedback.list.heading")}
         actionButton={{
           variant: "contained",
-          children: "Create new form",
+          children: msg("feedback.list.empty.create-btn"),
           href: routes.createFeedbackForm,
         }}
       />

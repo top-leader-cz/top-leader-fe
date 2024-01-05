@@ -1968,6 +1968,9 @@
   "general.edit": {
     "defaultMessage": "Edit"
   },
+  "general.freeSolo.placeholder": {
+    "defaultMessage": "Type your own and hit enter or select from the list"
+  },
   "general.message-from": {
     "defaultMessage": "Message from {from}"
   },

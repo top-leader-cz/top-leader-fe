@@ -3,6 +3,7 @@
   "clients.add-client.fields.locale": "Select language",
   "feedback.create.share-modal.desc": "Set email addresses and positions of people who you want to share the form with to provide you the feedback.",
   "general.decline": "Decline",
+  "general.freeSolo.placeholder": "Type your own and hit enter or select from the list",
   "help.back-to-dashboard": "Back to dashboard",
   "help.description": "If you need help, please email us at {emailLink}",
   "help.title": "Get help"

@@ -132,7 +132,7 @@ const FeedbackMeta = ({ data, sx = {} }) => {
   );
 };
 
-const ExternalFeedbackForm = ({ data, onSubmit }) => {
+const ExternalFeedbackForm = ({ data, submitDisabled, onSubmit }) => {
   const msg = useMsg();
   const form = useForm({
     defaultValues: {
@@ -163,7 +163,12 @@ const ExternalFeedbackForm = ({ data, onSubmit }) => {
         />
       ))}
       <Box sx={{ textAlign: "right" }}>
-        <Button type="submit" variant="contained" sx={{ mt: 4 }}>
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={submitDisabled}
+          sx={{ mt: 4 }}
+        >
           {msg("feedback.external.submit")}
         </Button>
       </Box>
@@ -292,9 +297,10 @@ const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
 const ExternalFeedbackPageInner = () => {
   const msg = useMsg();
   const { formId, username, token } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [finishedModalVisible, setFinishedModalVisible] = useState();
+  const [submitted, setSubmitted] = useState();
   const [requestAccessModalVisible, setRequestAccessModalVisible] = useState();
 
   const enabled = !!formId && !!username && !!token;
@@ -317,8 +323,9 @@ const ExternalFeedbackPageInner = () => {
   const handleFinished = useCallback(() => {
     setFinishedModalVisible();
     setRequestAccessModalVisible();
-    navigate(routes.signIn); // TODO?
-  }, [navigate]);
+    setSubmitted(true);
+    // navigate(routes.signIn); // TODO?
+  }, []);
 
   console.log("[ExternalFeedbackPageInner.rndr]", {
     params: { formId, username, token },
@@ -343,7 +350,11 @@ const ExternalFeedbackPageInner = () => {
           success={({ data }) => {
             return (
               <>
-                <ExternalFeedbackForm data={data} onSubmit={onSubmit} />
+                <ExternalFeedbackForm
+                  data={data}
+                  onSubmit={onSubmit}
+                  submitDisabled={submitted}
+                />
                 <FinishedModal
                   visible={finishedModalVisible}
                   onConfirm={() => {
