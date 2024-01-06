@@ -64,10 +64,7 @@ function CreateFeedbackPageInner({ data }) {
           : [FIELD_DEFAULT_VALUES],
       }
     : undefined;
-  const collected = useMemo(
-    () => getCollectedMaybe(data?.recipients),
-    [data?.recipients]
-  );
+  const collected = useMemo(() => getCollectedMaybe(data), [data]);
 
   const msg = useMsg();
   const { user } = useAuth();

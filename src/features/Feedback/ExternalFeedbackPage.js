@@ -176,32 +176,33 @@ const ExternalFeedbackForm = ({ data, submitDisabled, onSubmit }) => {
   );
 };
 
-const FinishedModal = ({ visible, onConfirm, onClose, data, msg }) => (
-  <ConfirmModal
-    open={!!visible}
-    onClose={onClose}
-    iconName="RocketLaunch"
-    title={msg("feedback.external.finished-modal.title", {
-      user: data.username,
-    })}
-    desc={msg("feedback.external.finished-modal.desc")}
-    buttons={[
-      {
-        variant: "outlined",
-        type: "button",
-        children: msg("feedback.external.finished-modal.request-access.no"),
-        onClick: onClose,
-      },
-      {
-        variant: "contained",
-        type: "button",
-        children: msg("feedback.external.finished-modal.request-access.yes"),
-        onClick: onConfirm,
-      },
-    ]}
-    sx={{ width: "500px" }}
-  />
-);
+const FinishedModal = ({ visible, onConfirm, onClose, data, msg }) =>
+  console.log("EFP.r", { data }) || (
+    <ConfirmModal
+      open={!!visible}
+      onClose={onClose}
+      iconName="RocketLaunch"
+      title={msg("feedback.external.finished-modal.title", {
+        user: data.username,
+      })}
+      desc={msg("feedback.external.finished-modal.desc")}
+      buttons={[
+        {
+          variant: "outlined",
+          type: "button",
+          children: msg("feedback.external.finished-modal.request-access.no"),
+          onClick: onClose,
+        },
+        {
+          variant: "contained",
+          type: "button",
+          children: msg("feedback.external.finished-modal.request-access.yes"),
+          onClick: onConfirm,
+        },
+      ]}
+      sx={{ width: "500px" }}
+    />
+  );
 
 const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
   const msg = useMsg();

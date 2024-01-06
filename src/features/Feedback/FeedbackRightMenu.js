@@ -16,6 +16,7 @@ export const FeedbackRightMenu = ({
   stats,
   collected,
   isLoading,
+  children,
 }) => {
   return (
     <ScrollableRightMenu heading={"Overview"} buttonProps={buttonProps}>
@@ -47,6 +48,7 @@ export const FeedbackRightMenu = ({
               </P>
             </>
           ) : null}
+          {children}
         </>
       )}
     </ScrollableRightMenu>
