@@ -31,7 +31,7 @@ dashboard.rightmenu.upcoming.start,27,Start session,Spustit osobní rozvoj,Déma
 ,29,No actions set,Aktivity nejsou určeny,Aucune action définie.,Keine Aktionen festgelegt,dashboard.rightmenu.actions.title.empty,,,No actions set,,,,
 dashboard.rightmenu.upcoming.perex.empty,30,"Once you set a goal, actions will apear here","Jakmile si stanovíte cíl, aktivity se zobrazí zde","Dès lors que vous établissez un objectif, les actions/tâches apparaîtront ici.","Sobald Sie ein Ziel festgelegt haben, werden Aktionen hier angezeigt",dashboard.rightmenu.actions.perex.empty,,,"Once you set a goal, actions will apear here",,,,
 ,31,Notifications,Oznámení,Les notifications,Benachrichtigungen,general.notifications,,,Notifications,,,,
-,32,Chat with,Chatovat s,Échanger avec,Unterhalten mit,,Performed,Found,Chat with,What were you happy with?,0.4444444444444444,sessions.edit.steps.reflect.hints.2,
+,32,Chat with,Chatovat s,Échanger avec,Unterhalten mit,,Performed,Found,Chat with,Shared with,0.5,feedback.results.shared-with,feedback.results.shared-with
 ,33,Cancel,Zrušit,Annuler,Abbrechen,clients.add-client.cancel|clients.upcoming.decline-session|coaches.contact.button.cancel|feedback.create.share-modal.cancel|general.cancel|settings.admin.member.cancel|settings.general.button.cancel,,,Cancel,,,,
 ,34,Send,Poslat,Envoyer,Senden,coaches.contact.button.send|messages.conversation.send,,,Send,,,,
 ,35,Back to the dashboard,Zpět na přehled,Retour au tableau de board.,Zurück zur Übersicht,assessment.header.back|feedback.create.heading|strengths.header.back|values.header.back,,,Back to the dashboard,,,,
@@ -575,7 +575,7 @@ settings.profile.heading,340,Personal info,Osobní informace,Information personn
 ,389,Unavailable,Nedostupné,Indisponible,Nicht verfügbar,settings.availability.unavailable,,,Unavailable,,,,
 ,390,Feedback form,Formulář zpětné vazby,Formulaire de retour de satisfaction,Rückmeldeformular,feedback.external.heading|feedback.heading,,,Feedback form,,,,
 ,391,Form,Formulář,Formulaire,Formular,,Performed,Found,Form,Share form,0.36363636363636365,feedback.create.next-btn,
-,392,Results,Výsledky,Résultats,Ergebnisse,,Performed,Found,Results,Responses,0.2857142857142857,assessment.menu.responses,
+,392,Results,Výsledky,Résultats,Ergebnisse,,Performed,Found,Results,Respondents,0.375,feedback.respondents,feedback.respondents
 ,393,Title,Název,Titre,Titel,,Performed,Found,Title,Edit,0.2857142857142857,"general.edit,settings.admin.table.edit.tooltip",
 ,394,Description,Popis,Description,Beschreibung,,Performed,Found,Description,Questions,0.4444444444444444,"assessment.menu.questions,feedback.create.stats.questions",
 ,395,optional,volitelné,optionnel,wahlweise,,Performed,Found,optional,HR (optional),0.7777777777777778,feedback.external.request-access-modal.fields.hrEmail,
@@ -764,7 +764,7 @@ dict.validation.notBlank,,Cannot be blank,Nesmí být prázdné,Ne peut pas êtr
 dict.validation.todayOrFuture,,Must be in the future,Musí být v budoucnosti,Doit être dans le futur,Muss in der Zukunft liegen,dict.validation.todayOrFuture,,,Must be in the future,,,,
 feedback.create.add-question,,Add question,Přidat otázku,Ajouter une question,Frage hinzufügen,feedback.create.add-question,,,Add question,,,,
 feedback.create.next-btn,,Share form,Sdílet formulář,Partager le formulaire,Formular teilen,feedback.create.next-btn,,,Share form,,,,
-feedback.create.share-modal.add-email,,Add email,Přidat e-mail,Ajouter un e-mail,E-Mail hinzufügen,feedback.create.share-modal.add-email,,,Add email,,,,
+feedback.create.share-modal.add-email,,Add email,Přidat e-mail,Ajouter un e-mail,E-Mail hinzufügen,feedback.create.share-modal.add-email|feedback.results.add-email,,,Add email,,,,
 feedback.create.share-modal.deadline,,Response deadline,Termín pro odpověď,Date limite de réponse,Antwortfrist,feedback.create.share-modal.deadline,,,Response deadline,,,,
 feedback.create.share-modal.share,,Share,Sdílet,Partager,Teilen,feedback.create.share-modal.share,,,Share,,,,
 feedback.external.deadline,,Please answer until {date},"Prosím, odpovězte do {date}",Veuillez répondre avant {date},Bitte antworten Sie bis {date},feedback.external.deadline,,,Please answer until {date},,,,

@@ -53,6 +53,10 @@ export const messages = defineMessages({
     id: "feedback.results.add-email",
     defaultMessage: "Add email",
   },
+  "feedback.results.add": {
+    id: "feedback.results.add",
+    defaultMessage: "Add",
+  },
   "feedback.create.stats.questions": {
     id: "feedback.create.stats.questions",
     defaultMessage: "Questions",

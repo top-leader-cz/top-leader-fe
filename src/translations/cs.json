@@ -879,5 +879,6 @@
   "settings.admin.table.col.action": "Aktivita",
   "settings.admin.table.col.paidCredit": "Zaplacené kredity",
   "settings.admin.table.col.remainingCredits": "Zbývající kredity",
+  "feedback.results.add-email": "Přidat e-mail",
   "settings.admin.member.modal.fields.companyId": "Firma"
 }

@@ -879,5 +879,6 @@
   "settings.admin.table.col.action": "Vorgehen",
   "settings.admin.table.col.paidCredit": "Bezahlte Rechnungen",
   "settings.admin.table.col.remainingCredits": "Verbleibendes Guthaben",
+  "feedback.results.add-email": "E-Mail hinzufügen",
   "settings.admin.member.modal.fields.companyId": "Unternehmen"
 }

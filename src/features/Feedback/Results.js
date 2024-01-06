@@ -6,6 +6,7 @@ import { INPUT_TYPES } from "./constants";
 import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
 import { defineMessages } from "react-intl";
 import { useMsg } from "../../components/Msg/Msg";
+import { multiply, pipe, replace, tap } from "ramda";
 
 const TextResults = ({ answers = [] }) => {
   return (
@@ -20,42 +21,52 @@ const TextResults = ({ answers = [] }) => {
   );
 };
 
+const toPercents = (value) =>
+  pipe(
+    replace("scale.", ""), // scale.1 .. scale.10
+    (n) => parseInt(n, 10),
+    multiply(10),
+    tap((percents) => console.log("toScore", { value, percents }))
+  )(value);
+
 const ScaleResults = ({ answers = [] }) => {
   return (
     <Box display="flex" flexDirection="row" gap={2}>
-      {answers.map(({ answer: value }, index) => (
-        <Box
-          key={`${value}_${index}`}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <P sx={{ mb: 0.5 }}>{value}%</P>
+      {answers.map(
+        ({ recipient, answer, _percents = toPercents(answer) }, index) => (
           <Box
+            key={`${_percents}_${index}_${recipient}`}
             sx={{
-              width: { xs: 20, md: 35, xl: 60 },
-              height: 120,
-              bgcolor: "#F9FAFB",
-              borderRadius: "4px",
-              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
+            <P sx={{ mb: 0.5 }}>{_percents}%</P>
             <Box
               sx={{
-                position: "absolute",
-                bottom: 0,
-                width: "100%",
-                height: value + "%",
-                bgcolor: "primary.main",
+                width: { xs: 20, md: 35, xl: 60 },
+                height: 120,
+                bgcolor: "#F9FAFB",
                 borderRadius: "4px",
+                position: "relative",
               }}
-            />
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  height: _percents + "%",
+                  bgcolor: "primary.main",
+                  borderRadius: "4px",
+                }}
+              />
+            </Box>
+            <P sx={{ mt: 0.5 }}>{index + 1}</P>
           </Box>
-          <P sx={{ mt: 0.5 }}>{index + 1}</P>
-        </Box>
-      ))}
+        )
+      )}
     </Box>
   );
 };
@@ -72,13 +83,15 @@ const messages = defineMessages({
 });
 
 const FieldResults = ({ question }) => {
-  const msg = useMsg({ dict: messages });
-  if (!question?.answers?.length)
-    return <Alert severity="info">{msg("feedback.results.no-answers")}</Alert>;
+  // const msg = useMsg({ dict: messages });
+  if (!question?.answers?.length) return null;
+  // return <Alert severity="info">{msg("feedback.results.no-answers")}</Alert>;
+
   if (question.type === INPUT_TYPES.TEXT)
     return <TextResults answers={question?.answers} />;
   if (question.type === INPUT_TYPES.SCALE)
     return <ScaleResults answers={question?.answers} />;
+
   return null;
 };
 

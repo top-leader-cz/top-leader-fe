@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "../../components/Header";
 import { Layout, useRightMenu } from "../../components/Layout";
@@ -19,6 +19,7 @@ import { Icon } from "../../components/Icon";
 import { RHForm } from "../../components/Forms/Form";
 import { useForm } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
+import { LoadingButton } from "@mui/lab";
 
 const AddRecipient = ({ feedback, onSuccess }) => {
   const msg = useMsg({ dict: messages });
@@ -39,16 +40,17 @@ const AddRecipient = ({ feedback, onSuccess }) => {
     })(feedback);
     mutation.mutate(updated);
   };
-  const disabled = mutation.isLoading;
+  const loading = mutation.isLoading;
 
   return (
     <RHForm form={form} onSubmit={handleSubmit}>
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "baseline",
           flexDirection: "row",
-          gap: 3,
+          justifyContent: "space-between",
+          gap: 2,
           mt: 1,
         }}
       >
@@ -58,17 +60,11 @@ const AddRecipient = ({ feedback, onSuccess }) => {
           rules={{ required: "Required" }}
           size="small"
           sx={{ flexGrow: 2 }}
+          autoFocus
         />
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={disabled}
-          sx={{ ml: 1, alignItems: "center", justifyContent: "space-between" }}
-          // startIcon={<Icon name="Add" />}
-          // onClick={handleAdd}
-        >
-          {msg("feedback.results.add-email")}
-        </Button>
+        <LoadingButton variant="contained" type="submit" loading={loading}>
+          {msg("feedback.results.add")}
+        </LoadingButton>
       </Box>
     </RHForm>
   );

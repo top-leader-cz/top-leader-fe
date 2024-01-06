@@ -1947,6 +1947,27 @@
   "feedback.list.heading": {
     "defaultMessage": "Get Feedback"
   },
+  "feedback.respondents": {
+    "defaultMessage": "Respondents"
+  },
+  "feedback.results.add": {
+    "defaultMessage": "Add"
+  },
+  "feedback.results.add-email": {
+    "defaultMessage": "Add email"
+  },
+  "feedback.results.no-answers": {
+    "defaultMessage": "No answers yet."
+  },
+  "feedback.results.question-answers-stats": {
+    "defaultMessage": "{answersCount} of {recipientsCount} people answered"
+  },
+  "feedback.results.shared-with": {
+    "defaultMessage": "Shared with"
+  },
+  "feedback.submitted": {
+    "defaultMessage": "Submitted"
+  },
   "file-upload.primary": {
     "defaultMessage": "Click to upload"
   },
