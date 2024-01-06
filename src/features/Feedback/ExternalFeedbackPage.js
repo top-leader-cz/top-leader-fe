@@ -1,15 +1,15 @@
 import { Alert, Box, Button, Card, CardContent } from "@mui/material";
 import { useCallback, useContext, useState } from "react";
 import { useFieldArray, useForm, useFormContext } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { RHFTextField, ScoreField, getLabel } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
 import { Header } from "../../components/Header";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { routes } from "../../routes";
 import { gray200 } from "../../theme";
+import { formatName } from "../Coaches/CoachCard";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
@@ -176,14 +176,14 @@ const ExternalFeedbackForm = ({ data, submitDisabled, onSubmit }) => {
   );
 };
 
-const FinishedModal = ({ visible, onConfirm, onClose, data, msg }) =>
-  console.log("EFP.r", { data }) || (
+const FinishedModal = ({ visible, onConfirm, onClose, feedback, msg }) =>
+  console.log("EFP.r", { feedback }) || (
     <ConfirmModal
       open={!!visible}
       onClose={onClose}
       iconName="RocketLaunch"
       title={msg("feedback.external.finished-modal.title", {
-        user: data.username,
+        user: formatName(feedback || {}) || feedback.username,
       })}
       desc={msg("feedback.external.finished-modal.desc")}
       buttons={[
@@ -364,10 +364,9 @@ const ExternalFeedbackPageInner = () => {
                   }}
                   msg={msg}
                   onClose={() => setFinishedModalVisible()}
-                  data={data}
+                  feedback={data}
                 />
                 <RequestAccessModal
-                  data={data}
                   params={{ formId, username, token }}
                   visible={requestAccessModalVisible}
                   onClose={() => setRequestAccessModalVisible()}
