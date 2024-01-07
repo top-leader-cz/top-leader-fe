@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Icon } from "../../components/Icon";
 import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
@@ -15,17 +15,59 @@ import { Authority } from "../Authorization/AuthProvider";
 import { formatName, getCoachPhotoUrl } from "../Coaches/CoachCard";
 import { SlotChip } from "../Team/Team.page";
 import { MemberAdminModal } from "./Admin/MemberAdminModal";
-import { useConfirmRequestedCreditMutation, useUsersQuery } from "./Admin/api";
+import {
+  useAdminDeleteUserMutation,
+  useConfirmRequestedCreditMutation,
+  useUsersQuery,
+} from "./Admin/api";
 import { messages } from "./messages";
 import { useUserStatusDict } from "./useUserStatusDict";
+import { ConfirmModal } from "../Modal/ConfirmModal";
+import { generalMessages } from "../../components/messages";
+import { LoadingButton } from "@mui/lab";
 
 function AdminSettingsInner() {
   const [user, setUser] = useState();
+  const [deleteUsername, setDeleteUsername] = useState();
   const msg = useMsg();
+  const generalMsg = useMsg({ dict: generalMessages });
   const { userStatusOptions } = useUserStatusDict();
 
   const usersQuery = useUsersQuery();
   const confirmCreditMutation = useConfirmRequestedCreditMutation({});
+  const deleteMutation = useAdminDeleteUserMutation({
+    onSuccess: () => setDeleteUsername(),
+  });
+
+  ConfirmModal.useModal(
+    useMemo(() => {
+      return {
+        open: !!deleteUsername,
+        iconName: "DeleteOutlined",
+        title: `${generalMsg("general.delete")} ${deleteUsername}?`,
+        desc: "",
+        error: deleteMutation.error,
+        getButtons: ({ onClose }) => [
+          {
+            variant: "outlined",
+            type: "button",
+            children: generalMsg("general.cancel"),
+            onClick: () => onClose(),
+          },
+          {
+            component: LoadingButton,
+            variant: "contained",
+            color: "error",
+            type: "button",
+            children: generalMsg("general.delete"),
+            disabled: deleteMutation.isLoading,
+            loading: deleteMutation.isLoading,
+            onClick: () => deleteMutation.mutate({ username: deleteUsername }),
+          },
+        ],
+      };
+    }, [deleteMutation, deleteUsername, generalMsg])
+  );
 
   const columns = [
     {
@@ -159,20 +201,36 @@ function AdminSettingsInner() {
       key: "action",
       render: (row) => (
         <TLCell>
-          <Tooltip
-            title={msg("settings.admin.table.edit.tooltip")}
-            placement="top"
-          >
-            <IconButton sx={{ color: gray500 }} onClick={() => setUser(row)}>
-              <Icon name="BorderColorOutlined" />
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: "flex", flexWrap: "nowrap" }}>
+            <Tooltip
+              title={msg("settings.admin.table.edit.tooltip")}
+              placement="top"
+            >
+              <IconButton sx={{ color: gray500 }} onClick={() => setUser(row)}>
+                <Icon name="BorderColorOutlined" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={generalMsg("general.delete")} placement="top">
+              <IconButton
+                sx={{ color: "error.main" }}
+                onClick={() => {
+                  setDeleteUsername(row.username);
+                }}
+              >
+                <Icon name="DeleteOutlined" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </TLCell>
       ),
     },
   ];
 
-  console.log("[AdminSettings.page]", { usersQuery });
+  console.log("[AdminSettings.page]", {
+    usersQuery,
+    deleteUsername,
+    deleteMutation,
+  });
 
   return (
     <>

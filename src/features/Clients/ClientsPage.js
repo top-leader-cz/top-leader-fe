@@ -51,46 +51,47 @@ const ScheduledSession = ({ data, canCancel, type }) => {
 
   const _declineSessionMutation = useDeclineSessionMutation({ type });
   const cancelMutationMaybe = canCancel ? _declineSessionMutation : undefined;
-  const modal = useMemo(() => {
-    return {
-      iconName: "RocketLaunch",
-      title: msg("clients.upcoming.decline-session.confirm.title", {
-        date: i18n.formatLocal(parsed, "Pp"),
-        name,
-        username,
-      }),
-      desc: "",
-      // error: cancelMutationMaybe.error,
-      getButtons: ({ onClose }) => [
-        {
-          variant: "outlined",
-          type: "button",
-          children: generalMsg("general.cancel"),
-          onClick: () => onClose(),
-        },
-        {
-          component: LoadingButton,
-          variant: "contained",
-          color: "error",
-          type: "button",
-          children: generalMsg("general.decline"),
-          disabled: cancelMutationMaybe.isLoading,
-          loading: cancelMutationMaybe.isLoading,
-          onClick: () => cancelMutationMaybe.mutate(data),
-        },
-      ],
-    };
-  }, [
-    cancelMutationMaybe,
-    data,
-    generalMsg,
-    i18n,
-    msg,
-    name,
-    parsed,
-    username,
-  ]);
-  const { show } = ConfirmModal.useModal(modal);
+  const { show } = ConfirmModal.useModal(
+    useMemo(() => {
+      return {
+        iconName: "RocketLaunch",
+        title: msg("clients.upcoming.decline-session.confirm.title", {
+          date: i18n.formatLocal(parsed, "Pp"),
+          name,
+          username,
+        }),
+        desc: "",
+        // error: cancelMutationMaybe.error,
+        getButtons: ({ onClose }) => [
+          {
+            variant: "outlined",
+            type: "button",
+            children: generalMsg("general.cancel"),
+            onClick: () => onClose(),
+          },
+          {
+            component: LoadingButton,
+            variant: "contained",
+            color: "error",
+            type: "button",
+            children: generalMsg("general.decline"),
+            disabled: cancelMutationMaybe.isLoading,
+            loading: cancelMutationMaybe.isLoading,
+            onClick: () => cancelMutationMaybe.mutate(data),
+          },
+        ],
+      };
+    }, [
+      cancelMutationMaybe,
+      data,
+      generalMsg,
+      i18n,
+      msg,
+      name,
+      parsed,
+      username,
+    ])
+  );
 
   const renderCancelButton = () => {
     if (!cancelMutationMaybe) return null;
