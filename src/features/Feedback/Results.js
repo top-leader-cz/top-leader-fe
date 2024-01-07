@@ -98,7 +98,8 @@ const FieldResults = ({ question }) => {
 const FieldResultsCard = ({ index, question, feedback, sx }) => {
   const msg = useMsg({ dict: messages });
   const { optionsProps } = useFeedbackOptions();
-  const answersCount = question?.answers?.length || 0;
+  const answersCount =
+    question?.answers?.filter(({ answer }) => !!answer?.trim())?.length || 0;
   const recipientsCount = feedback?.recipients?.length || 0;
 
   return (
@@ -106,7 +107,8 @@ const FieldResultsCard = ({ index, question, feedback, sx }) => {
       <Card sx={sx}>
         <CardContent>
           <H2 sx={{ mb: 2 }}>
-            {index + 1}. {getLabel(optionsProps.options, question.key)}
+            {index + 1}. {getLabel(optionsProps.options, question.key)}{" "}
+            {question.required ? "*" : null}
           </H2>
           <P>
             {msg("feedback.results.question-answers-stats", {

@@ -354,7 +354,7 @@ const ExternalFeedbackPageInner = () => {
                 <ExternalFeedbackForm
                   data={data}
                   onSubmit={onSubmit}
-                  submitDisabled={submitted}
+                  submitDisabled={submitted || mutation.isLoading}
                 />
                 <FinishedModal
                   visible={finishedModalVisible}

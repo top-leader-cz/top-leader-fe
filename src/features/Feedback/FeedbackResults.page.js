@@ -1,11 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { Box, Button, Divider } from "@mui/material";
+import { evolve, mergeRight, pipe, prop, slice } from "ramda";
+import { useContext, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
+import { RHFTextField } from "../../components/Forms";
+import { RHForm } from "../../components/Forms/Form";
 import { Header } from "../../components/Header";
+import { Icon } from "../../components/Icon";
 import { Layout, useRightMenu } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H1, P } from "../../components/Typography";
 import { routes } from "../../routes";
+import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { controlsMessages } from "../Sessions/steps/Controls";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
@@ -13,13 +21,6 @@ import { getCollectedMaybe } from "./GetFeedback.page";
 import { Results } from "./Results";
 import { useFeedbackResultsQuery, useSaveFeedbackFormMutation } from "./api";
 import { messages } from "./messages";
-import { evolve, prop } from "ramda";
-import { Box, Button, Divider } from "@mui/material";
-import { Icon } from "../../components/Icon";
-import { RHForm } from "../../components/Forms/Form";
-import { useForm } from "react-hook-form";
-import { RHFTextField } from "../../components/Forms";
-import { LoadingButton } from "@mui/lab";
 
 const AddRecipient = ({ feedback, onSuccess }) => {
   const msg = useMsg({ dict: messages });
@@ -34,10 +35,15 @@ const AddRecipient = ({ feedback, onSuccess }) => {
       onSuccess?.();
     },
   });
+  const { language } = useContext(I18nContext);
   const handleSubmit = ({ recipient }) => {
-    const updated = evolve({
-      recipients: (prev) => [...prev, { username: recipient }],
-    })(feedback);
+    const updated = pipe(
+      mergeRight({ locale: language }),
+      evolve({
+        recipients: (prev) => [...prev, { username: recipient }],
+        locale: slice(0, 2),
+      })
+    )(feedback);
     mutation.mutate(updated);
   };
   const loading = mutation.isLoading;
