@@ -13,7 +13,7 @@ name: Build
 
 on:
   push:
-    tags: [ 'v*.*.*' ]
+    tags: [ 'release-v*.*.*' ]
 jobs:
   build:
     name: Build prod top-leader-fe
