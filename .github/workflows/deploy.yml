@@ -80,7 +80,7 @@ jobs:
         with:
           parent: false
           path: build
-          destination: www.qa.toplead.app
+          destination: www.qa.topleaderplatform.io
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
