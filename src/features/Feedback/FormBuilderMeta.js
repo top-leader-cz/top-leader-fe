@@ -4,7 +4,7 @@ import { RHFTextField } from "../../components/Forms";
 import { FEEDBACK_FIELDS } from "./constants";
 import { notBlank } from "../../components/Forms/validations";
 
-export const FormBuilderMeta = ({}) => {
+export const FormBuilderMeta = ({ isExistingTitle }) => {
   return (
     <Card>
       <CardContent>
@@ -22,11 +22,9 @@ export const FormBuilderMeta = ({}) => {
                 error={!!fieldState.error}
                 placeholder={"Title"}
                 fullWidth
-                // size="small"
-                // helperText={fieldState.error}
-                // {...props}
+                helperText={isExistingTitle && "Title already exists"}
                 {...field}
-                // InputProps={{ ref: field.ref }}
+                // sx={{ fontSize: "2rem" }}
               />
             );
           }}

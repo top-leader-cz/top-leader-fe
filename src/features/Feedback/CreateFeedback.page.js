@@ -45,7 +45,6 @@ const from = ({ shareFormValues, formBuilderValues, username, language }) => {
 function CreateFeedbackPageInner({ data }) {
   const isEdit = !!data;
   const { i18n } = useContext(I18nContext);
-  // if (data) debugger;
   const initialValues = data
     ? {
         ...data,
