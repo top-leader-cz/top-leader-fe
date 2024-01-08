@@ -43,7 +43,7 @@ jobs:
         run: npm run build-github
 
       - name: Create Build Artifacts
-#        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v3
         with:
           name: build
@@ -52,7 +52,7 @@ jobs:
 
   deploy:
     name: Deploy prod top-leader-fe
-    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/main'
     needs: [ build ]
     runs-on: ubuntu-latest
     environment: prod
