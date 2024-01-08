@@ -22,7 +22,7 @@ jobs:
   build:
     name: Build top-leader-fe
     runs-on: ubuntu-latest
-    environment: production
+    environment: qa
     strategy:
       matrix:
         node-version: [18.x]

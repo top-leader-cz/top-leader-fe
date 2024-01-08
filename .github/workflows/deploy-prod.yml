@@ -55,7 +55,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [ build ]
     runs-on: ubuntu-latest
-    environment: production
+    environment: prod
     steps:
       - name: Cloud Authentication
         uses: google-github-actions/auth@v0
