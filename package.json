@@ -68,8 +68,9 @@
       "last 1 safari version"
     ]
   },
-  "proxy_bak": "https://topleader.hasura.app",
-  "proxy": "https://topleader-394306.ey.r.appspot.com",
+  "proxy_bak1": "https://topleader.hasura.app",
+  "proxy_bak2": "https://topleader-394306.ey.r.appspot.com",
+  "proxy": "https://qa-dot-topleader-394306.ey.r.appspot.com",
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@craco/craco": "^7.1.0",

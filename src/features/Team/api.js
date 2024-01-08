@@ -74,7 +74,7 @@ export const useUserMutation = ({ isEdit, isAdmin, ...rest } = {}) => {
   });
 };
 
-export const useCreditRequestMutation = ({ onSuccess, ...rest } = {}) => {
+export const useCreditRequestMutation = (rest = {}) => {
   return useMyMutation({
     fetchDef: {
       method: "POST",

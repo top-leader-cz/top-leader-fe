@@ -42,14 +42,17 @@ const EmptyFeedbacks = () => {
   );
 };
 
-export const getCollectedMaybe = (recipients) =>
-  !recipients
-    ? undefined
-    : {
-        total: recipients.length,
-        count: recipients.filter(({ id, username, submitted }) => submitted)
-          .length,
-      };
+export const getCollectedMaybe = (feedback) => {
+  if (!feedback?.recipients) return undefined;
+
+  // TODO: is this correct?
+  return {
+    total: feedback?.recipients.length,
+    count: feedback?.recipients.filter(
+      ({ id, username, submitted }) => submitted
+    ).length,
+  };
+};
 
 const FeedbackListCard = ({ feedback }) => {
   const { id, title, createdAt, recipients } = feedback;
@@ -62,7 +65,7 @@ const FeedbackListCard = ({ feedback }) => {
   const parsed = i18n.parseUTCLocal(createdAt);
   const formattedDate = i18n.formatLocalMaybe(parsed, "P");
 
-  const { count: responsesCount } = getCollectedMaybe(recipients);
+  const { count: responsesCount } = getCollectedMaybe(feedback);
 
   const txtSx = { fontSize: 16, fontWeight: 500 };
 

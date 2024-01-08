@@ -7,11 +7,11 @@ import {
   useEffect,
   useRef,
 } from "react";
+import { defineMessages, useIntl } from "react-intl";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { useSnackbar } from "../Modal/ConfirmModal";
-import { defineMessage, defineMessages, useIntl } from "react-intl";
 
 export const AuthContext = createContext(null);
 
@@ -288,9 +288,13 @@ export function AuthProvider({ children }) {
   const intl = useIntl();
 
   const qcRef = useRef(queryClient);
-  qcRef.current = queryClient;
+  if (qcRef.current !== queryClient) {
+    console.log("qcRef.current!==queryClient");
+    qcRef.current = queryClient;
+  }
   const signout = useCallback(() => {
     qcRef.current.removeQueries();
+    qcRef.current.clear();
     setIsLoggedIn(false);
   }, [setIsLoggedIn]);
 

@@ -56,6 +56,17 @@ export const useCompanyMutation = (rest = {}) => {
   });
 };
 
+export const useAdminDeleteUserMutation = (rest = {}) => {
+  return useMyMutation({
+    fetchDef: {
+      method: "DELETE",
+      getUrl: ({ username }) => `/api/latest/admin/users/${username}`,
+    },
+    invalidate: [{ queryKey: ["admin", "users"] }],
+    ...rest,
+  });
+};
+
 export const useConfirmRequestedCreditMutation = ({
   onSuccess,
   ...params

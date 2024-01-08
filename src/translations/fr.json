@@ -879,5 +879,6 @@
   "settings.admin.table.col.action": "Action",
   "settings.admin.table.col.paidCredit": "Crédits payés",
   "settings.admin.table.col.remainingCredits": "Crédits restants",
+  "feedback.results.add-email": "Ajouter un e-mail",
   "settings.admin.member.modal.fields.companyId": "Société"
 }

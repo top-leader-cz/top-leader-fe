@@ -74,7 +74,7 @@ const DashboardCardNotes = () => {
   const isFetchingUser = useIsFetching({ queryKey: ["user-info"] });
   // useEffect(() => { setNote?.(user.data.notes); }, [user.data.notes])
 
-  const { isLoading, isFetching, isPending } = noteMutation;
+  // const { isLoading, isFetching, isPending } = noteMutation;
   // console.log({ isLoading, isFetching, isPending, noteMutation });
 
   return (
@@ -285,7 +285,8 @@ const DashboardCardSession = ({ selectedKeys = [] }) => {
 
 export function DashboardPage() {
   const { user, isCoach } = useAuth();
-  const username = user.data.username;
+  const { username, firstName } = user.data;
+  const displayName = firstName || username;
   // console.log("[Dashboard.rndr]", { user });
 
   return (
@@ -295,7 +296,7 @@ export function DashboardPage() {
         header={{
           withNotifications: true,
           avatarSrc: isCoach && `/api/latest/coaches/${username}/photo`,
-          heading: <Msg id="dashboard.header" values={{ user: username }} />,
+          heading: <Msg id="dashboard.header" values={{ user: displayName }} />,
         }}
       >
         <Box>

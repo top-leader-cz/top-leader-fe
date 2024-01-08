@@ -37,6 +37,26 @@ export const messages = defineMessages({
     id: "feedback.heading",
     defaultMessage: "Feedback form",
   },
+  "feedback.respondents": {
+    id: "feedback.respondents",
+    defaultMessage: "Respondents",
+  },
+  "feedback.submitted": {
+    id: "feedback.submitted",
+    defaultMessage: "Submitted",
+  },
+  "feedback.results.shared-with": {
+    id: "feedback.results.shared-with",
+    defaultMessage: "Shared with",
+  },
+  "feedback.results.add-email": {
+    id: "feedback.results.add-email",
+    defaultMessage: "Add email",
+  },
+  "feedback.results.add": {
+    id: "feedback.results.add",
+    defaultMessage: "Add",
+  },
   "feedback.create.stats.questions": {
     id: "feedback.create.stats.questions",
     defaultMessage: "Questions",
