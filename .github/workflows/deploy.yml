@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-    name: Build top-leader-fe
+    name: Build qa top-leader-fe
     runs-on: ubuntu-latest
     environment: qa
     strategy:
@@ -55,7 +55,7 @@ jobs:
         if-no-files-found: error
 
   deploy:
-    name: Deploy top-leader-fe
+    name: Deploy qa top-leader-fe
     if: github.ref == 'refs/heads/main'
     needs: [ build ]
     runs-on: ubuntu-latest
