@@ -7,7 +7,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Header } from "../../components/Header";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -25,6 +25,8 @@ import { useDeleteFeedbackFormMutation, useFeedbackFormsQuery } from "./api";
 import { messages } from "./messages";
 import { useNavigate } from "react-router-dom";
 import { generalMessages } from "../../components/messages";
+import { ConfirmModal } from "../Modal/ConfirmModal";
+import { LoadingButton } from "@mui/lab";
 
 const EmptyFeedbacks = () => {
   const msg = useMsg();
@@ -57,17 +59,49 @@ export const getCollectedMaybe = (feedback) => {
 const FeedbackListCard = ({ feedback }) => {
   const { id, title, createdAt, recipients } = feedback;
   const navigate = useNavigate();
-  const deleteFeedbackMutation = useDeleteFeedbackFormMutation();
-
   const msg = useMsg();
   const generalMsg = useMsg({ dict: generalMessages });
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(createdAt);
   const formattedDate = i18n.formatLocalMaybe(parsed, "P");
-
   const { count: responsesCount } = getCollectedMaybe(feedback);
-
   const txtSx = { fontSize: 16, fontWeight: 500 };
+
+  const [deleteFeedback, setDeleteFeedback] = useState();
+  const deleteFeedbackMutation = useDeleteFeedbackFormMutation({
+    onSuccess: () => setDeleteFeedback(),
+  });
+
+  ConfirmModal.useModal(
+    useMemo(() => {
+      return {
+        open: !!deleteFeedback,
+        iconName: "DeleteOutlined",
+        title: `${generalMsg("general.delete")} ${deleteFeedback?.title}?`,
+        desc: "",
+        error: deleteFeedbackMutation.error,
+        onClose: () => setDeleteFeedback(),
+        getButtons: ({ onClose }) => [
+          {
+            variant: "outlined",
+            type: "button",
+            children: generalMsg("general.cancel"),
+            onClick: () => onClose(),
+          },
+          {
+            component: LoadingButton,
+            variant: "contained",
+            color: "error",
+            type: "button",
+            children: generalMsg("general.delete"),
+            disabled: deleteFeedbackMutation.isLoading,
+            loading: deleteFeedbackMutation.isLoading,
+            onClick: () => deleteFeedbackMutation.mutate(deleteFeedback),
+          },
+        ],
+      };
+    }, [deleteFeedback, deleteFeedbackMutation, generalMsg])
+  );
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -113,7 +147,7 @@ const FeedbackListCard = ({ feedback }) => {
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  deleteFeedbackMutation.mutate(feedback);
+                  setDeleteFeedback(feedback);
                 }}
                 disabled={deleteFeedbackMutation.isLoading}
               >

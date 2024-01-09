@@ -8,7 +8,8 @@ import { FormBuilderFields } from "./FormBuilderFields";
 import { FormBuilderMeta } from "./FormBuilderMeta";
 import { DEFAULT_VALUES, FEEDBACK_FIELDS } from "./constants";
 import { messages } from "./messages";
-import { evolve, pipe, trim } from "ramda";
+import { evolve, pipe, prop, trim } from "ramda";
+import { useFeedbackFormsQuery } from "./api";
 
 // const onSubmit = (data, e) => console.log("[onSubmit]", data, e);
 const onError = (errors, e) => console.log("[onError]", { errors, e });
@@ -35,6 +36,15 @@ export const CreateFeedbackForm = ({
     },
     [onShareForm]
   );
+  const feedbacksQuery = useFeedbackFormsQuery();
+  const currentTitle = form.watch(FEEDBACK_FIELDS.title);
+  const isExistingTitle = useMemo(() => {
+    if (!feedbacksQuery.data?.length) return false;
+    else
+      return feedbacksQuery.data
+        .map(prop(FEEDBACK_FIELDS.title))
+        .some((title) => title === currentTitle);
+  }, [currentTitle, feedbacksQuery.data]);
 
   useRightMenu(
     useMemo(
@@ -62,7 +72,7 @@ export const CreateFeedbackForm = ({
 
   return (
     <FormProvider {...form}>
-      <FormBuilderMeta />
+      <FormBuilderMeta isExistingTitle={isExistingTitle} />
       <Divider sx={{ my: 3 }} />
       <FormBuilderFields name="fields" />
     </FormProvider>

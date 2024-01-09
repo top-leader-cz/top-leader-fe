@@ -47,6 +47,7 @@ function AdminSettingsInner() {
         title: `${generalMsg("general.delete")} ${deleteUsername}?`,
         desc: "",
         error: deleteMutation.error,
+        onClose: () => setDeleteUsername(),
         getButtons: ({ onClose }) => [
           {
             variant: "outlined",
