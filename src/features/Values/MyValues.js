@@ -18,7 +18,7 @@ import { useValuesDict } from "./values";
 
 // {
 //     "id": 1,
-//     "username": "slavik.dan12@gmail.com",
+//     "username": "em@i.ll",
 //     "type": "VALUES",
 //     "createdAt": "2023-08-15T17:12:10.640453",
 //     "data": {

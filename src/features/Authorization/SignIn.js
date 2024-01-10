@@ -8,14 +8,13 @@ import { useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "./AuthProvider";
 import { WelcomeScreenTemplate } from "./WelcomeScreenTemplate";
 import { messages } from "./messages";
-import { routes } from "../../routes";
 import { parametrizedRoutes } from "../../routes/constants";
 
 export function SignInPage() {
   const { loginMutation } = useAuth();
   const msg = useMsg({ dict: messages });
   const form = useForm({
-    defaultValues: { email: "slavik.dan12@gmail.com", password: "pass" },
+    defaultValues: { email: "", password: "" },
   });
   const handleSubmit = ({ email, password }, e) => {
     console.log("[Login submit]", { username: email, password });
