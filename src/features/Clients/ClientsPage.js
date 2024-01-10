@@ -204,7 +204,7 @@ function ClientsPageInner() {
   const [declineMemberVisible, setDeclineMemberVisible] = useState();
   const msg = useMsg({ dict: clientsMessages });
 
-  const query = useClientsQuery({});
+  const query = useClientsQuery();
   const upcomingSessionsQuery = useUpcomingCoachSessionsQuery();
   const declineMutation = useDeclineMutation({
     onSuccess: () => {

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 import { useLocation } from "react-router-dom";
 import { RHFTextField } from "../../components/Forms";
 import { RHForm } from "../../components/Forms/Form";
@@ -19,19 +19,53 @@ import { Layout, useRightMenu } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2 } from "../../components/Typography";
-import { useAuth } from "../Authorization";
+import { routes } from "../../routes";
+import { EmptyTemplate } from "../Feedback/EmptyTemplate";
 import { QueryRenderer } from "../QM/QueryRenderer";
+import { ConversationMessage } from "./ConversationMessage";
+import { MessagesRightMenu } from "./MessagesRightMenu";
 import {
-  useConversationsQuery,
   useConversationMessagesQuery,
+  useConversationsQuery,
   useSendMessageMutation,
 } from "./api";
 import { messages } from "./messages";
-import { ConversationMessage } from "./ConversationMessage";
-import { MessagesRightMenu } from "./MessagesRightMenu";
-import { EmptyTemplate } from "../Feedback/EmptyTemplate";
-import { routes } from "../../routes";
-import { add } from "date-fns";
+import { useAuth } from "../Authorization";
+import { useClientsQuery } from "../Clients/api";
+import { prop } from "ramda";
+
+const useCoachClientsUsernames = () => {
+  const { isCoach } = useAuth();
+  const query = useClientsQuery({ enabled: isCoach });
+
+  if (!isCoach || !query.data) return [];
+
+  return query.data.map(prop("username"));
+};
+
+// temp until api will be ready
+const useAddCoachClients = () => {
+  const coachClientsUsernames = useCoachClientsUsernames();
+
+  return useCallback(
+    ({ conversations = [] }) => {
+      const coachClients = coachClientsUsernames
+        .filter(
+          (username) => !conversations.some((c) => c.username === username)
+        )
+        .map((username) => ({
+          username,
+          lastMessage: "",
+          avatarSrc: `/api/latest/coaches/${username}/photo`,
+          time: "",
+          unreadMessageCount: 0,
+        }));
+
+      return [...conversations, ...coachClients];
+    },
+    [coachClientsUsernames]
+  );
+};
 
 // https://mui.com/material-ui/react-list/
 const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
@@ -338,6 +372,8 @@ const Conversation = ({
   );
 };
 
+const arr = [];
+
 function MessagesPageInner() {
   const msg = useMsg();
   // cannot destructure, state is null initially
@@ -347,8 +383,10 @@ function MessagesPageInner() {
   const [_selectedUsername, setSelectedUsername] = useState();
   const conversationsQuery = useConversationsQuery();
 
+  const addClients = useAddCoachClients();
+  const conversations = addClients(conversationsQuery.data ?? arr);
+
   const selectedUsername = useMemo(() => {
-    const conversations = conversationsQuery.data ?? [];
     // When username is not among conversations usernames:
     const usernameCandidates = [
       _selectedUsername,
@@ -359,12 +397,11 @@ function MessagesPageInner() {
       conversations.some(({ username }) => username === candidate)
     );
     return selectedUsername;
-  }, [_selectedUsername, conversationsQuery.data, routeStateUsername]);
+  }, [_selectedUsername, conversations, routeStateUsername]);
 
   const selectedConversation = useMemo(() => {
-    const conversations = conversationsQuery.data ?? [];
     return conversations.find(({ username }) => username === selectedUsername);
-  }, [conversationsQuery.data, selectedUsername]);
+  }, [conversations, selectedUsername]);
 
   const onSelect = useCallback(
     (key) => {
@@ -397,7 +434,8 @@ function MessagesPageInner() {
       <QueryRenderer
         {...conversationsQuery}
         success={({ data = [] }) => {
-          if (!data?.length)
+          const conversations = addClients({ conversations: data });
+          if (!conversations?.length)
             return (
               <EmptyTemplate
                 title={msg("messages.empty.title")}
@@ -422,7 +460,7 @@ function MessagesPageInner() {
                 }}
               >
                 <ContactList
-                  conversations={data}
+                  conversations={conversations}
                   selectedUsername={selectedUsername}
                   onSelect={onSelect}
                 />
