@@ -84,7 +84,15 @@ function TeamPageInner() {
     {
       label: msg("team.members.table.col.coach"),
       key: "coach",
-      render: (row) => <TLCell name={row.coach} />,
+      render: (row) => (
+        <UserCell
+          email={row.coach}
+          name={formatName({
+            firstName: row.coachFirstName,
+            lastName: row.coachLastName,
+          })}
+        />
+      ),
     },
     {
       label: msg("team.members.table.col.paid"),
