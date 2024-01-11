@@ -21,11 +21,12 @@ import messages_cs from "../../translations/cs.json";
 import messages_de from "../../translations/de.json";
 import messages_en from "../../translations/en.json";
 import messages_fr from "../../translations/fr.json";
-import { useAuth } from "../Authorization/AuthProvider"; // cyclic dependency when imported from Auth...../index
+import { useAuth, useMyMutation } from "../Authorization/AuthProvider"; // cyclic dependency when imported from Auth...../index
 import { useI18nInternal } from "./useI18n.hook";
 import { getBrowserTz } from "./utils/date";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { objOf } from "ramda";
 // import messages_de_en from "./translations/de_en.json";
 // import messages_de_cz from "./translations/de_cz.json";
 // import messages_es from "./translations/es.json";
@@ -75,6 +76,7 @@ if (
 }
 
 const supportedLocales = Object.keys(messages);
+const isSupportedLanguage = (lang) => supportedLocales.includes(lang);
 
 console.log(
   "%c[App init] COMMIT: " + process.env.REACT_APP_GIT_SHA,
@@ -110,22 +112,24 @@ export const TLIntlProvider = ({ children }) => {
   const browserLocaleFull = Intl.DateTimeFormat()
     .resolvedOptions()
     .locale.substring(0, 5);
-  const savedLocale = window.localStorage.getItem("language");
-  const defaultLocale = supportedLocales.includes(browserLocaleFull)
+  const savedLocale = window.sessionStorage.getItem("language");
+  const defaultLocale = isSupportedLanguage(browserLocaleFull)
     ? browserLocaleFull
-    : supportedLocales.includes(browserLocale)
+    : isSupportedLanguage(browserLocale)
     ? browserLocale
     : defaultLanguage;
   const [language, _setLanguage] = useState(
-    supportedLocales.includes(savedLocale) ? savedLocale : defaultLocale
+    isSupportedLanguage(savedLocale) ? savedLocale : defaultLocale
   );
   const setLanguage = useCallback((lang) => {
+    if (!isSupportedLanguage(lang))
+      return console.log("Unsupported locale: ", lang); //throw new Error("Unsupported lang");
     _setLanguage(lang);
-    window.localStorage.setItem("language", lang);
+    window.sessionStorage.setItem("language", lang);
   }, []);
 
   return (
-    <LocaleCtx.Provider value={{ language, setLanguage }}>
+    <LocaleCtx.Provider value={{ language, setLanguage, isSupportedLanguage }}>
       <IntlProvider
         locale={language}
         defaultLocale={defaultLanguage}
@@ -146,11 +150,7 @@ export const I18nProvider = ({ children }) => {
     () => user.data?.timeZone || browserTz,
     [browserTz, user.data?.timeZone]
   );
-  // const userLanguage = useMemo(
-  //   () => user.data?. || language,
-  //   [browserTz, user.data?.timeZone]
-  // );
-  const userTzMutation = useMutation({
+  const userTzMutation = useMyMutation({
     mutationFn: (timezone) =>
       authFetch({
         method: "POST",
@@ -159,6 +159,23 @@ export const I18nProvider = ({ children }) => {
       }),
     onSuccess: () => fetchUser(),
   });
+  const localeMutation = useMyMutation({
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user-info/locale`,
+      from: objOf("locale"),
+    },
+    onSuccess: (data) => {
+      console.log("[localeMutation.onSuccess]", { data });
+      setLanguage(data.locale);
+      fetchUser();
+    },
+  });
+  useEffect(() => {
+    if (user.data?.locale && user.data?.locale !== language) {
+      setLanguage(user.data.locale);
+    }
+  }, [language, setLanguage, user.data?.locale]);
 
   const shouldSaveUserTz =
     user.data && !user.data.timeZone && browserTz && !userTzMutation.isLoading;
@@ -206,7 +223,15 @@ export const I18nProvider = ({ children }) => {
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
       <I18nContext.Provider
-        value={{ language, setLanguage, userTz, userTzMutation, locale, i18n }}
+        value={{
+          language,
+          setLanguage,
+          localeMutation,
+          userTz,
+          userTzMutation,
+          locale,
+          i18n,
+        }}
       >
         <LocalizationProvider
           dateAdapter={AdapterDateFns}

@@ -58,7 +58,7 @@ export const GeneralSettings = () => {
     },
   });
   const msg = useMsg();
-  const { language, setLanguage, userTz, userTzMutation } =
+  const { language, setLanguage, userTz, userTzMutation, localeMutation } =
     useContext(I18nContext);
   const form = useForm({
     defaultValues: {
@@ -79,7 +79,7 @@ export const GeneralSettings = () => {
   };
   const onCancel = useCallback(() => {
     console.log("TODO");
-    setLanguage(language);
+    // setLanguage(language); // TODO: cannot reset
     form.reset({
       [FIELDS_GENERAL.language]: language,
       [FIELDS_GENERAL.timeZone]: userTz,
@@ -87,7 +87,7 @@ export const GeneralSettings = () => {
       [FIELDS_GENERAL.newPassword]: "",
       [FIELDS_GENERAL.newPasswordConfirm]: "",
     });
-  }, [form, language, setLanguage, userTz]);
+  }, [form, language, userTz]);
 
   const onError = (errors, e) =>
     console.log("[GeneralSettings.onError]", errors, e);
@@ -114,9 +114,10 @@ export const GeneralSettings = () => {
             name={FIELDS_GENERAL.language}
             options={LANGUAGE_OPTIONS}
             renderOption={renderLanguageOption}
-            placeholder="Select languages you speak"
+            placeholder={msg("settings.profile.field.languages.placeholder")}
             autoComplete="language" // TODO: not working
-            onChange={(lang) => setLanguage(lang)}
+            onChange={(locale) => localeMutation.mutate(locale)}
+            disabled={localeMutation.isLoading}
           />
         </FormRow>
         <FormRow

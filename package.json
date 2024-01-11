@@ -33,8 +33,10 @@
   },
   "scripts": {
     "start": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
+    "start:qa": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` REACT_APP_ENV=QA react-scripts start",
     "build": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "build-github": "DISABLE_ESLINT_PLUGIN=true REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
+    "build-github:qa": "DISABLE_ESLINT_PLUGIN=true REACT_APP_GIT_SHA=`git rev-parse --short HEAD` REACT_APP_ENV=QA react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "extract-translations-long": "formatjs extract 'src/**/*.js*' --ignore='src/translations' --out-file extracted/en-with-descriptions.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",

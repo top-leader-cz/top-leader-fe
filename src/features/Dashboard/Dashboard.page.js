@@ -66,7 +66,6 @@ const useNoteMutation = () =>
   });
 
 const DashboardCardNotes = () => {
-  // const [note, setNote] = useLocalStorage("dashboard_note", "");
   const msg = useMsg();
   const { user } = useAuth();
   const [note, setNote] = useState(user.data.notes || "");

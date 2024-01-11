@@ -241,7 +241,10 @@ export const MainMenu = ({ open }) => {
               height: "auto",
               textAlign: "center",
               visibility:
-                process.env.NODE_ENV !== "production" ? "visible" : "hidden",
+                process.env.NODE_ENV !== "production" ||
+                process.env.REACT_APP_ENV === "QA"
+                  ? "visible"
+                  : "hidden",
             }}
           >
             <Typography

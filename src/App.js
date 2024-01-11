@@ -55,18 +55,18 @@ export default function App({ children = <RouterProvider router={router} /> }) {
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <GlobalLoader>
-                <I18nProvider>
-                  <StackProvider
-                    logAs="ModalProvider"
-                    Ctx={ModalCtx}
-                    ItemComponent={ConfirmModal}
-                    mapExtraProps={mapModalExtraProps}
-                  >
+                <StackProvider
+                  logAs="SnackbarProvider"
+                  Ctx={SnackbarCtx}
+                  ItemComponent={TLSnackbar}
+                  mapExtraProps={mapSnackbarExtraProps}
+                >
+                  <I18nProvider>
                     <StackProvider
-                      logAs="SnackbarProvider"
-                      Ctx={SnackbarCtx}
-                      ItemComponent={TLSnackbar}
-                      mapExtraProps={mapSnackbarExtraProps}
+                      logAs="ModalProvider"
+                      Ctx={ModalCtx}
+                      ItemComponent={ConfirmModal}
+                      mapExtraProps={mapModalExtraProps}
                     >
                       <ErrorBoundary
                         FallbackComponent={ResetAll}
@@ -78,8 +78,8 @@ export default function App({ children = <RouterProvider router={router} /> }) {
                         </RightMenuProvider>
                       </ErrorBoundary>
                     </StackProvider>
-                  </StackProvider>
-                </I18nProvider>
+                  </I18nProvider>
+                </StackProvider>
               </GlobalLoader>
             </AuthProvider>
           </QueryClientProvider>

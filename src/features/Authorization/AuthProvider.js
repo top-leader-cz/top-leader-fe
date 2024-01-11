@@ -221,7 +221,8 @@ const translateErr = ({ intl, error }) => {
 const DEFAULT_ERROR_MESSAGE = "Oops!";
 
 const stringifySensitive = (data, defaultMsg = DEFAULT_ERROR_MESSAGE) => {
-  return process.env.NODE_ENV === "production"
+  return process.env.NODE_ENV === "production" &&
+    process.env.REACT_APP_ENV !== "QA"
     ? defaultMsg
     : JSON.stringify(data);
 };
@@ -253,7 +254,11 @@ const translateErrors = ({ response, jsonMaybe, textMaybe, intl }) => {
     .map(({ translated, apiMessage, error, info }) => {
       if (translated) return translated;
       if (apiMessage) {
-        if (info && process.env.NODE_ENV !== "production")
+        if (
+          info &&
+          (process.env.NODE_ENV !== "production" ||
+            process.env.REACT_APP_ENV === "QA")
+        )
           return `${apiMessage} [DEV info - using API message: ${info}]`;
 
         return apiMessage;

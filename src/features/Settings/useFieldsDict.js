@@ -153,7 +153,6 @@ const fieldsKeys = [
 ];
 
 export const useFieldsDict = () => {
-  // const { language, setLanguage } = useContext(I18nContext);
   const intl = useIntl();
   const fieldsOptions = useMemo(
     () => pipe(map((k) => translateField(intl, k)))(fieldsKeys),
