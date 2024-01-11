@@ -19,7 +19,7 @@ export const useNotificationsQuery = (rest = {}) => {
     queryKey: ["notifications"],
     fetchDef: {
       url: `/api/latest/notifications`,
-      query: { page: 0, size: 10000, sort: "createdAt,asc" },
+      query: { page: 0, size: 10000, sort: "createdAt,desc" },
       to: pipe(
         pathOr([], ["content"]),
         map(
