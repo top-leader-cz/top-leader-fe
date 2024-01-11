@@ -128,8 +128,8 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       // };
 
       return df.formatRelative(date, referenceDate, {
-        ...options,
         locale,
+        ...options,
         // locale: oLocale,
       });
       return dffp.formatRelativeWithOptions(

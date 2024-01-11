@@ -90,7 +90,7 @@ export const CoachInfo = ({
   );
 };
 
-export const formatName = ({ firstName, lastName }) =>
+export const formatName = ({ firstName, lastName } = {}) =>
   `${firstName ?? ""} ${lastName ?? ""}`.trim();
 
 export const getCoachPhotoUrl = (username) =>

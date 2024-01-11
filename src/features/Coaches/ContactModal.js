@@ -62,10 +62,11 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
   });
   const onSubmit = (data, e) => {
     const { subject, message } = data;
-    console.log("[ContactModal.onSubmit]", { data, e, coach });
+    const subjectStr = subject?.trim() ? `[${subject.trim()}] ` : "";
+    console.log("[ContactModal.onSubmit]", { data, e, coach, subjectStr });
     return sendMutation.mutateAsync({
       userTo: username,
-      messageData: subject?.trim() ? `[${subject}] ${message}` : message,
+      messageData: `${subjectStr}${message?.trim()}`,
     });
   };
   const onError = (errors, e) =>

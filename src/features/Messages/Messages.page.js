@@ -8,7 +8,7 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "react-query";
 import { useLocation } from "react-router-dom";
@@ -33,41 +33,83 @@ import { messages } from "./messages";
 import { useAuth } from "../Authorization";
 import { useClientsQuery } from "../Clients/api";
 import { prop } from "ramda";
+import { I18nContext } from "../I18n/I18nProvider";
+import { getYear, isToday, isValid } from "date-fns";
+import { formatName } from "../Coaches/CoachCard";
 
-const useCoachClientsUsernames = () => {
+const useCoachClients = () => {
   const { isCoach } = useAuth();
   const query = useClientsQuery({ enabled: isCoach });
 
   if (!isCoach || !query.data) return [];
 
-  return query.data.map(prop("username"));
+  return query.data;
 };
 
 // temp until api will be ready
 const useAddCoachClients = () => {
-  const coachClientsUsernames = useCoachClientsUsernames();
+  const coachClients = useCoachClients();
 
   return useCallback(
     ({ conversations = [] }) => {
-      const coachClients = coachClientsUsernames
+      const uncontactedClientsConversations = coachClients
         .filter(
-          (username) => !conversations.some((c) => c.username === username)
+          ({ username }) => !conversations.some((c) => c.username === username)
         )
-        .map((username) => ({
+        .map(({ username, firstName, lastName }) => ({
           username,
+          firstName,
+          lastName,
           lastMessage: "",
           time: "",
           unreadMessageCount: 0,
         }));
 
-      return [...conversations, ...coachClients];
+      return [...conversations, ...uncontactedClientsConversations];
     },
-    [coachClientsUsernames]
+    [coachClients]
+  );
+};
+
+const stringToColor = (string) => {
+  /* eslint-disable no-bitwise */
+  let hash = 0;
+  let i;
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  let color = "#";
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+
+  return color;
+  /* eslint-enable no-bitwise */
+};
+
+const UserAvatar = ({ username, fullName, sx = {}, ...props }) => {
+  return (
+    <Avatar
+      alt={username}
+      src={`/api/latest/coaches/${username}/photo`}
+      sx={{
+        width: 44,
+        height: 44,
+        bgcolor: stringToColor(fullName || username),
+        ...sx,
+      }}
+      {...props}
+    >
+      {(fullName || username).split(" ").map(prop(0))}
+    </Avatar>
   );
 };
 
 // https://mui.com/material-ui/react-list/
 const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
+  const { i18n } = useContext(I18nContext);
   return (
     <List
       sx={{
@@ -81,7 +123,15 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
       }}
     >
       {conversations.map(
-        ({ username, lastMessage, time, unreadMessageCount }) => (
+        ({
+          username,
+          firstName,
+          lastName,
+          fullName = formatName({ firstName, lastName }),
+          lastMessage,
+          time,
+          unreadMessageCount,
+        }) => (
           <ListItem
             key={username}
             disablePadding
@@ -99,41 +149,58 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
               dense
             >
               <ListItemAvatar>
-                <Avatar
-                  alt={username}
-                  src={`/api/latest/coaches/${username}/photo`}
-                  sx={{ width: 44, height: 44 }}
-                />
+                <UserAvatar username={username} fullName={fullName} />
               </ListItemAvatar>
               <ListItemText
-                primary={<H2>{username}</H2>}
-                secondary={
-                  <span style={{ whiteSpace: "nowrap" }}>{lastMessage}</span>
-                }
-                sx={{ width: "100%", overflow: "hidden" }}
+                // disableTypography
+                // primary={<H2>{username}</H2>}
+                // secondary={<span style={{}}>{lastMessage}</span>}
+                primaryTypographyProps={{
+                  variant: "h2",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                secondaryTypographyProps={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                primary={fullName || username}
+                secondary={lastMessage}
+                title={username}
+                sx={{ width: "100%" }}
               />
               <ListItemText
-                primary={time}
+                primary={
+                  isToday(time)
+                    ? i18n.formatLocal(time, "p")
+                    : isValid(time)
+                    ? i18n.formatLocal(time, "P")
+                    : // .replace(getYear(new Date()).toString(), "")
+                      // ? i18n.formatRelativeLocal(time)
+                      ""
+                }
                 secondary={
-                  !!unreadMessageCount && (
-                    <Box
-                      component={"span"}
-                      borderRadius="6px"
-                      py={"2px"}
-                      px={"6px"}
-                      bgcolor={"#F9F8FF"}
-                      color={"primary.main"}
-                      fontWeight={500}
-                      fontSize={"14px"}
-                      sx={{ lineHeight: "21px" }}
-                    >
-                      {unreadMessageCount}
-                    </Box>
-                  )
+                  <Box
+                    component={"span"}
+                    borderRadius="6px"
+                    py={"2px"}
+                    px={"6px"}
+                    bgcolor={"#F9F8FF"}
+                    color={"primary.main"}
+                    fontWeight={500}
+                    fontSize={"14px"}
+                    lineHeight={"21px"}
+                    visibility={unreadMessageCount ? "visible" : "hidden"}
+                  >
+                    {unreadMessageCount}
+                  </Box>
                 }
                 sx={{
                   textAlign: "center",
-                  // display: { sm: "none", md: undefined },
+                  minWidth: "unset",
+                  // display: "none", md: undefined },
                 }}
               />
             </ListItemButton>
@@ -163,7 +230,7 @@ export const useImgLoading = ({ imgId }) => {
   };
 };
 
-const Conversation = ({ addressee, restHeight: restHeightProp = 0 }) => {
+const Conversation = ({ addressee, name, restHeight: restHeightProp = 0 }) => {
   const msg = useMsg();
   // const name = `${coach.firstName} ${coach.lastName}`;
   const methods = useForm({
@@ -292,18 +359,13 @@ const Conversation = ({ addressee, restHeight: restHeightProp = 0 }) => {
           alignItems: "center",
         }}
       >
-        <Avatar
-          alt={addressee}
-          src={`/api/latest/coaches/${addressee}/photo`}
-          sx={{
-            width: 44,
-            height: 44,
-            mr: 1.5,
-            ...avatarImgBag.fadeInOutSx,
-          }}
+        <UserAvatar
+          username={addressee}
+          fullName={name}
           onLoad={avatarImgBag.onLoad}
+          sx={{ mr: 1.5, ...avatarImgBag.fadeInOutSx }}
         />
-        <H2>{addressee}</H2>
+        <H2 title={!name ? undefined : addressee}>{name || addressee}</H2>
       </Box>
       <Box
         sx={{
@@ -468,7 +530,10 @@ function MessagesPageInner() {
                   selectedUsername={selectedUsername}
                   onSelect={onSelect}
                 />
-                <Conversation addressee={selectedConversation?.username} />
+                <Conversation
+                  addressee={selectedConversation?.username}
+                  name={formatName(selectedConversation)}
+                />
               </Box>
             );
         }}

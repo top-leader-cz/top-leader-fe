@@ -29,7 +29,7 @@ export const useMsg = ({ dict } = {}) => {
       const isTranslated = !!translation && translation !== id;
 
       // TODO: check that missing keys translated with values return just key (without values)
-      if (values) debugger;
+      // if (values) debugger;
 
       if (isTranslated) return translation;
       else return undefined;

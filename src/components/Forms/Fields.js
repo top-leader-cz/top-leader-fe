@@ -97,7 +97,7 @@ export const anchorTime = (date, time) => {
     return target;
   } catch (e) {
     console.error("anchorTime", { date, time, e });
-    debugger;
+    // debugger;
     return undefined;
   }
 };

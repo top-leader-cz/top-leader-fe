@@ -242,12 +242,10 @@ const translateErrors = ({ response, jsonMaybe, textMaybe, intl }) => {
     return { error, info, translated, apiMessage };
   });
 
-  // debugger;
-
   if (translatedArr.filter(prop("translated")).length !== errArr.length) {
     // prettier-ignore
     console.log("TODO: untranslated error", { errArr, translatedArr, jsonMaybe, response, });
-    debugger;
+    // debugger;
   }
 
   return translatedArr

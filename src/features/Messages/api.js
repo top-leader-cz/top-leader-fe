@@ -1,6 +1,22 @@
-import { pick } from "ramda";
+import {
+  applySpec,
+  converge,
+  defaultTo,
+  descend,
+  evolve,
+  keys,
+  map,
+  mergeAll,
+  pick,
+  pipe,
+  prop,
+  sort,
+  unapply,
+} from "ramda";
 import { useAuth } from "../Authorization";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { useContext } from "react";
+import { I18nContext } from "../I18n/I18nProvider";
 
 export const useCoachQuery = ({ username, onError, onSuccess }) => {
   return useMyQuery({
@@ -15,27 +31,31 @@ export const useCoachQuery = ({ username, onError, onSuccess }) => {
     onSuccess,
   });
 };
+
+export const evolveSome = converge(pick, [keys, evolve]);
+
 export const useConversationsQuery = (params = {}) => {
-  const { authFetch } = useAuth();
+  const { i18n } = useContext(I18nContext);
   const conversationsQuery = useMyQuery({
     queryKey: ["messages"],
-    queryFn: () =>
-      authFetch({ url: `/api/latest/messages` }).then((data) => {
-        const conversations = data.map(
-          ({
-            username,
-            unreadMessageCount = 0,
-            lastMessage = "",
-            time = "",
-          }) => ({
-            username,
-            lastMessage,
-            unreadMessageCount,
-            time, // TODO: time
-          })
-        );
-        return conversations;
-      }),
+    fetchDef: {
+      url: `/api/latest/messages`,
+      to: pipe(
+        sort(descend(prop("createdAt"))),
+        map(
+          converge(unapply(mergeAll), [
+            pick(["username", "firstName", "lastName"]),
+            evolveSome({
+              unreadMessageCount: defaultTo(0),
+              lastMessage: defaultTo(""),
+            }),
+            applySpec({
+              time: pipe(prop("createdAt"), i18n.parseUTCLocal),
+            }),
+          ])
+        )
+      ),
+    },
     ...params,
   });
   return conversationsQuery;
