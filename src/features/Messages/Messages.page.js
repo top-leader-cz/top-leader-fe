@@ -56,7 +56,6 @@ const useAddCoachClients = () => {
         .map((username) => ({
           username,
           lastMessage: "",
-          avatarSrc: `/api/latest/coaches/${username}/photo`,
           time: "",
           unreadMessageCount: 0,
         }));
@@ -82,7 +81,7 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
       }}
     >
       {conversations.map(
-        ({ username, lastMessage, avatarSrc, time, unreadMessageCount }) => (
+        ({ username, lastMessage, time, unreadMessageCount }) => (
           <ListItem
             key={username}
             disablePadding
@@ -164,11 +163,7 @@ export const useImgLoading = ({ imgId }) => {
   };
 };
 
-const Conversation = ({
-  addressee,
-  avatarSrc,
-  restHeight: restHeightProp = 0,
-}) => {
+const Conversation = ({ addressee, restHeight: restHeightProp = 0 }) => {
   const msg = useMsg();
   // const name = `${coach.firstName} ${coach.lastName}`;
   const methods = useForm({
@@ -384,7 +379,9 @@ function MessagesPageInner() {
   const conversationsQuery = useConversationsQuery();
 
   const addClients = useAddCoachClients();
-  const conversations = addClients(conversationsQuery.data ?? arr);
+  const conversations = addClients({
+    conversations: conversationsQuery.data ?? arr,
+  });
 
   const selectedUsername = useMemo(() => {
     // When username is not among conversations usernames:
@@ -411,7 +408,14 @@ function MessagesPageInner() {
     [setSelectedUsername]
   );
 
-  // console.log("[MessagesPageInner.rndr]", { setSelectedUsername, selectedUsername, selectedConversation, });
+  console.log("[MessagesPageInner.rndr]", {
+    _selectedUsername,
+    selectedUsername,
+    conversations,
+    selectedConversation,
+    state,
+    conversationsQuery,
+  });
 
   useRightMenu(
     useCallback(
@@ -464,10 +468,7 @@ function MessagesPageInner() {
                   selectedUsername={selectedUsername}
                   onSelect={onSelect}
                 />
-                <Conversation
-                  addressee={selectedConversation?.username}
-                  avatarSrc={selectedConversation?.avatarSrc}
-                />
+                <Conversation addressee={selectedConversation?.username} />
               </Box>
             );
         }}

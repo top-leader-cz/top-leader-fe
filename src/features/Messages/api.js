@@ -22,12 +22,16 @@ export const useConversationsQuery = (params = {}) => {
     queryFn: () =>
       authFetch({ url: `/api/latest/messages` }).then((data) => {
         const conversations = data.map(
-          ({ username, unreadMessageCount, lastMessage }) => ({
+          ({
+            username,
+            unreadMessageCount = 0,
+            lastMessage = "",
+            time = "",
+          }) => ({
             username,
             lastMessage,
             unreadMessageCount,
-            avatarSrc: `https://i.pravatar.cc/200?u=${"" + Math.random()}`,
-            time: "11:42",
+            time, // TODO: time
           })
         );
         return conversations;
