@@ -38,18 +38,19 @@ export const FIELD_DEFAULT_VALUES = {
 // const ROLE_OPTIONS = [{ value: "manager", label: "Manager" }];
 
 const EmailListItem = ({ index, remove, getName }) => {
+  const msg = useMsg({ dict: messages });
   return (
     <Box display="flex" alignItems="center" gap={3}>
       <RHFTextField
         name={getName(FIELD_FIELDS.email)}
-        placeholder="Email"
+        placeholder={msg("feedback.create.share-modal.email.placeholder")}
         rules={{ required: "Required" }}
         size="small"
         sx={{ flexGrow: 2 }}
       />
       {/* <AutocompleteSelect
         name={getName(FIELD_FIELDS.role)}
-        placeholder="Role"
+        placeholder={msg("feedback.create.share-modal.role.placeholder")}
         options={ROLE_OPTIONS}
         sx={{ width: "50%" }}
       /> */}
@@ -185,18 +186,18 @@ export const ShareFeedbackModal = ({
                 alignItems="baseline"
                 gap={3}
               >
-                {/* <TextField */}
-                <OutlinedInput
-                  name="link"
-                  value={link}
-                  label=""
-                  disabled
-                  size="small"
-                  placeholder="Not available yet"
-                  sx={{ flexGrow: 2 }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      {/* <IconButton
+                {null && (
+                  <OutlinedInput
+                    name="link"
+                    value={link}
+                    label=""
+                    disabled
+                    size="small"
+                    placeholder="Not available yet"
+                    sx={{ flexGrow: 2 }}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        {/* <IconButton
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
@@ -204,16 +205,17 @@ export const ShareFeedbackModal = ({
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton> */}
-                      <IconButton
-                        onClick={onCopy}
-                        disabled={!link}
-                        sx={{ mr: -1 }}
-                      >
-                        <Icon name="ContentCopy" />
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
+                        <IconButton
+                          onClick={onCopy}
+                          disabled={!link}
+                          sx={{ mr: -1 }}
+                        >
+                          <Icon name="ContentCopy" />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                )}
                 <P sx={{ color: "black" }}>
                   {msg("feedback.create.share-modal.deadline")}
                 </P>

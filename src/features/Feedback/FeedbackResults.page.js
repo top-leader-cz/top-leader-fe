@@ -62,7 +62,7 @@ const AddRecipient = ({ feedback, onSuccess }) => {
       >
         <RHFTextField
           name={"recipient"}
-          placeholder="Email"
+          placeholder={msg("feedback.results.email.placeholder")}
           rules={{ required: "Required" }}
           size="small"
           sx={{ flexGrow: 2 }}

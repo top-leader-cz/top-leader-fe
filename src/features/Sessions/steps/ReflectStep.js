@@ -6,6 +6,8 @@ import { FormStepCard } from "./FormStepCard";
 import { SessionTodosFields } from "./SessionTodos";
 import { useReflectionHints } from "./hints";
 import { SESSION_FIELDS } from "./constants";
+import { useMsg } from "../../../components/Msg/Msg";
+import { messages } from "../messages";
 
 const userInputSx = { my: 3, p: 3, bgcolor: "#FCFCFD" };
 
@@ -23,6 +25,7 @@ export const ReflectStep = ({
   const reflectionField = step.fieldDefMap[SESSION_FIELDS.REFLECTION];
   const hints = useReflectionHints();
   console.log("[ReflectStep.rndr]", { previousActionSteps });
+  const msg = useMsg({ dict: messages });
 
   return (
     <FormStepCard
@@ -53,7 +56,7 @@ export const ReflectStep = ({
           required: "Required",
           validate: { ...(reflectionField.validate ?? {}) },
         }}
-        placeholder={"Type your own reflection"}
+        placeholder={msg("sessions.edit.steps.reflect.reflection.placeholder")}
         autoFocus
         size="small"
         hiddenLabel

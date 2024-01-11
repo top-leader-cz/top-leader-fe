@@ -3,8 +3,11 @@ import { Controller } from "react-hook-form";
 import { RHFTextField } from "../../components/Forms";
 import { FEEDBACK_FIELDS } from "./constants";
 import { notBlank } from "../../components/Forms/validations";
+import { useMsg } from "../../components/Msg/Msg";
 
 export const FormBuilderMeta = ({ isExistingTitle }) => {
+  const msg = useMsg();
+
   return (
     <Card>
       <CardContent>
@@ -20,9 +23,11 @@ export const FormBuilderMeta = ({ isExistingTitle }) => {
               <TextField
                 variant="standard"
                 error={!!fieldState.error}
-                placeholder={"Title"}
+                placeholder={msg("feedback.create.title.placeholder")}
                 fullWidth
-                helperText={isExistingTitle && "Title already exists"}
+                helperText={
+                  isExistingTitle && msg("feedback.create.title.error.exists")
+                }
                 {...field}
                 // sx={{ fontSize: "2rem" }}
               />
@@ -31,7 +36,7 @@ export const FormBuilderMeta = ({ isExistingTitle }) => {
         />
         <RHFTextField
           name={FEEDBACK_FIELDS.description}
-          placeholder={"Description (optional)"}
+          placeholder={msg("feedback.create.description.placeholder")}
           rules={{}}
           variant="standard"
           fullWidth

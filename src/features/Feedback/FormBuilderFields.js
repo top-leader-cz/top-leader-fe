@@ -40,7 +40,7 @@ export const InputPreview = ({ inputType, index }) => {
   // return (
   //   <TextField
   //     // name={`_example_i_${index}`}
-  //     placeholder={"Type your answer here"}
+  //     placeholder={msg("feedback.external.answer-placeholder")}
   //     // rules={{ required: true }}
   //     variant="standard"
   //     // fullWidth

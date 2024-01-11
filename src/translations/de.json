@@ -26,7 +26,7 @@
   "dict.questions.ideamaker_02": "\"Setzen wir uns hin und denken wir gründlich darüber nach. Lasst mich meine Ideen mit euch teilen, Leute.\"",
   "dict.questions.communicator_02": "\"Geschichtenerzähler ist mein zweiter Vorname :-)\"",
   "dict.questions.positive_02": "\"Auch wenn es bewölkt ist, habe ich das Gefühl, dass überall die Sonne scheint.\" Sind Sie ein optimistischer Mensch?",
-  "dict.questions.solver_02": "\"Ich glaube fest daran, dass ich das Problem lösen kann! Ist das Ihr Ansatz?\"",
+  "dict.questions.solver_02": "\"Ich glaube fest daran, dass ich das Problem lösen kann!\" Ist das Ihr Ansatz?",
   "dict.questions.coach_03": "\"Ich sehe ein großes Potenzial in Ihnen.\" Gefällt es Ihnen, andere Menschen zu fördern?",
   "dict.questions.mediator_03": "\"Ich muss nur eine Übereinstimmung zwischen allen finden. Ich kann das Gleichgewicht in der Umgebung halten.\"",
   "dict.questions.concentrated_03": "\"Lasst uns konzentriert bleiben!\" Sind Sie oft derjenige, der alle bei der Stange halten muss?",
@@ -761,7 +761,9 @@
   "auth.forgot-pass.username.label": "Email",
   "auth.login.email.label": "Email",
   "clients.add-client.fields.email": "Email",
+  "feedback.create.share-modal.email.placeholder": "Email",
   "feedback.external.request-access-modal.fields.email": "Email",
+  "feedback.results.email.placeholder": "Email",
   "settings.admin.member.modal.fields.username": "Email",
   "settings.profile.field.email": "Email",
   "team.credit.add-member.fields.username": "Email",
@@ -810,6 +812,7 @@
   "settings.availability.unavailable": "Nicht verfügbar",
   "feedback.external.heading": "Rückmeldeformular",
   "feedback.heading": "Rückmeldeformular",
+  "feedback.create.title.placeholder": "Titel",
   "feedback.aside.text": "Rückmeldung zu meinen Führungsqualitäten",
   "feedback.aside.perex": "Nachstehend sehen Sie eine Übersicht über Ihr aktuelles Formular.",
   "feedback.aside.collected": "Erfasste Antworten",
@@ -880,5 +883,6 @@
   "settings.admin.table.col.paidCredit": "Bezahlte Rechnungen",
   "settings.admin.table.col.remainingCredits": "Verbleibendes Guthaben",
   "feedback.results.add-email": "E-Mail hinzufügen",
-  "settings.admin.member.modal.fields.companyId": "Unternehmen"
+  "settings.admin.member.modal.fields.companyId": "Unternehmen",
+  "feedback.create.share-modal.role.placeholder": "Rolle"
 }

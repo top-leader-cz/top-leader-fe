@@ -172,6 +172,10 @@ export const messages = defineMessages({
     id: "sessions.edit.steps.reflect.hints.2",
     defaultMessage: "What were you happy with?",
   },
+  "sessions.edit.steps.reflect.reflection.placeholder": {
+    id: "sessions.edit.steps.reflect.reflection.placeholder",
+    defaultMessage: "Type your own reflection",
+  },
 
   // setaction
   "sessions.edit.steps.setaction.label": {
@@ -189,6 +193,11 @@ export const messages = defineMessages({
   "sessions.edit.steps.setaction.perex": {
     id: "sessions.edit.steps.setaction.perex",
     defaultMessage: "They should be achievable and measurable.",
+  },
+
+  "sessions.steps.textareastep.placeholder": {
+    id: "sessions.steps.textareastep.placeholder",
+    defaultMessage: "Type your own {textAreaName}",
   },
 
   "sessions.steps.finished.title": {

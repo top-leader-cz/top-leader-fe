@@ -1848,6 +1848,9 @@
   "feedback.create.add-question": {
     "defaultMessage": "Add question"
   },
+  "feedback.create.description.placeholder": {
+    "defaultMessage": "Description (optional)"
+  },
   "feedback.create.heading": {
     "defaultMessage": "Back to the dashboard"
   },
@@ -1866,6 +1869,12 @@
   "feedback.create.share-modal.desc": {
     "defaultMessage": "Set email addresses and positions of people who you want to share the form with to provide you the feedback."
   },
+  "feedback.create.share-modal.email.placeholder": {
+    "defaultMessage": "Email"
+  },
+  "feedback.create.share-modal.role.placeholder": {
+    "defaultMessage": "Role"
+  },
   "feedback.create.share-modal.share": {
     "defaultMessage": "Share"
   },
@@ -1877,6 +1886,15 @@
   },
   "feedback.create.stats.required": {
     "defaultMessage": "Required"
+  },
+  "feedback.create.title.error.exists": {
+    "defaultMessage": "Title already exists"
+  },
+  "feedback.create.title.placeholder": {
+    "defaultMessage": "Title"
+  },
+  "feedback.external.answer-placeholder": {
+    "defaultMessage": "Type your answer here"
   },
   "feedback.external.deadline": {
     "defaultMessage": "Please answer until {date}"
@@ -1955,6 +1973,9 @@
   },
   "feedback.results.add-email": {
     "defaultMessage": "Add email"
+  },
+  "feedback.results.email.placeholder": {
+    "defaultMessage": "Email"
   },
   "feedback.results.no-answers": {
     "defaultMessage": "No answers yet."
@@ -2130,6 +2151,9 @@
   "sessions.edit.steps.reflect.perex": {
     "defaultMessage": "Here are the actions you set last time"
   },
+  "sessions.edit.steps.reflect.reflection.placeholder": {
+    "defaultMessage": "Type your own reflection"
+  },
   "sessions.edit.steps.setaction.caption": {
     "defaultMessage": "Be specific"
   },
@@ -2225,6 +2249,9 @@
   },
   "sessions.steps.finished.title": {
     "defaultMessage": "Congratulations, you’ve completed your session!"
+  },
+  "sessions.steps.textareastep.placeholder": {
+    "defaultMessage": "Type your own {textAreaName}"
   },
   "settings.admin.add": {
     "defaultMessage": "Add member"

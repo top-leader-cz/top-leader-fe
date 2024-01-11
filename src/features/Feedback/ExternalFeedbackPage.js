@@ -30,11 +30,12 @@ const SUBFIELDS = {
 };
 
 export const FeedbackField = ({ index, name, required, inputType, scales }) => {
+  const msg = useMsg();
   if (inputType === INPUT_TYPES.TEXT)
     return (
       <RHFTextField
         name={name}
-        placeholder={"Type your answer here"}
+        placeholder={msg("feedback.external.answer-placeholder")}
         rules={{ required }}
         variant="standard"
         // fullWidth

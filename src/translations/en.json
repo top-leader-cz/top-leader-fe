@@ -26,7 +26,7 @@
   "dict.questions.ideamaker_02": "\"Let's sit down and think this all the way through. Let me share my ideas with you, guys.\" ",
   "dict.questions.communicator_02": "\"Storyteller is my middle name :-)\"",
   "dict.questions.positive_02": "\"Even if it's cloudy I feel like sun is shining everywhere.\" Are you an optimistic person?",
-  "dict.questions.solver_02": "\"I strongly believe I can solve it! Is that your approach?\"",
+  "dict.questions.solver_02": "\"I strongly believe I can solve it!\" Is that your approach?",
   "dict.questions.coach_03": "\"I see huge potential in you.\" Do you like to develop other people?",
   "dict.questions.mediator_03": "\"I just need to find alignment between everyone. I can keep the balance in the environment.\" ",
   "dict.questions.concentrated_03": "\"Let's stay focused!\" Is it often you who needs to keep everyone on point?",
@@ -761,7 +761,9 @@
   "auth.forgot-pass.username.label": "Email",
   "auth.login.email.label": "Email",
   "clients.add-client.fields.email": "Email",
+  "feedback.create.share-modal.email.placeholder": "Email",
   "feedback.external.request-access-modal.fields.email": "Email",
+  "feedback.results.email.placeholder": "Email",
   "settings.admin.member.modal.fields.username": "Email",
   "settings.profile.field.email": "Email",
   "team.credit.add-member.fields.username": "Email",
@@ -810,6 +812,7 @@
   "settings.availability.unavailable": "Unavailable",
   "feedback.external.heading": "Feedback form",
   "feedback.heading": "Feedback form",
+  "feedback.create.title.placeholder": "Title",
   "feedback.aside.text": "Feedback on my leadership skills",
   "feedback.aside.perex": "Below you can see the overview of your current form.",
   "feedback.aside.collected": "Responses collected",
@@ -880,5 +883,6 @@
   "settings.admin.table.col.paidCredit": "Credits paid",
   "settings.admin.table.col.remainingCredits": "Remaining credits",
   "feedback.results.add-email": "Add email",
-  "settings.admin.member.modal.fields.companyId": "Company"
+  "settings.admin.member.modal.fields.companyId": "Company",
+  "feedback.create.share-modal.role.placeholder": "Role"
 }

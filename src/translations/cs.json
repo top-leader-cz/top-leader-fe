@@ -26,7 +26,7 @@
   "dict.questions.ideamaker_02": "„Posaďme se a promysleme to. Rád Vám k tomu řeknu, co mě napadlo.“",
   "dict.questions.communicator_02": "\"Mým druhým jménem je vypravěč :-)\"",
   "dict.questions.positive_02": "\"I když je zataženo, mám pocit, že slunce je všude kolem nás.\" Jste rozený optimista?",
-  "dict.questions.solver_02": "\"Pevně ​​věřím, že to dokážu vyřešit! Je to Váš přístup?\"",
+  "dict.questions.solver_02": "\"Pevně ​​věřím, že to dokážu vyřešit!\" Je to Váš přístup?",
   "dict.questions.coach_03": "\"No tak, je v tobě obrovský potenciál.\" Rádi rozvíjíte jiné lidi?",
   "dict.questions.mediator_03": "\"Mám nutkání naladit lidi na stejnou vlnu. Daří se mi v mém okolí nastavovat rovnováhu.\"",
   "dict.questions.concentrated_03": "\"No tak, zůstaňte soustředěni!\" Jste to často Vy, kdo potřebuje udržet všechny na místě?",
@@ -761,7 +761,9 @@
   "auth.forgot-pass.username.label": "E-mail",
   "auth.login.email.label": "E-mail",
   "clients.add-client.fields.email": "E-mail",
+  "feedback.create.share-modal.email.placeholder": "E-mail",
   "feedback.external.request-access-modal.fields.email": "E-mail",
+  "feedback.results.email.placeholder": "E-mail",
   "settings.admin.member.modal.fields.username": "E-mail",
   "settings.profile.field.email": "E-mail",
   "team.credit.add-member.fields.username": "E-mail",
@@ -810,6 +812,7 @@
   "settings.availability.unavailable": "Nedostupné",
   "feedback.external.heading": "Formulář zpětné vazby",
   "feedback.heading": "Formulář zpětné vazby",
+  "feedback.create.title.placeholder": "Název",
   "feedback.aside.text": "Zpětná vazba na moje dovednosti leadershipu",
   "feedback.aside.perex": "Níže můžete vidět přehled Vašeho aktuálního formuláře.",
   "feedback.aside.collected": "Shromážděné odpovědi",
@@ -880,5 +883,6 @@
   "settings.admin.table.col.paidCredit": "Zaplacené kredity",
   "settings.admin.table.col.remainingCredits": "Zbývající kredity",
   "feedback.results.add-email": "Přidat e-mail",
-  "settings.admin.member.modal.fields.companyId": "Firma"
+  "settings.admin.member.modal.fields.companyId": "Firma",
+  "feedback.create.share-modal.role.placeholder": "Role"
 }

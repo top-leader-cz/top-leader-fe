@@ -26,7 +26,7 @@
   "dict.questions.ideamaker_02": "\"Posons-nous et réfléchissons-y. Permettez-moi de partager mes idées avec vous.\"",
   "dict.questions.communicator_02": "\"Orateur est mon deuxième prénom :-)\"",
   "dict.questions.positive_02": "\"Même si le ciel est couvert, j'ai l'impression que le soleil brille partout. \"Êtes-vous une personne optimiste?",
-  "dict.questions.solver_02": "\"Je crois fermement que je peux le résoudre! Est-ce votre approche?\"",
+  "dict.questions.solver_02": "\"Je crois fermement que je peux le résoudre!\" Est-ce votre approche?",
   "dict.questions.coach_03": "\"Je vois un énorme potentiel en toi.\" Aimez-vous développer les aptitudes des autres?",
   "dict.questions.mediator_03": "\"J'ai besoin de mettre tout le monde d'accord. J'arrive à garder un équilibre dans mon entourage.\"",
   "dict.questions.concentrated_03": "\"Restons concentrés!\" Est-ce souvent vous qui avez besoin de garder tout le monde en place?",
@@ -761,7 +761,9 @@
   "auth.forgot-pass.username.label": "E-mail",
   "auth.login.email.label": "E-mail",
   "clients.add-client.fields.email": "E-mail",
+  "feedback.create.share-modal.email.placeholder": "E-mail",
   "feedback.external.request-access-modal.fields.email": "E-mail",
+  "feedback.results.email.placeholder": "E-mail",
   "settings.admin.member.modal.fields.username": "E-mail",
   "settings.profile.field.email": "E-mail",
   "team.credit.add-member.fields.username": "E-mail",
@@ -810,6 +812,7 @@
   "settings.availability.unavailable": "Indisponible",
   "feedback.external.heading": "Formulaire de retour de satisfaction",
   "feedback.heading": "Formulaire de retour de satisfaction",
+  "feedback.create.title.placeholder": "Titre",
   "feedback.aside.text": "Retours sur mes compétences en leadership",
   "feedback.aside.perex": "Ci-dessous, vous pouvez voir l'aperçu de votre formulaire actuel.",
   "feedback.aside.collected": "Réponses obtenues",
@@ -880,5 +883,6 @@
   "settings.admin.table.col.paidCredit": "Crédits payés",
   "settings.admin.table.col.remainingCredits": "Crédits restants",
   "feedback.results.add-email": "Ajouter un e-mail",
-  "settings.admin.member.modal.fields.companyId": "Société"
+  "settings.admin.member.modal.fields.companyId": "Société",
+  "feedback.create.share-modal.role.placeholder": "Rôle"
 }

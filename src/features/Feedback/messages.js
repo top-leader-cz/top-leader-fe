@@ -69,6 +69,18 @@ export const messages = defineMessages({
     id: "feedback.create.next-btn",
     defaultMessage: "Share form",
   },
+  "feedback.create.title.placeholder": {
+    id: "feedback.create.title.placeholder",
+    defaultMessage: "Title",
+  },
+  "feedback.create.title.error.exists": {
+    id: "feedback.create.title.error.exists",
+    defaultMessage: "Title already exists",
+  },
+  "feedback.create.description.placeholder": {
+    id: "feedback.create.description.placeholder",
+    defaultMessage: "Description (optional)",
+  },
   "feedback.create.add-question": {
     id: "feedback.create.add-question",
     defaultMessage: "Add question",
@@ -98,6 +110,14 @@ export const messages = defineMessages({
     id: "feedback.create.share-modal.share",
     defaultMessage: "Share",
   },
+  "feedback.create.share-modal.email.placeholder": {
+    id: "feedback.create.share-modal.email.placeholder",
+    defaultMessage: "Email",
+  },
+  "feedback.create.share-modal.role.placeholder": {
+    id: "feedback.create.share-modal.role.placeholder",
+    defaultMessage: "Role",
+  },
   "feedback.aside.text": {
     id: "feedback.aside.text",
     defaultMessage: "Feedback on my leadership skills",
@@ -121,6 +141,14 @@ export const messages = defineMessages({
   "feedback.external.deadline": {
     id: "feedback.external.deadline",
     defaultMessage: "Please answer until {date}",
+  },
+  "feedback.external.answer-placeholder": {
+    id: "feedback.external.answer-placeholder",
+    defaultMessage: "Type your answer here",
+  },
+  "feedback.results.email.placeholder": {
+    id: "feedback.results.email.placeholder",
+    defaultMessage: "Email",
   },
   "feedback.external.submit": {
     id: "feedback.external.submit",

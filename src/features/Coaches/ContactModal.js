@@ -114,7 +114,6 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
           <RHFTextField
             name="subject"
             label={msg("coaches.contact.subject.label")}
-            // placeholder={"Type your message"}
             autoFocus
             size="small"
             fullWidth

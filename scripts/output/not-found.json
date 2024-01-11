@@ -1,7 +1,10 @@
 {
   "auth.set-password.submit": "Set password",
   "clients.add-client.fields.locale": "Select language",
+  "feedback.create.description.placeholder": "Description (optional)",
   "feedback.create.share-modal.desc": "Set email addresses and positions of people who you want to share the form with to provide you the feedback.",
+  "feedback.create.title.error.exists": "Title already exists",
+  "feedback.external.answer-placeholder": "Type your answer here",
   "feedback.respondents": "Respondents",
   "feedback.results.add": "Add",
   "feedback.results.no-answers": "No answers yet.",
@@ -12,5 +15,7 @@
   "general.freeSolo.placeholder": "Type your own and hit enter or select from the list",
   "help.back-to-dashboard": "Back to dashboard",
   "help.description": "If you need help, please email us at {emailLink}",
-  "help.title": "Get help"
+  "help.title": "Get help",
+  "sessions.edit.steps.reflect.reflection.placeholder": "Type your own reflection",
+  "sessions.steps.textareastep.placeholder": "Type your own {textAreaName}"
 }

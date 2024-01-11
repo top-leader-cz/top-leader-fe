@@ -6,6 +6,8 @@ import { notBlank } from "../../../components/Forms/validations";
 import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { SESSION_FIELDS } from "./constants";
+import { useMsg } from "../../../components/Msg/Msg";
+import { messages } from "../messages";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
@@ -17,6 +19,7 @@ export const TextAreaStep = ({
   step: { fieldDefMap = {}, ...step },
   ...props
 }) => {
+  const msg = useMsg({ dict: messages });
   const field = fieldDefMap[textAreaName];
   const { control, watch, formState } = useForm({
     mode: "all",
@@ -46,7 +49,9 @@ export const TextAreaStep = ({
             required: "Required",
             validate: { ...(field.validate ?? { notBlank: notBlank(0) }) },
           }}
-          placeholder={"Type your own " + textAreaName}
+          placeholder={msg("sessions.steps.textareastep.placeholder", {
+            textAreaName,
+          })}
           autoFocus
           size="small"
           hiddenLabel
