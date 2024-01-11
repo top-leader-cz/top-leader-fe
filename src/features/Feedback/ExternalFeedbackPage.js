@@ -21,6 +21,7 @@ import {
 import { EXTERNAL_FEEDBACK_FIELDS, INPUT_TYPES } from "./constants";
 import { messages } from "./messages";
 import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
+import { notBlank } from "../../components/Forms/validations";
 
 const SUBFIELDS = {
   question: "question",
@@ -36,7 +37,7 @@ export const FeedbackField = ({ index, name, required, inputType, scales }) => {
       <RHFTextField
         name={name}
         placeholder={msg("feedback.external.answer-placeholder")}
-        rules={{ required }}
+        rules={{ required, validate: { notBlank: notBlank(0) } }}
         variant="standard"
         // fullWidth
         sx={{ mt: 3, width: "50%" }}

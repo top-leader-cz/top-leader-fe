@@ -1,4 +1,4 @@
-import { descend, evolve, map, pick, prop, sort } from "ramda";
+import { descend, evolve, map, pick, pipe, prop, sort, trim } from "ramda";
 import { useRef } from "react";
 import {
   useAuth,
@@ -44,7 +44,9 @@ export const useExternalFeedbackMutation = ({
       method: "POST",
       url: `/api/public/latest/feedback/${formId}/${username}/${token}`,
       from: evolve({
-        [EXTERNAL_FEEDBACK_FIELDS.answers]: map(pick(["question", "answer"])),
+        [EXTERNAL_FEEDBACK_FIELDS.answers]: map(
+          pipe(pick(["question", "answer"]), evolve({ answer: trim }))
+        ),
       }),
     },
     ...rest,
