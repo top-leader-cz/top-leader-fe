@@ -1,5 +1,5 @@
 import { Box, Skeleton } from "@mui/material";
-import { getHours, isWithinInterval, set } from "date-fns/fp";
+import { getHours, isBefore, isWithinInterval, set } from "date-fns/fp";
 import { useContext } from "react";
 
 import { I18nContext } from "../I18n/I18nProvider";
@@ -37,7 +37,9 @@ export const CalendarDaySlots = ({
 }) => {
   const { i18n } = useContext(I18nContext);
 
-  const freeHours = dayIntervals.map(({ start }) => getHours(start));
+  const freeHours = dayIntervals
+    .filter((interval) => isBefore(interval.start, new Date()))
+    .map(({ start }) => getHours(start));
   const slots = times(identity, slotsCount).map((index) => {
     const hour = index + firstHour;
     const startDateTime = set({ hours: hour }, date);
