@@ -162,8 +162,9 @@ export const CoachCard = ({
           <Box
             sx={{
               borderRadius: 0.6,
-              minWidth: 225,
-              width: 225,
+              minWidth: { xs: 225 },
+              width: { xs: 225 },
+              maxHeight: 500,
               position: "relative",
               overflow: "hidden",
             }}
@@ -183,10 +184,12 @@ export const CoachCard = ({
           <Box
             sx={{
               display: "flex",
-              gap: 3,
               flexWrap: "wrap",
-              justifyContent: "space-around",
+              gap: 3,
               width: "100%",
+              // justifyContent: "space-around",
+              justifyContent: "flex-end",
+              // justifyContent: "flex-start",
             }}
           >
             <ErrorBoundary>
@@ -194,32 +197,22 @@ export const CoachCard = ({
                 coach={{ name, role, experience, languages, rate, bio, fields }}
                 maxBioChars={50}
                 sx={{
-                  // maxWidth: "50%",
                   flexGrow: 2,
-                  // minWidth: "200px",
-                  maxWidth: "400px",
-                  // width: "fit-content",
+                  width: "280px",
+                  maxWidth: "100%",
                 }}
               />
             </ErrorBoundary>
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                // width: "100%",
-              }}
-            >
-              <ErrorBoundary>
-                <AvailabilityCalendar
-                  coach={coach}
-                  onContact={withContact && handleContact}
-                  onPick={pickCoach.onPick}
-                  pickPending={pickCoach.pickPending}
-                  sx={{ flexShrink: 0 }}
-                />
-              </ErrorBoundary>
-            </Box>
+            <ErrorBoundary>
+              <AvailabilityCalendar
+                coach={coach}
+                onContact={withContact && handleContact}
+                onPick={pickCoach.onPick}
+                pickPending={pickCoach.pickPending}
+                sx={{ alignSelf: "end" }}
+              />
+            </ErrorBoundary>
           </Box>
         </CardContent>
       </Card>

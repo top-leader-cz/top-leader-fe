@@ -88,8 +88,8 @@ export const anchorTime = (date, time) => {
           seconds: time.getSeconds(),
           milliseconds: time.getMilliseconds(),
         }
-      : {};
-    const target = new Date(date.getTime());
+      : time || {};
+    const target = new Date(typeof date === "number" ? date : date.getTime());
     target.setHours(hours);
     target.setMinutes(minutes);
     target.setSeconds(seconds);
