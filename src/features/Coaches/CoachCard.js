@@ -13,11 +13,12 @@ import { Icon } from "../../components/Icon";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 export const ShowMore = ({
-  text = "",
+  text: textProp,
   maxChars = 1000,
   moreTranslation = "Show more",
   initialShowAll = false,
 }) => {
+  const text = textProp || "";
   const [isMore, setIsMore] = useState(initialShowAll);
   const elipsis = "... ";
   const getShortened = () => (
