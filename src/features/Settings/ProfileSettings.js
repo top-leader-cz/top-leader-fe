@@ -64,6 +64,7 @@ const to = (data, { userLocale, userTz }) => {
   );
   const initialValues = {
     ...data,
+    bio: data.bio || "",
     certificates: data.rate || undefined,
     experienceSince: isValid(experienceSince) ? experienceSince : null,
     languages: data.languages?.length ? data.languages : [userLocale],

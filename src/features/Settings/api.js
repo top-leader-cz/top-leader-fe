@@ -206,7 +206,11 @@ export const useNonRecurringAvailabilityMutation = () => {
       from: applySpec({
         timeFrame: pipe(
           prop(FIELDS_AVAILABILITY.recurrenceRange),
-          pick(["from", "to"]),
+          // pick(["from", "to"]),
+          applySpec({
+            from: prop("start"),
+            to: prop("end"),
+          }),
           map(pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })))
         ),
         events: (formValues) =>
