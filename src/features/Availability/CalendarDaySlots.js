@@ -1,10 +1,6 @@
 import { Box, Skeleton } from "@mui/material";
-import { getHours, isBefore, isWithinInterval, set } from "date-fns/fp";
 import { useContext } from "react";
-
 import { I18nContext } from "../I18n/I18nProvider";
-import { identity, times } from "ramda";
-import { fixIntEnd } from "../I18n/utils/date";
 
 export const TimeSlot = ({ hour, isLoading, isFree, onClick, sx = {} }) => {
   return (
@@ -26,9 +22,10 @@ export const TimeSlot = ({ hour, isLoading, isFree, onClick, sx = {} }) => {
 
 export const CalendarDaySlots = ({
   date,
-  dayIntervals,
-  slotsCount = 1,
-  firstHour,
+  // dayIntervals,
+  // slotsCount = 1,
+  // firstHour,
+  slots = [],
   onTimeslotClick,
   sx = { flexDirection: "column" },
   dateSx,
@@ -36,33 +33,6 @@ export const CalendarDaySlots = ({
   isLoading,
 }) => {
   const { i18n } = useContext(I18nContext);
-
-  const freeHours = dayIntervals
-    .filter((interval) => isBefore(interval.start, new Date()))
-    .map(({ start }) => getHours(start));
-  const slots = times(identity, slotsCount).map((index) => {
-    const hour = index + firstHour;
-    const startDateTime = set({ hours: hour }, date);
-    const intervals = dayIntervals.filter((interval) =>
-      isWithinInterval(fixIntEnd(interval), startDateTime)
-    );
-    const isFree = freeHours.includes(hour);
-
-    if (isFree) {
-      if (intervals.length !== 1) {
-        console.log({ date, dayIntervals, freeHours, hour, isFree, intervals });
-        throw new Error("Missing intervals, check");
-      }
-      // console.log( `%c[CalendarDaySlots] ${intervals.length} intervals found`, intervals.length > 1 ? "color:red" : "color:salmon", { isFree, intervals, hour, date, startDateTime, } );
-    }
-    return {
-      index,
-      hour,
-      // hour: `${hour}(${intervalHour})`,
-      isFree,
-      interval: intervals?.[0],
-    };
-  });
 
   // console.log("%c[CalendarDaySlots.rndr]", "color:gold", { date, dayIntervals, slotsCount, firstHour, slots, });
 

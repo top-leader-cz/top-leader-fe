@@ -78,7 +78,6 @@ export const GeneralSettings = () => {
     else passwordMutation.mutate(data);
   };
   const onCancel = useCallback(() => {
-    console.log("TODO");
     // setLanguage(language); // TODO: cannot reset
     form.reset({
       [FIELDS_GENERAL.language]: language,
@@ -91,6 +90,11 @@ export const GeneralSettings = () => {
 
   const onError = (errors, e) =>
     console.log("[GeneralSettings.onError]", errors, e);
+
+  console.log("[GeneralSettings.rndr]", {
+    TIMEZONE_OPTIONS,
+    userTz,
+  });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>

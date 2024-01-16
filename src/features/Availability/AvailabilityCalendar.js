@@ -1,58 +1,66 @@
 import { LoadingButton } from "@mui/lab";
-import { Alert, Box, Button, IconButton } from "@mui/material";
+import { Alert, Box, Button, IconButton, Skeleton } from "@mui/material";
 import {
   addDays,
+  eachHourOfInterval,
   endOfDay,
-  getHours,
+  isWithinInterval,
   setHours,
   setMinutes,
   setSeconds,
   startOfDay,
 } from "date-fns/fp";
-import { filter, identity, pipe, reduce, times } from "ramda";
+import {
+  converge,
+  filter,
+  identity,
+  map,
+  pipe,
+  prop,
+  reduce,
+  subtract,
+  times,
+} from "ramda";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { defineMessages } from "react-intl";
+import { anchorTime } from "../../components/Forms";
 import { Icon } from "../../components/Icon";
+import { LayoutCtx } from "../../components/Layout";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { useAuth } from "../Authorization";
 import { I18nContext } from "../I18n/I18nProvider";
-import { fixEnd } from "../I18n/utils/date";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { ControlsContainer } from "../Sessions/steps/Controls";
-import { CalendarDaySlots } from "./CalendarDaySlots";
 import {
   getIsDayLoading,
   isIntervalWithin,
   useAvailabilityQueries,
   usePickSlotMutation,
 } from "./api";
-import { LayoutCtx } from "../../components/Layout";
 
 const HEADER_FORMAT = "d MMM";
 
-const computeSlotStats = pipe(
-  reduce(
-    ({ lowestHour, highestHour }, interval) => {
-      const startHour = getHours(interval.start);
-      const endHour = getHours(fixEnd(interval.end));
-      if (startHour !== endHour)
-        console.log("[computeSlotStats] interval longer than 1 hour", {
-          interval,
-        });
-      return {
-        lowestHour: Math.min(lowestHour, startHour),
-        highestHour: Math.max(highestHour, endHour),
-      };
-    },
-    { lowestHour: 12, highestHour: 12 }
-  ),
-  ({ lowestHour, highestHour }) => ({
-    slotsCount: Math.max(highestHour - lowestHour + 1, 3),
-    firstHour: lowestHour || 9,
-  })
+// const computeSlotStats = pipe( reduce( ({ lowestHour, highestHour }, interval) => { const startHour = getHours(interval.start); const endHour = getHours(fixEnd(interval.end)); if (interval.end - interval.start > 60 * 60 * 1000) console.log("[computeSlotStats] interval longer than 1 hour", { interval, }); return { lowestHour: Math.min(lowestHour, startHour), highestHour: Math.max(highestHour, endHour), }; }, { lowestHour: 12, highestHour: 12 } ), ({ lowestHour, highestHour }) => ({ slotsCount: Math.max(highestHour - lowestHour + 1, 3), firstHour: lowestHour || 9, lowestHour, highestHour, }) );
+
+const getAnchoredTimeRange = (dayDate = new Date()) =>
+  pipe(
+    reduce(
+      (acc, { start, end }) => ({
+        start: Math.min(acc.start, +anchorTime(dayDate, start)),
+        end: Math.max(acc.end, +anchorTime(dayDate, end)),
+      }),
+      { start: +endOfDay(dayDate), end: +startOfDay(dayDate) }
+    ),
+    map((timestamp) => new Date(timestamp))
+  );
+
+const minsToHeight = (mins) => mins * 0.6;
+const intervalToHeight = converge(
+  pipe(subtract, (duration) => duration / (1000 * 60), minsToHeight),
+  [prop("end"), prop("start")]
 );
 
 export const CREATE_OFFSET =
@@ -76,9 +84,9 @@ export const AvailabilityCalendar = ({
   sx,
   today: todayProp,
   disablePickSlot = false,
+  cellWidth = "47px",
 }) => {
   const { downLg } = useContext(LayoutCtx);
-  // const visibleDaysCount = 7;
   const visibleDaysCount = visibleDaysCountProp || downLg ? 3 : 7;
   const msg = useMsg({ dict: messages });
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
@@ -97,7 +105,7 @@ export const AvailabilityCalendar = ({
 
   const { someResultsQuery, queries } = useAvailabilityQueries({
     username: coach?.username,
-    timeZone: coach?.timeZone ?? userTz, // TODO: Dan
+    timeZone: coach?.timeZone, // TODO: Should work, check that it's everywhere
     calendarInterval,
   });
   const pickSlotMutation = usePickSlotMutation({
@@ -127,26 +135,12 @@ export const AvailabilityCalendar = ({
     reset();
   }, [reset]);
 
-  console.log(
-    "%c[AvailabilityCalendar.rndr]",
-    "color:deeppink",
-    coach.username,
-    {
-      calendarInterval,
-      someResultsQuery,
-      queries,
-      onPick,
-      pickedCoach,
-      coach,
-      visibleDaysCount,
-    }
-  );
+  // prettier-ignore
+  console.log( "%c[AvailabilityCalendar.rndr]", "color:deeppink", coach.username, { today, calendarInterval, someResultsQuery, queries, onPick, pickedCoach, coach, visibleDaysCount, } );
 
   return (
     <Box
       sx={{
-        // width: "100%",
-        maxWidth: downLg ? 180 : 335,
         display: "flex",
         flexDirection: "column",
         gap: 1,
@@ -208,63 +202,227 @@ export const AvailabilityCalendar = ({
         </IconButton>
       </Box>
       <Box
-        display="flex"
-        gap={1}
-        height={180}
-        overflow="auto"
-        borderBottom="1px solid #EAECF0"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          borderBottom: "1px solid #EAECF0",
+        }}
       >
-        <QueryRenderer
-          {...someResultsQuery}
-          loaderName="Block"
-          success={({ data: availabilityIntervals }) => {
-            // console.log({ availabilityIntervals });
-            // debugger;
-            if (!Array.isArray(availabilityIntervals)) return null;
-            const { slotsCount, firstHour } = computeSlotStats(
-              availabilityIntervals
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            gap: 1,
+            // px: 1,
+          }}
+        >
+          {times(identity, visibleDaysCount).map((index) => {
+            const date = addDays(index, calendarInterval.start);
+
+            return (
+              <Box
+                sx={{
+                  p: 0.5,
+                  pb: 1,
+                  position: "relative",
+                  textAlign: "center",
+                  width: cellWidth,
+                }}
+              >
+                {i18n.formatLocal(date, "E")}
+                <br />
+                {i18n.formatLocal(date, "d")}
+              </Box>
             );
-            return times(identity, visibleDaysCount).map((index) => {
-              const date = addDays(index, calendarInterval.start);
-              const dayInterval = {
-                start: startOfDay(date),
-                end: endOfDay(date),
-              };
-              const dayIntervals = filter(
-                isIntervalWithin({
-                  parentInterval: dayInterval,
-                  overlapping: "throw",
-                }),
+          })}
+        </Box>
+        <Box
+          sx={{
+            height: 125,
+            overflow: "auto",
+          }}
+        >
+          <QueryRenderer
+            {...someResultsQuery}
+            loaderName="Block"
+            success={({ data: availabilityIntervals }) => {
+              if (!Array.isArray(availabilityIntervals)) return null;
+
+              const anchoredInterval = getAnchoredTimeRange(today)(
                 availabilityIntervals
               );
 
-              const isLoading = getIsDayLoading({
-                queries,
-                dayInterval,
-                userTz,
-              });
-
               return (
-                <ErrorBoundary
-                  key={date.toISOString()}
-                  fallbackRender={(props) => {
-                    return null;
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    gap: 1,
+                    // px: 1,
                   }}
                 >
-                  <CalendarDaySlots
-                    key={date.toISOString()}
-                    date={date}
-                    slotsCount={slotsCount}
-                    firstHour={firstHour}
-                    dayIntervals={dayIntervals}
-                    onTimeslotClick={onTimeslotClick}
-                    isLoading={isLoading}
-                  />
-                </ErrorBoundary>
+                  {times(identity, visibleDaysCount).map((index) => {
+                    const date = addDays(index, calendarInterval.start);
+                    const dayInterval = {
+                      start: startOfDay(date),
+                      end: endOfDay(date),
+                    };
+                    const dayAvailabilities = filter(
+                      isIntervalWithin({
+                        parentInterval: dayInterval,
+                        overlapping: "debugger",
+                      }),
+                      availabilityIntervals
+                    );
+                    const isLoading = getIsDayLoading({
+                      queries,
+                      dayInterval,
+                      userTz,
+                    });
+                    const visibleDayInterval = {
+                      start: anchorTime(date, anchoredInterval.start),
+                      end: anchorTime(date, anchoredInterval.end),
+                    };
+
+                    const displayedMs =
+                      visibleDayInterval.end - visibleDayInterval.start;
+                    // assuming one slot === 1 hour
+                    const slotsCount =
+                      Math.max(
+                        0, // loading - negative
+                        Math.ceil(displayedMs / (1000 * 60 * 60))
+                      ) || 0; // NaN
+                    const unavailableSlots = Array(slotsCount)
+                      .fill(null)
+                      .map((_, idx) => {
+                        const slotStart = new Date(
+                          +visibleDayInterval.start + idx * 60 * 60 * 1000
+                        );
+                        const isAvailable = dayAvailabilities.some((interval) =>
+                          isWithinInterval(interval, slotStart)
+                        );
+                        if (isAvailable) return null;
+                        return {
+                          idx,
+                          top: intervalToHeight({
+                            start: visibleDayInterval.start,
+                            end: slotStart,
+                          }),
+                          height: minsToHeight(60) - 5,
+                          slotStart,
+                          // _: { visibleDayInterval, displayedMs, slotsCount, displayedHours: displayedMs / (1000 * 60 * 60), },
+                        };
+                      })
+                      .filter(Boolean);
+
+                    // prettier-ignore
+                    console.log( "[AvailabilityCalendar.rndr] DAY rndr prop", date, {displayedMs, slotsCount, unavailableSlots}, { date, dayInterval, dayAvailabilities, isLoading }, { anchoredInterval, availabilityIntervals, visibleDaysCount } );
+
+                    return (
+                      <Box
+                        key={date.toISOString()}
+                        sx={{
+                          position: "relative",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "stretch",
+                          textAlign: "center",
+                          gap: 1,
+                          width: cellWidth,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            position: "relative",
+                            height: intervalToHeight(visibleDayInterval),
+                          }}
+                        >
+                          {unavailableSlots.map(
+                            ({ idx, top, height, slotStart }) => {
+                              const text = i18n.formatLocalMaybe(
+                                slotStart,
+                                "p"
+                              );
+                              return (
+                                <Box
+                                  key={text}
+                                  sx={{
+                                    position: "absolute",
+                                    height,
+                                    lineHeight: `${height}px`,
+                                    top,
+                                    cursor: "default",
+                                    borderRadius: "6px",
+                                    bgcolor: "transparent",
+                                    color: "inherit",
+                                    fontWeight: 400,
+                                    width: "100%",
+                                    overflowX: "hidden",
+                                  }}
+                                >
+                                  {isLoading ? (
+                                    <Skeleton />
+                                  ) : (
+                                    <span title={text}> - </span>
+                                  )}
+                                </Box>
+                              );
+                            }
+                          )}
+                          {dayAvailabilities.map((interval) => {
+                            const text = i18n.formatLocalMaybe(
+                              interval.start,
+                              "p"
+                            );
+                            const onClick =
+                              interval &&
+                              onTimeslotClick &&
+                              !isLoading &&
+                              (() => onTimeslotClick({ interval }));
+                            const height = intervalToHeight(interval) - 5;
+
+                            return (
+                              <Box
+                                key={text}
+                                sx={{
+                                  position: "absolute",
+                                  height: height,
+                                  lineHeight: `${height}px`,
+                                  top: intervalToHeight({
+                                    start: visibleDayInterval.start,
+                                    end: interval.start,
+                                  }),
+                                  cursor: onClick ? "pointer" : "default",
+                                  borderRadius: "6px",
+                                  // py: 0.9,
+                                  // px: 0.5,
+                                  bgcolor: "#F9F8FF",
+                                  color: "primary.main",
+                                  fontWeight: 500,
+                                  width: "100%",
+                                  overflowX: "hidden",
+                                }}
+                                onClick={onClick}
+                              >
+                                {isLoading ? (
+                                  <Skeleton />
+                                ) : (
+                                  <span title={text}>{text}</span>
+                                )}
+                              </Box>
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
               );
-            });
-          }}
-        />
+            }}
+          />
+        </Box>
       </Box>
       <ConfirmModal
         open={!!pickSlot}

@@ -68,7 +68,7 @@ export const MessagesRightMenu = ({
         success={({ data: coach }) => (
           <>
             <CoachInfo coach={coach} maxBioChars={2000} sx={{ my: 3 }} />
-            <AvailabilityCalendar coach={coach} sx={{ flexShrink: 0 }} />
+            <AvailabilityCalendar coach={coach} />
           </>
         )}
       />

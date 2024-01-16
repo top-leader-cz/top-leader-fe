@@ -6,6 +6,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import { all } from "ramda";
+import { ErrorBoundary } from "react-error-boundary";
 
 export const Loaders = {
   Backdrop: () => (
@@ -66,7 +67,11 @@ export const QueryRenderer = ({
   const query = queryProp || queryRest; // TODO: migrate to separate prop, add queries renderer
   // const queries = queriesProp || [query];
 
-  if (query.data) return success?.(query);
-  if (query.isLoading) return loading?.(query, loaderProps);
-  if (query.error) return errored?.(query);
+  const render = () => {
+    if (query.data) return success?.(query);
+    if (query.isLoading) return loading?.(query, loaderProps);
+    if (query.error) return errored?.(query);
+  };
+
+  return <ErrorBoundary>{render()}</ErrorBoundary>;
 };
