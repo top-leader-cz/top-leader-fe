@@ -1,4 +1,4 @@
-import { concat, pipe, prop } from "ramda";
+import { always, concat, pipe, prop } from "ramda";
 import { useContext, useRef } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -6,7 +6,10 @@ import { I18nContext } from "../I18n/I18nProvider";
 export const useClientsQuery = (rest = {}) => {
   return useMyQuery({
     queryKey: ["coach-clients"],
-    fetchDef: { url: `/api/latest/coach-clients` },
+    fetchDef: {
+      url: `/api/latest/coach-clients`,
+      // to: always([ { username: null, firstName: null, lastName: null, email: null }, ]), // TODO: BE, sometimes returns nulls
+    },
     ...rest,
   });
 };

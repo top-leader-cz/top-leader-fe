@@ -73,6 +73,7 @@ const useAddCoachClients = () => {
 
 const stringToColor = (string) => {
   /* eslint-disable no-bitwise */
+  if (!string) return "#000000";
   let hash = 0;
   let i;
   for (i = 0; i < string.length; i += 1) {
@@ -89,7 +90,15 @@ const stringToColor = (string) => {
   /* eslint-enable no-bitwise */
 };
 
-const UserAvatar = ({ username, fullName, sx = {}, ...props }) => {
+const UserAvatar = ({
+  username: usernameProp,
+  fullName: fullNameProp,
+  sx = {},
+  ...props
+}) => {
+  const username = usernameProp || "";
+  const fullName = fullNameProp || "";
+
   return (
     <Avatar
       alt={username}
@@ -323,7 +332,8 @@ const Conversation = ({ addressee, name, restHeight: restHeightProp = 0 }) => {
     },
     [queryClient]
   );
-  const lastMessage = messagesQuery.data?.[messagesQuery.data.length - 1]?.text;
+  const lastMessage =
+    messagesQuery.data?.[messagesQuery.data?.length - 1]?.text;
   useEffect(() => {
     if (lastMessage) {
       const payload = { addressee, message: lastMessage };
@@ -386,7 +396,7 @@ const Conversation = ({ addressee, name, restHeight: restHeightProp = 0 }) => {
               <ConversationMessage
                 key={message.id}
                 message={message}
-                scrollIntoView={index + 1 === messagesQuery.data.length}
+                scrollIntoView={index + 1 === messagesQuery.data?.length}
               />
             ))
           }
