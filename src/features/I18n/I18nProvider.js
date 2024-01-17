@@ -143,12 +143,12 @@ export const TLIntlProvider = ({ children }) => {
 };
 
 export const I18nProvider = ({ children }) => {
-  const { authFetch, user, fetchUser } = useAuth();
+  const { authFetch, userQuery, fetchUser } = useAuth();
   const { language, setLanguage } = useContext(LocaleCtx);
   const browserTz = getBrowserTz();
   const userTz = useMemo(
-    () => user.data?.timeZone || browserTz,
-    [browserTz, user.data?.timeZone]
+    () => userQuery.data?.timeZone || browserTz,
+    [browserTz, userQuery.data?.timeZone]
   );
   const userTzMutation = useMyMutation({
     mutationFn: (timezone) =>
@@ -172,13 +172,16 @@ export const I18nProvider = ({ children }) => {
     },
   });
   useEffect(() => {
-    if (user.data?.locale && user.data?.locale !== language) {
-      setLanguage(user.data.locale);
+    if (userQuery.data?.locale && userQuery.data?.locale !== language) {
+      setLanguage(userQuery.data.locale);
     }
-  }, [language, setLanguage, user.data?.locale]);
+  }, [language, setLanguage, userQuery.data?.locale]);
 
   const shouldSaveUserTz =
-    user.data && !user.data.timeZone && browserTz && !userTzMutation.isLoading;
+    userQuery.data &&
+    !userQuery.data.timeZone &&
+    browserTz &&
+    !userTzMutation.isLoading;
   const saveUserTz = useStaticCallback(
     () => browserTz && userTzMutation.mutate(browserTz)
   );
@@ -189,10 +192,12 @@ export const I18nProvider = ({ children }) => {
     }
   }, [saveUserTz, shouldSaveUserTz]);
   const userTzWarningConfirmedRef = useRef(false);
-  const userDataRef = useRef(user.data);
-  userDataRef.current = user.data;
+  const userDataRef = useRef(userQuery.data);
+  userDataRef.current = userQuery.data;
   const userTzWarning = Boolean(
-    user.data?.timeZone && browserTz && user.data?.timeZone !== browserTz
+    userQuery.data?.timeZone &&
+      browserTz &&
+      userQuery.data?.timeZone !== browserTz
   );
   useEffect(() => {
     // TODO: move Alert in Layout or inside IntlProvider, translate
@@ -200,7 +205,7 @@ export const I18nProvider = ({ children }) => {
       userTzWarningConfirmedRef.current = true;
       console.log({ userTz: userDataRef.current?.timeZone, browserTz });
       alert(
-        `Timezone on your machine (${browserTz}) seems different than in your profile (${user.data?.timeZone}). You can change it in Menu -> Settings`
+        `Timezone on your machine (${browserTz}) seems different than in your profile (${userQuery.data?.timeZone}). You can change it in Menu -> Settings`
       );
     }
   }, [userTzWarning]);

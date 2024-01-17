@@ -44,11 +44,13 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
         const resultStr = dffp.formatWithOptions(
           {
             locale,
+            timeZone: userTz,
             // timeZone? https://stackoverflow.com/questions/58561169/date-fns-how-do-i-format-to-utc
           },
           formatStr,
           date
         );
+        // if (resultStr[2] === ":") debugger;
         // console.log("[formatLocal]", { date, formatStr, locale });
         return resultStr;
       } catch (e) {
@@ -56,15 +58,15 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
         return "";
       }
     },
-    [locale]
+    [locale, userTz]
   );
 
-  const formatUtcLocal = useCallback(
+  const formatInUserTzLocal = useCallback(
     (date, formatStr = "Pp") => {
       try {
-        const resultStr = tz.formatInTimeZone(date, "UTC", formatStr);
+        const resultStr = tz.formatInTimeZone(date, userTz, formatStr);
         // const resultStr = formatLocal(utcDate, formatStr);
-        console.log("[formatUtcLocal] 1", {
+        console.log("[formatInUserTzLocal] 1", {
           userTz,
           date,
           formatStr,
@@ -74,7 +76,7 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
 
         return resultStr;
       } catch (e) {
-        console.error("[formatUtcLocal]", { date, userTz, e });
+        console.error("[formatInUserTzLocal]", { date, userTz, e });
         throw e;
       }
     },
@@ -82,10 +84,10 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
   );
 
   const formatLocalMaybe = useCallback(
-    (maybeDate, formatStr = "PP", defaultStr = "") => {
+    (maybeDate, formatStr = "PP", defaultValue = "") => {
       const valid = dffp.isValid(maybeDate);
-      // console.log("formatLocalMaybe", { maybeDate, formatStr, defaultStr, valid, });
-      return !valid ? defaultStr : formatLocal(maybeDate, formatStr);
+      // console.log("formatLocalMaybe", { maybeDate, formatStr, defaultValue, valid, });
+      return !valid ? defaultValue : formatLocal(maybeDate, formatStr);
     },
     [formatLocal]
   );
@@ -170,7 +172,7 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       },
       formatLocal,
       formatLocalMaybe,
-      formatUtcLocal,
+      formatInUserTzLocal,
       parseUTCLocal,
       parseDate,
       formatDistanceToNowLocal,
@@ -187,7 +189,7 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       locale,
       formatLocal,
       formatLocalMaybe,
-      formatUtcLocal,
+      formatInUserTzLocal,
       parseUTCLocal,
       parseDate,
       formatDistanceToNowLocal,

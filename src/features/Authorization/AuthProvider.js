@@ -392,7 +392,8 @@ export function AuthProvider({ children }) {
     isLoggedIn,
     loginMutation,
     resetPasswordMutation,
-    user: userQuery,
+    userQuery,
+    user: userQuery, // TODO: replace by userQuery
     signout,
     authFetch,
     fetchUser: () => {

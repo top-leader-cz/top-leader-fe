@@ -1,5 +1,13 @@
 import { LoadingButton } from "@mui/lab";
-import { Alert, Box, Button, IconButton, Skeleton } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  IconButton,
+  Skeleton,
+  Tooltip,
+  tooltipClasses,
+} from "@mui/material";
 import {
   addDays,
   eachHourOfInterval,
@@ -372,7 +380,7 @@ export const AvailabilityCalendar = ({
                             }
                           )}
                           {dayAvailabilities.map((interval) => {
-                            const text = i18n.formatLocalMaybe(
+                            const formattedInBrowserTz = i18n.formatLocalMaybe(
                               interval.start,
                               "p"
                             );
@@ -383,9 +391,42 @@ export const AvailabilityCalendar = ({
                               (() => onTimeslotClick({ interval }));
                             const height = intervalToHeight(interval) - 5;
 
-                            return (
+                            const render = (children) =>
+                              i18n.formatLocalMaybe(interval.start, "O") ===
+                              i18n.formatInUserTzLocal(interval.start, "O") ? (
+                                children
+                              ) : (
+                                <Tooltip
+                                  followCursor
+                                  // componentsProps={{ popper: { sx: { marginTop: "0px" } }, }}
+                                  slotProps={{
+                                    popper: {
+                                      // NOT WORKING
+                                      // modifiers: [ { name: "offset", options: { offset: [0, -30] }, }, ],
+                                      // sx: { [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: { marginTop: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]: { marginBottom: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="right"] .${tooltipClasses.tooltip}`]: { marginLeft: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="left"] .${tooltipClasses.tooltip}`]: { marginRight: "0px" }, },
+                                    },
+                                  }}
+                                  title={
+                                    <>
+                                      {i18n.formatLocalMaybe(
+                                        interval.start,
+                                        "p (O)"
+                                      )}
+                                      <br />
+                                      {i18n.formatInUserTzLocal(
+                                        interval.start,
+                                        "p (O)"
+                                      )}
+                                    </>
+                                  }
+                                >
+                                  {children}
+                                </Tooltip>
+                              );
+
+                            return render(
                               <Box
-                                key={text}
+                                key={formattedInBrowserTz}
                                 sx={{
                                   position: "absolute",
                                   height: height,
@@ -409,7 +450,7 @@ export const AvailabilityCalendar = ({
                                 {isLoading ? (
                                   <Skeleton />
                                 ) : (
-                                  <span title={text}>{text}</span>
+                                  <span>{formattedInBrowserTz}</span>
                                 )}
                               </Box>
                             );
