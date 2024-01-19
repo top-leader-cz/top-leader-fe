@@ -4,22 +4,22 @@ import {
   Box,
   Button,
   Divider,
-  FormControlLabel,
   IconButton,
   Modal,
   Paper,
 } from "@mui/material";
-import { identity, map, pipe, prop } from "ramda";
+import { map, pipe, prop } from "ramda";
 import { useContext, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import stringSimilarity from "string-similarity";
 import {
   AutocompleteSelect,
-  CheckboxField,
   FreeSoloField,
   LANGUAGE_OPTIONS,
   RHFTextField,
   renderLanguageOption,
 } from "../../../components/Forms";
+import { useLoadableOptions } from "../../../components/Forms/hooks";
 import { Icon } from "../../../components/Icon";
 import { useMsg } from "../../../components/Msg/Msg";
 import { H2, P } from "../../../components/Typography";
@@ -36,7 +36,6 @@ import {
   useCompaniesQuery,
   useCompanyMutation,
 } from "./api";
-import stringSimilarity from "string-similarity";
 
 export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
@@ -60,16 +59,6 @@ const PreventSubmission = ({ children }) => {
       {children}
     </div>
   );
-};
-
-export const getLoadableOptions = ({ query, map = identity }) => {
-  if (query.data) return { options: map(query.data) };
-  if (query.error || query.isLoading)
-    return {
-      options: [],
-      disabled: true,
-      placeholder: query.isLoading ? "Loading..." : "Error loading options",
-    };
 };
 
 export const MemberAdminForm = ({ onClose, initialValues }) => {
@@ -182,6 +171,21 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
   };
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
+  const companyOptionsProps = useLoadableOptions({
+    query: companiesQuery,
+    map: useCompaniesQuery.toOpts,
+  });
+  const coachOptionsProps = useLoadableOptions({
+    query: coachesQuery,
+    map: pipe(
+      prop("content"),
+      map((coach) => ({
+        value: coach.username,
+        label: `${formatName(coach)} (${coach.username})`,
+      }))
+    ),
+  });
+
   console.log("[MemberAdminModal.rndr]", {
     initialValues,
     defaultValues,
@@ -255,10 +259,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
               name="companyId"
               label={msg("settings.admin.member.modal.fields.companyId")}
               fullWidth
-              {...getLoadableOptions({
-                query: companiesQuery,
-                map: useCompaniesQuery.toOpts,
-              })}
+              {...companyOptionsProps}
             />
           </PreventSubmission>
           <AutocompleteSelect
@@ -275,16 +276,7 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             <AutocompleteSelect
               name="coach"
               label={msg("settings.admin.member.modal.fields.coach")}
-              {...getLoadableOptions({
-                query: coachesQuery,
-                map: pipe(
-                  prop("content"),
-                  map((coach) => ({
-                    value: coach.username,
-                    label: `${formatName(coach)} (${coach.username})`,
-                  }))
-                ),
-              })}
+              {...coachOptionsProps}
             />
           ) : null}
           {isEdit ? (

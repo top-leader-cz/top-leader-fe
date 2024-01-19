@@ -60,6 +60,17 @@ import { useMsg } from "../Msg/Msg";
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 
+const formsMessages = defineMessages({
+  "general.freeSolo.placeholder": {
+    id: "general.freeSolo.placeholder",
+    defaultMessage: "Type your own and hit enter or select from the list",
+  },
+  "general.select.placeholder": {
+    id: "general.select.placeholder",
+    defaultMessage: "Select from the list",
+  },
+});
+
 export const getIntervals = pipe(
   when(
     ({ length }) => length % 2 !== 0,
@@ -72,7 +83,6 @@ export const getIntervals = pipe(
   splitEvery(2),
   map(([start, end]) => ({ start, end }))
 );
-const getValuesArr = pipe(chain((interval) => [interval.start, interval.end]));
 
 export const anchorTime = (date, time) => {
   try {
@@ -808,10 +818,11 @@ export const AutocompleteSelect = ({
   id = name,
   rules,
   label,
-  options,
+  options: optionsProp,
+  groupedOptions,
   renderOption,
   InputProps,
-  placeholder,
+  placeholder: placeholderProp,
   multiple,
   enableIsOptionEqualToValue = !multiple, // TODO: progressively enable everywhere
   disableCloseOnSelect,
@@ -826,6 +837,15 @@ export const AutocompleteSelect = ({
   disableClearable,
   ...props
 }) => {
+  const msg = useMsg({ dict: formsMessages });
+  const placeholder = useMemo(
+    () => placeholderProp || msg("general.select.placeholder"),
+    [placeholderProp, msg]
+  );
+  const optionsProps = useGroupedOptions({
+    options: optionsProp,
+    groupedOptions,
+  });
   const from = useMemo(
     () =>
       multiple
@@ -845,12 +865,12 @@ export const AutocompleteSelect = ({
           fullWidth
           id={id}
           {...field}
+          {...optionsProps}
           value={getValue(field)}
           sx={sx}
           multiple={multiple}
           disableCloseOnSelect={disableCloseOnSelect}
           disableClearable={disableClearable}
-          options={options}
           isOptionEqualToValue={
             // TODO: test multiple works
             enableIsOptionEqualToValue
@@ -859,7 +879,7 @@ export const AutocompleteSelect = ({
           }
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
-            getOption(options, optionOrValue)?.label ||
+            getOption(optionsProps.options, optionOrValue)?.label ||
             optionOrValue
           }
           size="small"
@@ -937,36 +957,8 @@ export const optionEqStrategies = {
   equals: "equals",
 };
 
-const freeSoloMessages = defineMessages({
-  "general.freeSolo.placeholder": {
-    id: "general.freeSolo.placeholder",
-    defaultMessage: "Type your own and hit enter or select from the list",
-  },
-});
-
-export const FreeSoloField = ({
-  name,
-  id = name,
-  rules,
-  label,
-  options: optionsProp,
-  groupedOptions,
-  optionEqStrategy = "optionValue",
-  placeholder: placeholderProp,
-  onChange,
-  selectOnFocus = true,
-  clearOnBlur = true,
-  debug = true,
-  inputProps = {},
-  ...props
-}) => {
-  const msg = useMsg({ dict: freeSoloMessages });
-  const placeholder = useMemo(
-    () => placeholderProp || msg("general.freeSolo.placeholder"),
-    [placeholderProp, msg]
-  );
-
-  const optionsProps = useMemo(() => {
+const useGroupedOptions = ({ options: optionsProp, groupedOptions }) => {
+  return useMemo(() => {
     if (!groupedOptions) return { options: optionsProp };
 
     const groupLens = lensProp("__group");
@@ -985,17 +977,39 @@ export const FreeSoloField = ({
       )(groupedOptions),
     };
   }, [groupedOptions, optionsProp]);
-  const isOptionEqualToValue = useMemo(() => {
-    const predicateFns = {
-      [optionEqStrategies.default]: undefined,
-      [optionEqStrategies.optionValue]: (opt, val) => opt.value === val,
-      [optionEqStrategies.equals]: (opt, val) => opt === val,
-    };
-    return pipeMaybe(
-      // tap(debug ? log(`[isOptionEqualToValue] ${optionEqStrategy}`) : identity),
-      predicateFns[optionEqStrategy]
-    );
-  }, [optionEqStrategy]);
+};
+
+const predicateFns = {
+  [optionEqStrategies.default]: undefined,
+  [optionEqStrategies.optionValue]: (opt, val) => opt.value === val,
+  [optionEqStrategies.equals]: (opt, val) => opt === val,
+};
+
+export const FreeSoloField = ({
+  name,
+  id = name,
+  rules,
+  label,
+  options: optionsProp,
+  groupedOptions,
+  optionEqStrategy = "optionValue",
+  placeholder: placeholderProp,
+  onChange,
+  selectOnFocus = true,
+  clearOnBlur = true,
+  debug = true,
+  inputProps = {},
+  ...props
+}) => {
+  const msg = useMsg({ dict: formsMessages });
+  const placeholder = useMemo(
+    () => placeholderProp || msg("general.freeSolo.placeholder"),
+    [placeholderProp, msg]
+  );
+  const optionsProps = useGroupedOptions({
+    options: optionsProp,
+    groupedOptions,
+  });
   const from = useCallback(
     ({ data, action }) => {
       if (action === "createOption") return data; // isUserInput(value)? {isUserInput: true, inputText: value}
@@ -1008,7 +1022,6 @@ export const FreeSoloField = ({
     },
     [props.multiple]
   );
-  const { options } = optionsProps;
   return (
     <Controller
       name={name}
@@ -1025,10 +1038,10 @@ export const FreeSoloField = ({
           id={id}
           {...field}
           {...optionsProps}
-          isOptionEqualToValue={isOptionEqualToValue}
+          isOptionEqualToValue={predicateFns[optionEqStrategy]}
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
-            getOption(options, optionOrValue)?.label ||
+            getOption(optionsProps.options, optionOrValue)?.label ||
             optionOrValue
           }
           size="small"

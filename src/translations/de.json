@@ -527,6 +527,7 @@
   "feedback.submitted": "Eingereicht",
   "general.decline": "Ablehnen",
   "general.freeSolo.placeholder": "Geben Sie Ihren eigenen Text ein und drücken Sie Enter oder wählen Sie aus der Liste aus",
+  "general.select.placeholder": "Wählen Sie aus der Liste aus",
   "help.back-to-dashboard": "Zurück zur Übersicht",
   "help.description": "Wenn Sie Hilfe benötigen, senden Sie uns bitte eine E-Mail an {emailLink}",
   "help.title": "Holen Sie sich Hilfe",

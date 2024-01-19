@@ -527,6 +527,7 @@
   "feedback.submitted": "Soumis",
   "general.decline": "Refuser",
   "general.freeSolo.placeholder": "Tapez votre propre texte et appuyez sur Entrée ou sélectionnez dans la liste",
+  "general.select.placeholder": "Sélectionnez dans la liste",
   "help.back-to-dashboard": "Retour au Tableau de bord",
   "help.description": "Si vous avez besoin d'aide, envoyez-nous un e-mail à {emailLink}",
   "help.title": "Obtenez de l'aide",

@@ -12,9 +12,9 @@ import {
 } from "ramda";
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
-import { useFeedbackOptionsQuery } from "./api";
-import { getLoadableOptions } from "../Settings/Admin/MemberAdminModal";
 import { useMsg } from "../../components/Msg/Msg";
+import { useFeedbackOptionsQuery } from "./api";
+import { useLoadableOptions } from "../../components/Forms/hooks";
 
 const messages = defineMessages({
   "dict.feedback.question.general.work-in-respectful-manners.label": {
@@ -364,11 +364,11 @@ export const useFeedbackOptions = () => {
   const intl = useIntl();
   const query = useFeedbackOptionsQuery();
 
+  const props = useLoadableOptions({
+    query,
+    map: pipe(prop("options"), map(prop("key")), map(translateOption(intl))),
+  });
   const optionsProps = useMemo(() => {
-    const props = getLoadableOptions({
-      query,
-      map: pipe(prop("options"), map(prop("key")), map(translateOption(intl))),
-    });
     const groupedOptions = groupBy(({ value }) => {
       const cat = value?.split(".")?.[1] ?? "";
       return cat
@@ -377,7 +377,7 @@ export const useFeedbackOptions = () => {
         : "";
     }, props.options);
     return { ...props, groupedOptions };
-  }, [intl, msg, query]);
+  }, [msg, props]);
 
   return { query, optionsProps };
 };

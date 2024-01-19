@@ -88,7 +88,7 @@ const FormBuilderField = ({ getName, index, remove, sx }) => {
         <InputPreview inputType={inputType} index={index} />
         <Divider sx={{ my: 3 }} />
         <Box display="flex" flexDirection="row" gap={3}>
-          <FreeSoloField
+          <AutocompleteSelect
             name={titleName}
             rules={{ required: "Required" }}
             sx={{ maxWidth: "50%", flex: "0 1 auto" }}

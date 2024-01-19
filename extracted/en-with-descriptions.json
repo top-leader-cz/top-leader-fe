@@ -2013,6 +2013,12 @@
   "general.freeSolo.placeholder": {
     "defaultMessage": "Type your own and hit enter or select from the list"
   },
+  "general.loadable-options.error.placeholder": {
+    "defaultMessage": "Error loading options"
+  },
+  "general.loadable-options.loading.placeholder": {
+    "defaultMessage": "Loading options"
+  },
   "general.message-from": {
     "defaultMessage": "Message from {from}"
   },
@@ -2021,6 +2027,9 @@
   },
   "general.notifications": {
     "defaultMessage": "Notifications"
+  },
+  "general.select.placeholder": {
+    "defaultMessage": "Select from the list"
   },
   "help.back-to-dashboard": {
     "defaultMessage": "Back to dashboard"

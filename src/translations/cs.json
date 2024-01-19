@@ -527,6 +527,7 @@
   "feedback.submitted": "Odesláno",
   "general.decline": "Zamítnout",
   "general.freeSolo.placeholder": "Napište svůj vlastní text a stiskněte Enter nebo vyberte ze seznamu",
+  "general.select.placeholder": "Vyberte ze seznamu",
   "help.back-to-dashboard": "Zpět na Přehled",
   "help.description": "Pokud potřebujete pomoc, napište nám na {emailLink}",
   "help.title": "Získejte pomoc",

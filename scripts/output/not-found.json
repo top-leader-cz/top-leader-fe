@@ -1,1 +1,4 @@
-{}
+{
+  "general.loadable-options.error.placeholder": "Error loading options",
+  "general.loadable-options.loading.placeholder": "Loading options"
+}

@@ -7,7 +7,6 @@ import {
   Modal,
   Paper,
 } from "@mui/material";
-import { identity } from "ramda";
 import { FormProvider, useForm } from "react-hook-form";
 import { RHFTextField } from "../../../components/Forms";
 import { Icon } from "../../../components/Icon";
@@ -18,16 +17,6 @@ export const USER_STATUS_OPTIONS = [
   { label: "Authorized", value: "AUTHORIZED" },
   { label: "Pending", value: "PENDING" },
 ];
-
-export const getLoadableOptions = ({ query, map = identity }) => {
-  if (query.data) return { options: map(query.data) };
-  if (query.error || query.isLoading)
-    return {
-      options: [],
-      disabled: true,
-      placeholder: query.isLoading ? "Loading..." : "Error loading options",
-    };
-};
 
 export const CompanyForm = ({ onClose, initialValues }) => {
   const mutation = useCompanyMutation({ onSuccess: onClose });
