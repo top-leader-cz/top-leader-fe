@@ -357,7 +357,7 @@ export const AvailabilityCalendar = ({
                               );
                               return (
                                 <Box
-                                  key={text}
+                                  key={text + idx}
                                   sx={{
                                     position: "absolute",
                                     height,
@@ -401,13 +401,13 @@ export const AvailabilityCalendar = ({
                                 <Tooltip
                                   followCursor
                                   // componentsProps={{ popper: { sx: { marginTop: "0px" } }, }}
-                                  slotProps={{
-                                    popper: {
+                                  // slotProps={{
+                                  //   popper: {
                                       // NOT WORKING
                                       // modifiers: [ { name: "offset", options: { offset: [0, -30] }, }, ],
                                       // sx: { [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: { marginTop: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]: { marginBottom: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="right"] .${tooltipClasses.tooltip}`]: { marginLeft: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="left"] .${tooltipClasses.tooltip}`]: { marginRight: "0px" }, },
-                                    },
-                                  }}
+                                  //   },
+                                  // }}
                                   title={
                                     <>
                                       {i18n.formatLocalMaybe(

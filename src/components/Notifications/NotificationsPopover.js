@@ -72,23 +72,12 @@ export const NotificationsPopover = ({
             <ListItem
               key={message.key}
               alignItems="flex-start"
-              // sx={{
-              //   bgcolor: key === selectedKey ? "#F9F8FF" : "transparent",
-              //   cursor: "pointer",
-              // }}
-              //   secondaryAction={
-              //     <IconButton edge="end" aria-label="comments">
-              //       <CommentIcon />
-              //     </IconButton>
-              //   }
               disablePadding
               divider={index < arr.length - 1}
             >
               <ListItemButton
                 role={undefined}
                 component={LinkBehavior}
-                // href={generatePath(routes.messages, { u: message.from })} // swallows param when not defined in route as :param
-                // href={qstr(routes.messages, { u: message.from })}
                 href={routes.messages}
                 state={{ messagesFrom: message.from }}
                 dense

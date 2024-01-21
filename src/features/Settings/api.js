@@ -13,7 +13,7 @@ import {
   tap,
   when,
 } from "ramda";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 import { useQueryClient } from "react-query";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { API_DATETIME_LOCAL_FORMAT, padLeft } from "../Availability/api";
@@ -69,27 +69,38 @@ export const useNonRecurringAvailabilityQuery = ({
   enabled = true,
 } = {}) => {
   const { userTz: timeZone } = useContext(I18nContext);
-  // const timeZone = "UTC";
-
-  const qParams = pipe(
-    when(
-      all(allPass([isValid])),
-      map(
-        pipe(
-          startOfDay,
-          // tap(log(1)),
-          createApiDayTimeStr({ timeZone })
-          // tap(log(2))
+  const qParams = useMemo(() => {
+    // console.log("%cMemoising", "color:pink", { timeZone: timeZone, start: start?.toISOString?.(), end: end?.toISOString?.(), });
+    return pipe(
+      when(
+        all(allPass([isValid])),
+        map(
+          pipe(
+            startOfDay,
+            // tap(log(1)),
+            createApiDayTimeStr({ timeZone })
+            // tap(log(2))
+          )
         )
-      )
-    ),
-    ([from, to]) => ({ from, to })
-  )([start, end]);
-  console.log("useNonRecurringAvailabilityQuery", { start, end, qParams });
+      ),
+      ([from, to]) => ({ from, to })
+    )([start, end]);
+  }, [end?.toISOString?.(), start?.toISOString?.(), timeZone]);
+  console.log("useNonRecurringAvailabilityQuery", {
+    start,
+    end,
+    qParams,
+    enabled,
+  });
   // if (start) debugger;
   const query = useMyQuery({
     enabled: enabled && !!start && !!end,
-    queryKey: ["coach-availability", AVAILABILITY_TYPE.NON_RECURRING],
+    queryKey: [
+      "coach-availability",
+      AVAILABILITY_TYPE.NON_RECURRING,
+      qParams.from,
+      qParams.to,
+    ],
     fetchDef: {
       url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
       query: qParams,

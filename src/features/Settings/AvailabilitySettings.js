@@ -29,6 +29,7 @@ import {
   useRecurringAvailabilityMutation,
   useRecurringAvailabilityQuery,
 } from "./api";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -181,7 +182,11 @@ export const getDateTime = ({
   referenceDate = getReferenceDate({ dayName }),
 }) => parse(time, API_TIME_FORMAT, referenceDate);
 
-const to = ({ events = [] } = {}, { recurring } = {}, { i18n } = {}) => {
+const to = (
+  { events = [] } = {},
+  { recurring, recurrenceRange } = {},
+  { i18n } = {}
+) => {
   const daysValues = DAY_NAMES.map((dayName) => {
     const ranges = events?.filter(({ from }) => from?.day === dayName) || [];
     if (ranges.some(({ from, to }) => from.day !== to.day)) {
@@ -219,7 +224,7 @@ const to = ({ events = [] } = {}, { recurring } = {}, { i18n } = {}) => {
   // debugger;
   const initialValues = {
     [FIELDS_AVAILABILITY.recurring]: isRec,
-    recurrenceRange: parseWeek({ i18n }, new Date()),
+    recurrenceRange: recurrenceRange ?? parseWeek({ i18n }, new Date()),
     ...daysValues,
   };
 
@@ -260,19 +265,20 @@ export const AvailabilitySettings = () => {
   const { resetForm, resetting } = useResetForm({
     initialResetting: true,
     form,
-    to: useCallback(
+    to: useStaticCallback(
       (data) =>
         to(
           data,
           {
             [FIELDS_AVAILABILITY.recurring]: recurringValue,
+            [FIELDS_AVAILABILITY.recurrenceRange]: recurrenceRangeValue,
             // userLocale: language,
             // TODO: notify user that timezone settings is different than currently set!
             // userTz,
           },
           { i18n }
-        ),
-      [i18n, recurringValue]
+        )
+      // [i18n, recurrenceRangeValue, recurringValue]
     ),
   });
 
@@ -302,6 +308,7 @@ export const AvailabilitySettings = () => {
     console.log("%c[eff reset]", "color:lime", {
       data: query.data,
       initialValues,
+      recurringValue,
     });
     resetForm(initialValues ?? {});
   }, [query.data, recurringValue, resetForm]);

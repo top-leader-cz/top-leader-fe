@@ -34,6 +34,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 const FIELDS = {
   firstName: "firstName",
@@ -87,7 +88,7 @@ const from = (values, { userTz }) => {
 export const useResetForm = ({ to, form, initialResetting }) => {
   const [resetting, setResetting] = useState(initialResetting);
   const { reset } = form;
-  const resetForm = useCallback(
+  const resetForm = useStaticCallback(
     (data) => {
       reset(to(data));
 
@@ -96,8 +97,8 @@ export const useResetForm = ({ to, form, initialResetting }) => {
       setTimeout(() => {
         setResetting(false);
       }, 0);
-    },
-    [reset, to]
+    }
+    // [reset, to]
   );
 
   return {
