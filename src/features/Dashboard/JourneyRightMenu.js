@@ -16,6 +16,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { ActionStepsReadOnly } from "../Sessions/Sessions";
 import { useUserSessionQuery } from "../Sessions/api";
 import { assoc, curry, evolve, keys, map, pipe, reduce, sort } from "ramda";
+import { messages as sessionMessages } from "../Sessions/messages";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -113,6 +114,7 @@ const Actions = ({ canFetch = true, ...props }) => {
 
 const ScheduledDay = ({ time, name, username }) => {
   const { i18n } = useContext(I18nContext);
+  const msg = useMsg({ dict: sessionMessages });
 
   return (
     <Box
@@ -142,7 +144,7 @@ const ScheduledDay = ({ time, name, username }) => {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
-          {name || username}
+          {name || username || msg("sessions.card.type.USER_SESSION")}
         </P>
         <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
           {i18n.formatLocal(time, "p")}
