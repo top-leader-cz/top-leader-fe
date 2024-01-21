@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
-import { omit } from "ramda";
+import { map, omit, pipe, prop, reject } from "ramda";
 import { useState } from "react";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { Header } from "../../components/Header";
@@ -47,7 +47,7 @@ export const ActionsCell = ({ buttons = [], ...props }) => {
         justifyContent={"space-between"}
         gap={2}
       >
-        {buttons.map(render)}
+        {pipe(reject(prop("hidden")), map(render))(buttons)}
       </Box>
     </StyledTableCell>
   );
@@ -71,7 +71,7 @@ function TeamPageInner() {
   const [topUpSelected, setTopUpSelected] = useState(false);
   const [member, setMember] = useState();
   const msg = useMsg();
-  const { isHR, isAdmin } = useAuth();
+  const { isHR, isAdmin, isCoach } = useAuth();
 
   const hrUsersQuery = useHrUsersQuery();
 
@@ -133,8 +133,9 @@ function TeamPageInner() {
             {
               tooltip: msg("settings.admin.table.edit.tooltip"),
               Component: IconButton,
-              onClick: () => console.log("mmm", { row }) || setMember(row),
+              onClick: () => setMember(row),
               children: <Icon name="BorderColorOutlined" />,
+              hidden: isCoach,
               sx: { color: gray500 },
             },
           ]}
