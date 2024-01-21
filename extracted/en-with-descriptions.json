@@ -2262,6 +2262,9 @@
   "sessions.steps.textareastep.placeholder": {
     "defaultMessage": "Type your own {textAreaName}"
   },
+  "sessions.type.USER_SESSION": {
+    "defaultMessage": "Private"
+  },
   "settings.admin.add": {
     "defaultMessage": "Add member"
   },

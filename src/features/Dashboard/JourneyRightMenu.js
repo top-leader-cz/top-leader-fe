@@ -144,7 +144,7 @@ const ScheduledDay = ({ time, name, username }) => {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
-          {name || username || msg("sessions.card.type.USER_SESSION")}
+          {name || username || msg("sessions.type.USER_SESSION")}
         </P>
         <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
           {i18n.formatLocal(time, "p")}

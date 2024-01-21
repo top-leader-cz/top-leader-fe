@@ -430,6 +430,7 @@ values.heading,240,Here are my values,Tady jsou moje hodnoty,Voici mes valeurs,D
 ,244,Change my values,Změnit své hodnoty,Changer mes valeurs,Ändern meiner Werte,values.aside.save,,,Change my values,,,,
 main-menu.items.sessions|sessions.heading,245,Sessions,Osobní rozvoj,Sessions,Persönliche Entwicklung,main-menu.items.sessions|sessions.heading,,,Sessions,,,,
 ,246,Session,Moje aktivita,Session privée,Private Lerneinheit,sessions.card.type.USER_SESSION|sessions.card.type.default,,,Session,,,,
+sessions.type.USER_SESSION,,Private,Soukromá,Privée,Privat,sessions.type.USER_SESSION,,,Private,,,,
 ,247,My session,Můj rozvoj,Ma session,Meine Lerneinheit,sessions.new.aside.title,,,My session,,,,
 ,248,Set area for your development,Určete oblast pro svůj rozvoj,Définir la zone pour votre développement,Bereich für Ihre Entwicklung festlegen,sessions.new.steps.area.heading,,,Set area for your development,,,,
 ,249,Step,Krok,Étape,Schritt,,Performed,Found,Step,Rate,0.3333333333333333,"coaches.coach.rate,coaches.filter.rate.label,settings.profile.field.rate",

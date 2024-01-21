@@ -17,6 +17,10 @@ export const messages = defineMessages({
     id: "sessions.card.goals.title",
     defaultMessage: "Goals",
   },
+  "sessions.type.USER_SESSION": {
+    id: "sessions.type.USER_SESSION",
+    defaultMessage: "Private",
+  },
   "sessions.card.type.USER_SESSION": {
     id: "sessions.card.type.USER_SESSION",
     defaultMessage: "Session",
