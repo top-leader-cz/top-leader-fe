@@ -173,6 +173,7 @@ export const useAvailabilityQueries = ({
   username,
   timeZone,
   calendarInterval,
+  disabled,
 }) => {
   // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
   // useEffect(() => {
@@ -189,7 +190,7 @@ export const useAvailabilityQueries = ({
   // console.log(".....", { calendarInterval, fetchFrameKeys });
 
   const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
-    enabled: !!username && !!timeZone,
+    enabled: !!username && !!timeZone && !disabled,
     queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey }], // prettier-ignore
     queryFn: async () => ({
       params: { userTz, fetchFrameKey, username, calendarInterval },

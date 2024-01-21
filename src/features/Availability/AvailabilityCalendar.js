@@ -93,6 +93,7 @@ export const AvailabilityCalendar = ({
   today: todayProp,
   disablePickSlot = false,
   cellWidth = "47px",
+  fetchDisabled = false,
 }) => {
   const { downLg } = useContext(LayoutCtx);
   const visibleDaysCount = visibleDaysCountProp || downLg ? 3 : 7;
@@ -115,6 +116,7 @@ export const AvailabilityCalendar = ({
     username: coach?.username,
     timeZone: coach?.timeZone, // TODO: Should work, check that it's everywhere
     calendarInterval,
+    disabled: fetchDisabled,
   });
   const pickSlotMutation = usePickSlotMutation({
     username: coach?.username,
@@ -144,7 +146,7 @@ export const AvailabilityCalendar = ({
   }, [reset]);
 
   // prettier-ignore
-  console.log( "%c[AvailabilityCalendar.rndr]", "color:deeppink", coach.username, { today, calendarInterval, someResultsQuery, queries, onPick, pickedCoach, coach, visibleDaysCount, } );
+  // console.log( "%c[AvailabilityCalendar.rndr]", "color:deeppink", coach.username, { today, calendarInterval, someResultsQuery, queries, onPick, pickedCoach, coach, visibleDaysCount, } );
 
   return (
     <Box
@@ -326,7 +328,7 @@ export const AvailabilityCalendar = ({
                       .filter(Boolean);
 
                     // prettier-ignore
-                    console.log( "[AvailabilityCalendar.rndr] DAY rndr prop", date, {displayedMs, slotsCount, unavailableSlots}, { date, dayInterval, dayAvailabilities, isLoading }, { anchoredInterval, availabilityIntervals, visibleDaysCount } );
+                    // console.log( "[AvailabilityCalendar.rndr] DAY rndr prop", date, {displayedMs, slotsCount, unavailableSlots}, { date, dayInterval, dayAvailabilities, isLoading }, { anchoredInterval, availabilityIntervals, visibleDaysCount } );
 
                     return (
                       <Box

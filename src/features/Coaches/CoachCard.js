@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardContent, CardMedia, Chip } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { getCoachLanguagesOptions, getLabel } from "../../components/Forms";
 import { useMsg } from "../../components/Msg/Msg";
 import { H1, P } from "../../components/Typography";
@@ -11,6 +11,7 @@ import { messages } from "./messages";
 import { certificatesOptions } from "../Settings/ProfileSettings";
 import { Icon } from "../../components/Icon";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { useIntersection } from "../../components/Forms/hooks";
 
 export const ShowMore = ({
   text: textProp,
@@ -148,16 +149,21 @@ export const CoachCard = ({
     webLink,
   } = coach;
   const [contactCoach, setContactCoach] = useState(null);
+  const [wasVisible, setWasVisible] = useState(false);
   const handleContact = useCallback(() => setContactCoach(coach), [coach]);
   const pickCoach = usePickCoach({ coach });
 
-  // console.log("[CoachCard.rndr]", name, {
-  //   coach,
-  // });
+  const elementRef = useRef();
+  useIntersection({
+    elementRef,
+    onVisibleOnce: () => setWasVisible(true),
+  });
+
+  // console.log("[CoachCard.rndr]", name, { isVisible, coach, wasVisible });
 
   return (
     <>
-      <Card sx={{ ...sx }}>
+      <Card sx={{ ...sx }} ref={elementRef}>
         <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
           <Box
             sx={{
@@ -176,7 +182,7 @@ export const CoachCard = ({
                 height: "100%",
                 borderRadius: 0.6,
               }}
-              image={getCoachPhotoUrl(username)}
+              image={wasVisible ? getCoachPhotoUrl(username) : undefined}
               alt={name}
             />
             <IntroLink webLink={webLink} />
@@ -210,6 +216,7 @@ export const CoachCard = ({
                 onContact={withContact && handleContact}
                 onPick={pickCoach.onPick}
                 pickPending={pickCoach.pickPending}
+                fetchDisabled={!wasVisible}
                 sx={{ alignSelf: "end" }}
               />
             </ErrorBoundary>

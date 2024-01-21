@@ -66,13 +66,7 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       try {
         const resultStr = tz.formatInTimeZone(date, userTz, formatStr);
         // const resultStr = formatLocal(utcDate, formatStr);
-        console.log("[formatInUserTzLocal] 1", {
-          userTz,
-          date,
-          formatStr,
-          // utcDate,
-          resultStr,
-        });
+        // console.log("[formatInUserTzLocal] 1", { userTz, date, formatStr, resultStr, });
 
         return resultStr;
       } catch (e) {
