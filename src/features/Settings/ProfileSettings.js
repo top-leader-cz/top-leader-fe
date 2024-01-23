@@ -35,6 +35,7 @@ import { FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
+import { invalidDate } from "../../components/Forms/validations";
 
 const FIELDS = {
   firstName: "firstName",
@@ -334,7 +335,7 @@ export const ProfileSettings = () => {
         <BareInputField
           name={FIELDS.email}
           autoComplete="email"
-          rules={{ minLength: 5 }}
+          rules={{ required: true, minLength: 5 }}
           placeholder={user.data?.username ?? ""}
         />
       </FormRow>
@@ -413,6 +414,7 @@ export const ProfileSettings = () => {
         <DatePickerField
           name={FIELDS.experienceSince}
           textFieldProps={{ sx: { ...WHITE_BG, width: "100%" } }}
+          rules={{ required: true, validate: { invalidDate } }}
           size="small"
         />
       </FormRow>

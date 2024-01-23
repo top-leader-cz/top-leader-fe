@@ -1647,6 +1647,12 @@
   "dict.validation.invalidTime": {
     "defaultMessage": "Invalid time"
   },
+  "dict.validation.maxLength": {
+    "defaultMessage": "Too long. Max length is {lteLength}"
+  },
+  "dict.validation.minLength": {
+    "defaultMessage": "Too short. Min length is {gteLength}"
+  },
   "dict.validation.notBlank": {
     "defaultMessage": "Cannot be blank"
   },

@@ -23,6 +23,7 @@ import {
   assoc,
   chain,
   curryN,
+  fromPairs,
   identity,
   lensProp,
   map,
@@ -56,6 +57,8 @@ import { Score } from "../Score";
 import { P } from "../Typography";
 import { FieldError } from "./validations";
 import { useMsg } from "../Msg/Msg";
+import * as validations from "./validations";
+import { gray200, gray500 } from "../../theme";
 
 // import { DateRangePicker } from "@mui/lab";
 // import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
@@ -640,16 +643,39 @@ const debugLog = (debug) => {
   }
 };
 
+const applyVParams = ({ rules = {}, parametrizedValidate = {} }) => {
+  const validate = pipe(
+    toPairs,
+    map(([name, arg]) => [name, validations[name](arg)]),
+    fromPairs
+  )(parametrizedValidate);
+  const rulesResult = {
+    ...rules,
+    validate: { ...(rules.validate || {}), ...validate },
+  };
+  console.log({ rulesResult, rules, validate, parametrizedValidate });
+
+  return rulesResult;
+};
+
 export const RHFTextField = ({
   name,
   control,
-  rules,
+  rules: rulesProp,
+  parametrizedValidate,
+  displayCharCounter,
   debug,
   size = "small", // "medium"
   // trim = false,
   ...props
 }) => {
   const methods = useFormContext();
+  const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
+  console.log("[RHFTextField.rndr]", {
+    rules,
+    rulesProp,
+    parametrizedValidate,
+  });
 
   return (
     <Controller
@@ -658,20 +684,42 @@ export const RHFTextField = ({
       rules={rules}
       render={({ field, fieldState }) => (
         // debugLog({ ...debug, data: { fieldState, field } }) ||
-        <TextField
-          error={!!fieldState.error}
-          helperText={<FieldError {...{ field, fieldState, rules, name }} />}
-          size={size}
-          {...props}
-          {...field}
-          // onChange={
-          //   !trim
-          //     ? field.onChange
-          //     : (e, newValue) => {
-          //         field.onChange(newValue?.trim());
-          //       }
-          // }
-        />
+        <Box>
+          <TextField
+            error={!!fieldState.error}
+            helperText={
+              <FieldError
+                {...{ field, fieldState, rules, name, parametrizedValidate }}
+              />
+            }
+            size={size}
+            {...props}
+            {...field}
+            // onChange={
+            //   !trim
+            //     ? field.onChange
+            //     : (e, newValue) => {
+            //         field.onChange(newValue?.trim());
+            //       }
+            // }
+          />
+          {displayCharCounter && (
+            <Box sx={{ mx: "14px", color: gray500 }}>
+              {
+                // !field.value?.length ? (
+                //   <>&nbsp;</>
+                // ) : (
+                `${[
+                  field.value.length || 0,
+                  parametrizedValidate?.maxLength?.lteLength,
+                ]
+                  .filter((v) => typeof v === "number")
+                  .join("/")}`
+                // )
+              }
+            </Box>
+          )}
+        </Box>
       )}
     />
   );

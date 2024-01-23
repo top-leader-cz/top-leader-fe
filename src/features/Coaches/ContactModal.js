@@ -18,6 +18,7 @@ import { formatName } from "./Coaches.page";
 import React, { useCallback, useState } from "react";
 import { useSnackbar } from "../Modal/ConfirmModal";
 import { messages } from "./messages";
+import { maxLength, notBlank } from "../../components/Forms/validations";
 
 // {
 //     "username": "coach1@gmail.com",
@@ -122,7 +123,14 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
           <Divider flexItem />
           <RHFTextField
             name="message"
-            rules={{ required: true, minLength: 3 }}
+            rules={{
+              required: true,
+            }}
+            parametrizedValidate={{
+              notBlank: undefined,
+              minLength: { gteLength: 1 },
+              maxLength: { lteLength: 3000 },
+            }}
             label={msg("coaches.contact.message.label")}
             placeholder={msg("coaches.contact.message.placeholder")}
             size="small"
@@ -131,6 +139,7 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
             rows={5}
             sx={{}}
             fullWidth
+            displayCharCounter
           />
           <Divider flexItem />
           <Box display="flex" flexDirection="row" gap={3}>

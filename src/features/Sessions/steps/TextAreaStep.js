@@ -12,6 +12,7 @@ import { messages } from "../messages";
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
   textAreaName,
+  textAreaLabel,
   handleNext,
   handleBack,
   data,

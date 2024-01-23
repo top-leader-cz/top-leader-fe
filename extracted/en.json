@@ -548,6 +548,8 @@
   "dict.user_status.pending.label": "Pending",
   "dict.validation.invalidDate": "Invalid date",
   "dict.validation.invalidTime": "Invalid time",
+  "dict.validation.maxLength": "Too long. Max length is {lteLength}",
+  "dict.validation.minLength": "Too short. Min length is {gteLength}",
   "dict.validation.notBlank": "Cannot be blank",
   "dict.validation.required": "Required",
   "dict.validation.todayOrFuture": "Must be in the future",

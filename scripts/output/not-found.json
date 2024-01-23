@@ -1,4 +1,6 @@
 {
+  "dict.validation.maxLength": "Too long. Max length is {lteLength}",
+  "dict.validation.minLength": "Too short. Min length is {gteLength}",
   "general.loadable-options.error.placeholder": "Error loading options",
   "general.loadable-options.loading.placeholder": "Loading options"
 }

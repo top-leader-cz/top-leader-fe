@@ -12,6 +12,14 @@ export const validationMessages = defineMessages({
     id: "dict.validation.notBlank",
     defaultMessage: "Cannot be blank",
   },
+  "dict.validation.minLength": {
+    id: "dict.validation.minLength",
+    defaultMessage: "Too short. Min length is {gteLength}",
+  },
+  "dict.validation.maxLength": {
+    id: "dict.validation.maxLength",
+    defaultMessage: "Too long. Max length is {lteLength}",
+  },
   "dict.validation.invalidDate": {
     id: "dict.validation.invalidDate",
     defaultMessage: "Invalid date",
@@ -26,10 +34,13 @@ export const validationMessages = defineMessages({
   },
 });
 
-const getError = ({ error, msg, name }) => {
+const getError = ({ error, msg, name, rules, parametrizedValidate }) => {
   if (!error?.type) return undefined;
   const tsKey = `dict.validation.${error?.type}`;
-  const translated = msg.maybe(tsKey);
+  const params = parametrizedValidate?.[error?.type] || {
+    gteLength: rules?.[error?.type] || "Unknown", // TODO
+  };
+  const translated = msg.maybe(tsKey, params);
   const errorMsg = translated || error?.type;
 
   if (errorMsg) {
@@ -40,17 +51,30 @@ const getError = ({ error, msg, name }) => {
   return errorMsg;
 };
 
-export const FieldError = ({ fieldState: { error }, rules, name }) => {
+export const FieldError = ({
+  fieldState: { error },
+  rules,
+  name,
+  parametrizedValidate,
+}) => {
   const msg = useMsg({ dict: validationMessages });
 
   if (!error) return undefined;
-  return getError({ error, msg, name });
+  return getError({ error, msg, name, rules, parametrizedValidate });
 };
 
 export const notBlank =
   (gtLen = 0) =>
   (v) =>
     v?.trim?.()?.length > gtLen;
+export const minLength =
+  ({ gteLength = 1 }) =>
+  (v) =>
+    v?.length >= gteLength;
+export const maxLength =
+  ({ lteLength = 1000 }) =>
+  (v) =>
+    v?.length <= lteLength;
 
 export const invalidDate = (v) => {
   if (!v) return true; // optional date fields
