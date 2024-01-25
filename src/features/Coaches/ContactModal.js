@@ -123,14 +123,12 @@ const ContactForm = React.forwardRef(({ onClose, coach }, ref) => {
           <Divider flexItem />
           <RHFTextField
             name="message"
-            rules={{
-              required: true,
-            }}
-            parametrizedValidate={{
-              notBlank: undefined,
-              minLength: { gteLength: 1 },
-              maxLength: { lteLength: 3000 },
-            }}
+            parametrizedValidate={[
+              ["required"],
+              ["notBlank"],
+              ["minLength", { gteLength: 1 }],
+              ["maxLength", { lteLength: 3000 }],
+            ]}
             label={msg("coaches.contact.message.label")}
             placeholder={msg("coaches.contact.message.placeholder")}
             size="small"

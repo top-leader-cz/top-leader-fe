@@ -20,15 +20,23 @@ import {
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import { getDay, isSameDay, isValid } from "date-fns/fp";
 import {
+  any,
   assoc,
   chain,
   curryN,
+  defaultTo,
+  find,
   fromPairs,
   identity,
   lensProp,
   map,
+  mergeRight,
+  nth,
+  omit,
   pipe,
   prop,
+  propEq,
+  reject,
   remove,
   set,
   sortBy,
@@ -643,17 +651,44 @@ const debugLog = (debug) => {
   }
 };
 
-const applyVParams = ({ rules = {}, parametrizedValidate = {} }) => {
-  const validate = pipe(
-    toPairs,
-    map(([name, arg]) => [name, validations[name](arg)]),
-    fromPairs
-  )(parametrizedValidate);
+const isValidate = curryN(2, (validateName, parametrizedValidateItem) =>
+  propEq(0, validateName, parametrizedValidateItem)
+);
+export const getValidateParamsMaybe = curryN(
+  2,
+  (validateName, parametrizedValidate = []) =>
+    pipe(
+      find(isValidate(validateName)),
+      defaultTo([]),
+      nth(1)
+    )(parametrizedValidate)
+);
+
+export const getValidateOptionsMaybe = curryN(
+  2,
+  (validateName, parametrizedValidate = []) =>
+    pipe(
+      find(isValidate(validateName)),
+      defaultTo([]),
+      nth(2)
+    )(parametrizedValidate)
+);
+
+const applyVParams = ({ rules = {}, parametrizedValidate = [] }) => {
+  const isRequired = any(isValidate("required"), parametrizedValidate); // tricky, let's trust to native validation for now
   const rulesResult = {
     ...rules,
-    validate: { ...(rules.validate || {}), ...validate },
+    ...(isRequired ? { required: true } : {}),
+    validate: mergeRight(
+      rules.validate || {},
+      pipe(
+        reject(isValidate("required")), // TODO: {hasValue: (value) => ...} arg by input type?
+        map(([name, arg]) => [name, validations[name](arg)]),
+        fromPairs
+      )(parametrizedValidate)
+    ),
   };
-  console.log({ rulesResult, rules, validate, parametrizedValidate });
+  console.log({ rulesResult, rules, parametrizedValidate });
 
   return rulesResult;
 };
@@ -672,9 +707,9 @@ export const RHFTextField = ({
   const methods = useFormContext();
   const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
   console.log("[RHFTextField.rndr]", {
-    rules,
     rulesProp,
     parametrizedValidate,
+    rules,
   });
 
   return (
@@ -684,42 +719,35 @@ export const RHFTextField = ({
       rules={rules}
       render={({ field, fieldState }) => (
         // debugLog({ ...debug, data: { fieldState, field } }) ||
-        <Box>
+        <>
           <TextField
             error={!!fieldState.error}
             helperText={
-              <FieldError
-                {...{ field, fieldState, rules, name, parametrizedValidate }}
-              />
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <FieldError
+                  {...{ field, fieldState, rules, name, parametrizedValidate }}
+                />
+                {displayCharCounter && (
+                  <Box
+                    component="span"
+                    sx={{ textAlign: "right", flexGrow: 1 }}
+                  >
+                    {`${[
+                      field.value.length || 0,
+                      getValidateParamsMaybe("maxLength", parametrizedValidate)
+                        ?.lteLength,
+                    ]
+                      .filter((v) => typeof v === "number")
+                      .join("/")}`}
+                  </Box>
+                )}
+              </Box>
             }
             size={size}
             {...props}
             {...field}
-            // onChange={
-            //   !trim
-            //     ? field.onChange
-            //     : (e, newValue) => {
-            //         field.onChange(newValue?.trim());
-            //       }
-            // }
           />
-          {displayCharCounter && (
-            <Box sx={{ mx: "14px", color: gray500 }}>
-              {
-                // !field.value?.length ? (
-                //   <>&nbsp;</>
-                // ) : (
-                `${[
-                  field.value.length || 0,
-                  parametrizedValidate?.maxLength?.lteLength,
-                ]
-                  .filter((v) => typeof v === "number")
-                  .join("/")}`
-                // )
-              }
-            </Box>
-          )}
-        </Box>
+        </>
       )}
     />
   );
@@ -1140,11 +1168,14 @@ export const StyledOutlinedInput = styled(OutlinedInput)({
 
 export const BareInputField = ({
   name,
-  rules,
+  rules: rulesProp,
+  parametrizedValidate,
   size = "small",
   fullWidth = true,
   ...props
 }) => {
+  const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
+
   return (
     <Controller
       name={name}
@@ -1168,7 +1199,9 @@ export const BareInputField = ({
               left: "8px",
             }}
           >
-            <FieldError {...{ field, fieldState, rules, name }} />
+            <FieldError
+              {...{ field, fieldState, rules, name, parametrizedValidate }}
+            />
           </P>
         </Box>
       )}

@@ -38,17 +38,15 @@ export function SignInPage() {
         <RHFTextField
           debug={{ msg: "email", color: "crimson" }}
           margin="normal"
-          required
-          rules={{
-            required: {
-              value: true,
-              message: <Msg id="auth.login.email.validation.required" />,
-            },
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: <Msg id="auth.login.email.validation.pattern" />,
-            },
-          }}
+          // required
+          parametrizedValidate={[
+            ["required"],
+            [
+              "rePattern",
+              { regexpToMatch: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i },
+              { tsKey: "auth.login.email.validation.pattern" },
+            ],
+          ]}
           fullWidth
           id="email"
           label={<Msg id="auth.login.email.label" />}
@@ -58,7 +56,7 @@ export function SignInPage() {
         />
         <RHFTextField
           margin="normal"
-          required
+          // required
           rules={{ required: "Required" }}
           fullWidth
           name="password"

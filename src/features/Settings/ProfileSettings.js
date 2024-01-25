@@ -335,7 +335,14 @@ export const ProfileSettings = () => {
         <BareInputField
           name={FIELDS.email}
           autoComplete="email"
-          rules={{ required: true, minLength: 5 }}
+          parametrizedValidate={[
+            ["required"],
+            [
+              "rePattern",
+              { regexpToMatch: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i },
+              { tsKey: "auth.login.email.validation.pattern" },
+            ],
+          ]}
           placeholder={user.data?.username ?? ""}
         />
       </FormRow>

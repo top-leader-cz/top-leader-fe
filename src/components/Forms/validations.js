@@ -2,6 +2,7 @@ import { isFuture, isToday } from "date-fns";
 import { isValid } from "date-fns/fp";
 import { defineMessages } from "react-intl";
 import { useMsg } from "../Msg/Msg";
+import { getValidateParamsMaybe, getValidateOptionsMaybe } from "./Fields";
 
 export const validationMessages = defineMessages({
   "dict.validation.required": {
@@ -36,8 +37,11 @@ export const validationMessages = defineMessages({
 
 const getError = ({ error, msg, name, rules, parametrizedValidate }) => {
   if (!error?.type) return undefined;
-  const tsKey = `dict.validation.${error?.type}`;
-  const params = parametrizedValidate?.[error?.type] || {
+  const tsKey =
+    getValidateOptionsMaybe(error?.type, parametrizedValidate)?.tsKey ||
+    `dict.validation.${error?.type}`;
+  const paramsMaybe = getValidateParamsMaybe(error?.type, parametrizedValidate);
+  const params = paramsMaybe || {
     gteLength: rules?.[error?.type] || "Unknown", // TODO
   };
   const translated = msg.maybe(tsKey, params);
@@ -63,6 +67,8 @@ export const FieldError = ({
   return getError({ error, msg, name, rules, parametrizedValidate });
 };
 
+// export const required = () => (v) => !!v;
+
 export const notBlank =
   (gtLen = 0) =>
   (v) =>
@@ -75,6 +81,12 @@ export const maxLength =
   ({ lteLength = 1000 }) =>
   (v) =>
     v?.length <= lteLength;
+export const rePattern =
+  ({ regexpToMatch }) =>
+  (v) => {
+    if (!v?.length) return true;
+    return !!v.match(regexpToMatch);
+  };
 
 export const invalidDate = (v) => {
   if (!v) return true; // optional date fields
