@@ -57,7 +57,7 @@ export function SignInPage() {
         <RHFTextField
           margin="normal"
           // required
-          rules={{ required: "Required" }}
+          parametrizedValidate={[["required"]]}
           fullWidth
           name="password"
           label={<Msg id="auth.login.password.label" />}

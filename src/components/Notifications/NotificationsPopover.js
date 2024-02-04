@@ -96,7 +96,7 @@ export const NotificationsPopover = ({
                         message.unread
                           ? "general.new-message-from"
                           : "general.message-from",
-                        { from: message.from }
+                        { from: message.fromName }
                       )}
                     </H2>
                   }
