@@ -16,21 +16,9 @@ export function SignInPage() {
   const form = useForm({
     defaultValues: { email: "", password: "" },
   });
-  const handleSubmit = ({ email, password }, e) => {
-    console.log("[Login submit]", { username: email, password });
-    return loginMutation.mutate({
-      username: email,
-      password,
-    });
-    // .catch((e) => { form.setError("email", { message: "" }); form.setError("password", { message }); });
-  };
-
+  const handleSubmit = ({ email, password }, e) =>
+    loginMutation.mutate({ username: email, password });
   const disabled = loginMutation.isLoading;
-  const errorMsg = loginMutation.error
-    ? msg("auth.login.validation.invalid-credentials")
-    : "";
-
-  console.log("[SignIn.rndr]", { disabled, errorMsg, form, loginMutation });
 
   return (
     <WelcomeScreenTemplate>
@@ -38,7 +26,6 @@ export function SignInPage() {
         <RHFTextField
           debug={{ msg: "email", color: "crimson" }}
           margin="normal"
-          // required
           parametrizedValidate={[
             ["required"],
             [
@@ -53,10 +40,10 @@ export function SignInPage() {
           name="email"
           autoComplete="email"
           autoFocus
+          error={!!loginMutation.error}
         />
         <RHFTextField
           margin="normal"
-          // required
           parametrizedValidate={[["required"]]}
           fullWidth
           name="password"
@@ -64,8 +51,12 @@ export function SignInPage() {
           type="password"
           id="password"
           autoComplete="current-password"
-          error={!!errorMsg}
-          helperText={errorMsg}
+          error={!!loginMutation.error}
+          helperText={
+            loginMutation.error
+              ? msg("auth.login.validation.invalid-credentials")
+              : ""
+          }
         />
 
         {/* <FormControlLabel
