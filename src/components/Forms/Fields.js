@@ -567,10 +567,10 @@ export const CheckboxField = ({ name, rules, ...props }) => {
 export const DatePickerField = ({
   control,
   name,
-  rules,
+  rules: rulesProp,
+  parametrizedValidate,
   inputFormat: inputFormatProp,
   textFieldProps,
-  clearable = !rules?.required,
   ...rest
 }) => {
   const { i18n } = useContext(I18nContext);
@@ -579,6 +579,8 @@ export const DatePickerField = ({
     [i18n.uiFormats.inputDateFormat, inputFormatProp]
   );
   const methods = useFormContext();
+  const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
+  const clearable = !rules?.required;
   // console.log("[DatePickerField.rndr]", { inputFormatProp, inputFormat, i18n });
 
   return (
@@ -675,7 +677,10 @@ export const getValidateOptionsMaybe = curryN(
 );
 
 const applyVParams = ({ rules = {}, parametrizedValidate = [] }) => {
-  const isRequired = any(isValidate("required"), parametrizedValidate); // tricky, let's trust to native validation for now
+  // tricky, let's trust to native validation for now
+  // also rules.required is used to default clearable and disableClearable
+  const isRequired = any(isValidate("required"), parametrizedValidate);
+
   const rulesResult = {
     ...rules,
     ...(isRequired ? { required: true } : {}),
@@ -892,7 +897,8 @@ export const SliderField = ({
 export const AutocompleteSelect = ({
   name,
   id = name,
-  rules,
+  rules: rulesProp,
+  parametrizedValidate,
   label,
   options: optionsProp,
   groupedOptions,
@@ -901,7 +907,7 @@ export const AutocompleteSelect = ({
   placeholder: placeholderProp,
   multiple,
   enableIsOptionEqualToValue = !multiple, // TODO: progressively enable everywhere
-  disableCloseOnSelect,
+  disableCloseOnSelect = multiple,
   autoComplete,
   onChange,
   getValue = (f) => f.value,
@@ -910,7 +916,7 @@ export const AutocompleteSelect = ({
   disablePortal,
   AutocompleteComponent = Autocomplete,
   TextFieldComponent = TextField,
-  disableClearable,
+  disableClearable: disableClearableProp, // needed for language and timezone - saved on change, not on submit, TODO: clearable as on other fields
   ...props
 }) => {
   const msg = useMsg({ dict: formsMessages });
@@ -929,6 +935,9 @@ export const AutocompleteSelect = ({
         : (data) => data?.value ?? null,
     [multiple]
   );
+  const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
+  const disableClearable = disableClearableProp ?? rules?.required;
+
   return (
     <Controller
       name={name}
@@ -983,7 +992,9 @@ export const AutocompleteSelect = ({
               placeholder={placeholder}
               error={!!fieldState.error}
               helperText={
-                <FieldError {...{ field, fieldState, rules, name }} />
+                <FieldError
+                  {...{ field, fieldState, rules, name, parametrizedValidate }}
+                />
               }
               inputProps={{
                 // TODO: profile language autocomplete

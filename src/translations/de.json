@@ -426,6 +426,7 @@
   "dict.user_status.authorized.label": "Autorisiert",
   "dict.user_status.paid.label": "Bezahlt",
   "dict.user_status.pending.label": "Ausstehend",
+  "dict.validation.validDate": "Ungültiges Datum",
   "dict.validation.invalidDate": "Ungültiges Datum",
   "dict.validation.invalidTime": "Ungültige Zeit",
   "dict.validation.notBlank": "Darf nicht leer sein",

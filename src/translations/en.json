@@ -426,6 +426,7 @@
   "dict.user_status.authorized.label": "Authorized",
   "dict.user_status.paid.label": "Paid",
   "dict.user_status.pending.label": "Pending",
+  "dict.validation.validDate": "Invalid date",
   "dict.validation.invalidDate": "Invalid date",
   "dict.validation.invalidTime": "Invalid time",
   "dict.validation.notBlank": "Cannot be blank",

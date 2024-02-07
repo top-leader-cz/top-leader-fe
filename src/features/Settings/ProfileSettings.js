@@ -321,13 +321,19 @@ export const ProfileSettings = () => {
       >
         <BareInputField
           name={FIELDS.firstName}
-          rules={{ required: true, minLength: 2 }}
-          // placeholder={"Type your message"}
+          parametrizedValidate={[
+            ["required"],
+            ["notBlank"],
+            ["minLength", { gteLength: 2 }],
+          ]}
         />
         <BareInputField
           name={FIELDS.lastName}
-          rules={{ required: true, minLength: 2 }}
-          // placeholder={"Type your message"}
+          parametrizedValidate={[
+            ["required"],
+            ["notBlank"],
+            ["minLength", { gteLength: 2 }],
+          ]}
         />
       </FormRow>
 
@@ -359,12 +365,7 @@ export const ProfileSettings = () => {
       </FormRow>
 
       <FormRow label={msg("settings.profile.field.bio")} name={FIELDS.bio}>
-        <BareInputField
-          name={FIELDS.bio}
-          // rules={{ required: true }}
-          multiline
-          rows={4}
-        />
+        <BareInputField name={FIELDS.bio} multiline rows={4} />
       </FormRow>
       <FormRow
         label={msg("settings.profile.field.webLink")}
@@ -372,7 +373,6 @@ export const ProfileSettings = () => {
       >
         <BareInputField
           name={FIELDS.webLink}
-          rules={{}}
           placeholder={msg("settings.profile.field.webLink.placeholder")}
         />
       </FormRow>
@@ -383,7 +383,6 @@ export const ProfileSettings = () => {
       >
         <AutocompleteSelect
           multiple
-          disableCloseOnSelect
           sx={WHITE_BG}
           name={FIELDS.languages}
           options={getCoachLanguagesOptions()}
@@ -399,7 +398,6 @@ export const ProfileSettings = () => {
       >
         <AutocompleteSelect
           multiple
-          disableCloseOnSelect
           sx={WHITE_BG}
           name={FIELDS.fields}
           options={fieldsOptions}
@@ -412,7 +410,7 @@ export const ProfileSettings = () => {
         label={msg("settings.profile.field.certificates")}
         name={FIELDS.certificates}
         >
-        <BareInputField name={FIELDS.certificates} rules={{}} />
+        <BareInputField name={FIELDS.certificates} />
       </FormRow> */}
       <FormRow
         label={msg("settings.profile.field.experience")}
@@ -421,7 +419,8 @@ export const ProfileSettings = () => {
         <DatePickerField
           name={FIELDS.experienceSince}
           textFieldProps={{ sx: { ...WHITE_BG, width: "100%" } }}
-          rules={{ required: true, validate: { invalidDate } }}
+          // rules={{ required: true, validate: { invalidDate } }}
+          parametrizedValidate={[["required"], ["validDate"]]}
           size="small"
         />
       </FormRow>
@@ -435,6 +434,7 @@ export const ProfileSettings = () => {
           name={FIELDS.certificates}
           options={certificatesOptions}
           placeholder={msg("settings.profile.field.certificates.placeholder")}
+          parametrizedValidate={[["required"]]}
         />
       </FormRow>
 

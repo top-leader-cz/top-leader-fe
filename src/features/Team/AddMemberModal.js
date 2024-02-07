@@ -156,7 +156,6 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
 
             <AutocompleteSelect
               multiple
-              disableCloseOnSelect
               name="authorities"
               options={Object.values(Authority).map((value) => ({
                 value,

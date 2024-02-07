@@ -759,6 +759,7 @@ dict.feedback.question.interpersonal.manage-the-emotions.label,,Does the employe
 dict.user_status.authorized.label,,Authorized,Ověřený,Autorisé,Autorisiert,dict.user_status.authorized.label,,,Authorized,,,,
 dict.user_status.paid.label,,Paid,Zaplaceno,Payé,Bezahlt,dict.user_status.paid.label,,,Paid,,,,
 dict.user_status.pending.label,,Pending,Čeká,En attente,Ausstehend,dict.user_status.pending.label,,,Pending,,,,
+dict.validation.validDate,,Invalid date,Neplatné datum,Date invalide,Ungültiges Datum,dict.validation.validDate,,,Invalid date,,,,
 dict.validation.invalidDate,,Invalid date,Neplatné datum,Date invalide,Ungültiges Datum,dict.validation.invalidDate,,,Invalid date,,,,
 dict.validation.invalidTime,,Invalid time,Neplatný čas,Heure invalide,Ungültige Zeit,dict.validation.invalidTime,,,Invalid time,,,,
 dict.validation.notBlank,,Cannot be blank,Nesmí být prázdné,Ne peut pas être vide,Darf nicht leer sein,dict.validation.notBlank,,,Cannot be blank,,,,

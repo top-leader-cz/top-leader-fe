@@ -426,6 +426,7 @@
   "dict.user_status.authorized.label": "Ověřený",
   "dict.user_status.paid.label": "Zaplaceno",
   "dict.user_status.pending.label": "Čeká",
+  "dict.validation.validDate": "Neplatné datum",
   "dict.validation.invalidDate": "Neplatné datum",
   "dict.validation.invalidTime": "Neplatný čas",
   "dict.validation.notBlank": "Nesmí být prázdné",

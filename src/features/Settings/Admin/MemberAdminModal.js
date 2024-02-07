@@ -264,7 +264,6 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
           </PreventSubmission>
           <AutocompleteSelect
             multiple
-            disableCloseOnSelect
             name="authorities"
             label={msg("settings.admin.member.modal.fields.authorities")}
             options={Object.values(Authority).map((value) => ({
@@ -294,17 +293,17 @@ export const MemberAdminForm = ({ onClose, initialValues }) => {
             options={USER_STATUS_OPTIONS}
           />
           <AutocompleteSelect
-            disableClearable
             name="locale"
             label={msg("settings.admin.member.modal.fields.locale")}
             options={LANGUAGE_OPTIONS}
             renderOption={renderLanguageOption}
+            parametrizedValidate={[["required"]]}
           />
           <AutocompleteSelect
-            disableClearable
             name="timeZone"
             label={msg("settings.admin.member.modal.fields.timeZone")}
             options={TIMEZONE_OPTIONS}
+            parametrizedValidate={[["required"]]}
           />
 
           <Divider flexItem sx={{ mt: 3 }} />

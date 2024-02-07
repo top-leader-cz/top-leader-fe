@@ -21,6 +21,10 @@ export const validationMessages = defineMessages({
     id: "dict.validation.maxLength",
     defaultMessage: "Too long. Max length is {lteLength}",
   },
+  "dict.validation.validDate": {
+    id: "dict.validation.validDate",
+    defaultMessage: "Invalid date",
+  },
   "dict.validation.invalidDate": {
     id: "dict.validation.invalidDate",
     defaultMessage: "Invalid date",
@@ -74,20 +78,26 @@ export const notBlank =
   (v) =>
     v?.trim?.()?.length > gtLen;
 export const minLength =
-  ({ gteLength = 1 }) =>
+  ({ gteLength = 1 } = {}) =>
   (v) =>
     v?.length >= gteLength;
 export const maxLength =
-  ({ lteLength = 1000 }) =>
+  ({ lteLength = 1000 } = {}) =>
   (v) =>
     v?.length <= lteLength;
 export const rePattern =
-  ({ regexpToMatch }) =>
+  ({ regexpToMatch } = {}) =>
   (v) => {
     if (!v?.length) return true;
     return !!v.match(regexpToMatch);
   };
 
+export const validDate = () => (v) => {
+  if (!v) return true; // optional date fields
+  return isValid(v);
+};
+
+// old validations for direct use in rules prop:
 export const invalidDate = (v) => {
   if (!v) return true; // optional date fields
   return isValid(v);

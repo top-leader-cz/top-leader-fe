@@ -136,14 +136,12 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
               options={getCoachLanguagesOptions()}
               // renderOption={renderLanguageOption}
               multiple
-              disableCloseOnSelect
             />
             <AutocompleteSelect
               name="fields"
               label={msg("coaches.filter.field.label")}
               options={fieldsOptions}
               multiple
-              disableCloseOnSelect
             />
             <SliderField
               name="experience"
@@ -159,7 +157,6 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
                   options={ratesOptions}
                   multiple
                   // disablePortal
-                  disableCloseOnSelect
                   // renderOption={(props, option, { selected }) => (
                   //   <li {...props}>
                   //     <Checkbox

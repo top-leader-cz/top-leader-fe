@@ -98,7 +98,6 @@ export const Multiple = {
   args: {
     ...Basic.args,
     multiple: true,
-    disableCloseOnSelect: true,
   },
   argTypes: {
     disableCloseOnSelect: { control: "boolean" },
