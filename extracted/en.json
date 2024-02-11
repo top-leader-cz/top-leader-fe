@@ -143,6 +143,7 @@
   "dict.error.email.used.message": "{apiMessage}",
   "dict.error.event.longer.that.24.message": "{apiMessage}",
   "dict.error.field.outside.of.frame.message": "{apiMessage}",
+  "dict.error.form.already.submitted.message": "Form already submitted",
   "dict.error.invalid.password.message": "{apiMessage}",
   "dict.error.not.enough.credits.message": "{apiMessage}",
   "dict.error.not.part.of.company.message": "{apiMessage}",

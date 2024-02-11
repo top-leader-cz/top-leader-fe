@@ -418,6 +418,7 @@
   "dict.error.not.part.of.company.message": "",
   "dict.error.session.in.past.message": "",
   "dict.error.time.not.available.message": "",
+  "dict.error.form.already.submitted.message": "Das Formular wurde bereits abgesendet",
   "dict.feedback-questions-categories.consider-other-team-members": "Berücksichtigen Sie andere Teammitglieder",
   "dict.feedback-questions-categories.interpersonal": "Zwischenmenschlich",
   "dict.feedback-questions-categories.organizational": "Organisatorisch",

@@ -418,6 +418,7 @@
   "dict.error.not.part.of.company.message": "",
   "dict.error.session.in.past.message": "",
   "dict.error.time.not.available.message": "",
+  "dict.error.form.already.submitted.message": "Formulář již byl odeslán",
   "dict.feedback-questions-categories.consider-other-team-members": "Zvažte další členy týmu",
   "dict.feedback-questions-categories.interpersonal": "Mezilidské vztahy",
   "dict.feedback-questions-categories.organizational": "Organizační",

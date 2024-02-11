@@ -418,6 +418,7 @@
   "dict.error.not.part.of.company.message": "",
   "dict.error.session.in.past.message": "",
   "dict.error.time.not.available.message": "",
+  "dict.error.form.already.submitted.message": "Le formulaire a déjà été soumis",
   "dict.feedback-questions-categories.consider-other-team-members": "Considérez les autres membres de l'équipe",
   "dict.feedback-questions-categories.interpersonal": "Interpersonnel",
   "dict.feedback-questions-categories.organizational": "Organisationnel",

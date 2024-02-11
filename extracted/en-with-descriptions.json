@@ -432,6 +432,9 @@
   "dict.error.field.outside.of.frame.message": {
     "defaultMessage": "{apiMessage}"
   },
+  "dict.error.form.already.submitted.message": {
+    "defaultMessage": "Form already submitted"
+  },
   "dict.error.invalid.password.message": {
     "defaultMessage": "{apiMessage}"
   },

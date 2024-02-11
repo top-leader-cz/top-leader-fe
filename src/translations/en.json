@@ -418,6 +418,7 @@
   "dict.error.not.part.of.company.message": "{apiMessage}",
   "dict.error.session.in.past.message": "{apiMessage}",
   "dict.error.time.not.available.message": "{apiMessage}",
+  "dict.error.form.already.submitted.message": "The form has already been submitted",
   "dict.feedback-questions-categories.consider-other-team-members": "Consider other team members",
   "dict.feedback-questions-categories.interpersonal": "Interpersonal",
   "dict.feedback-questions-categories.organizational": "Organizational",

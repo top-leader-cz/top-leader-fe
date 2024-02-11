@@ -97,6 +97,8 @@ const ERROR_CODES = {
   INVALID_PASSWORD: "invalid.password",
 
   ALREADY_EXISTING: "already.existing",
+
+  ALREADY_SUBMITTED: "form.already.submitted",
 };
 
 const getTsKey = (code = "", prop = "message") => `dict.error.${code}.${prop}`;
@@ -146,6 +148,10 @@ const errMessages = defineMessages({
     // id: getTsKey(ERROR_CODES.ALREADY_EXISTING),
     id: "dict.error.already.existing.message",
     defaultMessage: "{apiMessage}",
+  },
+  [getTsKey(ERROR_CODES.ALREADY_SUBMITTED)]: {
+    id: "dict.error.form.already.submitted.message",
+    defaultMessage: "The form has already been submitted",
   },
 });
 
