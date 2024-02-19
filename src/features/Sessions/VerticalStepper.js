@@ -66,7 +66,11 @@ export const VerticalStepper = ({ activeStepIndex, onStepClick, steps }) => {
             //   icon={<Avatar><Icon name={step.iconName} fontSize="small" /></Avatar>}
             StepIconComponent={StepIcon}
             StepIconProps={{ iconName: iconName }}
-            optional={<Typography variant="caption">{caption}</Typography>}
+            optional={
+              caption ? (
+                <Typography variant="caption">{caption}</Typography>
+              ) : undefined
+            }
             sx={{ padding: 0 }}
             onClick={onStepClick ? () => onStepClick({ index }) : undefined}
           >

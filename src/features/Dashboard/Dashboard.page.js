@@ -1,17 +1,22 @@
 import { Masonry } from "@mui/lab";
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   alpha,
   Card,
   CardActionArea,
   CardContent,
   Chip,
   CircularProgress,
+  Grid,
   TextField,
+  Typography,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import { pick } from "ramda";
-import React, { useMemo, useState } from "react";
+import { has, pick } from "ramda";
+import React, { Suspense, useMemo, useState } from "react";
 import { useIsFetching } from "react-query";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
@@ -20,12 +25,17 @@ import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
 import { useAuth } from "../Authorization";
-import { useMyMutation } from "../Authorization/AuthProvider";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { useAreas } from "../Sessions/steps/AreaStep";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
+import { primary25, primary500 } from "../../theme";
+import { ShowMore } from "../Coaches/CoachCard";
+import { QueryRenderer, SuspenseRenderer } from "../QM/QueryRenderer";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { VerticalStepper } from "../Sessions/VerticalStepper";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -147,17 +157,18 @@ const DashboardCardNotes = () => {
   // );
 };
 
-const DashboardCard = ({
-  title,
-  href,
-  items,
-  fallbackIcon = {},
-  minHeight = 215,
-}) => {
+const minCardHeight = 215;
+const DashboardCard = ({ title, href, items, fallbackIcon = {} }) => {
   return (
-    <Card sx={{ minHeight }}>
+    <Card sx={{ minHeight: minCardHeight }}>
       <CardActionArea sx={{ height: "100%" }} href={href}>
-        <CardContent sx={{ position: "relative", height: "100%" }}>
+        <CardContent
+          sx={{
+            position: "relative",
+            height: "100%",
+            minHeight: minCardHeight, // just for Grid
+          }}
+        >
           <H2 sx={{ mb: 2 }}>{title}</H2>
           {!items?.length ? (
             <DashboardIcon
@@ -258,6 +269,201 @@ const DashboardCardFeedback = () => {
   );
 };
 
+const ExpandableInfoBox = ({ heading, text, showMoreMaxChars = 250 }) => {
+  return (
+    <Accordion
+      sx={{
+        bgcolor: primary25,
+        mb: 1,
+        boxShadow: "none",
+        borderRadius: "6px",
+        "&:before": {
+          display: "none",
+        },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<Icon name="ExpandMore" />}
+        aria-controls="panel1-content"
+        id="panel1-header"
+        sx={{
+          // p: 3,
+          // borderRadius: 0.5,
+          color: primary500,
+          fontSize: 16,
+          fontWeight: 500,
+          py: 1,
+        }}
+      >
+        {heading}
+      </AccordionSummary>
+      <AccordionDetails>
+        {showMoreMaxChars ? (
+          <ShowMore maxChars={showMoreMaxChars} text={text} />
+        ) : (
+          text
+        )}
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+const InsightsTipsHeader = ({ title, perex }) => {
+  return (
+    <>
+      <Typography sx={{ mb: 2, color: primary500, fontSize: 14 }}>
+        <Icon name={"AutoAwesome"} sx={{ fontSize: "inherit", mr: 1 }} />
+        {title}
+      </Typography>
+      {perex && <Typography sx={{ mb: 2 }}>{perex}</Typography>}
+    </>
+  );
+};
+
+const hasInsights = (data) =>
+  data.leaderShipStyleAnalysis || data.animalSpiritGuide;
+const InsightsInner = ({ data }) => {
+  const msg = useMsg();
+  // const { data } = useMyQuery({
+  //   suspense: true,
+  //   queryKey: ["user-insight"],
+  //   fetchDef: { url: `/api/latest/user-insight` },
+  // });
+
+  if (hasInsights(data))
+    return (
+      <>
+        <InsightsTipsHeader
+          title={msg("dashboard.cards.ai.insights.title")}
+          perex={msg("dashboard.cards.ai.insights.perex")}
+        />
+        {data.leaderShipStyleAnalysis && (
+          <ExpandableInfoBox
+            elevation={0}
+            heading={msg("dashboard.cards.ai.insights.leadership-style.title")}
+            text={data.leaderShipStyleAnalysis}
+          />
+        )}
+        {data.animalSpiritGuide && (
+          <ExpandableInfoBox
+            heading={msg("dashboard.cards.ai.insights.animal-spirit.title")}
+            text={data.animalSpiritGuide}
+          />
+        )}
+      </>
+    );
+};
+
+const hasTips = (data) => data.leadershipTip || data.personalGrowthTip;
+const TipsInner = ({ data }) => {
+  const msg = useMsg();
+  // const { data } = useMyQuery({
+  //   suspense: true,
+  //   queryKey: ["user-insight", "generate-tips"],
+  //   fetchDef: { url: `/api/latest/user-insight/generate-tips` },
+  // });
+
+  if (hasTips(data))
+    return (
+      <>
+        <InsightsTipsHeader title={msg("dashboard.cards.ai.tips.title")} />
+        {data.leadershipTip && (
+          <ExpandableInfoBox
+            heading={msg("dashboard.cards.ai.tips.leadership.title")}
+            text={data.leadershipTip}
+          />
+        )}
+        {data.personalGrowthTip && (
+          <ExpandableInfoBox
+            heading={msg("dashboard.cards.ai.tips.personal-growth.title")}
+            text={data.personalGrowthTip}
+          />
+        )}
+      </>
+    );
+};
+
+const DashboardCardAI = () => {
+  const msg = useMsg();
+  const insightsQuery = useMyQuery({
+    queryKey: ["user-insight"],
+    fetchDef: { url: `/api/latest/user-insight` },
+  });
+  const tipsQuery = useMyQuery({
+    queryKey: ["user-insight", "generate-tips"],
+    fetchDef: { url: `/api/latest/user-insight/generate-tips` },
+  });
+
+  if (
+    tipsQuery.data &&
+    !hasTips(tipsQuery.data) &&
+    insightsQuery.data &&
+    !hasInsights(insightsQuery.data)
+  )
+    return (
+      <Card sx={{ minHeight: 66 }}>
+        <CardContent
+          sx={{
+            position: "relative",
+            height: "100%",
+            minHeight: 66, // just for Grid
+          }}
+        >
+          <InsightsTipsHeader
+            title={msg("dashboard.cards.ai.empty.title")}
+            perex={msg("dashboard.cards.ai.empty.perex")}
+          />
+          {/* <VerticalStepper
+            activeStepIndex={1}
+            steps={[
+              { label: msg("dashboard.cards.ai.empty.steps.0.title") },
+              { label: msg("dashboard.cards.ai.empty.steps.1.title") },
+              { label: msg("dashboard.cards.ai.empty.steps.2.title") },
+            ]}
+          /> */}
+        </CardContent>
+      </Card>
+    );
+
+  return (
+    // <UiMaybe.Root>
+    <Card sx={{ minHeight: minCardHeight }}>
+      <CardContent
+        sx={{
+          position: "relative",
+          height: "100%",
+          minHeight: minCardHeight, // just for Grid
+        }}
+      >
+        <QueryRenderer
+          query={insightsQuery}
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mb: 4 } }}
+          success={({ data }) => <InsightsInner data={data} />}
+        />
+        <QueryRenderer
+          query={tipsQuery}
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mt: 4 } }}
+          success={({ data }) => <TipsInner data={data} />}
+        />
+        {/* <SuspenseRenderer
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mb: 4 } }}
+        >
+          <InsightsInner />
+        </SuspenseRenderer>
+        <SuspenseRenderer
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mt: 4 } }}
+        >
+          <TipsInner />
+        </SuspenseRenderer> */}
+      </CardContent>
+    </Card>
+  );
+};
+
 const DashboardCardSession = ({ selectedKeys = [] }) => {
   const msg = useMsg();
   const selectedAreas = useAreas({
@@ -305,12 +511,39 @@ export function DashboardPage() {
           <P>
             <Msg id="dashboard.section-1.perex" />
           </P>
+          <Grid
+            container
+            // columns={{ xs: 4, md: 8, lg: 12 }}
+            spacing={2}
+            sx={{ my: 3 }}
+          >
+            <Grid item xs={12} md={6} lg={4}>
+              <DashboardCardAssessment selectedKeys={user.data.strengths} />
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <DashboardCardValues selectedKeys={user.data.values} />
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              {/* <DashboardCardNotes /> */}
+              <DashboardCardFeedback />
+            </Grid>
+            <Grid item xs={12}>
+              <DashboardCardAI />
+            </Grid>
+          </Grid>
+          <H2>
+            <Msg id="dashboard.section-1.heading" />
+          </H2>
+          {/*
+          <P>
+            <Msg id="dashboard.section-1.perex" />
+          </P>
           <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
             <DashboardCardAssessment selectedKeys={user.data.strengths} />
             <DashboardCardValues selectedKeys={user.data.values} />
             <DashboardCardNotes />
             <DashboardCardFeedback />
-          </Masonry>
+          </Masonry> */}
         </Box>
         <Box>
           <H2>

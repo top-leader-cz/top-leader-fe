@@ -6,6 +6,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import { all } from "ramda";
+import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 export const Loaders = {
@@ -32,7 +33,7 @@ export const Loaders = {
       <CircularProgress color="inherit" />
     </Box>
   ),
-  Skeleton: (_, loaderProps = {}) => {
+  Skeleton: ({ loaderProps = {} }) => {
     const { rows = 5, ...rest } = loaderProps;
     return (
       <Box {...rest}>
@@ -45,17 +46,33 @@ export const Loaders = {
   // INLINE
 };
 
+const renderError = ({ error }) =>
+  error && (
+    <Alert severity="error" sx={{ wordWrap: "break-word" }}>
+      {error?.message || "Oops!"}
+    </Alert>
+  );
+
+export const SuspenseRenderer = ({
+  children,
+  loaderProps,
+  loaderName = "Block",
+  loading = Loaders[loaderName]({ loaderProps }),
+  erroredRender = renderError,
+}) => (
+  <ErrorBoundary fallbackRender={erroredRender}>
+    <React.Suspense fallback={loading}>{children}</React.Suspense>
+  </ErrorBoundary>
+);
+
+SuspenseRenderer.Loaders = Loaders;
+
 export const QueryRenderer = ({
   children,
   success = (query) =>
     children?.(query) ||
     children || <pre>{JSON.stringify(query.data, null, 2)}</pre>,
-  errored = ({ error }) =>
-    error && (
-      <Alert severity="error" sx={{ wordWrap: "break-word" }}>
-        {error?.message || "Oops!"}
-      </Alert>
-    ),
+  errored = renderError,
   // errored = (e) => <pre>{JSON.stringify(e, null, 2)}</pre>,
   loaderName = "Backdrop",
   loaderProps,
@@ -69,7 +86,7 @@ export const QueryRenderer = ({
 
   const render = () => {
     if (query.data) return success?.(query);
-    if (query.isLoading) return loading?.(query, loaderProps);
+    if (query.isLoading) return loading?.({ loaderProps });
     if (query.error) return errored?.(query);
   };
 
