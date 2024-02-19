@@ -323,6 +323,42 @@
   "controls.next": {
     "defaultMessage": "Next"
   },
+  "dashboard.cards.ai.empty.perex": {
+    "defaultMessage": "Unlock deeper insights by revealing your Strengths and Values. With added feedback, the insights become even sharper."
+  },
+  "dashboard.cards.ai.empty.steps.explore.title": {
+    "defaultMessage": "Explore uniqueness & get growth tips"
+  },
+  "dashboard.cards.ai.empty.steps.strengths.title": {
+    "defaultMessage": "Assess strengths"
+  },
+  "dashboard.cards.ai.empty.steps.values.title": {
+    "defaultMessage": "Define values"
+  },
+  "dashboard.cards.ai.empty.title": {
+    "defaultMessage": "Insights and daily tips"
+  },
+  "dashboard.cards.ai.insights.animal-spirit.title": {
+    "defaultMessage": "Animal Spirit Guide - Discover the animal that resonates with your leadership persona"
+  },
+  "dashboard.cards.ai.insights.leadership-style.title": {
+    "defaultMessage": "Leadership style analysis - Delve into the leadership approach that aligns with your unique strengths and values."
+  },
+  "dashboard.cards.ai.insights.perex": {
+    "defaultMessage": "Unlock deeper insights by revealing your Strengths and Values. With added feedback, the insights become even sharper."
+  },
+  "dashboard.cards.ai.insights.title": {
+    "defaultMessage": "Insights"
+  },
+  "dashboard.cards.ai.tips.leadership.title": {
+    "defaultMessage": "Leadership Tip - Harness your unique mix of strengths and values with actionable tips to enhance your leadership journey every day."
+  },
+  "dashboard.cards.ai.tips.personal-growth.title": {
+    "defaultMessage": "Personal Growth Tip - A daily dose of surprising facts linked to leadership and self-improvement."
+  },
+  "dashboard.cards.ai.tips.title": {
+    "defaultMessage": "Daily tips"
+  },
   "dashboard.cards.feedback.title": {
     "defaultMessage": "Get feedback"
   },
@@ -433,7 +469,7 @@
     "defaultMessage": "{apiMessage}"
   },
   "dict.error.form.already.submitted.message": {
-    "defaultMessage": "Form already submitted"
+    "defaultMessage": "The form has already been submitted"
   },
   "dict.error.invalid.password.message": {
     "defaultMessage": "{apiMessage}"
