@@ -60,16 +60,16 @@ export const messages = defineMessages({
     defaultMessage:
       "Unlock deeper insights by revealing your Strengths and Values. With added feedback, the insights become even sharper.",
   },
-  "dashboard.cards.ai.empty.steps.0.title": {
-    id: "dashboard.cards.ai.empty.steps.0.title",
+  "dashboard.cards.ai.empty.steps.strengths.title": {
+    id: "dashboard.cards.ai.empty.steps.strengths.title",
     defaultMessage: "Assess strengths",
   },
-  "dashboard.cards.ai.empty.steps.1.title": {
-    id: "dashboard.cards.ai.empty.steps.1.title",
+  "dashboard.cards.ai.empty.steps.values.title": {
+    id: "dashboard.cards.ai.empty.steps.values.title",
     defaultMessage: "Define values",
   },
-  "dashboard.cards.ai.empty.steps.2.title": {
-    id: "dashboard.cards.ai.empty.steps.2.title",
+  "dashboard.cards.ai.empty.steps.explore.title": {
+    id: "dashboard.cards.ai.empty.steps.explore.title",
     defaultMessage: "Explore uniqueness & get growth tips",
   },
   "dashboard.cards.ai.insights.title": {

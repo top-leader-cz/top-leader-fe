@@ -10,6 +10,9 @@ import {
   Chip,
   CircularProgress,
   Grid,
+  Step,
+  StepLabel,
+  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -36,6 +39,7 @@ import { ShowMore } from "../Coaches/CoachCard";
 import { QueryRenderer, SuspenseRenderer } from "../QM/QueryRenderer";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { VerticalStepper } from "../Sessions/VerticalStepper";
+import { useNavigate } from "react-router-dom";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -385,6 +389,8 @@ const TipsInner = ({ data }) => {
 
 const DashboardCardAI = () => {
   const msg = useMsg();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const insightsQuery = useMyQuery({
     queryKey: ["user-insight"],
     fetchDef: { url: `/api/latest/user-insight` },
@@ -393,6 +399,28 @@ const DashboardCardAI = () => {
     queryKey: ["user-insight", "generate-tips"],
     fetchDef: { url: `/api/latest/user-insight/generate-tips` },
   });
+
+  // const assessed = false;
+  // const evaluated = false;
+  const assessed = !!user.data.strengths?.length;
+  const evaluated = !!user.data.values?.length;
+  const switchOrder = evaluated && !assessed;
+  const activeStepIndex = +evaluated + assessed;
+
+  const VALUES_STEP = {
+    label: msg("dashboard.cards.ai.empty.steps.values.title"),
+    onClick: () => navigate(routes.setValues),
+  };
+  const STRENGTHS_STEP = {
+    label: msg("dashboard.cards.ai.empty.steps.strengths.title"),
+    onClick: () => navigate(routes.assessment),
+  };
+  const steps = [
+    ...(switchOrder
+      ? [VALUES_STEP, STRENGTHS_STEP]
+      : [STRENGTHS_STEP, VALUES_STEP]),
+    { label: msg("dashboard.cards.ai.empty.steps.explore.title") },
+  ];
 
   if (
     tipsQuery.data &&
@@ -413,14 +441,25 @@ const DashboardCardAI = () => {
             title={msg("dashboard.cards.ai.empty.title")}
             perex={msg("dashboard.cards.ai.empty.perex")}
           />
-          {/* <VerticalStepper
-            activeStepIndex={1}
-            steps={[
-              { label: msg("dashboard.cards.ai.empty.steps.0.title") },
-              { label: msg("dashboard.cards.ai.empty.steps.1.title") },
-              { label: msg("dashboard.cards.ai.empty.steps.2.title") },
-            ]}
-          /> */}
+          <Stepper activeStep={activeStepIndex} orientation="vertical">
+            {steps.map(({ label, onClick }, index) => {
+              const stepLabelProps =
+                index === activeStepIndex
+                  ? {
+                      sx: {
+                        padding: 0,
+                        cursor: onClick ? "pointer" : "default",
+                      },
+                      onClick: () => onClick?.({ index, activeStepIndex }),
+                    }
+                  : { sx: { padding: 0 } };
+              return (
+                <Step key={label}>
+                  <StepLabel {...stepLabelProps}>{label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
         </CardContent>
       </Card>
     );
