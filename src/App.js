@@ -50,6 +50,7 @@ export default function App({ children = <RouterProvider router={router} /> }) {
   // TODO: extract contexts to be injectable in storybook stories?
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
+      {/* <React.Suspense fallback={<div>Loading...</div>}> */}
       <ThemeProvider theme={theme}>
         <TLIntlProvider>
           <QueryClientProvider client={queryClient}>
@@ -85,6 +86,7 @@ export default function App({ children = <RouterProvider router={router} /> }) {
           </QueryClientProvider>
         </TLIntlProvider>
       </ThemeProvider>
+      {/* </React.Suspense> */}
     </ErrorBoundary>
   );
 }

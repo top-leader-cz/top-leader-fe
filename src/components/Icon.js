@@ -50,6 +50,8 @@ import {
   SettingsOutlined,
   Star,
   Storage,
+  AutoAwesome,
+  ExpandMore,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -104,6 +106,8 @@ const Icons = {
   SettingsOutlined,
   Star,
   Storage,
+  AutoAwesome,
+  ExpandMore,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({
