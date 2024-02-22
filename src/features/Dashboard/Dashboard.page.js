@@ -563,7 +563,6 @@ export function DashboardPage() {
               <DashboardCardValues selectedKeys={user.data.values} />
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
-              {/* <DashboardCardNotes /> */}
               <DashboardCardFeedback />
             </Grid>
             <Grid item xs={12}>
@@ -573,27 +572,6 @@ export function DashboardPage() {
           <H2>
             <Msg id="dashboard.section-1.heading" />
           </H2>
-          {/*
-          <P>
-            <Msg id="dashboard.section-1.perex" />
-          </P>
-          <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-            <DashboardCardAssessment selectedKeys={user.data.strengths} />
-            <DashboardCardValues selectedKeys={user.data.values} />
-            <DashboardCardNotes />
-            <DashboardCardFeedback />
-          </Masonry> */}
-        </Box>
-        <Box>
-          <H2>
-            <Msg id="dashboard.section-2.heading" />
-          </H2>
-          <P>
-            <Msg id="dashboard.section-2.perex" />
-          </P>
-          <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={2} sx={{ mt: 3 }}>
-            <DashboardCardSession selectedKeys={user.data.areaOfDevelopment} />
-          </Masonry>
         </Box>
       </Layout>
     </MsgProvider>
