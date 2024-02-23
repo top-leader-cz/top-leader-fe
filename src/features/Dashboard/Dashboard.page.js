@@ -569,9 +569,6 @@ export function DashboardPage() {
               <DashboardCardAI />
             </Grid>
           </Grid>
-          <H2>
-            <Msg id="dashboard.section-1.heading" />
-          </H2>
         </Box>
       </Layout>
     </MsgProvider>
