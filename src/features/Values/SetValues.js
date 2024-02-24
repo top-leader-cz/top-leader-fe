@@ -48,12 +48,11 @@ const RightMenu = ({ selectedKeys, saveDisabled, onSave }) => {
 
 const useMyValues = () => {
   const valuesDict = useValuesDict();
-  const { user, fetchUser } = useAuth();
+  const { user } = useAuth();
   const { selectedKeys, toggleItem } = useSelection({
     initialValue: user?.data?.values,
   });
 
-  const queryClient = useQueryClient();
   const mutation = useMyMutation({
     fetchDef: {
       method: "POST",
@@ -61,10 +60,13 @@ const useMyValues = () => {
       from: applySpec({ data: prop("selectedKeys") }),
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["values"] });
-      fetchUser();
       navigate(routes.dashboard);
     },
+    invalidate: [
+      { queryKey: ["user-info"] },
+      { queryKey: ["values"] },
+      { queryKey: ["user-insight"] },
+    ],
   });
 
   const navigate = useNavigate();

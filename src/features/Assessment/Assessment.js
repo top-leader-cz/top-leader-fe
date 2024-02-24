@@ -109,7 +109,10 @@ const useSaveStrengthsMutation = ({ onSuccess } = {}) => {
         url: `/api/latest/user-info/strengths`,
         data: { data: orderedTalents },
       }),
-    invalidate: [{ exact: false, queryKey: ["strengths"] }],
+    invalidate: [
+      { exact: false, queryKey: ["strengths"] },
+      { queryKey: ["user-insight"] },
+    ],
     onSuccess: () => {
       deleteAnswersMutation.mutate();
       fetchUser();

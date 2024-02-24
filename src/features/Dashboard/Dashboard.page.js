@@ -1,4 +1,3 @@
-import { Masonry } from "@mui/lab";
 import {
   Accordion,
   AccordionDetails,
@@ -18,28 +17,26 @@ import {
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import { has, pick } from "ramda";
-import React, { Suspense, useMemo, useState } from "react";
+import { always, anyPass, ifElse, map, path, pick, prop } from "ramda";
+import React, { useMemo, useState } from "react";
 import { useIsFetching } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
+import { primary25, primary500 } from "../../theme";
 import { useAuth } from "../Authorization";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { ShowMore } from "../Coaches/CoachCard";
+import { QueryRenderer } from "../QM/QueryRenderer";
 import { useAreas } from "../Sessions/steps/AreaStep";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
-import { primary25, primary500 } from "../../theme";
-import { ShowMore } from "../Coaches/CoachCard";
-import { QueryRenderer, SuspenseRenderer } from "../QM/QueryRenderer";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
-import { VerticalStepper } from "../Sessions/VerticalStepper";
-import { useNavigate } from "react-router-dom";
 
 const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
@@ -85,10 +82,6 @@ const DashboardCardNotes = () => {
   const [note, setNote] = useState(user.data.notes || "");
   const noteMutation = useNoteMutation();
   const isFetchingUser = useIsFetching({ queryKey: ["user-info"] });
-  // useEffect(() => { setNote?.(user.data.notes); }, [user.data.notes])
-
-  // const { isLoading, isFetching, isPending } = noteMutation;
-  // console.log({ isLoading, isFetching, isPending, noteMutation });
 
   return (
     <Card>
@@ -100,7 +93,6 @@ const DashboardCardNotes = () => {
           placeholder={msg("dashboard.cards.notes.placeholder.empty")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          // defaultValue={user.data.notes || ""}
           onBlur={(e) => {
             if (note !== user.data.notes) {
               // TODO: race condition: Cmd+Z + Blur during user loading after save?
@@ -125,40 +117,6 @@ const DashboardCardNotes = () => {
       </CardContent>
     </Card>
   );
-
-  // return (
-  //   <Card>
-  //     <CardContent sx={sx}>
-  //       <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
-  //       <QueryRenderer
-  //         {...noteQuery}
-  //         loading={() => <NotesLoader />}
-  //         success={({ data }) => {
-  //           return (
-  //             <TextField
-  //               multiline
-  //               minRows={18}
-  //               placeholder={msg("dashboard.cards.notes.placeholder.empty")}
-  //               defaultValue={user.data.notes}
-  //               onBlur={(e) => noteMutation.mutate({ note: e.target.value })}
-  //               // sx={
-  //               //   !isLoading
-  //               //     ? undefined
-  //               //     : {
-  //               //         visibility: "hidden",
-  //               //       }
-  //               // }
-  //               // value={note}
-  //               // onChange={(e) => setNote({ note: e.target.value })}
-  //             />
-  //           );
-  //         }}
-  //       />
-  //       {/* {isLoading && <NotesLoader />} */}
-
-  //     </CardContent>
-  //   </Card>
-  // );
 };
 
 const minCardHeight = 215;
@@ -312,11 +270,21 @@ const ExpandableInfoBox = ({ heading, text, showMoreMaxChars = 250 }) => {
   );
 };
 
-const InsightsTipsHeader = ({ title, perex }) => {
+const InsightsTipsHeader = ({ title, perex, isLoading = false }) => {
+  const size = 14;
   return (
     <>
-      <Typography sx={{ mb: 2, color: primary500, fontSize: 14 }}>
-        <Icon name={"AutoAwesome"} sx={{ fontSize: "inherit", mr: 1 }} />
+      <Typography sx={{ mb: 2, color: primary500, fontSize: size }}>
+        {isLoading ? (
+          <CircularProgress
+            color="inherit"
+            size={size - 2}
+            // thickness={2}
+            sx={{ opacity: 0.25, mr: 1 }}
+          />
+        ) : (
+          <Icon name={"AutoAwesome"} sx={{ fontSize: "inherit", mr: 1 }} />
+        )}
         {title}
       </Typography>
       {perex && <Typography sx={{ mb: 2 }}>{perex}</Typography>}
@@ -324,82 +292,24 @@ const InsightsTipsHeader = ({ title, perex }) => {
   );
 };
 
-const hasInsights = (data) =>
-  data.leaderShipStyleAnalysis || data.animalSpiritGuide;
-const InsightsInner = ({ data }) => {
-  const msg = useMsg();
-  // const { data } = useMyQuery({
-  //   suspense: true,
-  //   queryKey: ["user-insight"],
-  //   fetchDef: { url: `/api/latest/user-insight` },
-  // });
+const AIPromptsCategory = ({ title, perex, items = [], isLoading = false }) => {
+  const visibleItems = items.filter(prop("text"));
+  if (!visibleItems.length) return null;
 
-  if (hasInsights(data))
-    return (
-      <>
-        <InsightsTipsHeader
-          title={msg("dashboard.cards.ai.insights.title")}
-          perex={msg("dashboard.cards.ai.insights.perex")}
-        />
-        {data.leaderShipStyleAnalysis && (
-          <ExpandableInfoBox
-            elevation={0}
-            heading={msg("dashboard.cards.ai.insights.leadership-style.title")}
-            text={data.leaderShipStyleAnalysis}
-          />
-        )}
-        {data.animalSpiritGuide && (
-          <ExpandableInfoBox
-            heading={msg("dashboard.cards.ai.insights.animal-spirit.title")}
-            text={data.animalSpiritGuide}
-          />
-        )}
-      </>
-    );
+  return (
+    <Box>
+      <InsightsTipsHeader title={title} perex={perex} isLoading={isLoading} />
+      {visibleItems.map(({ heading, text }) => (
+        <ExpandableInfoBox elevation={0} heading={heading} text={text} />
+      ))}
+    </Box>
+  );
 };
 
-const hasTips = (data) => data.leadershipTip || data.personalGrowthTip;
-const TipsInner = ({ data }) => {
-  const msg = useMsg();
-  // const { data } = useMyQuery({
-  //   suspense: true,
-  //   queryKey: ["user-insight", "generate-tips"],
-  //   fetchDef: { url: `/api/latest/user-insight/generate-tips` },
-  // });
-
-  if (hasTips(data))
-    return (
-      <>
-        <InsightsTipsHeader title={msg("dashboard.cards.ai.tips.title")} />
-        {data.leadershipTip && (
-          <ExpandableInfoBox
-            heading={msg("dashboard.cards.ai.tips.leadership.title")}
-            text={data.leadershipTip}
-          />
-        )}
-        {data.personalGrowthTip && (
-          <ExpandableInfoBox
-            heading={msg("dashboard.cards.ai.tips.personal-growth.title")}
-            text={data.personalGrowthTip}
-          />
-        )}
-      </>
-    );
-};
-
-const DashboardCardAI = () => {
+const UnlockAI = () => {
   const msg = useMsg();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const insightsQuery = useMyQuery({
-    queryKey: ["user-insight"],
-    fetchDef: { url: `/api/latest/user-insight` },
-  });
-  const tipsQuery = useMyQuery({
-    queryKey: ["user-insight", "generate-tips"],
-    fetchDef: { url: `/api/latest/user-insight/generate-tips` },
-  });
-
   // const assessed = false;
   // const evaluated = false;
   const assessed = !!user.data.strengths?.length;
@@ -422,50 +332,61 @@ const DashboardCardAI = () => {
     { label: msg("dashboard.cards.ai.empty.steps.explore.title") },
   ];
 
-  if (
-    tipsQuery.data &&
-    !hasTips(tipsQuery.data) &&
-    insightsQuery.data &&
-    !hasInsights(insightsQuery.data)
-  )
-    return (
-      <Card sx={{ minHeight: 66 }}>
-        <CardContent
-          sx={{
-            position: "relative",
-            height: "100%",
-            minHeight: 66, // just for Grid
-          }}
-        >
-          <InsightsTipsHeader
-            title={msg("dashboard.cards.ai.empty.title")}
-            perex={msg("dashboard.cards.ai.empty.perex")}
-          />
-          <Stepper activeStep={activeStepIndex} orientation="vertical">
-            {steps.map(({ label, onClick }, index) => {
-              const stepLabelProps =
-                index === activeStepIndex
-                  ? {
-                      sx: {
-                        padding: 0,
-                        cursor: onClick ? "pointer" : "default",
-                      },
-                      onClick: () => onClick?.({ index, activeStepIndex }),
-                    }
-                  : { sx: { padding: 0 } };
-              return (
-                <Step key={label}>
-                  <StepLabel {...stepLabelProps}>{label}</StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
-        </CardContent>
-      </Card>
-    );
+  return (
+    <Box>
+      <InsightsTipsHeader
+        title={msg("dashboard.cards.ai.empty.title")}
+        perex={msg("dashboard.cards.ai.empty.perex")}
+      />
+      <Stepper activeStep={activeStepIndex} orientation="vertical">
+        {steps.map(({ label, onClick }, index) => {
+          const stepLabelProps =
+            index === activeStepIndex
+              ? {
+                  sx: {
+                    padding: 0,
+                    cursor: onClick ? "pointer" : "default",
+                  },
+                  onClick: () => onClick?.({ index, activeStepIndex }),
+                }
+              : { sx: { padding: 0 } };
+          return (
+            <Step key={label}>
+              <StepLabel {...stepLabelProps}>{label}</StepLabel>
+            </Step>
+          );
+        })}
+      </Stepper>
+    </Box>
+  );
+};
+
+const anyTruthy = (subProp, propNames, obj) =>
+  anyPass(map((propName) => path([propName, subProp]), propNames))(obj);
+
+const insightsKeys = ["leaderShipStyle", "animalSpirit"];
+const tipsKeys = ["leadershipTip", "personalGrowthTip"];
+const allKeys = [...insightsKeys, ...tipsKeys];
+
+const isGenerating = (data, query) => {
+  if (!data) return false;
+  const isGeneratingResults = anyTruthy("isPending", allKeys, data);
+  console.log("[isGenerating]", { isGeneratingResults, data, query });
+  return isGeneratingResults;
+};
+
+const POLL_INTERVAL = 7 * 1000;
+
+const DashboardCardAI = () => {
+  const msg = useMsg();
+  const insightsQuery = useMyQuery({
+    queryKey: ["user-insight"],
+    fetchDef: { url: `/api/latest/user-insight` },
+    refetchInterval: ifElse(isGenerating, always(POLL_INTERVAL), always(false)),
+    refetchOnWindowFocus: false,
+  });
 
   return (
-    // <UiMaybe.Root>
     <Card sx={{ minHeight: minCardHeight }}>
       <CardContent
         sx={{
@@ -478,13 +399,51 @@ const DashboardCardAI = () => {
           query={insightsQuery}
           loaderName="Skeleton"
           loaderProps={{ rows: 3, sx: { mb: 4 } }}
-          success={({ data }) => <InsightsInner data={data} />}
-        />
-        <QueryRenderer
-          query={tipsQuery}
-          loaderName="Skeleton"
-          loaderProps={{ rows: 3, sx: { mt: 4 } }}
-          success={({ data }) => <TipsInner data={data} />}
+          success={({ data }) =>
+            !anyTruthy("text", allKeys, data) ? (
+              <UnlockAI /> // All empty
+            ) : (
+              // Some data available
+              <Box sx={{ display: "flex", flexFlow: "column nowrap", gap: 1 }}>
+                <AIPromptsCategory
+                  title={msg("dashboard.cards.ai.insights.title")}
+                  perex={msg("dashboard.cards.ai.insights.perex")}
+                  items={[
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.leadership-style.title"
+                      ),
+                      text: data[insightsKeys[0]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.animal-spirit.title"
+                      ),
+                      text: data[insightsKeys[1]]?.text,
+                    },
+                  ]}
+                  isLoading={anyTruthy("isPending", insightsKeys, data)}
+                />
+                <AIPromptsCategory
+                  title={msg("dashboard.cards.ai.tips.title")}
+                  // perex={msg("dashboard.cards.ai.tips.perex")}
+                  items={[
+                    {
+                      heading: msg("dashboard.cards.ai.tips.leadership.title"),
+                      text: data[tipsKeys[0]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.tips.personal-growth.title"
+                      ),
+                      text: data[tipsKeys[1]]?.text,
+                    },
+                  ]}
+                  isLoading={anyTruthy("isPending", tipsKeys, data)}
+                />
+              </Box>
+            )
+          }
         />
         {/* <SuspenseRenderer
           loaderName="Skeleton"
