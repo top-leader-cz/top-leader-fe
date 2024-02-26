@@ -65,6 +65,7 @@ const translateDay = ({
 const DaySlots = ({ dayName, date, selectedDate }) => {
   const msg = useMsg();
   const { i18n } = useContext(I18nContext);
+
   const enabled = useFormContext().watch(enabledName(dayName));
   const dayLabel = translateDay({
     dayIndex: INDEX_TO_DAY.findIndex((name) => name === dayName),
@@ -73,7 +74,12 @@ const DaySlots = ({ dayName, date, selectedDate }) => {
   });
   const isSelected = selectedDate && date && isSameDay(selectedDate, date);
   const referenceDate =
-    date || getDayInReferenceWeek({ dayName, referenceDate: date });
+    date ||
+    getDayInReferenceWeek({
+      dayName,
+      referenceDate: date,
+      weekStartsOn: i18n.weekStartsOn,
+    });
 
   // console.log("[DaySlots.rndr]", { date, dayName, enabled });
 
@@ -151,23 +157,46 @@ export const FIELDS_AVAILABILITY = {
   recurrenceRange: "recurrenceRange",
 };
 
-const getDayInReferenceWeek = ({ dayName, referenceDate } = {}) => {
+const getDayInReferenceWeek = ({
+  dayName,
+  referenceDate,
+  weekStartsOn,
+} = {}) => {
   const refDate = new Date(referenceDate || new Date());
   const targetDayIndex = INDEX_TO_DAY.findIndex((name) => name === dayName);
+  const weekDate = setDay(refDate, targetDayIndex, { weekStartsOn });
 
-  return setDay(refDate, targetDayIndex);
+  console.log("[getDayInReferenceWeek]", dayName, {
+    weekStartsOn,
+    refDate,
+    targetDayIndex,
+    weekDate,
+    dayName,
+    referenceDate,
+  });
+
+  return weekDate;
 };
-const getReferenceDate = ({ dayName, referenceWeekDate } = {}) => {
+const getReferenceDate = ({
+  dayName,
+  referenceWeekDate,
+  weekStartsOn = 0, // default
+} = {}) => {
   if (!dayName) return new Date();
 
-  return getDayInReferenceWeek({ dayName, referenceDate: referenceWeekDate });
+  return getDayInReferenceWeek({
+    dayName,
+    referenceDate: referenceWeekDate,
+    weekStartsOn,
+  });
 };
 
 export const getDateTime = ({
   time = "09:00:00",
   day,
   dayName = day,
-  referenceDate = getReferenceDate({ dayName }),
+  weekStartsOn,
+  referenceDate = getReferenceDate({ dayName, weekStartsOn }),
 }) => parse(time, API_TIME_FORMAT, referenceDate);
 
 const to = (
@@ -187,15 +216,26 @@ const to = (
 
     if (!ranges.length) {
       // No ranges for this day
+      // if (events?.length && (dayName === "SUNDAY" || dayName === "SATURDAY"))
+      //   debugger; // TODO
       const referenceDate = getReferenceDate({
         dayName,
+        weekStartsOn: i18n.weekStartsOn,
         referenceWeekDate: addDays(2, recurrenceRangeInitialValue.start), // SUN/MON
       });
       return {
         [enabledName(dayName)]: false,
         [dayRangesName(dayName)]: [
-          getDateTime({ time: "09:00:00", referenceDate }),
-          getDateTime({ time: "17:00:00", referenceDate }),
+          getDateTime({
+            time: "09:00:00",
+            referenceDate,
+            weekStartsOn: i18n.weekStartsOn,
+          }),
+          getDateTime({
+            time: "17:00:00",
+            referenceDate,
+            weekStartsOn: i18n.weekStartsOn,
+          }),
         ],
       };
     }

@@ -197,7 +197,7 @@ export const useNonRecurringAvailabilityMutation = () => {
             from: prop("start"),
             to: prop("end"),
           }),
-          map(pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })))
+          map(createApiDayTimeStr({ timeZone: userTz }))
         ),
         events: (formValues) =>
           toApiIntervals({
