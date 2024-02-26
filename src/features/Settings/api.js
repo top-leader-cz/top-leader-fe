@@ -1,5 +1,5 @@
 import { formatInTimeZone } from "date-fns-tz/fp";
-import { format, getDay, isValid, startOfDay } from "date-fns/fp";
+import { format, getDay, isValid } from "date-fns/fp";
 import {
   all,
   allPass,
@@ -68,10 +68,7 @@ export const useNonRecurringAvailabilityQuery = ({
   const qParams = useMemo(() => {
     // console.log("%cMemoising", "color:pink", { timeZone: timeZone, start: start?.toISOString?.(), end: end?.toISOString?.(), });
     return pipe(
-      when(
-        all(allPass([isValid])),
-        map(pipe(startOfDay, createApiDayTimeStr({ timeZone })))
-      ),
+      when(all(allPass([isValid])), map(createApiDayTimeStr({ timeZone }))),
       ([from, to]) => ({ from, to })
     )([start, end]);
   }, [end?.toISOString?.(), start?.toISOString?.(), timeZone]);
