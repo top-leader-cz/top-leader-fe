@@ -1,9 +1,9 @@
 import { Alert, Box } from "@mui/material";
 // import { TimePicker } from "@mui/x-date-pickers";
 import { getDay, parse, parseISO, setDay } from "date-fns";
-import { eachDayOfInterval, isSameDay } from "date-fns/fp";
-import { chain, map, pipe } from "ramda";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { addDays, eachDayOfInterval, isSameDay } from "date-fns/fp";
+import { chain, identity, map, pipe, prop } from "ramda";
+import { useContext, useEffect, useMemo } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
   CheckboxField,
@@ -16,6 +16,7 @@ import { useRightMenu } from "../../components/Layout";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { I18nContext } from "../I18n/I18nProvider";
 import { API_TIME_FORMAT } from "../I18n/utils/date";
 import { QueryRenderer } from "../QM/QueryRenderer";
@@ -29,7 +30,6 @@ import {
   useRecurringAvailabilityMutation,
   useRecurringAvailabilityQuery,
 } from "./api";
-import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 
 export const INDEX_TO_DAY = [
   "SUNDAY", // 0
@@ -75,7 +75,7 @@ const DaySlots = ({ dayName, date, selectedDate }) => {
   const referenceDate =
     date || getDayInReferenceWeek({ dayName, referenceDate: date });
 
-  // console.log("[DaySlots.rndr]", dayName, enabled);
+  // console.log("[DaySlots.rndr]", { date, dayName, enabled });
 
   return (
     <FieldLayout
@@ -101,18 +101,6 @@ const DaySlots = ({ dayName, date, selectedDate }) => {
         {enabled ? (
           <TimeRangesPickerField
             name={dayRangesName(dayName)}
-            // rules={{
-            //   validate: {
-            //     myvalidation: (a, b, c) => {
-            //       console.log("validate", { a, b, c });
-            //       debugger;
-            //     },
-            //   },
-            //   validate: (a, b, c) => {
-            //     console.log("validate", { a, b, c });
-            //     debugger;
-            //   },
-            // }}
             inputProps={{ sx: { ...WHITE_BG, width: 140 } }}
             referenceDate={referenceDate}
           />
@@ -169,10 +157,10 @@ const getDayInReferenceWeek = ({ dayName, referenceDate } = {}) => {
 
   return setDay(refDate, targetDayIndex);
 };
-const getReferenceDate = ({ dayName } = {}) => {
+const getReferenceDate = ({ dayName, referenceWeekDate } = {}) => {
   if (!dayName) return new Date();
 
-  return getDayInReferenceWeek({ dayName });
+  return getDayInReferenceWeek({ dayName, referenceDate: referenceWeekDate });
 };
 
 export const getDateTime = ({
@@ -187,6 +175,8 @@ const to = (
   { recurring, recurrenceRange } = {},
   { i18n } = {}
 ) => {
+  const recurrenceRangeInitialValue =
+    recurrenceRange ?? parseWeek({ i18n }, new Date());
   const daysValues = DAY_NAMES.map((dayName) => {
     const ranges = events?.filter(({ from }) => from?.day === dayName) || [];
     if (ranges.some(({ from, to }) => from.day !== to.day)) {
@@ -195,26 +185,26 @@ const to = (
     }
     // const range = ranges[0]; // TODO: multi + nonrecurring
 
-    if (!ranges.length)
+    if (!ranges.length) {
+      // No ranges for this day
+      const referenceDate = getReferenceDate({
+        dayName,
+        referenceWeekDate: addDays(2, recurrenceRangeInitialValue.start), // SUN/MON
+      });
       return {
         [enabledName(dayName)]: false,
         [dayRangesName(dayName)]: [
-          getDateTime({ time: "09:00:00", day: dayName }),
-          getDateTime({ time: "17:00:00", day: dayName }),
+          getDateTime({ time: "09:00:00", referenceDate }),
+          getDateTime({ time: "17:00:00", referenceDate }),
         ],
       };
-
-    // debugger;
+    }
 
     return {
       [enabledName(dayName)]: true,
-      // [dayRangesName(dayName)]: [
-      //   getDateTime({ time: range.from.time, dayName }),
-      //   getDateTime({ time: range.to.time, dayName }),
-      // ],
       [dayRangesName(dayName)]: pipe(
         chain(({ from, to }) => [from, to]),
-        map(getDateTime)
+        map(recurring ? getDateTime : prop("nonRecurringDate"))
       )(ranges),
     };
   }).reduce((acc, values) => {
@@ -224,11 +214,14 @@ const to = (
   // debugger;
   const initialValues = {
     [FIELDS_AVAILABILITY.recurring]: isRec,
-    recurrenceRange: recurrenceRange ?? parseWeek({ i18n }, new Date()),
+    recurrenceRange: recurrenceRangeInitialValue,
     ...daysValues,
   };
 
-  console.log("%c[to]", "color:skyblue", {
+  console.log("%c[AvailabilitySettings.to]", "color:skyblue", {
+    daysValues,
+    recurrenceRange,
+    recurrenceRangeInitialValue,
     isRec,
     recurring,
     events,
@@ -238,7 +231,7 @@ const to = (
   return initialValues;
 };
 
-const parseEvent = (str = "") => {
+const parseNonRecurringEvent = (str = "") => {
   // "2023-10-19T17:00:00"
   const date = parseISO(str);
   const dayIndex = getDay(date);
@@ -246,6 +239,7 @@ const parseEvent = (str = "") => {
   const obj = {
     day: INDEX_TO_DAY[dayIndex],
     time: str.substring(11),
+    nonRecurringDate: date,
   };
   return obj;
 };
@@ -298,7 +292,7 @@ export const AvailabilitySettings = () => {
     const fixNonRecurringEvents = (events) => {
       if (!events?.length) return events;
       if (typeof events[0]?.from === "string")
-        return events.map(map(parseEvent));
+        return events.map(map(parseNonRecurringEvent));
       return events;
     };
     const initialValues = Array.isArray(query.data)

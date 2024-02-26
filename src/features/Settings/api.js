@@ -5,16 +5,14 @@ import {
   allPass,
   applySpec,
   chain,
+  filter,
   map,
-  pick,
   pipe,
   prop,
   splitEvery,
-  tap,
   when,
 } from "ramda";
-import { useCallback, useContext, useEffect, useMemo } from "react";
-import { useQueryClient } from "react-query";
+import { useContext, useMemo } from "react";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { API_DATETIME_LOCAL_FORMAT, padLeft } from "../Availability/api";
 import { I18nContext } from "../I18n/I18nProvider";
@@ -56,10 +54,8 @@ const createApiDayTimeStr =
   ({ timeZone }) =>
   (date) => {
     if (!date || !timeZone) return "";
-    // const iso = formatISO(date);
-    // const formatted = format(API_DATETIME_LOCAL_FORMAT, date);
     const local = formatInTimeZone(API_DATETIME_LOCAL_FORMAT, timeZone, date);
-    // debugger;
+    // if (debug) debugger;
     return local;
   };
 
@@ -74,24 +70,12 @@ export const useNonRecurringAvailabilityQuery = ({
     return pipe(
       when(
         all(allPass([isValid])),
-        map(
-          pipe(
-            startOfDay,
-            // tap(log(1)),
-            createApiDayTimeStr({ timeZone })
-            // tap(log(2))
-          )
-        )
+        map(pipe(startOfDay, createApiDayTimeStr({ timeZone })))
       ),
       ([from, to]) => ({ from, to })
     )([start, end]);
   }, [end?.toISOString?.(), start?.toISOString?.(), timeZone]);
-  console.log("useNonRecurringAvailabilityQuery", {
-    start,
-    end,
-    qParams,
-    enabled,
-  });
+  // console.log("useNonRecurringAvailabilityQuery", { start, end, qParams, enabled, });
   // if (start) debugger;
   const query = useMyQuery({
     enabled: enabled && !!start && !!end,
@@ -133,13 +117,13 @@ const createApiDayTimeObj =
   };
 
 const toApiIntervals = ({ formValues, mapper }) => {
-  const byDay = DAY_NAMES.map((dayName) => ({
-    dayName,
-    enabled: formValues[enabledName(dayName)],
-    dayRanges: formValues[dayRangesName(dayName)],
-  })).filter(({ enabled } = {}) => enabled);
-
   const intervals = pipe(
+    map((dayName) => ({
+      dayName,
+      enabled: formValues[enabledName(dayName)],
+      dayRanges: formValues[dayRangesName(dayName)],
+    })),
+    filter(({ enabled } = {}) => enabled),
     chain(({ dayRanges }) => {
       if (dayRanges.some((date) => !isValid(date))) {
         console.error({
@@ -158,14 +142,14 @@ const toApiIntervals = ({ formValues, mapper }) => {
       // TODO: validate multiple ranges
       return dayRanges;
     }),
-    tap(log("toApiIntervals - 1")), // TODO: adjust intervals overlapping weeks
+    // tap(log("toApiIntervals - 1")), // TODO: adjust intervals overlapping weeks
     map(mapper),
-    tap(log("toApiIntervals - 2")),
+    // tap(log("toApiIntervals - 2")),
     splitEvery(2),
-    tap(log("toApiIntervals - 3")),
-    map(([from, to]) => ({ from, to })),
-    tap(log("toApiIntervals - 4"))
-  )(byDay);
+    // tap(log("toApiIntervals - 3")),
+    map(([from, to]) => ({ from, to }))
+    // tap(log("toApiIntervals - 4"))
+  )(DAY_NAMES);
   // debugger;
 
   return intervals;
@@ -173,23 +157,17 @@ const toApiIntervals = ({ formValues, mapper }) => {
 
 export const useRecurringAvailabilityMutation = () => {
   const { i18n, userTz } = useContext(I18nContext);
-  const queryClient = useQueryClient();
   const mutation = useMyMutation({
-    debug: true,
     fetchDef: {
       method: "POST",
       url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.RECURRING}`,
       from: (formValues) =>
         toApiIntervals({ formValues, mapper: createApiDayTimeObj({ i18n }) }),
     },
-    onSuccess: useCallback(
-      (data) => {
-        console.log("mutation.onSuccess", data);
-        queryClient.removeQueries({ queryKey: ["coach-availability"] });
-        queryClient.removeQueries({ queryKey: ["coaches"] });
-      },
-      [queryClient]
-    ),
+    invalidate: [
+      { queryKey: ["coach-availability"] },
+      { queryKey: ["coaches"] },
+    ],
   });
 
   return mutation;
@@ -208,16 +186,13 @@ export const useRecurringAvailabilityMutation = () => {
 
 export const useNonRecurringAvailabilityMutation = () => {
   const { i18n, userTz } = useContext(I18nContext);
-  const queryClient = useQueryClient();
   const mutation = useMyMutation({
     fetchDef: {
       method: "POST",
       url: `/api/latest/coach-availability/${AVAILABILITY_TYPE.NON_RECURRING}`,
-      // from: (values) => { const { from, to } = values[FIELDS_AVAILABILITY.recurrenceRange]; return { timeFrame: map( pipe(startOfDay, createApiDayTimeStr({ timeZone: userTz })) // TODO: validate )({ from, to }), events: toApiIntervals({ formValues: values, i18n, userTz, mapper: createApiDayTimeStr({ timeZone: userTz }), }), }; },
       from: applySpec({
         timeFrame: pipe(
           prop(FIELDS_AVAILABILITY.recurrenceRange),
-          // pick(["from", "to"]),
           applySpec({
             from: prop("start"),
             to: prop("end"),
@@ -231,14 +206,10 @@ export const useNonRecurringAvailabilityMutation = () => {
           }),
       }),
     },
-    onSuccess: useCallback(
-      (data) => {
-        console.log("mutation.onSuccess", data);
-        queryClient.removeQueries({ queryKey: ["coach-availability"] });
-        queryClient.removeQueries({ queryKey: ["coaches"] });
-      },
-      [queryClient]
-    ),
+    invalidate: [
+      { queryKey: ["coach-availability"] },
+      { queryKey: ["coaches"] },
+    ],
   });
 
   return mutation;
