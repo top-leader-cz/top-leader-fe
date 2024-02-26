@@ -18,7 +18,7 @@ import {
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { always, anyPass, ifElse, map, path, pick, prop } from "ramda";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useIsFetching } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
@@ -300,7 +300,12 @@ const AIPromptsCategory = ({ title, perex, items = [], isLoading = false }) => {
     <Box>
       <InsightsTipsHeader title={title} perex={perex} isLoading={isLoading} />
       {visibleItems.map(({ heading, text }) => (
-        <ExpandableInfoBox elevation={0} heading={heading} text={text} />
+        <ExpandableInfoBox
+          key={heading}
+          elevation={0}
+          heading={heading}
+          text={text}
+        />
       ))}
     </Box>
   );
@@ -371,7 +376,7 @@ const allKeys = [...insightsKeys, ...tipsKeys];
 const isGenerating = (data, query) => {
   if (!data) return false;
   const isGeneratingResults = anyTruthy("isPending", allKeys, data);
-  console.log("[isGenerating]", { isGeneratingResults, data, query });
+  // console.log("[isGenerating]", { isGeneratingResults, data, query });
   return isGeneratingResults;
 };
 
@@ -379,12 +384,32 @@ const POLL_INTERVAL = 7 * 1000;
 
 const DashboardCardAI = () => {
   const msg = useMsg();
+  // Does not return anything, BE side effect to trigger generation
+  const generateQuery = useMyQuery({
+    queryKey: ["user-insight", "generate-tips"],
+    fetchDef: {
+      url: `/api/latest/user-insight/generate-tips`,
+      to: always({ TODO: "@JK" }),
+    },
+    // refetch* apply only to stale query:
+    // refetchOnMount: false,
+    // refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
+
+    staleTime: 8 * 60 * 60 * 1000,
+    cacheTime: Infinity, // never garbage collect inactive query
+  });
   const insightsQuery = useMyQuery({
+    enabled: !generateQuery.isLoading,
     queryKey: ["user-insight"],
     fetchDef: { url: `/api/latest/user-insight` },
     refetchInterval: ifElse(isGenerating, always(POLL_INTERVAL), always(false)),
     refetchOnWindowFocus: false,
   });
+
+  // prettier-ignore
+  // useEffect( () => () => { console.log("%c[DashboardCardAI.unmounting]", "color:pink;");  }, [] );
+  // console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
 
   return (
     <Card sx={{ minHeight: minCardHeight }}>
@@ -491,6 +516,9 @@ export function DashboardPage() {
   const { username, firstName } = user.data;
   const displayName = firstName || username;
   // console.log("[Dashboard.rndr]", { user });
+
+  // prettier-ignore
+  // useEffect( () => () => { console.log("%c[DashboardPage.unmounting]", "color:pink;");  }, [] );
 
   return (
     <MsgProvider messages={messages}>

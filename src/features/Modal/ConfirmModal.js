@@ -154,8 +154,14 @@ export const TLSnackbar = ({ open, onClose, type, ...rest }) => {
   );
 };
 
-export const ModalCtx = React.createContext({});
-export const SnackbarCtx = React.createContext({});
+export const ModalCtx = React.createContext({
+  updateItem: () => console.error("[ModalCtx.updateItem] missing context"),
+  destroyItem: () => console.error("[ModalCtx.destroyItem] missing context"),
+});
+export const SnackbarCtx = React.createContext({
+  updateItem: () => console.error("[SnackbarCtx.updateItem] missing context"),
+  destroyItem: () => console.error("[SnackbarCtx.destroyItem] missing context"),
+});
 
 const ACTION = {
   UPDATE: "UPDATE",
