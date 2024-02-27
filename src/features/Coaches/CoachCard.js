@@ -164,7 +164,14 @@ export const CoachCard = ({
   return (
     <>
       <Card sx={{ ...sx }} ref={elementRef}>
-        <CardContent sx={{ display: "flex", gap: 3, p: 3 }}>
+        <CardContent
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 3,
+            p: 3,
+          }}
+        >
           <Box
             sx={{
               borderRadius: 0.6,
@@ -194,7 +201,9 @@ export const CoachCard = ({
               gap: 3,
               width: "100%",
               // justifyContent: "space-around",
-              justifyContent: "flex-end",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: { xs: "flex-start", md: "flex-end" },
+              justifyContent: { xs: "center", md: "flex-end" },
               // justifyContent: "flex-start",
             }}
           >
@@ -204,7 +213,7 @@ export const CoachCard = ({
                 maxBioChars={50}
                 sx={{
                   flexGrow: 2,
-                  width: "280px",
+                  width: { md: "280px" },
                   maxWidth: "100%",
                 }}
               />
@@ -217,7 +226,7 @@ export const CoachCard = ({
                 onPick={pickCoach.onPick}
                 pickPending={pickCoach.pickPending}
                 fetchDisabled={!wasVisible}
-                sx={{ alignSelf: "end" }}
+                sx={{ alignSelf: { xs: "auto", md: "end" } }}
               />
             </ErrorBoundary>
           </Box>

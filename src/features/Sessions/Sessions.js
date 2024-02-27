@@ -64,7 +64,7 @@ export const ActionStepsReadOnly = ({
   ),
 }) => {
   return (
-    <>
+    <Box sx={{ maxWidth: { xs: 200, sm: 250, md: 350, lg: 450, xl: 750 } }}>
       {heading}
       <ul style={{ paddingLeft: "24px", color: "#667085" /* gray/500 */ }}>
         {steps.map(({ id, label, date, checked }, i) => {
@@ -83,7 +83,7 @@ export const ActionStepsReadOnly = ({
           );
         })}
       </ul>
-    </>
+    </Box>
   );
 };
 
@@ -124,13 +124,25 @@ const SessionCard = ({
         disableRipple
         // href={id ? parametrizedRoutes.editSession({ id }) : undefined}
       >
-        <CardContent sx={{ display: "flex", flexDirection: "row" }}>
+        <CardContent
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+          }}
+        >
           <Box>
             <P>{formattedDate}&nbsp;-&nbsp;</P>
           </Box>
           <Box sx={{ width: "100%" }}>
             <P>{translateSessionType({ type, msg })}</P>
-            <Box sx={{ display: "flex", mt: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+                mt: 3,
+              }}
+            >
               <SessionCardIconTile
                 iconName={"InsertChart"}
                 caption={msg("sessions.edit.steps.align.area.caption")}
@@ -224,13 +236,11 @@ function Sessions() {
         <Header text={<Msg id="sessions.heading" />} />
         <QueryRenderer
           query={sessionsQuery}
-          success={() => (
-            <ErrorBoundary>
-              {sel.all?.map((session) => (
-                <SessionCard key={session.id} session={session} />
-              ))}
-            </ErrorBoundary>
-          )}
+          success={() =>
+            sel.all?.map((session) => (
+              <SessionCard key={session.id} session={session} />
+            ))
+          }
         />
       </Layout>
     </MsgProvider>

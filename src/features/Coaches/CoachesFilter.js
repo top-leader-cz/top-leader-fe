@@ -129,7 +129,10 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
       <Card sx={{ ...sx }}>
         <CardContent sx={{ "&:last-child": { pb: 2 } }}>
           {/* <Box display="flex" flexDirection="row" gap={3}> */}
-          <Stack direction="row" spacing={2}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={{ xs: 4, md: 2 }}
+          >
             <AutocompleteSelect
               name="languages"
               label={msg("coaches.filter.language.label")}

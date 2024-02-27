@@ -241,6 +241,7 @@ export const Layout = ({
           display: "flex",
           bgcolor: gray50,
           minHeight: "100%",
+          overflow: "auto",
         }}
       >
         <SideMenu
