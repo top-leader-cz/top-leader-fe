@@ -404,12 +404,13 @@ const DashboardCardAI = () => {
     queryKey: ["user-insight"],
     fetchDef: { url: `/api/latest/user-insight` },
     refetchInterval: ifElse(isGenerating, always(POLL_INTERVAL), always(false)),
-    refetchOnWindowFocus: false,
+    // refetchOnWindowFocus: false,
   });
 
   // prettier-ignore
-  // useEffect( () => () => { console.log("%c[DashboardCardAI.unmounting]", "color:pink;");  }, [] );
-  // console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
+  useEffect( () => () => { console.log("%c[DashboardCardAI.eff.unmounting] in React.StrictMode mode executes nested tree queries twice, but user-info query once", "color:pink;");  }, [] );
+  // prettier-ignore
+  if (process.env.NODE_ENV === "development") console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
 
   return (
     <Card sx={{ minHeight: minCardHeight }}>

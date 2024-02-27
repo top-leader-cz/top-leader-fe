@@ -48,6 +48,7 @@ import {
   useAvailabilityQueries,
   usePickSlotMutation,
 } from "./api";
+import { isToday } from "date-fns";
 
 const HEADER_FORMAT = "d MMM";
 
@@ -179,7 +180,7 @@ export const AvailabilityCalendar = ({
           variant="outlined"
           size="small"
           sx={{ color: "inherit" }}
-          onClick={createAddOffset(-3)}
+          onClick={createAddOffset(-visibleDaysCount)}
         >
           <Icon name={"KeyboardDoubleArrowLeft"} />
         </IconButton>
@@ -198,7 +199,7 @@ export const AvailabilityCalendar = ({
           variant="outlined"
           size="small"
           sx={{ color: "inherit" }}
-          onClick={createAddOffset(3)}
+          onClick={createAddOffset(visibleDaysCount)}
         >
           <Icon name={"KeyboardDoubleArrowRight"} />
         </IconButton>
@@ -234,10 +235,13 @@ export const AvailabilityCalendar = ({
               <Box
                 sx={{
                   p: 0.5,
-                  pb: 1,
+                  pb: 0.5,
+                  mb: 0.5,
                   position: "relative",
                   textAlign: "center",
                   width: cellWidth,
+                  border: isToday(date) ? "1px solid #DAD2F1" : "none",
+                  borderRadius: 1
                 }}
               >
                 {i18n.formatLocal(date, "E")}

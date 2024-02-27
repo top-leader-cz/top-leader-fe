@@ -371,8 +371,10 @@ export function AuthProvider({ children }) {
     queryKey: ["user-info"],
     queryFn: () => _fetchUser({ authFetch }),
     enabled: !!isLoggedIn,
-    retry: false,
+    // retry: false,
     // retryOnMount: false,
+    // refetchOnMount: false,
+    refetchOnWindowFocus: false,
     onError: (e) => {
       console.log("%c[AuthProvider.userQuery.onError]", "color:coral", { e });
       // if (e?.response?.status === 401) signout(); // TODO: move to authFetch?

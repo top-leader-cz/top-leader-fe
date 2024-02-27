@@ -167,6 +167,7 @@ export const useSessionsQuery = (rest = {}) => {
       url: `/api/latest/history/USER_SESSION`,
       to: sort(descend(prop("createdAt"))),
     },
+    refetchOnWindowFocus: false,
     ...rest,
   });
   return query;

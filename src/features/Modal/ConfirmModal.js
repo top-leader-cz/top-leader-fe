@@ -22,6 +22,7 @@ import {
   reject,
 } from "ramda";
 import React, {
+  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -154,11 +155,11 @@ export const TLSnackbar = ({ open, onClose, type, ...rest }) => {
   );
 };
 
-export const ModalCtx = React.createContext({
+export const ModalCtx = createContext({
   updateItem: () => console.error("[ModalCtx.updateItem] missing context"),
   destroyItem: () => console.error("[ModalCtx.destroyItem] missing context"),
 });
-export const SnackbarCtx = React.createContext({
+export const SnackbarCtx = createContext({
   updateItem: () => console.error("[SnackbarCtx.updateItem] missing context"),
   destroyItem: () => console.error("[SnackbarCtx.destroyItem] missing context"),
 });
@@ -193,10 +194,9 @@ export const mapModalExtraProps = ({ buttons, getButtons }, { onClose }) => ({
   buttons: getButtons?.({ onClose }) || buttons,
 });
 
-export const mapSnackbarExtraProps = (item, { onClose }) => ({});
-
 export const StackProvider = ({
-  Ctx = ModalCtx,
+  // Ctx = ModalCtx, // console warning: Rendering <Context.Consumer.Provider> is not supported and will be removed in a future major release. Did you mean to render <Context.Provider> instead?
+  Provider = ModalCtx.Provider,
   ItemComponent = ConfirmModal,
   logAs = "StackProvider",
   children,
@@ -246,17 +246,17 @@ export const StackProvider = ({
     }),
     []
   );
-  console.log(`[${logAs}.rndr]`, { Ctx, ctx, stack, ItemComponent });
+  // console.log(`[${logAs}.rndr]`, { Ctx, ctx, stack, ItemComponent });
 
   return (
-    <Ctx.Provider value={ctx}>
+    <Provider value={ctx}>
       {children}
       <div style={{ position: "absolute" }}>
         {stack.map((item) => (
           <ItemComponent {...mapProps(item)} />
         ))}
       </div>
-    </Ctx.Provider>
+    </Provider>
   );
 };
 
