@@ -1752,6 +1752,12 @@
   "dict.values.fitness.name": {
     "defaultMessage": "Fitness"
   },
+  "dict.values.freedom.description": {
+    "defaultMessage": "Freedom is the breath of creativity and innovation. It's about having the space to explore new ideas, express oneself, and make choices that align with one's deepest values and desires. In a setting where freedom is cherished, individuals are empowered to take initiative and drive change, leading to personal growth and collective advancement. Freedom fosters a culture of trust and respect, where constraints are minimized, and possibilities are endless. It encourages a sense of adventure and exploration, allowing people and ideas to flourish. Embracing freedom means embracing diversity and the unique contributions each person brings to the table, creating a vibrant and dynamic environment."
+  },
+  "dict.values.freedom.name": {
+    "defaultMessage": "Freedom"
+  },
   "dict.values.health.description": {
     "defaultMessage": "Healthy people are the basis of healthy societies and economies. It's wise not to take health for granted. As long as we feel good and have no pain, we usually don't think about health. Yet, once something goes wrong, we realize how important health actually is, especially when we are taking care of others and they depend on us. This is why health is one of the top values for many of us. If we're not ok, all other values like family, relationships, etc. are negatively effected. Keep taking care of your vitality."
   },
