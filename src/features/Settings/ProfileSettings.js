@@ -1,4 +1,4 @@
-import { Alert, Box, Chip } from "@mui/material";
+import { Alert, Box, Button, Chip } from "@mui/material";
 import { formatInTimeZone } from "date-fns-tz/fp";
 import { isValid, parse } from "date-fns/fp";
 import {
@@ -36,6 +36,8 @@ import { WHITE_BG } from "./Settings.page";
 import { useFieldsDict } from "./useFieldsDict";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { invalidDate } from "../../components/Forms/validations";
+import { Icon } from "../../components/Icon";
+import { messages } from "./messages";
 
 const FIELDS = {
   firstName: "firstName",
@@ -44,6 +46,7 @@ const FIELDS = {
   imageSrc: "imageSrc", // TODO: extract "upload component" and "upload form field"
   bio: "bio",
   webLink: "webLink",
+  linkedinProfile: "linkedinProfile",
   languages: "languages",
   fields: "fields",
   certificates: "certificates",
@@ -106,6 +109,30 @@ export const useResetForm = ({ to, form, initialResetting }) => {
     resetting,
     resetForm,
   };
+};
+
+export const LinkedInProfileMaybe = ({ href }) => {
+  const msg = useMsg({ dict: messages });
+
+  if (!href) return null;
+
+  return (
+    <Button
+      type="button"
+      variant="text"
+      // color="secondary"
+      sx={{ my: 3, alignSelf: "flex-start", color: "black" }}
+      href={href}
+      startIcon={<Icon name="LinkedIn" />}
+      // endIcon={<Icon name="OpenInNew" sx={{ fontSize: 14 }} />}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {msg("settings.profile.field.linkedinProfile")}
+      &nbsp;
+      <Icon name="OpenInNew" sx={{ fontSize: "inherit" || 14 }} />
+    </Button>
+  );
 };
 
 export const ProfileSettings = () => {
@@ -188,8 +215,8 @@ export const ProfileSettings = () => {
     experienceSince: form.watch("experienceSince"),
   });
 
-  const onError = (errors, e) =>
-    console.log("[ProfileSettings.onError]", errors, e);
+  const onError = (errors, e, ...rest) =>
+    console.log("[ProfileSettings.onError]", { errors, e, rest });
 
   const saveDisabled = saveMutation.isLoading || !!initialValuesQuery.error;
   useRightMenu(
@@ -266,23 +293,25 @@ export const ProfileSettings = () => {
                 />
               ))}
           </Box>
+          <LinkedInProfileMaybe href={COACH.linkedinProfile} />
         </ScrollableRightMenu>
       ),
       [
-        COACH.bio,
+        msg,
+        saveDisabled,
+        reloadPhotoToken,
+        COACH.webLink,
+        COACH.firstName,
+        COACH.lastName,
         COACH.certificates,
         COACH.experienceSince,
-        COACH.fields,
-        COACH.firstName,
-        COACH.webLink,
         COACH.languages,
-        COACH.lastName,
+        COACH.bio,
+        COACH.fields,
+        COACH.linkedinProfile,
+        i18n,
         fieldsOptions,
         form,
-        i18n,
-        msg,
-        reloadPhotoToken,
-        saveDisabled,
         saveMutation.mutateAsync,
       ]
     )
@@ -342,7 +371,7 @@ export const ProfileSettings = () => {
           name={FIELDS.email}
           autoComplete="email"
           parametrizedValidate={[
-            ["required"],
+            // ["required"], // not required, user.data?.username always present
             [
               "rePattern",
               { regexpToMatch: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i },
@@ -374,6 +403,17 @@ export const ProfileSettings = () => {
         <BareInputField
           name={FIELDS.webLink}
           placeholder={msg("settings.profile.field.webLink.placeholder")}
+        />
+      </FormRow>
+      <FormRow
+        label={msg("settings.profile.field.linkedinProfile")}
+        name={FIELDS.linkedinProfile}
+      >
+        <BareInputField
+          name={FIELDS.linkedinProfile}
+          placeholder={msg(
+            "settings.profile.field.linkedinProfile.placeholder"
+          )}
         />
       </FormRow>
 

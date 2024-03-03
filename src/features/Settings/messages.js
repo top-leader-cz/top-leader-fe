@@ -62,6 +62,14 @@ export const messages = defineMessages({
     id: "settings.profile.field.webLink.placeholder",
     defaultMessage: "https://",
   },
+  "settings.profile.field.linkedinProfile": {
+    id: "settings.profile.field.linkedinProfile",
+    defaultMessage: "LinkedIn profile",
+  },
+  "settings.profile.field.linkedinProfile.placeholder": {
+    id: "settings.profile.field.linkedinProfile.placeholder",
+    defaultMessage: "https://",
+  },
   "settings.profile.field.timezone": {
     id: "settings.profile.field.timezone",
     defaultMessage: "Timezone",

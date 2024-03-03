@@ -506,6 +506,7 @@
   "settings.profile.field.rate": "Rate",
   "settings.profile.field.webLink": "Videovorstellung",
   "settings.profile.field.webLink.placeholder": "https://",
+  "settings.profile.field.linkedinProfile": "LinkedIn-Profil",
   "settings.tabs.admin.label": "Administrator",
   "team.credit.add-member.fields.authorities": "Behörden",
   "team.credit.add-member.fields.lastName": "Nachname",
@@ -925,5 +926,6 @@
   "settings.admin.table.col.remainingCredits": "Verbleibendes Guthaben",
   "feedback.results.add-email": "E-Mail hinzufügen",
   "settings.admin.member.modal.fields.companyId": "Unternehmen",
-  "feedback.create.share-modal.role.placeholder": "Rolle"
+  "feedback.create.share-modal.role.placeholder": "Rolle",
+  "settings.profile.field.linkedinProfile.placeholder": "https://"
 }

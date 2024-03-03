@@ -231,7 +231,7 @@ const DashboardCardFeedback = () => {
   );
 };
 
-const ExpandableInfoBox = ({ heading, text, showMoreMaxChars = 250 }) => {
+const ExpandableInfoBox = ({ heading, text, showMoreMaxChars }) => {
   return (
     <Accordion
       sx={{
@@ -278,7 +278,7 @@ const InsightsTipsHeader = ({ title, perex, isLoading = false }) => {
         {isLoading ? (
           <CircularProgress
             color="inherit"
-            size={size - 2}
+            size={size}
             // thickness={2}
             sx={{ opacity: 0.25, mr: 1 }}
           />
@@ -381,6 +381,7 @@ const isGenerating = (data, query) => {
 };
 
 const POLL_INTERVAL = 7 * 1000;
+// const POLL_INTERVAL = 3 * 1000;
 
 const DashboardCardAI = () => {
   const msg = useMsg();

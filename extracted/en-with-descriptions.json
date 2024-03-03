@@ -2514,6 +2514,12 @@
   "settings.profile.field.level": {
     "defaultMessage": "Level"
   },
+  "settings.profile.field.linkedinProfile": {
+    "defaultMessage": "LinkedIn profile"
+  },
+  "settings.profile.field.linkedinProfile.placeholder": {
+    "defaultMessage": "https://"
+  },
   "settings.profile.field.name": {
     "defaultMessage": "Name"
   },

@@ -56,6 +56,12 @@ const getError = ({ error, msg, name, rules, parametrizedValidate }) => {
     // debugger;
   }
 
+  // if (true) {
+  //   error?.ref?.focus?.();
+  //   error?.ref?.select?.();
+  // }
+  // debugger;
+
   return errorMsg;
 };
 

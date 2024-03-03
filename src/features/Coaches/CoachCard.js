@@ -8,7 +8,10 @@ import { useFieldsDict } from "../Settings/useFieldsDict";
 import { ContactModal } from "./ContactModal";
 import { usePickCoach } from "./api";
 import { messages } from "./messages";
-import { certificatesOptions } from "../Settings/ProfileSettings";
+import {
+  LinkedInProfileMaybe,
+  certificatesOptions,
+} from "../Settings/ProfileSettings";
 import { Icon } from "../../components/Icon";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { useIntersection } from "../../components/Forms/hooks";
@@ -26,7 +29,13 @@ export const ShowMore = ({
     <>
       {text.substring(0, maxChars)}
       {elipsis}
-      <Button variant="text" onClick={() => setIsMore(true)}>
+      <Button
+        variant="text"
+        sx={{ lineHeight: 1 }}
+        onClick={() => setIsMore(true)}
+        disableFocusRipple
+        disableRipple
+      >
         {moreTranslation}
       </Button>
     </>
@@ -38,7 +47,16 @@ export const ShowMore = ({
 };
 
 export const CoachInfo = ({
-  coach: { name, role, experience, languages, rate, bio, fields } = {},
+  coach: {
+    name,
+    role,
+    experience,
+    languages,
+    rate,
+    bio,
+    fields,
+    linkedinProfile,
+  } = {},
   maxBioChars = 50,
   sx = {},
 }) => {
@@ -88,6 +106,7 @@ export const CoachInfo = ({
           />
         ))}
       </Box>
+      <LinkedInProfileMaybe href={linkedinProfile} />
     </Box>
   );
 };
@@ -147,6 +166,7 @@ export const CoachCard = ({
     bio,
     fields,
     webLink,
+    linkedinProfile,
   } = coach;
   const [contactCoach, setContactCoach] = useState(null);
   const [wasVisible, setWasVisible] = useState(false);
@@ -209,8 +229,17 @@ export const CoachCard = ({
           >
             <ErrorBoundary>
               <CoachInfo
-                coach={{ name, role, experience, languages, rate, bio, fields }}
-                maxBioChars={50}
+                coach={{
+                  name,
+                  role,
+                  experience,
+                  languages,
+                  rate,
+                  bio,
+                  fields,
+                  linkedinProfile,
+                }}
+                maxBioChars={250}
                 sx={{
                   flexGrow: 2,
                   width: { md: "280px" },

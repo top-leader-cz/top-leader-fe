@@ -837,6 +837,8 @@
   "settings.profile.field.languages": "Languages",
   "settings.profile.field.languages.placeholder": "Select languages you speak",
   "settings.profile.field.level": "Level",
+  "settings.profile.field.linkedinProfile": "LinkedIn profile",
+  "settings.profile.field.linkedinProfile.placeholder": "https://",
   "settings.profile.field.name": "Name",
   "settings.profile.field.photo": "Photo",
   "settings.profile.field.photo.limit": "SVG, PNG, JPG or GIF (max. {maxSize})",

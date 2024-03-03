@@ -506,6 +506,7 @@
   "settings.profile.field.rate": "Hodnocení",
   "settings.profile.field.webLink": "Video úvod",
   "settings.profile.field.webLink.placeholder": "https://",
+  "settings.profile.field.linkedinProfile": "Profil na LinkedIn",
   "settings.tabs.admin.label": "Správce",
   "team.credit.add-member.fields.authorities": "Pravomoci",
   "team.credit.add-member.fields.lastName": "Příjmení",
@@ -925,5 +926,6 @@
   "settings.admin.table.col.remainingCredits": "Zbývající kredity",
   "feedback.results.add-email": "Přidat e-mail",
   "settings.admin.member.modal.fields.companyId": "Firma",
-  "feedback.create.share-modal.role.placeholder": "Role"
+  "feedback.create.share-modal.role.placeholder": "Role",
+  "settings.profile.field.linkedinProfile.placeholder": "https://"
 }
