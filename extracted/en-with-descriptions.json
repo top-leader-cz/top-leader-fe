@@ -341,6 +341,9 @@
   "dashboard.cards.ai.insights.animal-spirit.title": {
     "defaultMessage": "Animal Spirit Guide - Discover the animal that resonates with your leadership persona"
   },
+  "dashboard.cards.ai.insights.leader-persona.title": {
+    "defaultMessage": "World Leader Persona: Discover Your Leadership Twin in History"
+  },
   "dashboard.cards.ai.insights.leadership-style.title": {
     "defaultMessage": "Leadership style analysis - Delve into the leadership approach that aligns with your unique strengths and values."
   },

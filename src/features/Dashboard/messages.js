@@ -86,6 +86,11 @@ export const messages = defineMessages({
     defaultMessage:
       "Leadership style analysis - Delve into the leadership approach that aligns with your unique strengths and values.",
   },
+  "dashboard.cards.ai.insights.leader-persona.title": {
+    id: "dashboard.cards.ai.insights.leader-persona.title",
+    defaultMessage:
+      "World Leader Persona: Discover Your Leadership Twin in History",
+  },
   "dashboard.cards.ai.insights.animal-spirit.title": {
     id: "dashboard.cards.ai.insights.animal-spirit.title",
     defaultMessage:

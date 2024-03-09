@@ -555,6 +555,7 @@
   "dict.validation.minLength": "Příliš krátké. Minimální délka je {gteLength}",
   "general.loadable-options.error.placeholder": "Chyba při načítání možností",
   "general.loadable-options.loading.placeholder": "Načítání možností",
+  "dashboard.cards.ai.insights.leader-persona.title": "Leadership Persona: Objevte své dvojče v historii leaderů",
   "auth.unauthorized.title": "Vítejte v TopLeader",
   "auth.unauthorized.perex": "Zadejte své údaje",
   "feedback.external.request-access-modal.desc": "Zadejte své údaje",

@@ -369,7 +369,7 @@ const UnlockAI = () => {
 const anyTruthy = (subProp, propNames, obj) =>
   anyPass(map((propName) => path([propName, subProp]), propNames))(obj);
 
-const insightsKeys = ["leaderShipStyle", "animalSpirit"];
+const insightsKeys = ["leaderShipStyle", "leaderPersona", "animalSpirit"];
 const tipsKeys = ["leadershipTip", "personalGrowthTip"];
 const allKeys = [...insightsKeys, ...tipsKeys];
 
@@ -444,9 +444,15 @@ const DashboardCardAI = () => {
                     },
                     {
                       heading: msg(
-                        "dashboard.cards.ai.insights.animal-spirit.title"
+                        "dashboard.cards.ai.insights.leader-persona.title"
                       ),
                       text: data[insightsKeys[1]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.animal-spirit.title"
+                      ),
+                      text: data[insightsKeys[2]]?.text,
                     },
                   ]}
                   isLoading={anyTruthy("isPending", insightsKeys, data)}
