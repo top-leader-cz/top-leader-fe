@@ -555,7 +555,7 @@
   "dict.validation.minLength": "Zu kurz. Mindestlänge ist {gteLength}",
   "general.loadable-options.error.placeholder": "Fehler beim Laden der Optionen",
   "general.loadable-options.loading.placeholder": "Optionen werden geladen",
-  "dashboard.cards.ai.insights.leader-persona.title": "Weltführer-Persönlichkeit: Entdecken Sie Ihren Führungs-Zwilling in der Geschichte",
+  "dashboard.cards.ai.insights.leader-persona.title": "Globales Führungsmosaik: Entdecken Sie Ihre Weltweiten Führungspendants",
   "auth.unauthorized.title": "Herzlich Willkommen bei TopLeader",
   "auth.unauthorized.perex": "Geben Sie Ihre Zugangsdaten ein",
   "feedback.external.request-access-modal.desc": "Geben Sie Ihre Zugangsdaten ein",

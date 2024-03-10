@@ -555,7 +555,7 @@
   "dict.validation.minLength": "Trop court. La longueur min est de {gteLength}",
   "general.loadable-options.error.placeholder": "Erreur de chargement des options",
   "general.loadable-options.loading.placeholder": "Chargement des options",
-  "dashboard.cards.ai.insights.leader-persona.title": "Personnalité de Leader Mondial : Découvrez Votre Jumeau de Leadership dans l'Histoire",
+  "dashboard.cards.ai.insights.leader-persona.title": "Mosaïque du Leadership Mondial : Découvrez vos Homologues Leaders à l'Échelle Mondiale",
   "auth.unauthorized.title": "Bienvenu chez Topleader",
   "auth.unauthorized.perex": "Veuillez saisir vos identifiants",
   "feedback.external.request-access-modal.desc": "Veuillez saisir vos identifiants",
