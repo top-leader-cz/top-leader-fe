@@ -1,4 +1,9 @@
-import { Box } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+} from "@mui/material";
 import { RHFTextField } from "../../../components/Forms";
 import { P } from "../../../components/Typography";
 import { FocusedList } from "../FocusedList";
@@ -8,8 +13,7 @@ import { useReflectionHints } from "./hints";
 import { SESSION_FIELDS } from "./constants";
 import { useMsg } from "../../../components/Msg/Msg";
 import { messages } from "../messages";
-
-const userInputSx = { my: 3, p: 3, bgcolor: "#FCFCFD" };
+import { Icon } from "../../../components/Icon";
 
 export const ReflectStep = ({
   step,
@@ -44,11 +48,32 @@ export const ReflectStep = ({
       }}
     >
       <SessionTodosFields name={SESSION_FIELDS.PREV_ACTION_STEPS} />
-      <Box sx={{ ...userInputSx }}>
-        <P sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
-          {lastReflection || motivation}
-        </P>
-      </Box>
+      <Accordion
+        sx={{
+          my: 3,
+          bgcolor: "#FCFCFD",
+          boxShadow: "none",
+          borderRadius: "6px",
+          "&:before": {
+            display: "none",
+          },
+        }}
+      >
+        <AccordionSummary
+          sx={{ fontSize: 16 }}
+          expandIcon={<Icon name="ExpandMore" />}
+        >
+          {msg("sessions.edit.steps.reflect.reflection-heading")}
+        </AccordionSummary>
+        <AccordionDetails>
+          <P sx={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
+            {lastReflection || motivation}
+          </P>
+        </AccordionDetails>
+      </Accordion>
+      <AccordionSummary sx={{ fontSize: 16 }}>
+        {msg("sessions.edit.steps.reflect.reflection-questions-heading")}
+      </AccordionSummary>
       <FocusedList items={hints} />
       <RHFTextField
         name={SESSION_FIELDS.REFLECTION}

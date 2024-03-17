@@ -738,6 +738,8 @@
   "sessions.edit.steps.reflect.label": "Reflect",
   "sessions.edit.steps.reflect.mark-all-as-completed": "Mark all as completed",
   "sessions.edit.steps.reflect.perex": "Here are the actions you set last time",
+  "sessions.edit.steps.reflect.reflection-heading": "Last session’s reflection",
+  "sessions.edit.steps.reflect.reflection-questions-heading": "Pick the question you want to reflect on:",
   "sessions.edit.steps.reflect.reflection.placeholder": "Type your own reflection",
   "sessions.edit.steps.setaction.caption": "Be specific",
   "sessions.edit.steps.setaction.heading": "Set your action steps",

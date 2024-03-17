@@ -168,6 +168,14 @@ export const messages = defineMessages({
     id: "sessions.edit.steps.reflect.mark-all-as-completed",
     defaultMessage: "Mark all as completed",
   },
+  "sessions.edit.steps.reflect.reflection-heading": {
+    id: "sessions.edit.steps.reflect.reflection-heading",
+    defaultMessage: "Last session’s reflection",
+  },
+  "sessions.edit.steps.reflect.reflection-questions-heading": {
+    id: "sessions.edit.steps.reflect.reflection-questions-heading",
+    defaultMessage: "Pick the question you want to reflect on:",
+  },
   "sessions.edit.steps.reflect.hints.1": {
     id: "sessions.edit.steps.reflect.hints.1",
     defaultMessage: "What have you learned when aiming to that action step?",

@@ -2217,6 +2217,12 @@
   "sessions.edit.steps.reflect.perex": {
     "defaultMessage": "Here are the actions you set last time"
   },
+  "sessions.edit.steps.reflect.reflection-heading": {
+    "defaultMessage": "Last session’s reflection"
+  },
+  "sessions.edit.steps.reflect.reflection-questions-heading": {
+    "defaultMessage": "Pick the question you want to reflect on:"
+  },
   "sessions.edit.steps.reflect.reflection.placeholder": {
     "defaultMessage": "Type your own reflection"
   },
