@@ -231,7 +231,9 @@ const DashboardCardFeedback = () => {
   );
 };
 
-const ExpandableInfoBox = ({ heading, text, showMoreMaxChars }) => {
+const ExpandableInfoBox = ({ heading, text }) => {
+  const showMoreMaxChars = 1500;
+
   return (
     <Accordion
       sx={{

@@ -1,20 +1,27 @@
 import { Box, Button, Card, CardContent, CardMedia, Chip } from "@mui/material";
+import { intersperse, pipe, split } from "ramda";
 import { useCallback, useRef, useState } from "react";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
 import { getCoachLanguagesOptions, getLabel } from "../../components/Forms";
+import { useIntersection } from "../../components/Forms/hooks";
+import { Icon } from "../../components/Icon";
 import { useMsg } from "../../components/Msg/Msg";
 import { H1, P } from "../../components/Typography";
 import { AvailabilityCalendar } from "../Availability/AvailabilityCalendar";
-import { useFieldsDict } from "../Settings/useFieldsDict";
-import { ContactModal } from "./ContactModal";
-import { usePickCoach } from "./api";
-import { messages } from "./messages";
 import {
   LinkedInProfileMaybe,
   certificatesOptions,
 } from "../Settings/ProfileSettings";
-import { Icon } from "../../components/Icon";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
-import { useIntersection } from "../../components/Forms/hooks";
+import { useFieldsDict } from "../Settings/useFieldsDict";
+import { ContactModal } from "./ContactModal";
+import { usePickCoach } from "./api";
+import { messages } from "./messages";
+import { nonbreakableSubstr } from "./nonbreakableSubstr";
+
+// dangerouslySetInnerHTML is not safe, can we trust it?
+const renderSafeWithBreaks = pipe(split("\n"), intersperse(<br />), (arr) => (
+  <>{arr}</>
+));
 
 export const ShowMore = ({
   text: textProp,
@@ -22,12 +29,17 @@ export const ShowMore = ({
   moreTranslation = "Show more",
   initialShowAll = false,
 }) => {
-  const text = textProp || "";
   const [isMore, setIsMore] = useState(initialShowAll);
+  // const text = (textProp || "").replace(/(\\n){2,}/, "\n"); // TODO
+  const text = textProp || "";
   const elipsis = "... ";
-  const getShortened = () => (
+  const maxCharsWithOffset =
+    maxChars + elipsis.length + (moreTranslation?.length || 0);
+  const canFit = text.replaceAll("\n", "").length <= maxCharsWithOffset;
+
+  const withShowMore = (text) => (
     <>
-      {text.substring(0, maxChars)}
+      {renderSafeWithBreaks(text)}
       {elipsis}
       <Button
         variant="text"
@@ -40,10 +52,10 @@ export const ShowMore = ({
       </Button>
     </>
   );
-  const maxCharsWithOffset =
-    maxChars + elipsis.length + (moreTranslation?.length || 0);
 
-  return isMore || text.length <= maxCharsWithOffset ? text : getShortened();
+  return isMore || canFit
+    ? renderSafeWithBreaks(text)
+    : withShowMore(nonbreakableSubstr("\n", maxChars, text));
 };
 
 export const CoachInfo = ({
