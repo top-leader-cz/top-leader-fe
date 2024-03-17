@@ -14,6 +14,7 @@ import { messages } from "./messages";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 import { Finished } from "./steps/Finished";
 import { useEditSteps, useSteps } from "./steps/useSessionSteps";
+import { Icon } from "../../components/Icon";
 
 function EditSessionPageInner() {
   const msg = useMsg();
@@ -89,16 +90,22 @@ function EditSessionPageInner() {
           activeStepIndex={activeStepIndex}
           onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={steps}
-          buttonProps={{
-            children: "End session",
-            onClick: () => navigate(routes.sessions),
-          }}
         />
       }
     >
       <Header
         text={<Msg id="sessions.new.header" />}
         back={{ href: routes.sessions }}
+        actionButton={{
+          variant: "text",
+          color: "error",
+          children: msg("sessions.new.aside.end-button"),
+          onClick: () => navigate(routes.sessions),
+          startIcon: <Icon name="StopCircle" />,
+        }}
+        sx={{
+          justifyContent: "space-between",
+        }}
       />
       {finished ? (
         <Finished />

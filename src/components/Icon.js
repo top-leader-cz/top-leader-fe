@@ -53,6 +53,7 @@ import {
   AutoAwesome,
   ExpandMore,
   LinkedIn,
+  StopCircle,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -110,6 +111,7 @@ const Icons = {
   AutoAwesome,
   ExpandMore,
   LinkedIn,
+  StopCircle,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

@@ -16,6 +16,7 @@ import { useUserSessionMutation, useUserSessionQuery } from "./api";
 import { messages } from "./messages";
 import { Finished } from "./steps/Finished";
 import { useNewSessionSteps, useSteps } from "./steps/useSessionSteps";
+import { Header } from "../../components/Header";
 
 export const StepperRightMenu = ({
   heading,
@@ -122,25 +123,20 @@ function NewSessionPageInner() {
         />
       }
     >
-      <Box mt={4} mb={3}>
-        <Box
-          display="flex"
-          flexWrap="nowrap"
-          alignItems="center"
-          flexDirection="row"
-        >
-          <Button
-            color="inherit"
-            href={routes.sessions}
-            startIcon={<Icon name="ArrowBack" />}
-          >
-            <H2>
-              <Msg id="sessions.new.header" />
-            </H2>
-          </Button>
-        </Box>
-        <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
-      </Box>
+      <Header
+        text={<Msg id="sessions.new.header" />}
+        back={{ href: routes.sessions }}
+        actionButton={{
+          variant: "text",
+          color: "error",
+          children: msg("sessions.new.aside.end-button"),
+          onClick: () => navigate(routes.sessions),
+          startIcon: <Icon name="StopCircle" />,
+        }}
+        sx={{
+          justifyContent: "space-between",
+        }}
+      />
       {finished ? (
         <Finished />
       ) : (

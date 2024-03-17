@@ -10,10 +10,15 @@ export const Header = ({
   withNotifications,
   actionButton,
   back,
+  sx,
 }) => {
   const renderInner = () =>
     back ? (
-      <Button color="inherit" href={back.href} startIcon={<Icon name="ArrowBack" />}>
+      <Button
+        color="inherit"
+        href={back.href}
+        startIcon={<Icon name="ArrowBack" />}
+      >
         <H2>{text}</H2>
       </Button>
     ) : (
@@ -23,10 +28,13 @@ export const Header = ({
   return (
     <Box mt={4} mb={3}>
       <Box
-        display="flex"
-        flexDirection="row"
-        flexWrap="nowrap"
-        alignItems="center"
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "nowrap",
+          alignItems: "center",
+          ...sx,
+        }}
       >
         {avatar}
         {renderInner()}
