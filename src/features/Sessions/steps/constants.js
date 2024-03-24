@@ -4,5 +4,6 @@ export const SESSION_FIELDS = {
   MOTIVATION: "motivation",
   ACTION_STEPS: "actionSteps",
   REFLECTION: "reflection",
+  REFLECTION_QUESTION: "reflection_question",
   PREV_ACTION_STEPS: "previousActionSteps",
 };

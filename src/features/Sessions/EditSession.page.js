@@ -36,7 +36,7 @@ function EditSessionPageInner() {
     setData,
   } = useSteps({
     steps,
-    initialIndex: 0,
+    initialIndex: 1,
     initialData: {
       actionSteps: DEFAULT_VALUE_ROW,
       previousActionSteps: [],

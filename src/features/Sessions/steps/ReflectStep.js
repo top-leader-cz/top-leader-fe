@@ -4,7 +4,11 @@ import {
   AccordionSummary,
   Box,
 } from "@mui/material";
-import { RHFTextField } from "../../../components/Forms";
+import {
+  AutocompleteSelect,
+  FreeSoloField,
+  RHFTextField,
+} from "../../../components/Forms";
 import { P } from "../../../components/Typography";
 import { FocusedList } from "../FocusedList";
 import { FormStepCard } from "./FormStepCard";
@@ -14,6 +18,7 @@ import { SESSION_FIELDS } from "./constants";
 import { useMsg } from "../../../components/Msg/Msg";
 import { messages } from "../messages";
 import { Icon } from "../../../components/Icon";
+import { useMemo } from "react";
 
 export const ReflectStep = ({
   step,
@@ -28,7 +33,22 @@ export const ReflectStep = ({
 }) => {
   const reflectionField = step.fieldDefMap[SESSION_FIELDS.REFLECTION];
   const hints = useReflectionHints();
-  console.log("[ReflectStep.rndr]", { previousActionSteps });
+  const questionOptions = useMemo(() => {
+    return hints.map((translated) => ({
+      value: translated,
+      label: translated,
+    }));
+  }, [hints]);
+  console.log("[ReflectStep.rndr]", {
+    step,
+    stepper,
+    data,
+    motivation,
+    lastReflection,
+    previousActionSteps,
+    reflectionField,
+    hints,
+  });
   const msg = useMsg({ dict: messages });
 
   return (
@@ -71,6 +91,45 @@ export const ReflectStep = ({
           </P>
         </AccordionDetails>
       </Accordion>
+
+      <AccordionSummary sx={{ fontSize: 16 }}>
+        {msg("sessions.edit.steps.reflect.reflection-questions-heading")}
+      </AccordionSummary>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: 3, px: 2 }}>
+        {/* <FreeSoloField name={titleName} rules={{ required: "Required" }} sx={{ maxWidth: "50%", flex: "0 1 auto" }} {...optionsProps} /> */}
+        <AutocompleteSelect
+          name={SESSION_FIELDS.REFLECTION_QUESTION}
+          options={questionOptions}
+          rules={{
+            required: "Required",
+            // validate: { ...(reflectionField.validate ?? {}) },
+          }}
+          autoFocus
+          size="small"
+          hiddenLabel
+          multiline
+          rows={4}
+          sx={{ my: 4 }}
+          fullWidth
+          // sx={{ maxWidth: "50%", flex: "0 1 180px" }}
+        />
+        <RHFTextField
+          name={SESSION_FIELDS.REFLECTION}
+          rules={{
+            required: "Required",
+            validate: { ...(reflectionField.validate ?? {}) },
+          }}
+          placeholder={msg(
+            "sessions.edit.steps.reflect.reflection.placeholder"
+          )}
+          // autoFocus
+          size="small"
+          hiddenLabel
+          sx={{ my: 4 }}
+          fullWidth
+        />
+      </Box>
+
       <AccordionSummary sx={{ fontSize: 16 }}>
         {msg("sessions.edit.steps.reflect.reflection-questions-heading")}
       </AccordionSummary>
@@ -82,7 +141,7 @@ export const ReflectStep = ({
           validate: { ...(reflectionField.validate ?? {}) },
         }}
         placeholder={msg("sessions.edit.steps.reflect.reflection.placeholder")}
-        autoFocus
+        // autoFocus
         size="small"
         hiddenLabel
         multiline

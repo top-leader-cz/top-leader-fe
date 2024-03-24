@@ -556,6 +556,8 @@
   "general.loadable-options.error.placeholder": "Fehler beim Laden der Optionen",
   "general.loadable-options.loading.placeholder": "Optionen werden geladen",
   "dashboard.cards.ai.insights.leader-persona.title": "Globales Führungsmosaik: Entdecken Sie Ihre Weltweiten Führungspendants",
+  "sessions.edit.steps.reflect.reflection-heading": "Reflektion der letzten Sitzung",
+  "sessions.edit.steps.reflect.reflection-questions-heading": "Wählen Sie die Frage, über die Sie reflektieren möchten:",
   "auth.unauthorized.title": "Herzlich Willkommen bei TopLeader",
   "auth.unauthorized.perex": "Geben Sie Ihre Zugangsdaten ein",
   "feedback.external.request-access-modal.desc": "Geben Sie Ihre Zugangsdaten ein",
