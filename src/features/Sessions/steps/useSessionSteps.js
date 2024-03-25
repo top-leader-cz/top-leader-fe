@@ -1,4 +1,4 @@
-import { defaultTo, evolve, map, pipe, trim } from "ramda";
+import { defaultTo, evolve, join, map, pipe, trim } from "ramda";
 import { useCallback, useState } from "react";
 import { useMsg } from "../../../components/Msg/Msg";
 import { ActionStepsStep } from "./ActionStepsStep";
@@ -56,8 +56,9 @@ const DEFS = {
   },
   [SESSION_FIELDS.ACTION_STEPS]: { map: map(evolve({ label: trim })) },
   [SESSION_FIELDS.REFLECTION]: {
-    map: trim,
-    validate: { notBlank: notBlank(0) },
+    map: pipe(map(pipe(join(" "), trim)), join(" ")),
+    // map: trim,
+    validate: { notBlank: notBlank(0) }, // TODO: rm
   },
   [SESSION_FIELDS.PREV_ACTION_STEPS]: {},
 };
