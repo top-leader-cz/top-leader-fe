@@ -90,7 +90,7 @@ export const useNewSessionSteps = () => {
       iconName: "Adjust",
       heading: msg("sessions.new.steps.goal.heading"),
       perex: msg("sessions.new.steps.goal.perex"),
-      focusedList: goalHints,
+      // focusedList: goalHints,
     },
     {
       StepComponent: MotivationStep,
@@ -185,7 +185,7 @@ export const useEditSteps = ({ adjust }) => {
       iconName: "Adjust",
       heading: msg("sessions.new.steps.goal.heading"),
       perex: msg("sessions.new.steps.goal.perex"),
-      focusedList: goalHints,
+      // focusedList: goalHints,
     },
   ];
   const steps = adjust

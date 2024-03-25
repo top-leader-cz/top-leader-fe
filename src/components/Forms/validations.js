@@ -3,6 +3,7 @@ import { isValid } from "date-fns/fp";
 import { defineMessages } from "react-intl";
 import { useMsg } from "../Msg/Msg";
 import { getValidateParamsMaybe, getValidateOptionsMaybe } from "./Fields";
+import { Fade } from "@mui/material";
 
 export const validationMessages = defineMessages({
   "dict.validation.required": {
@@ -74,6 +75,11 @@ export const FieldError = ({
   const msg = useMsg({ dict: validationMessages });
 
   if (!error) return undefined;
+  return (
+    <Fade in={true} timeout={500}>
+      <span>{getError({ error, msg, name, rules, parametrizedValidate })}</span>
+    </Fade>
+  );
   return getError({ error, msg, name, rules, parametrizedValidate });
 };
 

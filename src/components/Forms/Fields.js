@@ -706,6 +706,7 @@ export const RHFTextField = ({
   displayCharCounter,
   debug,
   size = "small", // "medium"
+  withHelperTextSpace,
   // trim = false,
   ...props
 }) => {
@@ -732,6 +733,7 @@ export const RHFTextField = ({
                 <FieldError
                   {...{ field, fieldState, rules, name, parametrizedValidate }}
                 />
+                {withHelperTextSpace ? <>&nbsp;</> : null}
                 {displayCharCounter && (
                   <Box
                     component="span"

@@ -211,6 +211,10 @@ export const messages = defineMessages({
     id: "sessions.steps.textareastep.placeholder",
     defaultMessage: "Type your own {textAreaName}",
   },
+  "sessions.steps.goal.placeholder": {
+    id: "sessions.steps.goal.placeholder",
+    defaultMessage: "Type your own goal or choose from the list",
+  },
 
   "sessions.steps.finished.title": {
     id: "sessions.steps.finished.title",

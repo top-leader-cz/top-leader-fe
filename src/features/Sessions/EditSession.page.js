@@ -16,12 +16,15 @@ import { Finished } from "./steps/Finished";
 import { useEditSteps, useSteps } from "./steps/useSessionSteps";
 import { Icon } from "../../components/Icon";
 
+const initialAdjust = false;
+const initialStepIndex = 0;
+
 function EditSessionPageInner() {
   const msg = useMsg();
   const { id } = useParams();
   const { i18n } = useContext(I18nContext);
 
-  const [adjust, setAdjust] = useState(false);
+  const [adjust, setAdjust] = useState(initialAdjust);
   const [finished, setFinished] = useState(false);
 
   const { steps } = useEditSteps({ adjust });
@@ -36,7 +39,7 @@ function EditSessionPageInner() {
     setData,
   } = useSteps({
     steps,
-    initialIndex: 0,
+    initialIndex: initialStepIndex,
     initialData: {
       actionSteps: DEFAULT_VALUE_ROW,
       previousActionSteps: [],
