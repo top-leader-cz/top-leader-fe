@@ -1,4 +1,4 @@
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, Chip, IconButton } from "@mui/material";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import {
@@ -14,6 +14,9 @@ import { Icon } from "../../../components/Icon";
 import { MsgProvider } from "../../../components/Msg";
 import { Msg, useMsg } from "../../../components/Msg/Msg";
 import { P } from "../../../components/Typography";
+import { useMyQuery } from "../../Authorization/AuthProvider";
+import { primary25, primary500 } from "../../../theme";
+import { useCallback, useMemo, useState } from "react";
 
 const messages = defineMessages({
   "action-steps.label.placeholder": {
@@ -30,7 +33,79 @@ const messages = defineMessages({
   },
 });
 
-export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
+const RefreshableChip = ({ index, text, onChipClick, handleRefreshTip }) => {
+  // const isHidden = unusedHints.length === 0 || value === text;
+
+  if (!text) return null;
+
+  return (
+    <Chip
+      sx={{
+        m: "6px",
+        p: "6px",
+        borderRadius: "6px",
+        color: primary500,
+        bgcolor: primary25,
+        // justifyContent: "flex-start",
+        // pointerEvents: "none",
+        // height: "auto",
+        "& .MuiChip-label": {
+          // textWrap: "wrap",
+          paddingLeft: 0,
+          // paddingRight: 0,
+        },
+      }}
+      key={text}
+      label={text}
+      onClick={() => onChipClick({ text, index })}
+      {...(handleRefreshTip
+        ? {
+            onDelete: handleRefreshTip,
+            deleteIcon: (
+              <Icon
+                name="Sync"
+                sx={{ width: 16, height: 16, color: primary500 }}
+              />
+            ),
+          }
+        : {})}
+    />
+  );
+};
+
+const getListHints = (hints, labelValues) => {
+  const { listHints, unusedHints } = labelValues.reduce(
+    (acc, label) => {
+      const labelIsHint = hints.some((h) => h === label);
+      const [nextHint, ...unused] = acc.unusedHints;
+
+      if (labelIsHint || !nextHint || label) {
+        return {
+          listHints: acc.listHints.concat(""),
+          unusedHints: acc.unusedHints,
+        };
+      }
+
+      return {
+        listHints: acc.listHints.concat(nextHint),
+        unusedHints: unused,
+      };
+    },
+    {
+      listHints: [],
+      unusedHints: hints.filter((h) => !labelValues.some((v) => v === h)),
+    }
+  );
+  return { listHints, unusedHints };
+};
+
+export const ActionStepsInner = ({
+  name,
+  rules,
+  control,
+  sx = {},
+  hints = [],
+}) => {
   const msg = useMsg();
   const methods = useFormContext();
   const { fields, append, remove } = useFieldArray({
@@ -38,59 +113,121 @@ export const ActionStepsInner = ({ name, rules, control, sx = {} }) => {
     name,
     rules,
   });
+  const getLabelName = (index) => `${name}.${index}.label`;
+
+  const [hintsShift, setHintsShift] = useState(0);
+  const onChipClick = ({ text, index }) => {
+    methods.setValue(getLabelName(index), text, { shouldValidate: true });
+  };
+  const handleRefreshTip = useCallback(() => {
+    setHintsShift((i) => i + 1);
+  }, []);
+
+  const labelValues = methods.watch(name).map((item) => item.label);
+  const shiftedHints = useMemo(() => {
+    const shifted = hints
+      .slice(hintsShift % hints.length, hints.length)
+      .concat(hints.slice(0, hintsShift))
+      .slice(0, hints.length);
+    return shifted;
+  }, [hints, hintsShift]);
+  const { listHints, unusedHints } = useMemo(
+    () => getListHints(shiftedHints, labelValues),
+    [labelValues, shiftedHints]
+  );
+  const getHint = (index) => listHints[index] || "";
+
+  console.log("[ActionStepsInner.rndr]", {
+    labelValues,
+    hints,
+    hintsShift,
+    shiftedHints,
+    listHints,
+    unusedHints,
+  });
 
   return (
     <Box sx={{ ...sx }}>
       {fields.map((field, i) => (
         <Box
           key={field.id}
-          // component={"li"}
           sx={{
             display: "flex",
-            alignItems: "baseline",
+            flexDirection: "column",
+            alignItems: "stretch",
+            justifyContent: "flex-start",
             mb: 2,
           }}
         >
-          <Box sx={{ width: 16, mx: 1 }}>{i + 1}.</Box>
-          <RHFTextField
-            control={control}
-            name={`${name}.${i}.label`}
-            placeholder={msg("action-steps.label.placeholder")}
-            rules={{
-              required: true,
-              validate: { notBlank: notBlank(0) },
-            }}
-            autoFocus
+          <Box
+            key={field.id}
             sx={{
-              mx: 1,
-              mb: 0.5,
-              minWidth: { lg: 320 },
-              // "& .MuiFormHelperText-root.Mui-error": { height: 0, position: "relative", mt: 0, textAlign: "right", },
+              display: "flex",
+              alignItems: "stretch",
+              // mb: 2,
             }}
-          />
-          <P sx={{ ml: 4, mr: 2 }}>
-            <Msg id="action-steps.due-date.label" />
-          </P>
-          <DatePickerField
-            control={control}
-            name={`${name}.${i}.date`}
-            rules={{ validate: { invalidDate, todayOrFuture } }}
-            disablePast
-            clearable
-            sx={{ width: 290 }}
-          />
-          {i > 0 && (
-            <IconButton
-              onClick={() => remove(i)}
+          >
+            <Box sx={{ width: 16, mx: 1, mt: 1.5 }}>{i + 1}.</Box>
+            <Box
+              // component={"li"}
               sx={{
-                mx: 2,
-                position: "relative",
-                top: "5px",
+                display: "flex",
+                alignItems: "baseline",
+                // mb: 2,
               }}
             >
-              <Icon name="Delete" />
-            </IconButton>
-          )}
+              <RHFTextField
+                control={control}
+                name={getLabelName(i)}
+                placeholder={msg("action-steps.label.placeholder")}
+                rules={{
+                  required: true,
+                  validate: { notBlank: notBlank(0) },
+                }}
+                withHelperTextSpace
+                autoFocus
+                sx={{
+                  mx: 1,
+                  mb: 0.5,
+                  minWidth: { lg: 320 },
+                  // "& .MuiFormHelperText-root.Mui-error": { height: 0, position: "relative", mt: 0, textAlign: "right", },
+                }}
+              />
+              <P sx={{ ml: 4, mr: 2 }}>
+                <Msg id="action-steps.due-date.label" />
+              </P>
+              <DatePickerField
+                control={control}
+                name={`${name}.${i}.date`}
+                rules={{ validate: { invalidDate, todayOrFuture } }}
+                disablePast
+                clearable
+                sx={{ width: 290 }}
+              />
+              {i > 0 && (
+                <IconButton
+                  onClick={() => remove(i)}
+                  sx={{
+                    mx: 2,
+                    position: "relative",
+                    top: "5px",
+                  }}
+                >
+                  <Icon name="Delete" />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+          <Box sx={{ ml: 4 }}>
+            <RefreshableChip
+              index={i}
+              text={getHint(i)}
+              onChipClick={onChipClick}
+              handleRefreshTip={
+                unusedHints.length ? handleRefreshTip : undefined
+              }
+            />
+          </Box>
         </Box>
       ))}
       <Button

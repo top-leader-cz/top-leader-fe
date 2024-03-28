@@ -10,6 +10,8 @@ import { useMsg } from "../../../components/Msg/Msg";
 import { messages } from "../messages";
 import { useGoalHints } from "./hints";
 import { primary25, primary500 } from "../../../theme";
+import { useMyQuery } from "../../Authorization/AuthProvider";
+import { useArea } from "./AreaStep";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
@@ -75,6 +77,18 @@ export const TextAreaStep = ({
   );
 };
 
+const useGoalAIHintsQuery = ({ areaOfDevelopment }) => {
+  return useMyQuery({
+    enabled: !!areaOfDevelopment,
+    queryKey: ["user-sessions", "generate-long-term-goal", areaOfDevelopment],
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user-sessions/generate-long-term-goal`,
+      payload: { areaOfDevelopment },
+    },
+  });
+};
+
 export const GoalStep = ({
   textAreaLabel,
   handleNext,
@@ -85,7 +99,16 @@ export const GoalStep = ({
   ...props
 }) => {
   const textAreaName = SESSION_FIELDS.LONG_TERM_GOAL;
-  const goalHints = useGoalHints();
+
+  const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
+  const { areaLabelMaybe, customAreaMaybe } = useArea({
+    value: valueArr?.length ? valueArr[0] : "",
+  });
+  const goalAIHintsQuery = useGoalAIHintsQuery({
+    areaOfDevelopment: areaLabelMaybe || customAreaMaybe,
+  });
+  // const goalHints = useGoalHints();
+  const goalHints = [].concat(goalAIHintsQuery.data || []);
 
   const msg = useMsg({ dict: messages });
   const field = fieldDefMap[textAreaName];
@@ -97,10 +120,9 @@ export const GoalStep = ({
   const componentData = {
     [textAreaName]: map(watch(textAreaName)),
   };
-  const onChipClick = (text) => {
+  const onChipClick = ({ text }) => {
     setValue(textAreaName, text, { shouldValidate: true });
   };
-  console.log("[GoalStep.rndr]", formState.isValid, { componentData, data });
 
   return (
     <SessionStepCard step={step} {...props}>
@@ -141,7 +163,7 @@ export const GoalStep = ({
             }}
             key={text}
             label={text}
-            onClick={() => onChipClick(text)}
+            onClick={() => onChipClick({ text })}
           />
         ))}
 

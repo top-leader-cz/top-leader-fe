@@ -37,7 +37,10 @@ export const useAreas = ({ valueArr }) => {
   return mapped;
 };
 
-const useArea = ({ valueArr, value = valueArr?.length ? valueArr[0] : "" }) => {
+export const useArea = ({
+  valueArr,
+  value = valueArr?.length ? valueArr[0] : "",
+}) => {
   const { areas: areasDict } = useAreasDict();
   const areasArr = Object.entries(areasDict).map(([key, value]) => ({
     key,

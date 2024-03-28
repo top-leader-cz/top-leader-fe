@@ -65,7 +65,7 @@ const DEFS = {
 export const useNewSessionSteps = () => {
   const msg = useMsg();
 
-  const goalHints = useGoalHints();
+  // const goalHints = useGoalHints();
   const motivationHints = useMotivationHints();
   const STEPS = [
     {
@@ -159,7 +159,7 @@ export const useEditSteps = ({ adjust }) => {
       perex: msg("sessions.edit.steps.setaction.perex"),
     },
   ];
-  const goalHints = useGoalHints();
+  // const goalHints = useGoalHints();
   const ADJUST_STEPS = [
     {
       StepComponent: AreaStep,

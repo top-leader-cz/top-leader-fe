@@ -54,6 +54,7 @@ import {
   ExpandMore,
   LinkedIn,
   StopCircle,
+  Sync,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -112,6 +113,7 @@ const Icons = {
   ExpandMore,
   LinkedIn,
   StopCircle,
+  Sync,
 };
 
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({

@@ -66,6 +66,7 @@ const _fetchUser = ({ authFetch }) =>
 export const FETCH_TYPE = {
   JSON: "JSON",
   FORMDATA: "FORMDATA",
+  TEXT: "TEXT",
 };
 
 // src/main/java/com/topleader/topleader/user/User.java
@@ -324,10 +325,16 @@ export function AuthProvider({ children }) {
         .then(async (response) => {
           let jsonMaybe, parsingError, textMaybe;
           try {
-            if (hasContentType("application/json", response))
-              jsonMaybe = await response.json();
-            else if (hasContentType("text/html", response))
+            if (
+              hasContentType("text/html", response) || // TODO: AND instead of OR = self-documented code
+              type === FETCH_TYPE.TEXT
+            )
               textMaybe = await response.text();
+            else if (
+              hasContentType("application/json", response) &&
+              type === FETCH_TYPE.JSON
+            )
+              jsonMaybe = await response.json();
           } catch (e) {
             parsingError = e;
             console.log("FETCH ERR NOT PARSED", { response, parsingError });
@@ -348,7 +355,8 @@ export function AuthProvider({ children }) {
               intl: intlRef.current,
             });
           }
-          if (type === FETCH_TYPE.JSON) return jsonMaybe;
+          if (jsonMaybe) return jsonMaybe;
+          if (textMaybe) return textMaybe;
 
           return { response };
         })
