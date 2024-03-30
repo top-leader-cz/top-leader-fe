@@ -17,6 +17,7 @@ import { messages } from "./messages";
 import { Finished } from "./steps/Finished";
 import { useNewSessionSteps, useSteps } from "./steps/useSessionSteps";
 import { Header } from "../../components/Header";
+import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 
 export const StepperRightMenu = ({
   heading,
@@ -54,6 +55,9 @@ function NewSessionPageInner() {
   } = useSteps({
     steps: STEPS,
     initialIndex: 0,
+    initialData: {
+      actionSteps: DEFAULT_VALUE_ROW,
+    },
   });
 
   const [unmountedUi, setUnmountedUi] = useState(false);
@@ -116,10 +120,6 @@ function NewSessionPageInner() {
           activeStepIndex={activeStepIndex}
           onStepClick={({ index }) => setActiveStepIndex(index)}
           steps={STEPS}
-          buttonProps={{
-            children: <Msg id="sessions.new.aside.end-button" />,
-            onClick: () => navigate(routes.sessions),
-          }}
         />
       }
     >

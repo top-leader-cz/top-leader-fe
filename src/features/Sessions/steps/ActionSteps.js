@@ -1,4 +1,5 @@
 import { Box, Button, Chip, IconButton } from "@mui/material";
+import { useCallback, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { defineMessages } from "react-intl";
 import {
@@ -12,11 +13,9 @@ import {
 } from "../../../components/Forms/validations";
 import { Icon } from "../../../components/Icon";
 import { MsgProvider } from "../../../components/Msg";
-import { Msg, useMsg } from "../../../components/Msg/Msg";
+import { useMsg } from "../../../components/Msg/Msg";
 import { P } from "../../../components/Typography";
-import { useMyQuery } from "../../Authorization/AuthProvider";
 import { primary25, primary500 } from "../../../theme";
-import { useCallback, useMemo, useState } from "react";
 
 const messages = defineMessages({
   "action-steps.label.placeholder": {
@@ -123,6 +122,12 @@ export const ActionStepsInner = ({
     setHintsShift((i) => i + 1);
   }, []);
 
+  console.log("[ActionSteps.rndr]", {
+    methods,
+    value: methods.watch(name),
+    name,
+  });
+
   const labelValues = methods.watch(name).map((item) => item.label);
   const shiftedHints = useMemo(() => {
     const shifted = hints
@@ -193,9 +198,7 @@ export const ActionStepsInner = ({
                   // "& .MuiFormHelperText-root.Mui-error": { height: 0, position: "relative", mt: 0, textAlign: "right", },
                 }}
               />
-              <P sx={{ ml: 4, mr: 2 }}>
-                <Msg id="action-steps.due-date.label" />
-              </P>
+              <P sx={{ ml: 4, mr: 2 }}>{msg("action-steps.due-date.label")}</P>
               <DatePickerField
                 control={control}
                 name={`${name}.${i}.date`}
@@ -239,7 +242,7 @@ export const ActionStepsInner = ({
         }
         startIcon={<Icon name="Add" />}
       >
-        <Msg id="action-steps.add-button" />
+        {msg("action-steps.add-button")}
       </Button>
     </Box>
   );

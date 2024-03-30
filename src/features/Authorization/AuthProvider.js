@@ -378,6 +378,7 @@ export function AuthProvider({ children }) {
   const userQuery = useQuery({
     queryKey: ["user-info"],
     queryFn: () => _fetchUser({ authFetch }),
+    // .then( (data) => console.log("UI-----", { data }) || MOCK ),
     enabled: !!isLoggedIn,
     // retry: false,
     // retryOnMount: false,
