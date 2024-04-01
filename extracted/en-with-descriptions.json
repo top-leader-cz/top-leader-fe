@@ -2322,6 +2322,9 @@
   "sessions.steps.finished.title": {
     "defaultMessage": "Congratulations, you’ve completed your session!"
   },
+  "sessions.steps.goal.placeholder": {
+    "defaultMessage": "Type your own goal or choose from the list"
+  },
   "sessions.steps.textareastep.placeholder": {
     "defaultMessage": "Type your own {textAreaName}"
   },

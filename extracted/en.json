@@ -773,6 +773,7 @@
   "sessions.steps.finished.datetime.separator": "at",
   "sessions.steps.finished.perex": "Would you like to book the next one?",
   "sessions.steps.finished.title": "Congratulations, you’ve completed your session!",
+  "sessions.steps.goal.placeholder": "Type your own goal or choose from the list",
   "sessions.steps.textareastep.placeholder": "Type your own {textAreaName}",
   "sessions.type.USER_SESSION": "Private",
   "settings.admin.add": "Add member",
