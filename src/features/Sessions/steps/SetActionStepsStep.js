@@ -7,7 +7,10 @@ import { FormStepCard } from "./FormStepCard";
 import { SessionTodosFields } from "./SessionTodos";
 import { SESSION_FIELDS } from "./constants";
 
-const useActionStepsAIHintsQuery = ({ areaOfDevelopment, longTermGoal }) => {
+export const useActionStepsAIHintsQuery = ({
+  areaOfDevelopment,
+  longTermGoal,
+}) => {
   return useMyQuery({
     enabled: !!areaOfDevelopment && !!longTermGoal,
     queryKey: [
@@ -71,8 +74,6 @@ export const SetActionStepsStep = ({
       )}
     >
       <SessionTodosFields name={"previousActionSteps"} />
-      {/* <SessionTodos actionSteps={previousActionSteps} withoutControls /> */}
-      {/* <Todos items={exampleTodos} keyProp="id" /> */}
       <P my={2}></P>
       <ActionSteps
         name={SESSION_FIELDS.ACTION_STEPS}
