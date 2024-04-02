@@ -17,8 +17,7 @@ export const ActionStepsStep = ({
   data,
   setData,
   onFinish,
-  disabled: disabledProp,
-  step: { fieldDefMap, ...step },
+  step,
   disabled,
   stepper,
 }) => {

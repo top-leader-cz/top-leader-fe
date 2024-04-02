@@ -47,10 +47,7 @@ export const RequireAuth = ({ children, someRequired = [] }) => {
     if (username) setLastUsername(username);
   }, [username]);
 
-  console.log("[RequireAuth]", !auth.isLoggedIn ? " REDIRECTING" : "", {
-    auth,
-    location,
-  });
+  // console.log("[RequireAuth]", !auth.isLoggedIn ? " REDIRECTING" : "", { auth, location, });
   // debugger;
 
   if (!auth.isLoggedIn) {
@@ -93,10 +90,7 @@ export const ForbidAuth = ({ children }) => {
   const auth = useAuth();
   const location = useLocation();
 
-  console.log("[ForbidAuth]", auth.isLoggedIn ? " REDIRECTING" : "", {
-    auth,
-    location,
-  });
+  // console.log("[ForbidAuth]", auth.isLoggedIn ? " REDIRECTING" : "", { auth, location, });
 
   if (auth.isLoggedIn) {
     const to = getAuthorizedLocationRedirect({

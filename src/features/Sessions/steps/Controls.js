@@ -32,7 +32,7 @@ const ControlsInner = ({
   sx = {},
 }) => {
   const msg = useMsg();
-  console.log("[Controls.rndr]", data);
+  // console.log("[Controls.rndr]", { data });
   return (
     <ControlsContainer>
       <Button

@@ -44,6 +44,7 @@ export const FormStepCard = ({
   console.log("[FormStepCard.rndr]", methods.formState.isValid, {
     componentData,
     data,
+    fieldDefMap,
   });
 
   return (

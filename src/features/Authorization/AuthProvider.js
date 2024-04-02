@@ -291,6 +291,42 @@ const throwResponse = ({ response, jsonMaybe, textMaybe, intl }) => {
 const hasContentType = (type, res) =>
   res.headers.get("content-type")?.includes(type);
 
+const MOCK_USER_INFO = {
+  username: "user5@gmail.com",
+  firstName: "",
+  lastName: "",
+  userRoles: ["USER"],
+  timeZone: "Europe/Prague",
+  strengths: [
+    "intellectual",
+    "empathizer",
+    "responsible",
+    "strategist",
+    "connector",
+    "coach",
+    "selfDeveloper",
+    "analyser",
+    "leader",
+    "selfBeliever",
+    "believer",
+    "solver",
+    "flexible",
+    "ideamaker",
+    "loverOfOrder",
+    "initiator",
+    "positive",
+    "concentrated",
+    "communicator",
+    "challenger",
+  ],
+  values: ["family", "independence", "love", "creativity", "peace", "health"],
+  areaOfDevelopment: [],
+  // areaOfDevelopment: ["Become effective in dig marketing"],
+  notes: "test\n",
+  coach: "coach1@gmail.com",
+  locale: "en",
+};
+
 export function AuthProvider({ children }) {
   // Should reflect JSESSIONID cookie obtained during login (httpOnly, not accessible by JS):
   const [isLoggedIn, setIsLoggedIn] = useSessionStorage("isLoggedIn", false);
@@ -378,7 +414,7 @@ export function AuthProvider({ children }) {
   const userQuery = useQuery({
     queryKey: ["user-info"],
     queryFn: () => _fetchUser({ authFetch }),
-    // .then( (data) => console.log("UI-----", { data }) || MOCK ),
+    // .then( (data) => console.log("userInfo", { data }) || MOCK_USER_INFO || data ),
     enabled: !!isLoggedIn,
     // retry: false,
     // retryOnMount: false,

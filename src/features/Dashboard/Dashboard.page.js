@@ -411,9 +411,9 @@ const DashboardCardAI = () => {
   });
 
   // prettier-ignore
-  useEffect( () => () => { console.log("%c[DashboardCardAI.eff.unmounting] in React.StrictMode mode executes nested tree queries twice, but user-info query once", "color:pink;");  }, [] );
+  // useEffect( () => () => { console.log("%c[DashboardCardAI.eff.unmounting] in React.StrictMode mode executes nested tree queries twice, but user-info query once", "color:pink;");  }, [] );
   // prettier-ignore
-  if (process.env.NODE_ENV === "development") console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
+  // if (process.env.NODE_ENV === "development") console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
 
   return (
     <Card sx={{ minHeight: minCardHeight }}>

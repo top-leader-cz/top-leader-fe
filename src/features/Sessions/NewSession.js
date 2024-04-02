@@ -75,9 +75,9 @@ function NewSessionPageInner() {
   const activeStepIndexRef = useRef(activeStepIndex);
   activeStepIndexRef.current = activeStepIndex;
   useEffect(() => {
-    console.log("[NewSession.eff]", { qData: query.data });
+    // console.log("[NewSession.eff]", { qData: query.data });
     if (query.data && activeStepIndexRef.current === 0) {
-      console.log("%c[NewSession.eff]", "color:pink", { qData: query.data });
+      // console.log("%c[NewSession.eff]", "color:pink", { qData: query.data });
       // reinit(query.data);
     }
   }, [query.data, reinit]);
@@ -103,7 +103,7 @@ function NewSessionPageInner() {
   };
 
   const isLoading = unmountedUi || query.isFetching || mutation.isLoading;
-  console.log("[NewSessionPage.rndr]", { data, query, isLoading });
+  // console.log("[NewSessionPage.rndr]", { data, query, isLoading });
 
   if (isLoading) return <QueryRenderer isLoading />;
 
