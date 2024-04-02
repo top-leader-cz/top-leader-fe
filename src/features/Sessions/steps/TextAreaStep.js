@@ -80,6 +80,8 @@ export const TextAreaStep = ({
 const useGoalAIHintsQuery = ({ areaOfDevelopment }) => {
   return useMyQuery({
     enabled: !!areaOfDevelopment,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     queryKey: ["user-sessions", "generate-long-term-goal", areaOfDevelopment],
     fetchDef: {
       method: "POST",

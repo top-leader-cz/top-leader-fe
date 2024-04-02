@@ -13,6 +13,8 @@ export const useActionStepsAIHintsQuery = ({
 }) => {
   return useMyQuery({
     enabled: !!areaOfDevelopment && !!longTermGoal,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     queryKey: [
       "user-sessions",
       "generate-action-steps",
