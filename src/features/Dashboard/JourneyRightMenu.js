@@ -175,7 +175,7 @@ const CoachUpcomingSessions = ({ data }) => {
         py: 2.5,
         // height: "300px",
         maxHeight: "300px",
-        overflow: "scroll",
+        overflow: "auto",
       }}
     >
       {data.map(({ username, firstName, lastName, time }) => (

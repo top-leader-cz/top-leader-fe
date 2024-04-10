@@ -69,8 +69,8 @@ export const WelcomeScreenTemplate = ({
         >
           <Box
             sx={{
-              my: "25%",
-              mx: { sm: "10%", md: "25%" },
+              my: { xs: "10%", md: "15%" },
+              mx: { xs: "10%", md: "22%", lg: "25%" },
               // width: "33%",
               display: "flex",
               flexDirection: "column",

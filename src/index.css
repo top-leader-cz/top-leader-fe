@@ -3,7 +3,7 @@ body,
 #root,
 #root>div {
   height: 100%;
-  overflow: scroll;
+  /* overflow: scroll; scrollbars on windows */
 }
 
 body {

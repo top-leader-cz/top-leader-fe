@@ -27,7 +27,7 @@ export const ScrollableRightMenu = ({
         {heading && <H2 sx={{ my: 4 }}>{heading}</H2>}
         <Box
           sx={{
-            overflow: "scroll",
+            overflow: "auto",
             flex: 1,
             display: "flex",
             flexDirection: "column",

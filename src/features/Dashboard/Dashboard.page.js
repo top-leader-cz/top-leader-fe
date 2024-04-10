@@ -416,7 +416,7 @@ const DashboardCardAI = () => {
   // if (process.env.NODE_ENV === "development") console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
 
   return (
-    <Card sx={{ minHeight: minCardHeight }}>
+    <Card sx={{ minHeight: minCardHeight, mb: 3 }}>
       <CardContent
         sx={{
           position: "relative",

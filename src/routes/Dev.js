@@ -242,7 +242,7 @@ const Pre = ({ data, label, sx = {} }) => {
       sx={{
         position: "relative",
         height: "400px",
-        overflow: "scroll",
+        overflow: "auto",
         border: "1px solid black",
         // pt: label ? 3 : 0,
         ...sx,
@@ -261,7 +261,6 @@ const Area = ({ rows = 10, data, label, sx = {} }) => {
     <Box
       sx={{
         position: "relative",
-        // overflow: "scroll",
         border: "1px solid black",
         // pt: label ? 3 : 0,
         ...sx,

@@ -27,7 +27,7 @@ import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H2, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { useMyMutation } from "../Authorization/AuthProvider";
-import { IntroLink } from "../Coaches/CoachCard";
+import { IntroLink, formatName } from "../Coaches/CoachCard";
 import { I18nContext } from "../I18n/I18nProvider";
 import { API_DATE_FORMAT } from "../I18n/utils/date";
 import { QueryRenderer } from "../QM/QueryRenderer";
@@ -132,6 +132,74 @@ export const LinkedInProfileMaybe = ({ href }) => {
       &nbsp;
       <Icon name="OpenInNew" sx={{ fontSize: "inherit" || 14 }} />
     </Button>
+  );
+};
+
+// TODO: CoachInfo?
+const CoachInfoFields = ({
+  msg,
+  i18n,
+  coach: {
+    firstName,
+    lastName,
+    certificates,
+    experienceSince,
+    languages,
+    bio,
+    fields,
+    linkedinProfile,
+  } = {},
+}) => {
+  const { fieldsOptions } = useFieldsDict();
+
+  return (
+    <>
+      <H2 mt={3}>{formatName({ firstName, lastName })}</H2>
+      {certificates && (
+        <P mt={1}>
+          {msg("settings.profile.field.level")}
+          {": "}
+          {getLabel(certificatesOptions)(certificates)}
+        </P>
+      )}
+      <P mt={1}>
+        {msg("settings.profile.field.experience")}
+        {": "}
+        {experienceSince
+          ? `${i18n.formatDistanceToNowLocal(experienceSince)}`
+          : ""}
+      </P>
+      <P mt={1}>
+        {msg("settings.profile.field.languages")}
+        {": "}
+        {[]
+          .concat(languages)
+          .map(getLabel(getCoachLanguagesOptions()))
+          .join(", ")}
+      </P>
+      <P
+        sx={{
+          whiteSpace: "normal",
+          my: 3,
+        }}
+        color="black"
+      >
+        {bio}
+      </P>
+      <Box display="flex" gap={1}>
+        {[]
+          .concat(fields)
+          .map(getLabel(fieldsOptions))
+          .map((label) => (
+            <Chip
+              key={label}
+              sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
+              label={label}
+            />
+          ))}
+      </Box>
+      <LinkedInProfileMaybe href={linkedinProfile} />
+    </>
   );
 };
 
@@ -255,62 +323,15 @@ export const ProfileSettings = () => {
             />
             <IntroLink webLink={COACH.webLink} />
           </Box>
-          <H2 mt={3}>{`${COACH.firstName || ""} ${COACH.lastName || ""}`}</H2>
-          {COACH.certificates && (
-            <P mt={1}>
-              {msg("settings.profile.field.level")}
-              {": "}
-              {getLabel(certificatesOptions)(COACH.certificates)}
-            </P>
-          )}
-          <P mt={1}>
-            {msg("settings.profile.field.experience")}
-            {": "}
-            {COACH.experienceSince
-              ? `${i18n.formatDistanceToNowLocal(COACH.experienceSince)}`
-              : ""}
-          </P>
-          <P mt={1}>
-            {msg("settings.profile.field.languages")}
-            {": "}
-            {[]
-              .concat(COACH.languages)
-              .map(getLabel(getCoachLanguagesOptions()))
-              .join(", ")}
-          </P>
-          <P my={3} color="black">
-            {COACH.bio}
-          </P>
-          <Box display="flex" gap={1}>
-            {[]
-              .concat(COACH.fields)
-              .map(getLabel(fieldsOptions))
-              .map((label) => (
-                <Chip
-                  key={label}
-                  sx={{ borderRadius: "6px", bgcolor: "#F9F8FF" }}
-                  label={label}
-                />
-              ))}
-          </Box>
-          <LinkedInProfileMaybe href={COACH.linkedinProfile} />
+          <CoachInfoFields msg={msg} i18n={i18n} coach={COACH} />
         </ScrollableRightMenu>
       ),
       [
         msg,
         saveDisabled,
         reloadPhotoToken,
-        COACH.webLink,
-        COACH.firstName,
-        COACH.lastName,
-        COACH.certificates,
-        COACH.experienceSince,
-        COACH.languages,
-        COACH.bio,
-        COACH.fields,
-        COACH.linkedinProfile,
+        COACH,
         i18n,
-        fieldsOptions,
         form,
         saveMutation.mutateAsync,
       ]

@@ -127,6 +127,7 @@ const ContactList = ({ conversations = [], selectedUsername, onSelect }) => {
         bgcolor: "background.paper",
         borderRadius: "6px 0px 0px 6px",
         borderRight: "1px solid #EAECF0",
+        overflow: "auto",
         // borderRadius: 0.6,
         // height: "100%",
       }}
@@ -380,27 +381,33 @@ const Conversation = ({ addressee, name, restHeight: restHeightProp = 0 }) => {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          flexFlow: "column nowrap",
-          justifyContent: "flex-end",
+          overflow: "auto",
           p: 3,
           height: `calc(100% - ${restHeight}px)`,
-          overflow: "scroll",
         }}
       >
-        <QueryRenderer
-          {...messagesQuery}
-          loaderName="Block"
-          success={({ data }) =>
-            data.map((message, index) => (
-              <ConversationMessage
-                key={message.id}
-                message={message}
-                scrollIntoView={index + 1 === messagesQuery.data?.length}
-              />
-            ))
-          }
-        />
+        <Box
+          sx={{
+            display: "flex",
+            flexFlow: "column nowrap",
+            justifyContent: "flex-end",
+            minHeight: "100%",
+          }}
+        >
+          <QueryRenderer
+            {...messagesQuery}
+            loaderName="Block"
+            success={({ data }) =>
+              data.map((message, index) => (
+                <ConversationMessage
+                  key={message.id}
+                  message={message}
+                  scrollIntoView={index + 1 === messagesQuery.data?.length}
+                />
+              ))
+            }
+          />
+        </Box>
       </Box>
       <RHForm
         sx={{
