@@ -43,7 +43,11 @@ export const useUserSessionMutation = (rest = {}) => {
         ),
       }),
     },
-    invalidate: [{ queryKey: ["user-sessions"] }, { queryKey: ["user-info"] }],
+    invalidate: [
+      { queryKey: ["user-sessions"] },
+      { queryKey: ["user-info"] },
+      { queryKey: ["user-insight"] },
+    ],
     ...rest,
   });
   return mutation;
@@ -82,7 +86,11 @@ export const useUserReflectionMutation = ({ adjust, ...rest } = {}) => {
         ),
       }),
     },
-    invalidate: [{ queryKey: ["user-sessions"] }, { queryKey: ["user-info"] }],
+    invalidate: [
+      { queryKey: ["user-sessions"] },
+      { queryKey: ["user-info"] },
+      { queryKey: ["user-insight"] },
+    ],
     ...rest,
   });
   return mutation;
