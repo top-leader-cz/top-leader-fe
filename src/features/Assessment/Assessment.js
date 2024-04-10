@@ -393,7 +393,7 @@ function Assessment() {
               currentIndex={pagination.currentIndex}
               totalCount={pagination.totalCount}
             />
-            <H1 my={7.5} minHeight={"4rem"} align="center">
+            <H1 my={4} minHeight={"4rem"} align="center">
               {question.text}
             </H1>
             <Box width="100%" align="center">
@@ -406,7 +406,7 @@ function Assessment() {
               />
             </Box>
             <Score
-              sx={{ my: 12.5 }}
+              sx={{ my: 8 }}
               value={score.value}
               onChange={score.onChange}
             />
