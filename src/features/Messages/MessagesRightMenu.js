@@ -39,7 +39,7 @@ export const MessagesRightMenu = ({
           type: "button",
           variant: "outlined",
           disabled: pickCoach.pickPending,
-          onClick: pickCoach.onPick,
+          onClick: () => pickCoach.onPick(),
         }
       }
       sx={{ whiteSpace: "normal" }}

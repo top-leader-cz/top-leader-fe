@@ -242,6 +242,7 @@ function Sessions() {
             ))
           }
         />
+        <Box sx={{ pb: "1px" }} />
       </Layout>
     </MsgProvider>
   );

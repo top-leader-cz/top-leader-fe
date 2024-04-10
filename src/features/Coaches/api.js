@@ -28,7 +28,12 @@ export const usePickCoach = ({ coach, ...rest }) => {
             : coach.username,
       }),
     },
-    invalidate: [{ queryKey: ["user-info"] }, { queryKey: ["coaches"] }],
+    // snackbar: { success: true, error: true },
+    invalidate: [
+      { queryKey: ["user-info"] },
+      { queryKey: ["coaches"] },
+      { queryKey: ["coach", coach?.username] },
+    ],
     ...rest,
   });
 

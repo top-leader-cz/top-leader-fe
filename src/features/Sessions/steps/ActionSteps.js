@@ -205,7 +205,7 @@ export const ActionStepsInner = ({
                 rules={{ validate: { invalidDate, todayOrFuture } }}
                 disablePast
                 clearable
-                sx={{ width: 290 }}
+                sx={{ width: 180 }}
               />
               {i > 0 && (
                 <IconButton
