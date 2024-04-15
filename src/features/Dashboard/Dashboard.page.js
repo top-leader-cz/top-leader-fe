@@ -18,7 +18,7 @@ import {
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import { always, anyPass, ifElse, map, path, pick, prop } from "ramda";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useIsFetching } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
@@ -32,7 +32,6 @@ import { useAuth } from "../Authorization";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { ShowMore } from "../Coaches/CoachCard";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { useAreas } from "../Sessions/steps/AreaStep";
 import { useTalentsDict } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
@@ -164,17 +163,23 @@ const DashboardCard = ({ title, href, items, fallbackIcon = {} }) => {
   );
 };
 
-const DashboardCardAssessment = ({ selectedKeys = [] }) => {
+export const useStrengths = ({ keys = [] }) => {
   const { talents } = useTalentsDict();
-  const items = useMemo(
+  return useMemo(
     () =>
-      selectedKeys?.slice(0, 5).map((key) => ({
+      keys.map((key) => ({
+        key,
+        name: talents[key]?.name || key,
         label: [talents[key]?.emoji ?? "👤", talents[key]?.name || key]
           .filter(Boolean)
           .join(" "),
       })),
-    [selectedKeys, talents]
+    [keys, talents]
   );
+};
+
+const DashboardCardAssessment = ({ selectedKeys = [] }) => {
+  const items = useStrengths({ keys: selectedKeys?.slice(0, 5) });
   const msg = useMsg();
 
   return (
@@ -494,30 +499,6 @@ const DashboardCardAI = () => {
         </SuspenseRenderer> */}
       </CardContent>
     </Card>
-  );
-};
-
-const DashboardCardSession = ({ selectedKeys = [] }) => {
-  const msg = useMsg();
-  const selectedAreas = useAreas({
-    valueArr: selectedKeys,
-  });
-  const items = useMemo(
-    () => selectedAreas.map(({ label }) => ({ label, key: label })),
-    [selectedAreas]
-  );
-
-  return (
-    <DashboardCard
-      title={
-        items.length
-          ? msg("dashboard.cards.sessions.title.filled")
-          : msg("dashboard.cards.sessions.title.empty")
-      }
-      href={routes.startSession}
-      items={items}
-      fallbackIcon={{ name: "FitnessCenterOutlined", color: "#66C61C" }}
-    />
   );
 };
 
