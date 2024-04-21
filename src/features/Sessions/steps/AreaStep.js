@@ -169,10 +169,12 @@ export const AreaStep = ({
     : 0;
   const [selectedTile, setSelectedTile] = useState(initialSelectedTile);
 
-  const [selectedArea, setSelected] = useState(areaNameMaybe);
-  const [customArea, setCustomArea] = useState(customAreaMaybe ?? "");
-
-  const newArea = customArea?.trim() || selectedArea;
+  const [selectedArea, setSelected] = useState(
+    areaNameMaybe || customAreaMaybe || ""
+  );
+  // const [customArea, setCustomArea] = useState(customAreaMaybe ?? "");
+  const newArea = selectedArea?.trim();
+  // const newArea = customArea?.trim() || selectedArea;
   const field = fieldDefMap[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
   const areaValue = (field?.map || identity)(newArea);
   console.log("[AreaStep.rndr]", { areaValue });
@@ -182,18 +184,22 @@ export const AreaStep = ({
   const msg = useMsg();
   const createOnSelect = (key) => () => {
     setSelectedTile(key);
-    setSelected();
-    setCustomArea("");
+    // setSelected();
+    // setCustomArea("");
   };
   const onItemSelect = (item) => {
     setSelected(item?.name);
-    setCustomArea("");
+    // setCustomArea("");
+  };
+  const onCustomAreaChange = (value) => {
+    setSelected(value);
+    // setCustomArea(value);
   };
 
   console.log("[AreaStep.rndr]", {
     data,
     selectedArea,
-    customArea,
+    // customArea,
     selectedTile,
   });
 
@@ -253,10 +259,9 @@ export const AreaStep = ({
           // autoFocus
           size="small"
           hiddenLabel
-          value={customArea}
+          value={selectedArea}
           onChange={(e) => {
-            setSelected();
-            setCustomArea(e.target.value);
+            onCustomAreaChange(e.target.value);
           }}
           sx={{ flex: "1 1 auto" }}
         />
