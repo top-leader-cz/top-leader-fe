@@ -28,10 +28,10 @@ const SelectableChip2 = styled(Chip, {
     }
 );
 
-export const SelectableChip = ({ selected, ...props }) => {
+export const SelectableChip = ({ selected, noIcon = false, ...props }) => {
   const selectedProps = selected
-    ? { variant: "selected", icon: <Icon name="Check" /> }
-    : { variant: "unselected", icon: <Icon name="Close" /> };
+    ? { variant: "selected", icon: !noIcon && <Icon name="Check" /> }
+    : { variant: "unselected", icon: !noIcon && <Icon name="Close" /> };
 
   return <Chip {...props} {...selectedProps} />;
 };

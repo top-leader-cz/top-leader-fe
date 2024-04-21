@@ -23,11 +23,9 @@ export const ActionStepsStep = ({
 }) => {
   const keyName = SESSION_FIELDS.ACTION_STEPS;
   const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
-  const { areaLabelMaybe, customAreaMaybe } = useArea({
-    value: valueArr?.length ? valueArr[0] : "",
-  });
+  const { areaText } = useArea({ valueArr });
   const actionStepsAIHintsQuery = useActionStepsAIHintsQuery({
-    areaOfDevelopment: areaLabelMaybe || customAreaMaybe,
+    areaOfDevelopment: areaText,
     longTermGoal: data[SESSION_FIELDS.LONG_TERM_GOAL],
   });
   const actionStepsHints = [].concat(actionStepsAIHintsQuery.data || []);

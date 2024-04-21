@@ -103,11 +103,9 @@ export const GoalStep = ({
   const textAreaName = SESSION_FIELDS.LONG_TERM_GOAL;
 
   const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
-  const { areaLabelMaybe, customAreaMaybe } = useArea({
-    value: valueArr?.length ? valueArr[0] : "",
-  });
+  const { areaText } = useArea({ valueArr });
   const goalAIHintsQuery = useGoalAIHintsQuery({
-    areaOfDevelopment: areaLabelMaybe || customAreaMaybe,
+    areaOfDevelopment: areaText,
   });
   // const goalHints = useGoalHints();
   const goalHints = [].concat(goalAIHintsQuery.data || []);

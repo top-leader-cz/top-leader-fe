@@ -44,9 +44,26 @@ export const messages = defineMessages({
   },
   "sessions.new.steps.area.perex": {
     id: "sessions.new.steps.area.perex",
-    defaultMessage: " ",
+    defaultMessage: "Choose one ...",
   },
 
+  "sessions.new.steps.area.strengths.title": {
+    id: "sessions.new.steps.area.strengths.title",
+    defaultMessage: "I want to develop my strengths to excel in them",
+  },
+  "sessions.new.steps.area.weaknesses.title": {
+    id: "sessions.new.steps.area.weaknesses.title",
+    defaultMessage: "I want to develop my lesser talent to unblock me",
+  },
+  "sessions.new.steps.area.recommended.title": {
+    id: "sessions.new.steps.area.recommended.title",
+    defaultMessage: "See what is recommended for me",
+  },
+  "sessions.new.steps.area.fallback.title": {
+    id: "sessions.new.steps.area.fallback.title",
+    defaultMessage:
+      "First, finish the strengths assessment to get recommended areas.",
+  },
   "sessions.new.steps.area.customarea.placeholder": {
     id: "sessions.new.steps.area.customarea.placeholder",
     defaultMessage: "Type your own area for growth",
