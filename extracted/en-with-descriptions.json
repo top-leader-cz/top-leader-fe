@@ -371,9 +371,6 @@
   "dashboard.cards.notes.title": {
     "defaultMessage": "My notes"
   },
-  "dashboard.cards.sessions.title.empty": {
-    "defaultMessage": "Set area for my development"
-  },
   "dashboard.cards.sessions.title.filled": {
     "defaultMessage": "My areas of development"
   },
@@ -2268,6 +2265,9 @@
   "sessions.new.steps.area.customarea.placeholder": {
     "defaultMessage": "Type your own area for growth"
   },
+  "sessions.new.steps.area.fallback.title": {
+    "defaultMessage": "First, finish the strengths assessment to get recommended areas."
+  },
   "sessions.new.steps.area.heading": {
     "defaultMessage": "Set area for your development"
   },
@@ -2278,7 +2278,16 @@
     "defaultMessage": "Next"
   },
   "sessions.new.steps.area.perex": {
-    "defaultMessage": ""
+    "defaultMessage": "Choose one ..."
+  },
+  "sessions.new.steps.area.recommended.title": {
+    "defaultMessage": "See what is recommended for me"
+  },
+  "sessions.new.steps.area.strengths.title": {
+    "defaultMessage": "I want to develop my strengths to excel in them"
+  },
+  "sessions.new.steps.area.weaknesses.title": {
+    "defaultMessage": "I want to develop my lesser talent to unblock me"
   },
   "sessions.new.steps.goal.caption": {
     "defaultMessage": "Goals give you focus"

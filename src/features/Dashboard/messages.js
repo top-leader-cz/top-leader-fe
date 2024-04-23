@@ -43,10 +43,6 @@ export const messages = defineMessages({
     id: "dashboard.cards.feedback.title",
     defaultMessage: "Get feedback",
   },
-  "dashboard.cards.sessions.title.empty": {
-    id: "dashboard.cards.sessions.title.empty",
-    defaultMessage: "Set area for my development",
-  },
   "dashboard.cards.sessions.title.filled": {
     id: "dashboard.cards.sessions.title.filled",
     defaultMessage: "My areas of development",
