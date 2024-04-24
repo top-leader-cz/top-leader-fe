@@ -457,7 +457,7 @@ sessions.new.steps.motivation.perex,264,Imagine a situation where you excel in t
 ,268,Label,Označení,Étiquette,Etikett,action-steps.label.placeholder,,,Label,,,,
 ,269,Due date,Do kdy,Date d'échéance,Fälligkeitsdatum,action-steps.due-date.label,,,Due date,,,,
 ,270,Add action,Přidejte aktivitu,Ajouter une action,Aktion hinzufügen,action-steps.add-button,,,Add action,,,,
-,271,Done,Hotovo,Terminé,Erledigt,feedback.external.finished-modal.request-access.no,,,Done,,,,
+,271,Done,Hotovo,Terminé,Erledigt,action-steps.done|feedback.external.finished-modal.request-access.no,,,Done,,,,
 ,272,"Congratulations, you’ve completed your session!","Gratulujeme, dokončili jste relaci!","Félicitations, vous avez terminé votre session!","Herzlichen Glückwunsch, Sie haben Ihre Lerneinheit abgeschlossen!",sessions.steps.finished.title,,,"Congratulations, you’ve completed your session!",,,,
 sessions.steps.finished.perex,273,Would you like to book the next session?,"Chtěli byste si určit, kdy budete mít další aktivitu osobního rozvoje?",Souhaitez-vous réserver votre prochaine session?,Möchten Sie die nächste Lerneinheit beginnen?,,Performed,Found,Would you like to book the next session?,Would you like to book the next one?,0.8333333333333334,sessions.steps.finished.perex,
 ,274,at,ve,à,unter / auf,sessions.steps.finished.datetime.separator,,,at,,,,

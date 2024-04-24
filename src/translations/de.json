@@ -759,6 +759,7 @@
   "action-steps.label.placeholder": "Etikett",
   "action-steps.due-date.label": "Fälligkeitsdatum",
   "action-steps.add-button": "Aktion hinzufügen",
+  "action-steps.done": "Erledigt",
   "feedback.external.finished-modal.request-access.no": "Erledigt",
   "sessions.steps.finished.title": "Herzlichen Glückwunsch, Sie haben Ihre Lerneinheit abgeschlossen!",
   "sessions.steps.finished.datetime.separator": "unter / auf",

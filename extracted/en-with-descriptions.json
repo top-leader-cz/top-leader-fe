@@ -2,6 +2,9 @@
   "action-steps.add-button": {
     "defaultMessage": "Add action"
   },
+  "action-steps.done": {
+    "defaultMessage": "Done"
+  },
   "action-steps.due-date.label": {
     "defaultMessage": "Due date"
   },

@@ -1,6 +1,7 @@
+import { useMsg } from "../../../components/Msg/Msg";
 import { P } from "../../../components/Typography";
 import { FETCH_TYPE, useMyQuery } from "../../Authorization/AuthProvider";
-import { ActionSteps } from "./ActionSteps";
+import { ActionSteps, actionStepsMessages } from "./ActionSteps";
 import { useArea } from "./AreaStep";
 import { Controls } from "./Controls";
 import { FormStepCard } from "./FormStepCard";
@@ -42,6 +43,7 @@ export const SetActionStepsStep = ({
   previousArea,
   previousGoal,
 }) => {
+  const msg = useMsg({ dict: actionStepsMessages });
   const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT] || previousArea;
   const { areaText } = useArea({ valueArr });
   const actionStepsAIHintsQuery = useActionStepsAIHintsQuery({
@@ -67,7 +69,7 @@ export const SetActionStepsStep = ({
           handleBack={handleBack}
           nextProps={{
             disabled: !formState.isValid || submitDisabled,
-            children: "Done",
+            children: msg("action-steps.done"),
             endIcon: undefined,
           }}
         />

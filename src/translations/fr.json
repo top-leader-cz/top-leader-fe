@@ -759,6 +759,7 @@
   "action-steps.label.placeholder": "Étiquette",
   "action-steps.due-date.label": "Date d'échéance",
   "action-steps.add-button": "Ajouter une action",
+  "action-steps.done": "Terminé",
   "feedback.external.finished-modal.request-access.no": "Terminé",
   "sessions.steps.finished.title": "Félicitations, vous avez terminé votre session!",
   "sessions.steps.finished.datetime.separator": "à",

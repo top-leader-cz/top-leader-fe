@@ -4,10 +4,11 @@ import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { identity } from "ramda";
 import { SESSION_FIELDS } from "./constants";
-import { ActionSteps } from "./ActionSteps";
+import { ActionSteps, actionStepsMessages } from "./ActionSteps";
 import { FormStepCard } from "./FormStepCard";
 import { useArea } from "./AreaStep";
 import { useActionStepsAIHintsQuery } from "./SetActionStepsStep";
+import { useMsg } from "../../../components/Msg/Msg";
 
 export const DEFAULT_VALUE_ROW = [{ label: "", date: null }];
 
@@ -21,6 +22,7 @@ export const ActionStepsStep = ({
   disabled,
   stepper,
 }) => {
+  const msg = useMsg({ dict: actionStepsMessages });
   const keyName = SESSION_FIELDS.ACTION_STEPS;
   const valueArr = data[SESSION_FIELDS.AREA_OF_DEVELOPMENT];
   const { areaText } = useArea({ valueArr });
@@ -46,7 +48,7 @@ export const ActionStepsStep = ({
           handleBack={handleBack}
           nextProps={{
             disabled: !formState.isValid || disabled,
-            children: "Done",
+            children: msg("action-steps.done"),
             endIcon: undefined,
           }}
         />

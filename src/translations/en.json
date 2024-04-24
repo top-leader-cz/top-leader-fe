@@ -759,6 +759,7 @@
   "action-steps.label.placeholder": "Label",
   "action-steps.due-date.label": "Due date",
   "action-steps.add-button": "Add action",
+  "action-steps.done": "Done",
   "feedback.external.finished-modal.request-access.no": "Done",
   "sessions.steps.finished.title": "Congratulations, you’ve completed your session!",
   "sessions.steps.finished.datetime.separator": "at",

@@ -18,7 +18,7 @@ import { P } from "../../../components/Typography";
 import { primary25, primary500 } from "../../../theme";
 import { Loaders } from "../../QM/QueryRenderer";
 
-const messages = defineMessages({
+export const actionStepsMessages = defineMessages({
   "action-steps.label.placeholder": {
     id: "action-steps.label.placeholder",
     defaultMessage: "Label",
@@ -30,6 +30,10 @@ const messages = defineMessages({
   "action-steps.add-button": {
     id: "action-steps.add-button",
     defaultMessage: "Add action",
+  },
+  "action-steps.done": {
+    id: "action-steps.done",
+    defaultMessage: "Done",
   },
 });
 
@@ -256,7 +260,7 @@ export const ActionStepsInner = ({
 };
 
 export const ActionSteps = (props) => (
-  <MsgProvider messages={messages}>
+  <MsgProvider messages={actionStepsMessages}>
     <ActionStepsInner {...props} />
   </MsgProvider>
 );

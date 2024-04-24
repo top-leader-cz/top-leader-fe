@@ -759,6 +759,7 @@
   "action-steps.label.placeholder": "Označení",
   "action-steps.due-date.label": "Do kdy",
   "action-steps.add-button": "Přidejte aktivitu",
+  "action-steps.done": "Hotovo",
   "feedback.external.finished-modal.request-access.no": "Hotovo",
   "sessions.steps.finished.title": "Gratulujeme, dokončili jste relaci!",
   "sessions.steps.finished.datetime.separator": "ve",
