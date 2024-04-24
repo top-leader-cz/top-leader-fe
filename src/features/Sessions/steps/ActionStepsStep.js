@@ -56,6 +56,7 @@ export const ActionStepsStep = ({
         name={keyName}
         rules={{ required: true, minLength: 1 }}
         hints={actionStepsHints}
+        hintsLoading={actionStepsAIHintsQuery.isLoading}
         sx={{ my: 5 }}
       />
     </FormStepCard>

@@ -79,6 +79,7 @@ export const SetActionStepsStep = ({
         name={SESSION_FIELDS.ACTION_STEPS}
         rules={{ required: true, minLength: 1 }}
         hints={actionStepsHints}
+        hintsLoading={actionStepsAIHintsQuery.isLoading}
         sx={{ my: 5 }}
       />
     </FormStepCard>

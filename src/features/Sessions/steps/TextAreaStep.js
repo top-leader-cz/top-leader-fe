@@ -12,6 +12,7 @@ import { useGoalHints } from "./hints";
 import { primary25, primary500 } from "../../../theme";
 import { useMyQuery } from "../../Authorization/AuthProvider";
 import { useArea } from "./AreaStep";
+import { QueryRenderer } from "../../QM/QueryRenderer";
 
 // TODO: -> FormStepCard
 export const TextAreaStep = ({
@@ -108,7 +109,7 @@ export const GoalStep = ({
     areaOfDevelopment: areaText,
   });
   // const goalHints = useGoalHints();
-  const goalHints = [].concat(goalAIHintsQuery.data || []);
+  // const goalHints = [].concat(goalAIHintsQuery.data || []);
 
   const msg = useMsg({ dict: messages });
   const field = fieldDefMap[textAreaName];
@@ -144,28 +145,35 @@ export const GoalStep = ({
           sx={{ mt: 4, mb: 0 }}
           fullWidth
         />
-        {goalHints.map((text) => (
-          <Chip
-            sx={{
-              m: "6px",
-              p: "6px",
-              borderRadius: "6px",
-              color: primary500,
-              bgcolor: primary25,
-              // justifyContent: "flex-start",
-              // pointerEvents: "none",
-              // height: "auto",
-              "& .MuiChip-label": {
-                textWrap: "wrap",
-                paddingLeft: 0,
-                paddingRight: 0,
-              },
-            }}
-            key={text}
-            label={text}
-            onClick={() => onChipClick({ text })}
-          />
-        ))}
+        <QueryRenderer
+          query={goalAIHintsQuery}
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mb: 2 } }}
+          success={({ data }) =>
+            [].concat(data || []).map((text) => (
+              <Chip
+                sx={{
+                  m: "6px",
+                  p: "6px",
+                  borderRadius: "6px",
+                  color: primary500,
+                  bgcolor: primary25,
+                  // justifyContent: "flex-start",
+                  // pointerEvents: "none",
+                  // height: "auto",
+                  "& .MuiChip-label": {
+                    textWrap: "wrap",
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                  },
+                }}
+                key={text}
+                label={text}
+                onClick={() => onChipClick({ text })}
+              />
+            ))
+          }
+        />
 
         <Controls
           handleNext={handleNext}

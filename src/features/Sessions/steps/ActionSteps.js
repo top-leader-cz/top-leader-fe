@@ -16,6 +16,7 @@ import { MsgProvider } from "../../../components/Msg";
 import { useMsg } from "../../../components/Msg/Msg";
 import { P } from "../../../components/Typography";
 import { primary25, primary500 } from "../../../theme";
+import { Loaders } from "../../QM/QueryRenderer";
 
 const messages = defineMessages({
   "action-steps.label.placeholder": {
@@ -51,6 +52,7 @@ const RefreshableChip = ({ index, text, onChipClick, handleRefreshTip }) => {
         "& .MuiChip-label": {
           // textWrap: "wrap",
           paddingLeft: 0,
+          whiteSpace: "pre-wrap",
           // paddingRight: 0,
         },
       }}
@@ -104,6 +106,7 @@ export const ActionStepsInner = ({
   control,
   sx = {},
   hints = [],
+  hintsLoading = false,
 }) => {
   const msg = useMsg();
   const methods = useFormContext();
@@ -222,14 +225,18 @@ export const ActionStepsInner = ({
             </Box>
           </Box>
           <Box sx={{ ml: 4 }}>
-            <RefreshableChip
-              index={i}
-              text={getHint(i)}
-              onChipClick={onChipClick}
-              handleRefreshTip={
-                unusedHints.length ? handleRefreshTip : undefined
-              }
-            />
+            {hintsLoading ? (
+              <Loaders.Skeleton loaderProps={{ rows: 2, sx: { mb: 1 } }} />
+            ) : (
+              <RefreshableChip
+                index={i}
+                text={getHint(i)}
+                onChipClick={onChipClick}
+                handleRefreshTip={
+                  unusedHints.length ? handleRefreshTip : undefined
+                }
+              />
+            )}
           </Box>
         </Box>
       ))}
