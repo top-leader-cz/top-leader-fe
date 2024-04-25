@@ -2493,6 +2493,18 @@
   "settings.general.heading": {
     "defaultMessage": "General"
   },
+  "settings.general.integrations": {
+    "defaultMessage": "Integrations"
+  },
+  "settings.general.integrations.google-calendar.connect": {
+    "defaultMessage": "Connect"
+  },
+  "settings.general.integrations.google-calendar.description": {
+    "defaultMessage": "Sync your appointments with Google Calendar"
+  },
+  "settings.general.integrations.google-calendar.title": {
+    "defaultMessage": "Google Calendar"
+  },
   "settings.general.password": {
     "defaultMessage": "Password"
   },

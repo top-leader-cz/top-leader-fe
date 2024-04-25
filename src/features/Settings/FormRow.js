@@ -2,6 +2,8 @@ import { Box, Divider } from "@mui/material";
 import { P } from "../../components/Typography";
 import { ErrorBoundary } from "react-error-boundary";
 
+export const FL_MAX_WIDTH = 800;
+
 export const FieldLayout = ({
   children,
   label,
@@ -13,7 +15,13 @@ export const FieldLayout = ({
   return (
     <>
       {dividerTop && <Divider sx={{ mt: 3, mb: 3 }} />}
-      <Box display="flex" gap={3} alignItems="center" maxWidth={800} sx={sx}>
+      <Box
+        display="flex"
+        gap={3}
+        alignItems="center"
+        maxWidth={FL_MAX_WIDTH}
+        sx={sx}
+      >
         <Box
           {...labelProps}
           minWidth="190px"

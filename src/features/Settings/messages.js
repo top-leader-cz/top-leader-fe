@@ -154,6 +154,22 @@ export const messages = defineMessages({
     id: "settings.general.button.save",
     defaultMessage: "Update password",
   },
+  "settings.general.integrations": {
+    id: "settings.general.integrations",
+    defaultMessage: "Integrations",
+  },
+  "settings.general.integrations.google-calendar.title": {
+    id: "settings.general.integrations.google-calendar.title",
+    defaultMessage: "Google Calendar",
+  },
+  "settings.general.integrations.google-calendar.description": {
+    id: "settings.general.integrations.google-calendar.description",
+    defaultMessage: "Sync your appointments with Google Calendar",
+  },
+  "settings.general.integrations.google-calendar.connect": {
+    id: "settings.general.integrations.google-calendar.connect",
+    defaultMessage: "Connect",
+  },
   "settings.availability.aside.title": {
     id: "settings.availability.aside.title",
     defaultMessage: "Preview",

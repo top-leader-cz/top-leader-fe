@@ -1,1 +1,6 @@
-{}
+{
+  "settings.general.integrations": "Integrations",
+  "settings.general.integrations.google-calendar.connect": "Connect",
+  "settings.general.integrations.google-calendar.description": "Sync your appointments with Google Calendar",
+  "settings.general.integrations.google-calendar.title": "Google Calendar"
+}

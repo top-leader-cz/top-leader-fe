@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Avatar, Box, Button } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -11,12 +11,13 @@ import {
 } from "../../components/Forms/Fields";
 import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
-import { H2, P } from "../../components/Typography";
+import { H2, H3, P } from "../../components/Typography";
 import { useMyMutation } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ControlsContainer } from "../Sessions/steps/Controls";
-import { FormRow } from "./FormRow";
+import { FL_MAX_WIDTH, FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
+import pjson from "../../../package.json";
 
 const FIELDS_GENERAL = {
   language: "language",
@@ -203,7 +204,7 @@ export const GeneralSettings = () => {
             autoComplete="new-password"
           />
         </FormRow>
-        <FormRow dividerTop={false}>
+        <FormRow dividerTop={false} dividerBottom>
           <ControlsContainer>
             <Button
               variant="outlined"
@@ -221,7 +222,54 @@ export const GeneralSettings = () => {
             </Button>
           </ControlsContainer>
         </FormRow>
+
+        <H2 sx={{ mb: 3 }}>
+          <Msg id="settings.general.integrations" />
+        </H2>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            maxWidth: FL_MAX_WIDTH,
+          }}
+        >
+          <Avatar
+            sx={{ width: 44, height: 44, mr: 2 }}
+            variant="square"
+            src={"/google-calendar.png"}
+          />
+          <Box sx={{ flexGrow: "2" }}>
+            <H3 sx={{ mb: 1 }}>
+              {msg("settings.general.integrations.google-calendar.title")}
+            </H3>
+            <P>
+              {msg("settings.general.integrations.google-calendar.description")}
+            </P>
+          </Box>
+          <Button
+            variant="outlined"
+            href={getAbsoluteHref(`/login/google`)}
+            target="_blank"
+          >
+            {msg("settings.general.integrations.google-calendar.connect")}
+          </Button>
+        </Box>
       </FormProvider>
     </form>
   );
+};
+
+const getAbsoluteHref = (path) => {
+  const origin =
+    process.env.NODE_ENV === "development"
+      ? pjson?.proxy || window.location.origin
+      : window.location.origin;
+  const url = new URL(path, origin);
+  const href = url.href;
+
+  if (process.env.NODE_ENV === "development")
+    console.log("[getAbsoluteHref]", { path, href, url, origin });
+
+  return href;
 };
