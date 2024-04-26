@@ -2640,11 +2640,20 @@
   "team.credit.add-member.fields.firstName": {
     "defaultMessage": "Name"
   },
+  "team.credit.add-member.fields.isManager": {
+    "defaultMessage": "Is manager"
+  },
   "team.credit.add-member.fields.lastName": {
     "defaultMessage": "Surname"
   },
   "team.credit.add-member.fields.locale": {
     "defaultMessage": "Select languages"
+  },
+  "team.credit.add-member.fields.manager": {
+    "defaultMessage": "Manager"
+  },
+  "team.credit.add-member.fields.position": {
+    "defaultMessage": "Position"
   },
   "team.credit.add-member.fields.timeZone": {
     "defaultMessage": "Timezone"

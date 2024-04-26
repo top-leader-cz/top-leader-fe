@@ -2,5 +2,8 @@
   "settings.general.integrations": "Integrations",
   "settings.general.integrations.google-calendar.connect": "Connect",
   "settings.general.integrations.google-calendar.description": "Sync your appointments with Google Calendar",
-  "settings.general.integrations.google-calendar.title": "Google Calendar"
+  "settings.general.integrations.google-calendar.title": "Google Calendar",
+  "team.credit.add-member.fields.isManager": "Is manager",
+  "team.credit.add-member.fields.manager": "Manager",
+  "team.credit.add-member.fields.position": "Position"
 }

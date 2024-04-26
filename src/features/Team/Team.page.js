@@ -144,7 +144,7 @@ function TeamPageInner() {
     },
   ];
 
-  console.log("[Team->Credits.page]", { hrUsersQuery });
+  console.log("[Team->Credits.page]", { hrUsersQuery, isHR, isAdmin });
   const manageUsersProps =
     isHR || isAdmin
       ? {
@@ -195,7 +195,7 @@ function TeamPageInner() {
       />
       <AddMemberModal
         open={!!member}
-        initialValues={member}
+        username={member?.username}
         onClose={() => setMember()}
       />
     </Layout>

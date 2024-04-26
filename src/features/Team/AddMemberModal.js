@@ -21,62 +21,96 @@ import { Icon } from "../../components/Icon";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { gray500 } from "../../theme";
-import { Authority } from "../Authorization/AuthProvider";
+import { Authority, useAuth, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
-import { QueryRenderer } from "../QM/QueryRenderer";
+import { Loaders, QueryRenderer } from "../QM/QueryRenderer";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
 import { useUserMutation } from "./api";
 import { messages } from "./messages";
+import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
+import { useLoadableOptions } from "../../components/Forms/hooks";
+import { map } from "ramda";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
 
-const obj = {};
+export const useHrUserQuery = ({ username, enabled, initialData }) => {
+  return useMyQuery({
+    queryKey: ["hr-users", username],
+    fetchDef: {
+      url: `/api/latest/hr-users/${username}`,
+    },
+    cacheTime: 0,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled,
+    initialData,
+  });
+};
 
-export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
-  const isEdit = !!initialValues?.username;
-
-  const msg = useMsg({ dict: messages });
+const useDefaultValues = () => {
   const { userTz, language } = useContext(I18nContext);
-
-  const mutation = useUserMutation({ isEdit, onSuccess: onClose });
-  const { reset } = mutation;
-  const resetMutation = useCallback(() => {
-    reset();
-  }, [reset]);
-
   const defaultValues = useMemo(
     () => ({
       firstName: "",
       lastName: "",
       username: "",
       authorities: ["USER"],
+      // isManager
+      // manager
+      // position
       locale: language,
       timeZone: userTz,
       trialUser: false,
     }),
     [language, userTz]
   );
+  return defaultValues;
+};
+
+const useManagersQuery = () => {
+  return useMyQuery({
+    queryKey: ["hr-users", "managers"],
+    fetchDef: {
+      url: "/api/latest/hr-users/managers",
+    },
+  });
+};
+
+export const AddMemberModal = ({ onClose, open, username }) => {
+  const { isHR, isAdmin, isCoach } = useAuth();
+  const msg = useMsg({ dict: messages });
+  const isEdit = !!username;
+  const hrUserQuery = useHrUserQuery({
+    username,
+    enabled: !!username,
+    initialData: useDefaultValues(),
+  });
+
+  const mutation = useUserMutation({ isEdit, onSuccess: onClose });
+  const resetMutation = useStaticCallback(mutation.reset);
+  useEffect(() => {
+    if (!open) resetMutation();
+  }, [open, resetMutation]);
 
   const methods = useForm({
     mode: "onSubmit",
-    defaultValues,
+    values: hrUserQuery.data,
   });
-  const { reset: resetForm } = methods;
-  useEffect(() => {
-    if (!open) {
-      resetMutation();
-      resetForm(defaultValues);
-    } else if (isEdit) {
-      console.log("[AddMemberModal reset]", { initialValues, defaultValues });
-      resetForm({ ...defaultValues, ...initialValues });
-    }
-  }, [defaultValues, initialValues, isEdit, open, resetForm, resetMutation]);
+
   const onSubmit = (values, e) => mutation.mutateAsync(values);
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
-  console.log("[AddMemberModal.rndr]", isEdit, {
-    initialValues,
-    defaultValues,
+  const managersProps = useLoadableOptions({
+    query: useManagersQuery(),
+    map: map(({ username, firstName, lastName }) => ({
+      value: username,
+      label: `${firstName} ${lastName}`,
+    })),
+  });
+
+  console.log("[AddMemberModal.rndr]", {
+    hrUserQuery,
     mutation,
     isEdit,
   });
@@ -102,6 +136,8 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
             display: "flex",
             flexDirection: "column",
             gap: 3,
+            maxHeight: "100%",
+            overflow: "auto",
             // border: "2px solid #000",
             // boxShadow: 24,
           }}
@@ -128,63 +164,95 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
             <P id="add-member-modal-description">
               {msg("team.credit.add-member.modal.desc")}
             </P>
-            <RHFTextField
-              name="firstName"
-              rules={{ required: true, minLength: 2 }}
-              label={msg("team.credit.add-member.fields.firstName")}
-              autoFocus
-              size="small"
-              fullWidth
-            />
-            <RHFTextField
-              name="lastName"
-              rules={{ required: true, minLength: 2 }}
-              label={msg("team.credit.add-member.fields.lastName")}
-              autoFocus
-              size="small"
-              fullWidth
-            />
-            <RHFTextField
-              disabled={isEdit}
-              name="username"
-              rules={{ required: true, minLength: 2 }}
-              label={msg("team.credit.add-member.fields.username")}
-              autoFocus
-              size="small"
-              fullWidth
-            />
+            {hrUserQuery.isFetching ? (
+              <Loaders.Skeleton />
+            ) : (
+              <>
+                <RHFTextField
+                  name="firstName"
+                  rules={{ required: true, minLength: 2 }}
+                  label={msg("team.credit.add-member.fields.firstName")}
+                  autoFocus
+                  size="small"
+                  fullWidth
+                />
+                <RHFTextField
+                  name="lastName"
+                  rules={{ required: true, minLength: 2 }}
+                  label={msg("team.credit.add-member.fields.lastName")}
+                  size="small"
+                  fullWidth
+                />
+                <RHFTextField
+                  disabled={isEdit}
+                  name="username"
+                  rules={{ required: true, minLength: 2 }}
+                  label={msg("team.credit.add-member.fields.username")}
+                  size="small"
+                  fullWidth
+                />
 
-            <AutocompleteSelect
-              multiple
-              name="authorities"
-              options={Object.values(Authority).map((value) => ({
-                value,
-                label: value,
-              }))}
-              label={msg("team.credit.add-member.fields.authorities")}
-              {...HIDDEN_FIELD}
-            />
-            <AutocompleteSelect
-              disableClearable
-              name="locale"
-              options={LANGUAGE_OPTIONS}
-              renderOption={renderLanguageOption}
-              label={msg("team.credit.add-member.fields.locale")}
-            />
-            <AutocompleteSelect
-              disableClearable
-              name="timeZone"
-              options={TIMEZONE_OPTIONS}
-              label={msg("team.credit.add-member.fields.timeZone")}
-              // TODO: translations? should be always populated
-            />
-            {!isEdit ? (
-              <FormControlLabel
-                control={<CheckboxField name="trialUser" />}
-                label={msg("team.credit.add-member.fields.trial-user")}
-              />
-            ) : null}
+                <AutocompleteSelect
+                  multiple
+                  name="authorities"
+                  options={Object.values(Authority).map((value) => ({
+                    value,
+                    label: value,
+                  }))}
+                  label={msg("team.credit.add-member.fields.authorities")}
+                  {...HIDDEN_FIELD}
+                />
 
+                {(isHR || isAdmin) && (
+                  <>
+                    {!isEdit && (
+                      <FormControlLabel
+                        control={<CheckboxField name="isManager" />}
+                        label={msg("team.credit.add-member.fields.isManager")}
+                      />
+                    )}
+
+                    {isEdit && (
+                      <>
+                        <AutocompleteSelect
+                          name="manager"
+                          label={msg("team.credit.add-member.fields.manager")}
+                          {...managersProps}
+                        />
+                        <RHFTextField
+                          name="position"
+                          rules={{ minLength: 2 }}
+                          label={msg("team.credit.add-member.fields.position")}
+                          size="small"
+                          fullWidth
+                        />
+                      </>
+                    )}
+                  </>
+                )}
+
+                <AutocompleteSelect
+                  disableClearable
+                  name="locale"
+                  options={LANGUAGE_OPTIONS}
+                  renderOption={renderLanguageOption}
+                  label={msg("team.credit.add-member.fields.locale")}
+                />
+                <AutocompleteSelect
+                  disableClearable
+                  name="timeZone"
+                  options={TIMEZONE_OPTIONS}
+                  label={msg("team.credit.add-member.fields.timeZone")}
+                  // TODO: translations? should be always populated
+                />
+                {!isEdit ? (
+                  <FormControlLabel
+                    control={<CheckboxField name="trialUser" />}
+                    label={msg("team.credit.add-member.fields.trial-user")}
+                  />
+                ) : null}
+              </>
+            )}
             <Divider flexItem sx={{ mt: 3 }} />
             <Box display="flex" flexDirection="row" gap={3}>
               <Button fullWidth variant="outlined" onClick={() => onClose()}>
@@ -194,7 +262,7 @@ export const AddMemberModal = ({ onClose, open, initialValues = obj }) => {
                 fullWidth
                 variant="contained"
                 type="submit"
-                disabled={mutation.isLoading}
+                disabled={mutation.isLoading || hrUserQuery.isFetching}
               >
                 {msg(
                   isEdit

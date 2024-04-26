@@ -13,7 +13,11 @@ import {
   take,
   unapply,
 } from "ramda";
-import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import {
+  useAuth,
+  useMyMutation,
+  useMyQuery,
+} from "../Authorization/AuthProvider";
 
 export const useHrUsersQuery = (params = {}) => {
   return useMyQuery({
@@ -36,7 +40,9 @@ export const creditFrom = (credit) => {
 
 export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
 
-export const useUserMutation = ({ isEdit, isAdmin, ...rest } = {}) => {
+export const useUserMutation = ({ isEdit, ...rest } = {}) => {
+  const { isHR, isAdmin, isCoach } = useAuth();
+
   return useMyMutation({
     fetchDef: {
       ...(isEdit
@@ -55,6 +61,11 @@ export const useUserMutation = ({ isEdit, isAdmin, ...rest } = {}) => {
             ifElse(prop("trialUser"), always("AUTHORIZED"), always("PENDING"))
           ),
         }),
+        ifElse(
+          always(isHR || isAdmin),
+          pick(["isManager", "manager", "position"]),
+          always({})
+        ),
         ifElse(
           allPass([always(isAdmin), always(isEdit)]),
           applySpec({
