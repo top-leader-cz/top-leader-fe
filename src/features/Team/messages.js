@@ -110,6 +110,18 @@ export const messages = defineMessages({
     id: "team.credit.add-member.fields.authorities",
     defaultMessage: "Authorities",
   },
+  "team.credit.add-member.fields.isManager": {
+    id: "team.credit.add-member.fields.isManager",
+    defaultMessage: "Is manager",
+  },
+  "team.credit.add-member.fields.manager": {
+    id: "team.credit.add-member.fields.manager",
+    defaultMessage: "Manager",
+  },
+  "team.credit.add-member.fields.position": {
+    id: "team.credit.add-member.fields.position",
+    defaultMessage: "Position",
+  },
   "team.credit.add-member.fields.locale": {
     id: "team.credit.add-member.fields.locale",
     defaultMessage: "Select languages",
