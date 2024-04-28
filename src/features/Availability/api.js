@@ -155,7 +155,7 @@ export const fetchAvailabilityWeekIntervals = ({
         username: always(username),
         from: prop("from"),
         to: prop("to"),
-        freeBusy: always(freeBusy),
+        useFreeBusy: always(freeBusy),
       },
     }),
     authFetch,
@@ -318,10 +318,12 @@ const exampleErr = [
 ];
 export const usePickSlotMutation = ({ username, ...mutationProps }) => {
   const { i18n, userTz } = useContext(I18nContext);
+  const [freeBusy] = useFreeBusy();
   const pickSlotMutation = useMyMutation({
     fetchDef: {
       method: "POST",
       url: `/api/latest/coaches/${username}/schedule`,
+      query: { useFreeBusy: freeBusy },
       from: applySpec({
         time: ({ interval }) =>
           i18n.formatLocal(interval.start, API_DATETIME_LOCAL_FORMAT),
