@@ -29,6 +29,10 @@ import { useAuth } from "../Authorization";
 import { useMyMutation } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { fixEnd } from "../I18n/utils/date";
+import {
+  useLocalStorage,
+  useSessionStorage,
+} from "../../hooks/useLocalStorage";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -138,6 +142,7 @@ export const fetchAvailabilityWeekIntervals = ({
   fetchFrameKey,
   userTz,
   timeZone,
+  freeBusy,
 }) => {
   return pipeP(
     fetchFrameKeyToParams({ userTz }),
@@ -146,7 +151,12 @@ export const fetchAvailabilityWeekIntervals = ({
     //     query: { username, from, to, }, }),
     applySpec({
       url: always(`/api/latest/coaches/${username}/availability`),
-      query: { username: always(username), from: prop("from"), to: prop("to") },
+      query: {
+        username: always(username),
+        from: prop("from"),
+        to: prop("to"),
+        freeBusy: always(freeBusy),
+      },
     }),
     authFetch,
     parseAvailabilities({ timeZone })
@@ -169,6 +179,11 @@ const joinResults = pipe(flatten);
 
 // const updateWindows = curryN(2, (interval, intervals) => {});
 
+export const useFreeBusy = () => {
+  const [freeBusy, setFreeBusy] = useSessionStorage("__freeBusy", true);
+  return [freeBusy, setFreeBusy];
+};
+
 export const useAvailabilityQueries = ({
   username,
   timeZone,
@@ -189,9 +204,11 @@ export const useAvailabilityQueries = ({
   // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
   // console.log(".....", { calendarInterval, fetchFrameKeys });
 
+  const [freeBusy] = useFreeBusy();
+
   const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
     enabled: !!username && !!timeZone && !disabled,
-    queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey }], // prettier-ignore
+    queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey, freeBusy }], // prettier-ignore
     queryFn: async () => ({
       params: { userTz, fetchFrameKey, username, calendarInterval },
       weekData: await fetchAvailabilityWeekIntervals({
@@ -200,6 +217,7 @@ export const useAvailabilityQueries = ({
         fetchFrameKey,
         userTz,
         timeZone,
+        freeBusy,
       }),
     }),
   }));

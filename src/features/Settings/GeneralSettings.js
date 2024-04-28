@@ -1,4 +1,4 @@
-import { Avatar, Box, Button } from "@mui/material";
+import { Avatar, Box, Button, Checkbox, Tooltip } from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -12,12 +12,14 @@ import {
 import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, H3, P } from "../../components/Typography";
-import { useMyMutation } from "../Authorization/AuthProvider";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FL_MAX_WIDTH, FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import pjson from "../../../package.json";
+import { useFreeBusy } from "../Availability/api";
+import { QueryRenderer } from "../QM/QueryRenderer";
 
 const FIELDS_GENERAL = {
   language: "language",
@@ -38,6 +40,64 @@ export const TIMEZONE_OPTIONS = timeZones.map((value) => ({
   value,
   label: formatTimezone(value),
 }));
+
+/*
+{
+  "active": true,
+  "status": "IN_PROGRESS",
+  "lastSync": "2024-04-28T12:48:19.110Z"
+}
+*/
+const useGoogleInfoQuery = () => {
+  return useMyQuery({
+    fetchDef: {
+      url: "/api/latest/google-info",
+    },
+  });
+};
+
+const GCalSync = ({ msg }) => {
+  const query = useGoogleInfoQuery();
+  const [freeBusy, setFreeBusy] = useFreeBusy();
+
+  console.log({ freeBusy });
+
+  return (
+    <>
+      <QueryRenderer
+        loaderName="Block"
+        query={query}
+        success={({ data }) => {
+          if (!data?.active)
+            return (
+              <Button
+                variant="outlined"
+                href={getAbsoluteHref(`/login/google`)}
+                target="_blank"
+              >
+                {msg("settings.general.integrations.google-calendar.connect")}
+              </Button>
+            );
+          else return data?.status;
+        }}
+      />
+      <Tooltip title={"Enabled freeBusy"} placement="top">
+        <Checkbox
+          disabled={
+            process.env.NODE_ENV === "production" &&
+            process.env.REACT_APP_ENV !== "QA"
+          }
+          name="__freeBusy"
+          checked={!!freeBusy}
+          onChange={(e, value) => {
+            console.log("freeBusy", { value });
+            setFreeBusy(value);
+          }}
+        />
+      </Tooltip>
+    </>
+  );
+};
 
 export const GeneralSettings = () => {
   const passwordMutation = useMyMutation({
@@ -247,13 +307,7 @@ export const GeneralSettings = () => {
               {msg("settings.general.integrations.google-calendar.description")}
             </P>
           </Box>
-          <Button
-            variant="outlined"
-            href={getAbsoluteHref(`/login/google`)}
-            target="_blank"
-          >
-            {msg("settings.general.integrations.google-calendar.connect")}
-          </Button>
+          <GCalSync msg={msg} />
         </Box>
       </FormProvider>
     </form>
