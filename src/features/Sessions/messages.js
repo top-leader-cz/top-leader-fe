@@ -241,6 +241,10 @@ export const messages = defineMessages({
     id: "sessions.steps.finished.perex",
     defaultMessage: "Would you like to book the next one?",
   },
+  "sessions.steps.finished.schedule-private": {
+    id: "sessions.steps.finished.schedule-private",
+    defaultMessage: "Or you can schedule your private session",
+  },
   "sessions.steps.finished.datetime.separator": {
     id: "sessions.steps.finished.datetime.separator",
     defaultMessage: "at",

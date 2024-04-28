@@ -2331,6 +2331,9 @@
   "sessions.steps.finished.perex": {
     "defaultMessage": "Would you like to book the next one?"
   },
+  "sessions.steps.finished.schedule-private": {
+    "defaultMessage": "Or you can schedule your private session"
+  },
   "sessions.steps.finished.title": {
     "defaultMessage": "Congratulations, you’ve completed your session!"
   },

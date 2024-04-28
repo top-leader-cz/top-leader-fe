@@ -776,6 +776,7 @@
   "sessions.steps.finished.button.skip": "Skip for now",
   "sessions.steps.finished.datetime.separator": "at",
   "sessions.steps.finished.perex": "Would you like to book the next one?",
+  "sessions.steps.finished.schedule-private": "Or you can schedule your private session",
   "sessions.steps.finished.title": "Congratulations, you’ve completed your session!",
   "sessions.steps.goal.placeholder": "Type your own goal or choose from the list",
   "sessions.steps.textareastep.placeholder": "Type your own {textAreaName}",

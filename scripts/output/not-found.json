@@ -1,4 +1,5 @@
 {
+  "sessions.steps.finished.schedule-private": "Or you can schedule your private session",
   "settings.general.integrations": "Integrations",
   "settings.general.integrations.google-calendar.connect": "Connect",
   "settings.general.integrations.google-calendar.description": "Sync your appointments with Google Calendar",

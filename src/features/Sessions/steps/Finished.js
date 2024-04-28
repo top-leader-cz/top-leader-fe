@@ -192,7 +192,9 @@ export const Finished = () => {
         {!currentCoach ? null : ( // TODO? https://topleader.atlassian.net/browse/TOP-116
           <>
             <ScheduleCoached />
-            <P sx={{ my: 5 }}>Or you can schedule your private session</P>
+            <P sx={{ my: 5 }}>
+              <Msg id="sessions.steps.finished.schedule-private" />
+            </P>
           </>
         )}
         <SchedulePrivateForm />
