@@ -1,4 +1,11 @@
-import { Avatar, Box, Button, Checkbox, Tooltip } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Tooltip,
+} from "@mui/material";
 import { useCallback, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -65,8 +72,8 @@ const GCalSync = ({ msg }) => {
   return (
     <>
       <QueryRenderer
-        loaderName="Block"
         query={query}
+        loading={() => <CircularProgress size={20} color="primary" />}
         success={({ data }) => {
           if (!data?.active)
             return (
@@ -81,7 +88,7 @@ const GCalSync = ({ msg }) => {
           else return data?.status;
         }}
       />
-      <Tooltip title={"Enabled freeBusy"} placement="top">
+      <Tooltip title={"Enabled useFreeBusy"} placement="top">
         <Checkbox
           disabled={
             process.env.NODE_ENV === "production" &&

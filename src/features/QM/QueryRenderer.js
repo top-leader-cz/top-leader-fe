@@ -18,7 +18,7 @@ export const Loaders = {
       <CircularProgress color="inherit" />
     </Backdrop>
   ),
-  Block: () => (
+  Block: ({ loaderProps = {} }) => (
     <Box
       sx={{
         display: "flex",
@@ -28,6 +28,7 @@ export const Loaders = {
         height: "100%",
         width: "100%",
         color: "primary.main",
+        ...(loaderProps.sx || {}),
       }}
     >
       <CircularProgress color="inherit" />
