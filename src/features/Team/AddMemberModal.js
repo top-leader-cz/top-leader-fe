@@ -205,13 +205,10 @@ export const AddMemberModal = ({ onClose, open, username }) => {
 
                 {(isHR || isAdmin) && (
                   <>
-                    {!isEdit && (
-                      <FormControlLabel
-                        control={<CheckboxField name="isManager" />}
-                        label={msg("team.credit.add-member.fields.isManager")}
-                      />
-                    )}
-
+                    <FormControlLabel
+                      control={<CheckboxField name="isManager" />}
+                      label={msg("team.credit.add-member.fields.isManager")}
+                    />
                     {isEdit && (
                       <>
                         <AutocompleteSelect
