@@ -25,28 +25,13 @@ import { Authority, useAuth, useMyQuery } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { Loaders, QueryRenderer } from "../QM/QueryRenderer";
 import { TIMEZONE_OPTIONS } from "../Settings/GeneralSettings";
-import { useUserMutation } from "./api";
+import { useHRUserMutation, useHrUserQuery, useManagersQuery } from "./api";
 import { messages } from "./messages";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { useLoadableOptions } from "../../components/Forms/hooks";
 import { map } from "ramda";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
-
-export const useHrUserQuery = ({ username, enabled, initialData }) => {
-  return useMyQuery({
-    queryKey: ["hr-users", username],
-    fetchDef: {
-      url: `/api/latest/hr-users/${username}`,
-    },
-    cacheTime: 0,
-    staleTime: 0,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    enabled,
-    initialData,
-  });
-};
 
 const useDefaultValues = () => {
   const { userTz, language } = useContext(I18nContext);
@@ -68,17 +53,8 @@ const useDefaultValues = () => {
   return defaultValues;
 };
 
-const useManagersQuery = () => {
-  return useMyQuery({
-    queryKey: ["hr-users", "managers"],
-    fetchDef: {
-      url: "/api/latest/hr-users/managers",
-    },
-  });
-};
-
 export const AddMemberModal = ({ onClose, open, username }) => {
-  const { isHR, isAdmin, isCoach } = useAuth();
+  const { isHR, isAdmin } = useAuth();
   const msg = useMsg({ dict: messages });
   const isEdit = !!username;
   const hrUserQuery = useHrUserQuery({
@@ -87,7 +63,7 @@ export const AddMemberModal = ({ onClose, open, username }) => {
     initialData: useDefaultValues(),
   });
 
-  const mutation = useUserMutation({ isEdit, onSuccess: onClose });
+  const mutation = useHRUserMutation({ isEdit, onSuccess: onClose });
   const resetMutation = useStaticCallback(mutation.reset);
   useEffect(() => {
     if (!open) resetMutation();

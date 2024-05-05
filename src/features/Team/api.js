@@ -30,6 +30,30 @@ export const useHrUsersQuery = (params = {}) => {
   });
 };
 
+export const useHrUserQuery = ({ username, enabled, initialData }) => {
+  return useMyQuery({
+    queryKey: ["hr-users", username],
+    fetchDef: {
+      url: `/api/latest/hr-users/${username}`,
+    },
+    cacheTime: 0,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled,
+    initialData,
+  });
+};
+
+export const useManagersQuery = () => {
+  return useMyQuery({
+    queryKey: ["hr-users", "managers"],
+    fetchDef: {
+      url: "/api/latest/hr-users/managers",
+    },
+  });
+};
+
 export const creditFrom = (credit) => {
   const num = Number(credit);
   const nan = isNaN(num);
@@ -40,7 +64,7 @@ export const creditFrom = (credit) => {
 
 export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
 
-export const useUserMutation = ({ isEdit, ...rest } = {}) => {
+export const useHRUserMutation = ({ isEdit, ...rest } = {}) => {
   const { isHR, isAdmin } = useAuth();
 
   return useMyMutation({
@@ -48,7 +72,7 @@ export const useUserMutation = ({ isEdit, ...rest } = {}) => {
       ...(isEdit
         ? {
             method: "PUT",
-            getUrl: pipe(prop("username"), concat(`/api/latest/hr-user/`)),
+            getUrl: pipe(prop("username"), concat(`/api/latest/hr-users/`)),
           }
         : { method: "POST", url: `/api/latest/hr-users` }),
       from: converge(unapply(mergeAll), [
@@ -67,15 +91,6 @@ export const useUserMutation = ({ isEdit, ...rest } = {}) => {
           pick(["isManager", "manager", "position"]),
           always({})
         ),
-        // ifElse(
-        //   allPass([always(isAdmin), always(isEdit)]),
-        //   applySpec({
-        //     // TODO: BE?
-        //     coach: prop("coach"),
-        //     credit: pipe(prop("credit"), creditFrom),
-        //   }),
-        //   always({})
-        // ),
       ]),
     },
     invalidate: [
