@@ -41,18 +41,19 @@ export const creditFrom = (credit) => {
 export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
 
 export const useUserMutation = ({ isEdit, ...rest } = {}) => {
-  const { isHR, isAdmin, isCoach } = useAuth();
+  const { isHR, isAdmin } = useAuth();
 
   return useMyMutation({
     fetchDef: {
       ...(isEdit
         ? {
             method: "PUT",
-            getUrl: pipe(prop("username"), concat(`/api/latest/user/`)),
+            getUrl: pipe(prop("username"), concat(`/api/latest/hr-user/`)),
           }
-        : { method: "POST", url: `/api/latest/user` }),
+        : { method: "POST", url: `/api/latest/hr-users` }),
       from: converge(unapply(mergeAll), [
-        pick(["username", "firstName", "lastName", "authorities", "timeZone"]),
+        pick(isEdit ? [] : ["username"]),
+        pick(["firstName", "lastName", "authorities", "timeZone"]),
         applySpec({
           locale: toApiLocale, // just create?
           status: ifElse(
@@ -66,15 +67,15 @@ export const useUserMutation = ({ isEdit, ...rest } = {}) => {
           pick(["isManager", "manager", "position"]),
           always({})
         ),
-        ifElse(
-          allPass([always(isAdmin), always(isEdit)]),
-          applySpec({
-            // TODO: BE?
-            coach: prop("coach"),
-            credit: pipe(prop("credit"), creditFrom),
-          }),
-          always({})
-        ),
+        // ifElse(
+        //   allPass([always(isAdmin), always(isEdit)]),
+        //   applySpec({
+        //     // TODO: BE?
+        //     coach: prop("coach"),
+        //     credit: pipe(prop("credit"), creditFrom),
+        //   }),
+        //   always({})
+        // ),
       ]),
     },
     invalidate: [
