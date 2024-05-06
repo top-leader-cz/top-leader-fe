@@ -893,6 +893,18 @@ export const SliderField = ({
   );
 };
 
+export const optionEqStrategies = {
+  default: "default",
+  optionValue: "optionValue",
+  equals: "equals",
+};
+
+const predicateFns = {
+  [optionEqStrategies.default]: undefined,
+  [optionEqStrategies.optionValue]: (opt, val) => opt.value === val,
+  [optionEqStrategies.equals]: (opt, val) => opt === val,
+};
+
 // TODO: make stateless for language select, keep state in mutation with optimistic update
 // export const AutocompleteBare = ({}) => {}
 
@@ -906,13 +918,15 @@ export const AutocompleteSelect = ({
   groupedOptions,
   renderOption,
   InputProps,
-  placeholder: placeholderProp,
   multiple,
   enableIsOptionEqualToValue = !multiple, // TODO: progressively enable everywhere
+  optionEqStrategy = enableIsOptionEqualToValue ? "optionValue" : "default",
+  placeholder: placeholderProp,
   disableCloseOnSelect = multiple,
   autoComplete,
   onChange,
-  getValue = (f) => f.value,
+  defaultValueFix = multiple ? [] : null, // initial value of undefined breaks lazy initialization from form
+  getValue = (f) => f.value || defaultValueFix,
   sx = {},
   textFieldProps = {},
   disablePortal,
@@ -958,12 +972,7 @@ export const AutocompleteSelect = ({
           multiple={multiple}
           disableCloseOnSelect={disableCloseOnSelect}
           disableClearable={disableClearable}
-          isOptionEqualToValue={
-            // TODO: test multiple works
-            enableIsOptionEqualToValue
-              ? (option, value) => option.value === value
-              : undefined
-          }
+          isOptionEqualToValue={predicateFns[optionEqStrategy]}
           getOptionLabel={(optionOrValue) =>
             optionOrValue?.label ||
             getOption(optionsProps.options, optionOrValue)?.label ||
@@ -995,7 +1004,13 @@ export const AutocompleteSelect = ({
               error={!!fieldState.error}
               helperText={
                 <FieldError
-                  {...{ field, fieldState, rules, name, parametrizedValidate }}
+                  {...{
+                    field,
+                    fieldState,
+                    rules,
+                    name,
+                    parametrizedValidate,
+                  }}
                 />
               }
               inputProps={{
@@ -1040,12 +1055,6 @@ const log =
   (data) =>
     console.log(...args, data);
 
-export const optionEqStrategies = {
-  default: "default",
-  optionValue: "optionValue",
-  equals: "equals",
-};
-
 const useGroupedOptions = ({ options: optionsProp, groupedOptions }) => {
   return useMemo(() => {
     if (!groupedOptions) return { options: optionsProp };
@@ -1066,12 +1075,6 @@ const useGroupedOptions = ({ options: optionsProp, groupedOptions }) => {
       )(groupedOptions),
     };
   }, [groupedOptions, optionsProp]);
-};
-
-const predicateFns = {
-  [optionEqStrategies.default]: undefined,
-  [optionEqStrategies.optionValue]: (opt, val) => opt.value === val,
-  [optionEqStrategies.equals]: (opt, val) => opt === val,
 };
 
 export const FreeSoloField = ({

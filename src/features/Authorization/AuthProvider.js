@@ -75,6 +75,7 @@ export const Authority = {
   USER: "USER",
   ADMIN: "ADMIN",
   HR: "HR",
+  MANAGER: "MANAGER",
 };
 
 export const qstr = (url, query) => {

@@ -30,6 +30,7 @@ import { messages } from "./messages";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import { useLoadableOptions } from "../../components/Forms/hooks";
 import { map } from "ramda";
+import { formatName } from "../Coaches/CoachCard";
 
 const HIDDEN_FIELD = { sx: { display: "none" } };
 
@@ -62,6 +63,7 @@ export const AddMemberModal = ({ onClose, open, username }) => {
     enabled: !!username,
     initialData: useDefaultValues(),
   });
+  const managersQuery = useManagersQuery();
 
   const mutation = useHRUserMutation({ isEdit, onSuccess: onClose });
   const resetMutation = useStaticCallback(mutation.reset);
@@ -78,17 +80,20 @@ export const AddMemberModal = ({ onClose, open, username }) => {
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 
   const managersProps = useLoadableOptions({
-    query: useManagersQuery(),
+    query: managersQuery,
     map: map(({ username, firstName, lastName }) => ({
       value: username,
-      label: `${firstName} ${lastName}`,
+      // label: `${firstName} ${lastName}`,
+      label: formatName({ firstName, lastName }),
     })),
   });
 
   console.log("[AddMemberModal.rndr]", {
     hrUserQuery,
+    reactiveValues: hrUserQuery.data,
     mutation,
     isEdit,
+    managersProps,
   });
 
   return (
@@ -176,6 +181,7 @@ export const AddMemberModal = ({ onClose, open, username }) => {
                     label: value,
                   }))}
                   label={msg("team.credit.add-member.fields.authorities")}
+                  enableIsOptionEqualToValue
                   {...HIDDEN_FIELD}
                 />
 

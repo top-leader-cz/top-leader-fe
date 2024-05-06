@@ -51,6 +51,8 @@ export const useManagersQuery = () => {
     fetchDef: {
       url: "/api/latest/hr-users/managers",
     },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 };
 

@@ -22,16 +22,16 @@ import { useHrUsersQuery } from "./api";
 import { messages } from "./messages";
 import { formatName } from "../Coaches/CoachCard";
 
+const getKey = (button) =>
+  button.key || JSON.stringify(omit(["children"], button));
+
 export const ActionsCell = ({ buttons = [], ...props }) => {
   const renderButton = ({ Component = Button, ...button }) => (
-    <Component
-      key={button.key || JSON.stringify(omit(["children"], button))}
-      {...button}
-    />
+    <Component key={getKey(button)} {...button} />
   );
   const render = (button) =>
     button.tooltip ? (
-      <ErrorBoundary>
+      <ErrorBoundary key={getKey(button)}>
         <Tooltip title={button.tooltip}>{renderButton(button)}</Tooltip>
       </ErrorBoundary>
     ) : (
@@ -126,11 +126,13 @@ function TeamPageInner() {
         <ActionsCell
           buttons={[
             {
+              key: 1,
               variant: "outlined",
               onClick: () => setTopUpSelected(row),
               children: msg("team.credit.topup"),
             },
             {
+              key: 2,
               tooltip: msg("settings.admin.table.edit.tooltip"),
               Component: IconButton,
               onClick: () => setMember(row),
