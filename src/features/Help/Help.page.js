@@ -27,7 +27,6 @@ export function HelpPage() {
       <EmptyTemplate
         title={msg("help.title")}
         description={msg("help.description", {
-          // emailLink: "support@topleader.io",
           emailLink: (
             <EmailTo
               email={"support@topleader.io"}

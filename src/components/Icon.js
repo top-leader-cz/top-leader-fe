@@ -116,6 +116,8 @@ const Icons = {
   Sync,
 };
 
+export const ICON_NAMES = Object.keys(Icons);
+
 // const StepIconRoot = styled("div")(({ theme, ownerState }) => ({
 //   backgroundColor:
 //     theme.palette.mode === "dark" ? theme.palette.grey[700] : "#EAECF0",

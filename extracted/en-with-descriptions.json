@@ -2088,6 +2088,21 @@
   "general.select.placeholder": {
     "defaultMessage": "Select from the list"
   },
+  "google.back-to-dashboard": {
+    "defaultMessage": "Back to dashboard"
+  },
+  "google.error.description": {
+    "defaultMessage": "Unfortunately, we were unable to integrate your Google Calendar with the TopLeader platform at this time. Please try again later. If the issue persists, do not hesitate to contact us at {emailLink} for assistance."
+  },
+  "google.error.title": {
+    "defaultMessage": "Failed"
+  },
+  "google.success.description": {
+    "defaultMessage": "Your Google Calendar has been successfully integrated with the TopLeader platform. You can now close this window by clicking the button below."
+  },
+  "google.success.title": {
+    "defaultMessage": "Success"
+  },
   "help.back-to-dashboard": {
     "defaultMessage": "Back to dashboard"
   },

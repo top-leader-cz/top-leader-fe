@@ -1,4 +1,8 @@
 {
+  "google.back-to-dashboard": "Back to dashboard",
+  "google.error.description": "Unfortunately, we were unable to integrate your Google Calendar with the TopLeader platform at this time. Please try again later. If the issue persists, do not hesitate to contact us at {emailLink} for assistance.",
+  "google.error.title": "Failed",
+  "google.success.description": "Your Google Calendar has been successfully integrated with the TopLeader platform. You can now close this window by clicking the button below.",
   "sessions.steps.finished.schedule-private": "Or you can schedule your private session",
   "settings.general.integrations": "Integrations",
   "settings.general.integrations.google-calendar.connect": "Connect",

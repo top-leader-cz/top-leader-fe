@@ -39,6 +39,7 @@ import { MyValuesPage, SetValuesPage } from "../features/Values";
 import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
 import { HelpPage } from "../features/Help/Help.page";
+import { GoogleCalPage } from "../features/Integrations/GoogleCalPage";
 
 const GlobalSpinner = () => {
   return (
@@ -215,6 +216,22 @@ export const router = createHashRouter([
         element: (
           <RequireAuth>
             <SettingsPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.syncSuccess,
+        element: (
+          <RequireAuth>
+            <GoogleCalPage result="success" />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.syncError,
+        element: (
+          <RequireAuth>
+            <GoogleCalPage result="error" />
           </RequireAuth>
         ),
       },

@@ -23,6 +23,8 @@ export const routes = {
   startSession: "/start-session",
   coaches: "/coaches",
   settings: "/settings",
+  syncSuccess: "/sync-success",
+  syncError: "/sync-error",
   help: "/help",
   getFeedback: "/get-feedback",
   createFeedbackForm: "/get-feedback/create",

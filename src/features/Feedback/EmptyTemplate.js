@@ -23,11 +23,13 @@ export const EmptyTemplate = ({ title, description, iconName, button }) => {
             {title}
           </H1>
         )}
-        renderText={() => (
-          <P bigger mb={4}>
-            {description}
-          </P>
-        )}
+        renderText={() =>
+          !description ? null : (
+            <P bigger mb={4}>
+              {description}
+            </P>
+          )
+        }
       >
         {button && <Button {...button} />}
       </IconTile>
