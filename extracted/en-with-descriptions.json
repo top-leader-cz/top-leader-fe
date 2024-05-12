@@ -2616,6 +2616,66 @@
   "settings.tabs.profile.label": {
     "defaultMessage": "Profile"
   },
+  "settings.user-profile.field.aspiredCompetency": {
+    "defaultMessage": "Aspired Competency"
+  },
+  "settings.user-profile.field.aspiredCompetency.placeholder": {
+    "defaultMessage": "Enter your aspired competency"
+  },
+  "settings.user-profile.field.aspiredPosition": {
+    "defaultMessage": "Aspired Position (2-5 Years)"
+  },
+  "settings.user-profile.field.aspiredPosition.placeholder": {
+    "defaultMessage": "Enter your aspired position"
+  },
+  "settings.user-profile.field.businessStrategy": {
+    "defaultMessage": "Company business strategy"
+  },
+  "settings.user-profile.field.businessStrategy.placeholder": {
+    "defaultMessage": ""
+  },
+  "settings.user-profile.field.companyId": {
+    "defaultMessage": "Company"
+  },
+  "settings.user-profile.field.companyId.placeholder": {
+    "defaultMessage": ""
+  },
+  "settings.user-profile.field.firstName.placeholder": {
+    "defaultMessage": "Enter your first name"
+  },
+  "settings.user-profile.field.lastName.placeholder": {
+    "defaultMessage": "Enter your last name"
+  },
+  "settings.user-profile.field.manager": {
+    "defaultMessage": "Manager"
+  },
+  "settings.user-profile.field.manager.placeholder": {
+    "defaultMessage": "Enter your manager"
+  },
+  "settings.user-profile.field.name": {
+    "defaultMessage": "Name"
+  },
+  "settings.user-profile.field.position": {
+    "defaultMessage": "Position"
+  },
+  "settings.user-profile.field.position.placeholder": {
+    "defaultMessage": "Enter your position"
+  },
+  "settings.user-profile.field.username": {
+    "defaultMessage": "Email"
+  },
+  "settings.user-profile.field.username.placeholder": {
+    "defaultMessage": ""
+  },
+  "settings.user-profile.heading": {
+    "defaultMessage": "Profile"
+  },
+  "settings.user-profile.perex": {
+    "defaultMessage": "Update your profile here"
+  },
+  "settings.user-profile.save": {
+    "defaultMessage": "Save"
+  },
   "strengths.aside.perex": {
     "defaultMessage": "History"
   },

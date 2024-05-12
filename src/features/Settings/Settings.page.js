@@ -13,27 +13,34 @@ import { AdminSettings } from "./AdminSettings";
 import { prop } from "ramda";
 import { ErrorBoundary } from "react-error-boundary";
 import { CompaniesSettings } from "./CompaniesSettings";
+import { UserProfileSettings } from "./UserProfileSettings";
+import { useSessionStorage } from "../../hooks/useLocalStorage";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
 const TABS = {
   PROFILE: "PROFILE",
+  USER_PROFILE: "USER_PROFILE",
   GENERAL: "GENERAL",
   AVAILABILITY: "AVAILABILITY",
   ADMIN: "ADMIN",
   COMPANIES: "COMPANIES",
 };
 
+export const useDevMode = () => {
+  return useSessionStorage("_devMode", false);
+};
+
 function SettingsPageInner() {
   // const [tab, setTab] = useState(TABS.AVAILABILITY);
   const msg = useMsg();
   const { isCoach, isAdmin } = useAuth();
+  const [isDevMode] = useDevMode();
 
   const tabs = useMemo(() => {
     const tabs = [
       {
         key: TABS.PROFILE,
-        // visible: isCoach && !isAdmin,
         visible: isCoach,
         label: msg("settings.tabs.profile.label"),
         Component: ProfileSettings,
@@ -45,7 +52,12 @@ function SettingsPageInner() {
         Component: GeneralSettings,
       },
       {
-        // visible: isCoach && !isAdmin,
+        key: TABS.USER_PROFILE,
+        visible: !isCoach && isDevMode,
+        label: msg("settings.tabs.profile.label"),
+        Component: UserProfileSettings,
+      },
+      {
         visible: isCoach,
         key: TABS.AVAILABILITY,
         label: msg("settings.tabs.availability.label"),
@@ -66,7 +78,7 @@ function SettingsPageInner() {
       },
     ].filter(prop("visible"));
     return tabs;
-  }, [isAdmin, isCoach, msg]);
+  }, [isAdmin, isCoach, isDevMode, msg]);
 
   console.log("[SettingsPageInner.rndr]", { tabs });
 

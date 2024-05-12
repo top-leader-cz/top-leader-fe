@@ -653,8 +653,10 @@ const debugLog = (debug) => {
   }
 };
 
+// <|>
+// https://github.com/ramda/ramda/issues/1279
 const isValidate = curryN(2, (validateName, parametrizedValidateItem) =>
-  propEq(0, validateName, parametrizedValidateItem)
+  propEq(validateName, 0, parametrizedValidateItem)
 );
 export const getValidateParamsMaybe = curryN(
   2,
@@ -677,25 +679,36 @@ export const getValidateOptionsMaybe = curryN(
 );
 
 const applyVParams = ({ rules = {}, parametrizedValidate = [] }) => {
-  // tricky, let's trust to native validation for now
-  // also rules.required is used to default clearable and disableClearable
-  const isRequired = any(isValidate("required"), parametrizedValidate);
+  try {
+    // tricky, let's trust to native validation for now
+    // also rules.required is used to default clearable and disableClearable
+    const isRequired = any(isValidate("required"), parametrizedValidate);
 
-  const rulesResult = {
-    ...rules,
-    ...(isRequired ? { required: true } : {}),
-    validate: mergeRight(
-      rules.validate || {},
-      pipe(
-        reject(isValidate("required")), // TODO: {hasValue: (value) => ...} arg by input type?
-        map(([name, arg]) => [name, validations[name](arg)]),
-        fromPairs
-      )(parametrizedValidate)
-    ),
-  };
-  // console.log({ rulesResult, rules, parametrizedValidate });
+    const rulesResult = {
+      ...rules,
+      ...(isRequired ? { required: true } : {}),
+      validate: mergeRight(
+        rules.validate || {},
+        pipe(
+          reject(isValidate("required")), // TODO: {hasValue: (value) => ...} arg by input type?
+          map(([name, arg]) => [name, validations[name](arg)]),
+          fromPairs
+        )(parametrizedValidate)
+      ),
+    };
+    // console.log({ rulesResult, rules, parametrizedValidate });
 
-  return rulesResult;
+    return rulesResult;
+  } catch (e) {
+    console.log("ERROR:applyVParams", {
+      e,
+      validations,
+      rules,
+      parametrizedValidate,
+    });
+    debugger;
+    return {};
+  }
 };
 
 export const RHFTextField = ({
