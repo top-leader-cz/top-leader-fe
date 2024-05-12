@@ -114,6 +114,90 @@ export const messages = defineMessages({
     id: "settings.profile.field.publicProfile",
     defaultMessage: "Public account",
   },
+
+  "settings.user-profile.heading": {
+    id: "settings.user-profile.heading",
+    defaultMessage: "Profile",
+  },
+  "settings.user-profile.perex": {
+    id: "settings.user-profile.perex",
+    defaultMessage: "Update your profile here",
+  },
+  "settings.user-profile.field.name": {
+    id: "settings.user-profile.field.name",
+    defaultMessage: "Name",
+  },
+  "settings.user-profile.field.username": {
+    id: "settings.user-profile.field.username",
+    defaultMessage: "Email",
+  },
+  "settings.user-profile.field.companyId": {
+    id: "settings.user-profile.field.companyId",
+    defaultMessage: "Company",
+  },
+  "settings.user-profile.field.businessStrategy": {
+    id: "settings.user-profile.field.businessStrategy",
+    defaultMessage: "Company business strategy",
+  },
+  "settings.user-profile.field.manager": {
+    id: "settings.user-profile.field.manager",
+    defaultMessage: "Manager",
+  },
+  "settings.user-profile.field.position": {
+    id: "settings.user-profile.field.position",
+    defaultMessage: "Position",
+  },
+  "settings.user-profile.field.aspiredCompetency": {
+    id: "settings.user-profile.field.aspiredCompetency",
+    defaultMessage: "Aspired Competency",
+  },
+  "settings.user-profile.field.aspiredPosition": {
+    id: "settings.user-profile.field.aspiredPosition",
+    defaultMessage: "Aspired Position (2-5 Years)",
+  },
+
+  "settings.user-profile.field.firstName.placeholder": {
+    id: "settings.user-profile.field.firstName.placeholder",
+    defaultMessage: "Enter your first name",
+  },
+  "settings.user-profile.field.lastName.placeholder": {
+    id: "settings.user-profile.field.lastName.placeholder",
+    defaultMessage: "Enter your last name",
+  },
+  "settings.user-profile.field.username.placeholder": {
+    id: "settings.user-profile.field.username.placeholder",
+    defaultMessage: " ",
+  },
+  "settings.user-profile.field.companyId.placeholder": {
+    id: "settings.user-profile.field.companyId.placeholder",
+    defaultMessage: " ",
+  },
+  "settings.user-profile.field.businessStrategy.placeholder": {
+    id: "settings.user-profile.field.businessStrategy.placeholder",
+    defaultMessage: " ",
+  },
+  "settings.user-profile.field.manager.placeholder": {
+    id: "settings.user-profile.field.manager.placeholder",
+    defaultMessage: "Enter your manager",
+  },
+  "settings.user-profile.field.position.placeholder": {
+    id: "settings.user-profile.field.position.placeholder",
+    defaultMessage: "Enter your position",
+  },
+  "settings.user-profile.field.aspiredCompetency.placeholder": {
+    id: "settings.user-profile.field.aspiredCompetency.placeholder",
+    defaultMessage: "Enter your aspired competency",
+  },
+  "settings.user-profile.field.aspiredPosition.placeholder": {
+    id: "settings.user-profile.field.aspiredPosition.placeholder",
+    defaultMessage: "Enter your aspired position",
+  },
+
+  "settings.user-profile.save": {
+    id: "settings.user-profile.save",
+    defaultMessage: "Save",
+  },
+
   "settings.general.heading": {
     id: "settings.general.heading",
     defaultMessage: "General",

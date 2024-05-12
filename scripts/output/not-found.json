@@ -1,14 +1,12 @@
 {
-  "google.back-to-dashboard": "Back to dashboard",
-  "google.error.description": "Unfortunately, we were unable to integrate your Google Calendar with the TopLeader platform at this time. Please try again later. If the issue persists, do not hesitate to contact us at {emailLink} for assistance.",
-  "google.error.title": "Failed",
-  "google.success.description": "Your Google Calendar has been successfully integrated with the TopLeader platform. You can now close this window by clicking the button below.",
-  "sessions.steps.finished.schedule-private": "Or you can schedule your private session",
-  "settings.general.integrations": "Integrations",
-  "settings.general.integrations.google-calendar.connect": "Connect",
-  "settings.general.integrations.google-calendar.description": "Sync your appointments with Google Calendar",
-  "settings.general.integrations.google-calendar.title": "Google Calendar",
-  "team.credit.add-member.fields.isManager": "Is manager",
-  "team.credit.add-member.fields.manager": "Manager",
-  "team.credit.add-member.fields.position": "Position"
+  "settings.user-profile.field.aspiredCompetency": "Aspired Competency",
+  "settings.user-profile.field.aspiredCompetency.placeholder": "Enter your aspired competency",
+  "settings.user-profile.field.aspiredPosition": "Aspired Position (2-5 Years)",
+  "settings.user-profile.field.aspiredPosition.placeholder": "Enter your aspired position",
+  "settings.user-profile.field.businessStrategy": "Company business strategy",
+  "settings.user-profile.field.firstName.placeholder": "Enter your first name",
+  "settings.user-profile.field.lastName.placeholder": "Enter your last name",
+  "settings.user-profile.field.manager.placeholder": "Enter your manager",
+  "settings.user-profile.field.position.placeholder": "Enter your position",
+  "settings.user-profile.perex": "Update your profile here"
 }

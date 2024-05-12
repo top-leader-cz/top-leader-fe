@@ -172,8 +172,10 @@ const INITIAL_STATE = {
   stack: [],
 };
 
+// TODO: test propEq https://github.com/ramda/ramda/issues/1279
+
 const adjustStack = (payload) => (stack) => {
-  const index = findIndex(propEq("id", payload.id))(stack);
+  const index = findIndex(propEq(payload.id, "id"))(stack);
   if (index === -1) return [...stack, payload];
   else return adjust(index, (item) => ({ ...item, ...payload }), stack);
 };
@@ -184,7 +186,7 @@ const reducer = (state, { payload, type }) => {
     case ACTION.UPDATE:
       return evolve({ stack: adjustStack(payload) }, state);
     case ACTION.DESTROY:
-      return evolve({ stack: reject(propEq("id", payload.id)) }, state);
+      return evolve({ stack: reject(propEq(payload.id, "id")) }, state);
     default:
       return state;
   }

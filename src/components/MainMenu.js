@@ -19,6 +19,7 @@ import { Icon } from "./Icon";
 import { LinkBehavior } from "./LinkBehavior";
 import { Msg, MsgProvider } from "./Msg";
 import { P } from "./Typography";
+import { useDevMode } from "../features/Settings/Settings.page";
 
 const messages = defineMessages({
   "main-menu.items.dashboard": {
@@ -136,6 +137,7 @@ const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
 export const MainMenu = ({ open }) => {
   const { signout, isHR, isCoach, isAdmin } = useAuth();
   const mobile = !open;
+  const [isDevMode, setIsDevMode] = useDevMode();
 
   return (
     <MsgProvider messages={messages}>
@@ -252,8 +254,15 @@ export const MainMenu = ({ open }) => {
               target="_blank"
               rel="noreferrer"
               href={`https://github.com/top-leader-cz/top-leader-fe/commit/${process.env.REACT_APP_GIT_SHA}`}
-              color={"silver"}
+              color={isDevMode ? "black" : "silver"}
               sx={{ textDecoration: "none" }}
+              onClick={(e) => {
+                if (e.altKey) {
+                  setIsDevMode(!isDevMode);
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
             >
               <span style={{ userSelect: "none" }}>
                 {!mobile ? "commit: " : ""}
