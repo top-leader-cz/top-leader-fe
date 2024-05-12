@@ -80,7 +80,7 @@ const GCalSync = ({ msg }) => {
               <Button
                 variant="outlined"
                 href={getAbsoluteHref(`/login/google`)}
-                target="_blank"
+                // target="_blank"
               >
                 {msg("settings.general.integrations.google-calendar.connect")}
               </Button>
@@ -88,7 +88,7 @@ const GCalSync = ({ msg }) => {
           else return data?.status;
         }}
       />
-      <Tooltip title={"Enabled useFreeBusy"} placement="top">
+      {/* <Tooltip title={"Enabled useFreeBusy"} placement="top">
         <Checkbox
           disabled={
             process.env.NODE_ENV === "production" &&
@@ -101,7 +101,7 @@ const GCalSync = ({ msg }) => {
             setFreeBusy(value);
           }}
         />
-      </Tooltip>
+      </Tooltip> */}
     </>
   );
 };

@@ -8,6 +8,28 @@ import { Icon } from "../../components/Icon";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { P } from "../../components/Typography";
 import { messages } from "./messages";
+import { Button } from "@mui/material";
+import { defineMessages } from "react-intl";
+import { useMsg } from "../../components/Msg/Msg";
+
+const MyLink = ({ href, children, target, sx = {} }) => {
+  return (
+    <P
+      component="a"
+      href={href}
+      target={target}
+      sx={{
+        color: "#475467",
+        fontWeight: 500,
+        textDecoration: "none",
+        display: "inline-flex",
+        ...sx,
+      }}
+    >
+      {children}
+    </P>
+  );
+};
 
 const EMAIL = "support@topleader.io";
 const EMAIL_SUBJECT = "SignIn";
@@ -19,18 +41,7 @@ export const EmailTo = ({
   sx = {},
 }) => {
   return (
-    <P
-      component="a"
-      href={`mailto:${email}?subject=${subject}`}
-      target="_blank"
-      sx={{
-        color: "#475467",
-        fontWeight: 500,
-        textDecoration: "none",
-        display: "inline-flex",
-        ...sx,
-      }}
-    >
+    <MyLink href={`mailto:${email}?subject=${subject}`} target="_blank" sx={sx}>
       {withIcon ? (
         <>
           <Icon name="MailOutline" sx={{ fontSize: "16px" }} />
@@ -40,9 +51,20 @@ export const EmailTo = ({
         ""
       )}
       {email}
-    </P>
+    </MyLink>
   );
 };
+
+const legalMessages = defineMessages({
+  "legal.terms-and-conditions": {
+    id: "legal.terms-and-conditions",
+    defaultMessage: "Terms & Conditions",
+  },
+  "legal.privacy-policy": {
+    id: "legal.privacy-policy",
+    defaultMessage: "Privacy Policy",
+  },
+});
 
 export const WelcomeScreenTemplate = ({
   title = <Msg id="auth.unauthorized.title" />,
@@ -54,6 +76,8 @@ export const WelcomeScreenTemplate = ({
   children,
   containerSx = {},
 }) => {
+  const legalMsg = useMsg({ dict: legalMessages });
+
   return (
     <MsgProvider messages={messages}>
       <Grid container component="main" sx={{ height: "100vh" }}>
@@ -107,8 +131,35 @@ export const WelcomeScreenTemplate = ({
             {children}
             {/* </Box> */}
           </Box>
-          <Box sx={{ position: "absolute", right: "24px", bottom: "24px" }}>
+          <Box
+            sx={{
+              position: "absolute",
+              right: "24px",
+              bottom: "24px",
+              left: "24px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 1,
+              // justifyContent: "space-between",
+            }}
+          >
             <EmailTo email={EMAIL} subject={EMAIL_SUBJECT} />
+            <Box>
+              <MyLink
+                href="https://www.topleader.io/terms-conditions"
+                target="_blank"
+              >
+                {legalMsg("legal.terms-and-conditions")}
+              </MyLink>
+              <MyLink
+                href="https://www.topleader.io/privacy-policy"
+                target="_blank"
+                sx={{ ml: 2 }}
+              >
+                {legalMsg("legal.privacy-policy")}
+              </MyLink>
+            </Box>
           </Box>
         </Grid>
         <Grid
