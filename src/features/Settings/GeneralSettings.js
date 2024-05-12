@@ -78,6 +78,7 @@ const GCalSync = ({ msg }) => {
           if (!data?.active)
             return (
               <Button
+                component="a"
                 variant="outlined"
                 href={getAbsoluteHref(`/login/google`)}
                 // target="_blank"
