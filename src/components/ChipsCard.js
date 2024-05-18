@@ -7,13 +7,18 @@ export const ChipsCard = ({
   dict = {},
   renderSummary = () => {},
   renderSelected = () => {},
+  isSelectable = () => true,
   sx = { mb: 3 },
 }) => {
   const [selectedKey, setSelectedKey] = useState();
-  const selected = selectedKey ? dict[selectedKey] : undefined;
+  const selectedItem = selectedKey ? dict[selectedKey] : undefined;
   useEffect(() => {
-    if (selectedKey && !keys.includes(selectedKey)) setSelectedKey(undefined);
-  }, [selectedKey, keys]);
+    if (
+      selectedKey &&
+      (!keys.includes(selectedKey) || !isSelectable(selectedItem))
+    )
+      setSelectedKey(undefined);
+  }, [selectedKey, keys, isSelectable, selectedItem]);
 
   return (
     <Card sx={{ display: "flex", ...sx }} elevation={0}>
@@ -28,20 +33,21 @@ export const ChipsCard = ({
                 justifyContent: "flex-start",
                 bgcolor: key === selectedKey ? "primary.main" : primary25,
               }}
-              label={[dict[key]?.emoji ?? "👤", dict[key]?.name || key]
+              label={[dict[key]?.emoji, dict[key]?.name || key]
                 .filter(Boolean)
                 .join(" ")}
-              onClick={(e) =>
-                setSelectedKey((selectedKey) =>
-                  selectedKey === key ? undefined : key
-                )
-              }
+              onClick={(e) => {
+                if (isSelectable(dict[key]))
+                  setSelectedKey((selectedKey) =>
+                    selectedKey === key ? undefined : key
+                  );
+              }}
             />
           ))}
         </Stack>
       </CardContent>
       <Divider sx={{ my: 2 }} orientation="vertical" flexItem />
-      {!selected ? renderSummary() : renderSelected(selected)}
+      {!selectedItem ? renderSummary() : renderSelected(selectedItem)}
     </Card>
   );
 };

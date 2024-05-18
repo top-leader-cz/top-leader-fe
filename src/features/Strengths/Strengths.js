@@ -1,134 +1,25 @@
-import { Box, Button, CardContent, Chip, Divider, Paper } from "@mui/material";
-import React, { useContext } from "react";
-import { useQuery } from "react-query";
+import { Box, Button, CardContent, Chip, Divider } from "@mui/material";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChipsCard } from "../../components/ChipsCard";
 import { Icon } from "../../components/Icon";
-import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { H1, H2, P } from "../../components/Typography";
 import { routes } from "../../routes";
-import { primary25 } from "../../theme";
-import { useAuth } from "../Authorization";
-import { I18nContext } from "../I18n/I18nProvider";
+import { useMyQuery } from "../Authorization/AuthProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
-import { SwipeableStepper } from "./SwipeableStepper";
+import { SelectedStregth } from "./SelectedStregth";
+import { StrengthsRightMenu } from "./StrengthsRightMenu";
 import { messages } from "./messages";
-import { useTalentsDict } from "./talents";
+import { useAllTalentsDict } from "./talents";
 
-const AssessmentRightMenu = ({
-  history,
-  selectedTimestamp,
-  onSelect,
-  onRemove,
-  onRetake,
-}) => {
-  const { i18n } = useContext(I18nContext);
-  return (
-    <Paper
-      square
-      sx={{
-        px: 3,
-        py: 4,
-        height: "100vh",
-        display: "flex",
-        flexFlow: "column nowrap",
-        justifyContent: "space-between",
-      }}
-    >
-      <Box sx={{ display: "flex", flexFlow: "column nowrap" }}>
-        <H2>
-          <Msg id="strengths.aside.title" />
-        </H2>
-        <P mt={5}>
-          <Msg id="strengths.aside.perex" />
-        </P>
-        {history.map((entry) => (
-          <Button
-            key={entry.timestamp}
-            onClick={(e) =>
-              console.log({ e }) || (onRemove && e.metaKey && e.shiftKey)
-                ? onRemove(entry)
-                : onSelect(entry)
-            }
-            sx={{
-              mt: 3,
-              p: 2,
-              flexFlow: "column nowrap",
-              alignItems: "flex-start",
-              bgcolor: primary25,
-            }}
-            color={
-              entry.timestamp === selectedTimestamp ? "primary" : "secondary"
-            }
-            // variant={"contained"}
-          >
-            {i18n.formatLocal(i18n.parseUTCLocal(entry.date), "Pp")}
-            <br />
-            <P>{entry.status}</P>
-          </Button>
-        ))}
-      </Box>
-      <Button fullWidth variant="contained" onClick={onRetake}>
-        <Msg id="strengths.aside.retake-button" />
-      </Button>
-    </Paper>
-  );
-};
-
-const SelectedStregth = ({
-  positives = [],
-  tips = [],
-  positivesHeading = <Msg id="strengths.positives.title" />,
-}) => {
-  return (
-    <CardContent sx={{ display: "flex", gap: 2, width: "100%" }}>
-      <InfoBox
-        color="primary"
-        heading={positivesHeading}
-        sx={{
-          width: "50%",
-          minWidth: "49%",
-          maxWidth: "50%",
-          overflow: "hidden",
-        }}
-      >
-        <ul>
-          {positives.map((text) => (
-            <li>{text}</li>
-          ))}
-        </ul>
-      </InfoBox>
-      <InfoBox
-        color="default"
-        heading={<Msg id="strengths.tips.title" />}
-        sx={{
-          width: "50%",
-          minWidth: "49%",
-          maxWidth: "50%",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <SwipeableStepper
-          key={JSON.stringify(tips)} // reset to first step when tips change
-          steps={tips.map((text) => ({ key: text, text }))}
-        />
-      </InfoBox>
-    </CardContent>
-  );
-};
-
-const useStrengthsHistoryQuery = () => {
-  const { authFetch } = useAuth();
-  return useQuery({
+const useStrengthsHistoryQuery = () =>
+  useMyQuery({
     queryKey: ["strengths"],
-    queryFn: () => authFetch({ url: "/api/latest/history/STRENGTHS" }),
+    fetchDef: { url: "/api/latest/history/STRENGTHS" },
   });
-};
 
 export function StrengthsPage() {
   const query = useStrengthsHistoryQuery();
@@ -141,14 +32,10 @@ export function StrengthsPage() {
       orderedTalents: el.data.strengths,
     }),
   });
-  // const assessmentHistory = useHistoryEntries({
-  //   storageKey: "assessment_history",
-  // });
   const navigate = useNavigate();
-  const { talents } = useTalentsDict();
+  const talents = useAllTalentsDict();
 
   console.log("[Strengths.rndr]", {
-    // assessmentHistory,
     sel,
     query,
     talents,
@@ -158,11 +45,10 @@ export function StrengthsPage() {
     <MsgProvider messages={messages}>
       <Layout
         rightMenuContent={
-          <AssessmentRightMenu
-            history={sel.all}
+          <StrengthsRightMenu
+            items={sel.all}
             selectedTimestamp={sel.selected?.timestamp}
             onSelect={sel.setSelected}
-            // onRemove={assessmentHistory.remove}
             onRetake={() => navigate(routes.assessment)}
           />
         }
@@ -214,6 +100,9 @@ export function StrengthsPage() {
                       </P>
                     </CardContent>
                   )}
+                  isSelectable={(item) =>
+                    item?.positives?.length || item?.tips?.length
+                  }
                   renderSelected={(selected) => (
                     <SelectedStregth
                       positives={selected.positives}
@@ -234,6 +123,9 @@ export function StrengthsPage() {
                         </P>
                       </CardContent>
                     )}
+                    isSelectable={(item) =>
+                      item?.positives?.length || item?.tips?.length
+                    }
                     renderSelected={(selected) => (
                       <SelectedStregth
                         positives={selected.positives}
@@ -254,6 +146,9 @@ export function StrengthsPage() {
                         </P>
                       </CardContent>
                     )}
+                    isSelectable={(item) =>
+                      item?.positives?.length || item?.tips?.length
+                    }
                     renderSelected={(selected) => (
                       <SelectedStregth
                         positivesHeading={

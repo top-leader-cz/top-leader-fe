@@ -20,6 +20,30 @@
   "assessment.button.save": {
     "defaultMessage": "Save"
   },
+  "assessment.external-info.add": {
+    "defaultMessage": "Add results"
+  },
+  "assessment.external-info.continue": {
+    "defaultMessage": "Go to assesment"
+  },
+  "assessment.external-info.desc": {
+    "defaultMessage": "Add your top strengths in case you already passed such assessment as Gallup before."
+  },
+  "assessment.external-info.title": {
+    "defaultMessage": "Do you already have the results?"
+  },
+  "assessment.external.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "assessment.external.save": {
+    "defaultMessage": "Save"
+  },
+  "assessment.external.strength.placeholder": {
+    "defaultMessage": "Type your strenght"
+  },
+  "assessment.external.title": {
+    "defaultMessage": "Add your top strengths"
+  },
   "assessment.header.back": {
     "defaultMessage": "Back to the dashboard"
   },
@@ -488,6 +512,108 @@
   },
   "dict.error.time.not.available.message": {
     "defaultMessage": "{apiMessage}"
+  },
+  "dict.external-talents.Achiever.name": {
+    "defaultMessage": "Achiever"
+  },
+  "dict.external-talents.Activator.name": {
+    "defaultMessage": "Activator"
+  },
+  "dict.external-talents.Adaptability.name": {
+    "defaultMessage": "Adaptability"
+  },
+  "dict.external-talents.Analytical.name": {
+    "defaultMessage": "Analytical"
+  },
+  "dict.external-talents.Arranger.name": {
+    "defaultMessage": "Arranger"
+  },
+  "dict.external-talents.Belief.name": {
+    "defaultMessage": "Belief"
+  },
+  "dict.external-talents.Command.name": {
+    "defaultMessage": "Command"
+  },
+  "dict.external-talents.Communication.name": {
+    "defaultMessage": "Communication"
+  },
+  "dict.external-talents.Competition.name": {
+    "defaultMessage": "Competition"
+  },
+  "dict.external-talents.Connectedness.name": {
+    "defaultMessage": "Connectedness"
+  },
+  "dict.external-talents.Consistency.name": {
+    "defaultMessage": "Consistency"
+  },
+  "dict.external-talents.Context.name": {
+    "defaultMessage": "Context"
+  },
+  "dict.external-talents.Deliberative.name": {
+    "defaultMessage": "Deliberative"
+  },
+  "dict.external-talents.Developer.name": {
+    "defaultMessage": "Developer"
+  },
+  "dict.external-talents.Discipline.name": {
+    "defaultMessage": "Discipline"
+  },
+  "dict.external-talents.Empathy.name": {
+    "defaultMessage": "Empathy"
+  },
+  "dict.external-talents.Focus.name": {
+    "defaultMessage": "Focus"
+  },
+  "dict.external-talents.Futuristic.name": {
+    "defaultMessage": "Futuristic"
+  },
+  "dict.external-talents.Harmony.name": {
+    "defaultMessage": "Harmony"
+  },
+  "dict.external-talents.Ideation.name": {
+    "defaultMessage": "Ideation"
+  },
+  "dict.external-talents.Includer.name": {
+    "defaultMessage": "Includer"
+  },
+  "dict.external-talents.Individualization.name": {
+    "defaultMessage": "Individualization"
+  },
+  "dict.external-talents.Input.name": {
+    "defaultMessage": "Input"
+  },
+  "dict.external-talents.Intellection.name": {
+    "defaultMessage": "Intellection"
+  },
+  "dict.external-talents.Learner.name": {
+    "defaultMessage": "Learner"
+  },
+  "dict.external-talents.Maximizer.name": {
+    "defaultMessage": "Maximizer"
+  },
+  "dict.external-talents.Positivity.name": {
+    "defaultMessage": "Positivity"
+  },
+  "dict.external-talents.Relator.name": {
+    "defaultMessage": "Relator"
+  },
+  "dict.external-talents.Responsibility.name": {
+    "defaultMessage": "Responsibility"
+  },
+  "dict.external-talents.Restorative.name": {
+    "defaultMessage": "Restorative"
+  },
+  "dict.external-talents.Self-Assurance.name": {
+    "defaultMessage": "Self-Assurance"
+  },
+  "dict.external-talents.Significance.name": {
+    "defaultMessage": "Significance"
+  },
+  "dict.external-talents.Strategic.name": {
+    "defaultMessage": "Strategic"
+  },
+  "dict.external-talents.Woo.name": {
+    "defaultMessage": "Woo (Winning Others Over)"
   },
   "dict.feedback-questions-categories.communication": {
     "defaultMessage": "Communication"
@@ -2111,6 +2237,12 @@
   },
   "help.title": {
     "defaultMessage": "Get help"
+  },
+  "legal.privacy-policy": {
+    "defaultMessage": "Privacy Policy"
+  },
+  "legal.terms-and-conditions": {
+    "defaultMessage": "Terms & Conditions"
   },
   "main-menu.items.clients": {
     "defaultMessage": "Clients"

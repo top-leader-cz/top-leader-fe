@@ -32,7 +32,7 @@ import { useAuth } from "../Authorization";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { ShowMore } from "../Coaches/CoachCard";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { useTalentsDict } from "../Strengths/talents";
+import { useStrengths } from "../Strengths/talents";
 import { useValuesDict } from "../Values/values";
 import { JourneyRightMenu } from "./JourneyRightMenu";
 import { messages } from "./messages";
@@ -160,21 +160,6 @@ const DashboardCard = ({ title, href, items, fallbackIcon = {} }) => {
         </CardContent>
       </CardActionArea>
     </Card>
-  );
-};
-
-export const useStrengths = ({ keys = [] }) => {
-  const { talents } = useTalentsDict();
-  return useMemo(
-    () =>
-      keys.map((key) => ({
-        key,
-        name: talents[key]?.name || key,
-        label: [talents[key]?.emoji ?? "👤", talents[key]?.name || key]
-          .filter(Boolean)
-          .join(" "),
-      })),
-    [keys, talents]
   );
 };
 

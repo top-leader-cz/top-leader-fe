@@ -18,7 +18,7 @@ import { SESSION_FIELDS } from "./constants";
 import { H2, P } from "../../../components/Typography";
 import { primary25, primary500 } from "../../../theme";
 import { useAuth } from "../../Authorization";
-import { useStrengths } from "../../Dashboard/Dashboard.page";
+import { useStrengths } from "../../Strengths/talents";
 
 export const useAreas = () => {
   const { areas: areasDict } = useAreasDict();

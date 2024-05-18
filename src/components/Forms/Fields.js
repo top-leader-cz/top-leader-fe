@@ -1060,14 +1060,6 @@ export const AutocompleteSelect = ({
   );
 };
 
-const pipeMaybe = (...fns) =>
-  fns.some((fn) => !fn) ? undefined : pipe(...fns);
-
-const log =
-  (...args) =>
-  (data) =>
-    console.log(...args, data);
-
 const useGroupedOptions = ({ options: optionsProp, groupedOptions }) => {
   return useMemo(() => {
     if (!groupedOptions) return { options: optionsProp };

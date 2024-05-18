@@ -1,5 +1,5 @@
 import { Box, Button, Divider } from "@mui/material";
-import { groupBy, sort } from "ramda";
+import { groupBy, map, pipe, prop, sort, sortBy, toPairs } from "ramda";
 import React, {
   useCallback,
   useEffect,
@@ -28,30 +28,9 @@ import {
 } from "./api";
 import { messages } from "./messages";
 import { useQuestionsDict } from "./questions";
-
-const ProgressItem = ({ value, active }) => {
-  const Component = active ? "b" : "span";
-
-  return (
-    <>
-      <Component sx={{ right: 12 }}>{value}</Component>&nbsp;
-    </>
-  );
-};
-
-const AssessmentProgress = ({ currentIndex, totalCount, sx = {} }) => {
-  const currentQuestion = currentIndex + 1;
-
-  return (
-    <Box sx={sx}>
-      <P sx={{ justifyContent: "center", display: "flex", cursor: "default" }}>
-        {currentQuestion !== 1 && <ProgressItem value={1} />}
-        <ProgressItem value={currentQuestion} active />
-        {currentQuestion !== totalCount && <ProgressItem value={totalCount} />}
-      </P>
-    </Box>
-  );
-};
+import { AssessmentProgress } from "./AssessmentProgress";
+import { ExternalAssessmentModal } from "./ExternalAssessmentModal";
+import { useDevMode } from "../Settings/Settings.page";
 
 const createAssessmentEntry = ({ questions, scores }) => {
   const scoreSumByTalent = questions.reduce(
@@ -64,28 +43,9 @@ const createAssessmentEntry = ({ questions, scores }) => {
   const orderedTalents = Object.entries(scoreSumByTalent)
     .sort(([, aScore], [, bScore]) => bScore - aScore)
     .map(([talent]) => talent);
-  const status =
-    Object.entries(scores).filter(([id, score]) => typeof score === "number")
-      .length === questions.length
-      ? "Assessment completed"
-      : "Incomplete";
-
-  console.log("createAssessmentEntry", {
-    orderedTalents,
-    scoreSumByTalent,
-    questions,
-    scores,
-    status,
-  });
 
   return {
-    date: new Date().toISOString(),
-    timestamp: new Date().getTime(),
-    status,
     orderedTalents,
-    scoreSumByTalent,
-    questions,
-    scores,
   };
 };
 
@@ -231,6 +191,17 @@ const useAssessment = () => {
     const entry = createAssessmentEntry({ questions, scores });
     mutate({ orderedTalents: entry.orderedTalents });
   }, [mutate, questions, scores]);
+  const saveExternal = useCallback(
+    (values) => {
+      const orderedTalents = Array.isArray(values)
+        ? values
+        : pipe(toPairs, sortBy(pipe(prop(0), Number)), map(prop(1)))(values);
+      console.log("saveExternal", { values, orderedTalents });
+      // debugger;
+      mutate({ orderedTalents });
+    },
+    [mutate]
+  );
 
   const onPaginationChange = useCallback(
     ({ value }) => {
@@ -311,7 +282,21 @@ const useAssessment = () => {
       unfinishedAssessment,
       handleDiscard,
     },
+    saveExternal,
   };
+};
+
+const useVisibility = (initialVisible) => {
+  const [visible, setVisible] = useState(initialVisible);
+
+  return useMemo(
+    () => ({
+      show: () => setVisible(true),
+      hide: () => setVisible(false),
+      visible,
+    }),
+    [visible]
+  );
 };
 
 function Assessment() {
@@ -325,12 +310,16 @@ function Assessment() {
     nextWithSave,
     submitDisabled,
     isInitialized,
+    saveExternal,
     unfinished: {
       handleContinueUnfinished,
       unfinishedAssessment,
       handleDiscard,
     },
   } = useAssessment();
+  const [isDevMode] = useDevMode();
+  const externalInfoModal = useVisibility(isDevMode);
+  const externalAssessmentModal = useVisibility(false);
 
   const handleNextRef = useRef(nextWithSave);
   handleNextRef.current = nextWithSave;
@@ -445,7 +434,11 @@ function Assessment() {
         )}
       </Layout>
       <ConfirmModal
-        open={!!unfinishedAssessment}
+        open={
+          !!unfinishedAssessment &&
+          !externalAssessmentModal.visible &&
+          !externalInfoModal.visible
+        }
         onClose={handleContinueUnfinished}
         iconName="RocketLaunch"
         title={msg("assessment.unfinished.title")}
@@ -465,6 +458,33 @@ function Assessment() {
           },
         ]}
         sx={{ width: "800px" }}
+      />
+      <ConfirmModal
+        open={externalInfoModal.visible}
+        onClose={externalInfoModal.hide}
+        iconName="InfoOutlined"
+        title={msg("assessment.external-info.title")}
+        desc={msg("assessment.external-info.desc")}
+        buttons={[
+          {
+            variant: "outlined",
+            type: "button",
+            children: msg("assessment.external-info.add"),
+            onClick: pipe(externalInfoModal.hide, externalAssessmentModal.show),
+          },
+          {
+            variant: "contained",
+            type: "button",
+            children: msg("assessment.external-info.continue"),
+            onClick: externalInfoModal.hide,
+          },
+        ]}
+        // sx={{ width: "800px" }}
+      />
+      <ExternalAssessmentModal
+        visible={externalAssessmentModal.visible}
+        onClose={externalAssessmentModal.hide}
+        onSubmit={saveExternal}
       />
     </MsgProvider>
   );
