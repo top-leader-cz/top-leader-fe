@@ -1,4 +1,10 @@
 {
+  "assessment.external-info.add": "Add results",
+  "assessment.external-info.continue": "Go to assesment",
+  "assessment.external-info.desc": "Add your top strengths in case you already passed such assessment as Gallup before.",
+  "assessment.external-info.title": "Do you already have the results?",
+  "assessment.external.strength.placeholder": "Type your strenght",
+  "assessment.external.title": "Add your top strengths",
   "settings.user-profile.field.aspiredCompetency": "Aspired Competency",
   "settings.user-profile.field.aspiredCompetency.placeholder": "Enter your aspired competency",
   "settings.user-profile.field.aspiredPosition": "Aspired Position (2-5 Years)",

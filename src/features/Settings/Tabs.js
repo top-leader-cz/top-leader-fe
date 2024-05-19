@@ -25,15 +25,10 @@ function a11yProps(index) {
   };
 }
 
-// const StyledTab = Tab;
-
 export const StyledTabs = styled(Tabs)(({ theme }) => ({
-  // padding: "0 8px",
   minWidth: 8,
   minHeight: "16px",
   borderBottom: `1px solid rgba(0,0,0,0.12)`,
-  // fontWeight: 400,
-  // textTransform: "none",
   "& .MuiTabs-indicator": {
     backgroundColor: theme.palette.primary.main,
   },
@@ -53,26 +48,6 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
     marginLeft: 0,
   },
 }));
-
-// interface StyledTabProps {
-//   label: string;
-// }
-
-// const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
-//   ({ theme }) => ({
-//     textTransform: "none",
-//     fontWeight: theme.typography.fontWeightRegular,
-//     fontSize: theme.typography.pxToRem(15),
-//     marginRight: theme.spacing(1),
-//     color: "rgba(255, 255, 255, 0.7)",
-//     "&.Mui-selected": {
-//       color: "#fff",
-//     },
-//     "&.Mui-focusVisible": {
-//       backgroundColor: "rgba(100, 95, 228, 0.32)",
-//     },
-//   })
-// );
 
 const queryParamName = "tab";
 
@@ -94,16 +69,12 @@ export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
   const [tabName, setTab] = useState(defaultTabKey);
   const handleChange = (event, newValue) => {
     try {
-      // console.log("[TLTabs.change]", { value: tabName, newValue });
       setTab(newValue);
-
       searchParams.set(queryParamName, newValue);
       const qStr = searchParams.toString();
-      // console.log("[TLTabs.change]", { qStr });
       setSearchParams(qStr);
     } catch (e) {
       console.error(e);
-      // debugger;
     }
   };
   const tabsRef = useRef(tabs);
@@ -154,36 +125,3 @@ export const TLTabs = ({ tabs = [], initialTabKey, ariaLabel = "tabs" }) => {
     </Box>
   );
 };
-
-// function CustomizedTabs() {
-//   const [value, setValue] = useState(0);
-
-//   const handleChange = (event, newValue) => {
-//     setValue(newValue);
-//   };
-
-//   return (
-//     <Box sx={{ width: "100%" }}>
-//       <Box sx={{ bgcolor: "#fff" }}>
-//         <AntTabs value={value} onChange={handleChange} aria-label="ant example">
-//           <AntTab label="Tab 1" />
-//           <AntTab label="Tab 2" />
-//           <AntTab label="Tab 3" />
-//         </AntTabs>
-//         <Box sx={{ p: 3 }} />
-//       </Box>
-//       <Box sx={{ bgcolor: "#2e1534" }}>
-//         <StyledTabs
-//           value={value}
-//           onChange={handleChange}
-//           aria-label="styled tabs example"
-//         >
-//           <StyledTab label="Workflows" />
-//           <StyledTab label="Datasets" />
-//           <StyledTab label="Connections" />
-//         </StyledTabs>
-//         <Box sx={{ p: 3 }} />
-//       </Box>
-//     </Box>
-//   );
-// }

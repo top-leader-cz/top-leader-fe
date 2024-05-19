@@ -63,7 +63,6 @@ function CircularProgressWithLabel({ value, sx = {} }) {
 }
 
 export const AssessmentRightMenu = ({
-  currentIndex,
   saveDisabled,
   totalCount,
   responsesCount,

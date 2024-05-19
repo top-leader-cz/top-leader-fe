@@ -1,4 +1,4 @@
-import { fromPairs, map, pipe } from "ramda";
+import { fromPairs, is, map, pipe } from "ramda";
 import { useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
@@ -972,6 +972,143 @@ const messages = defineMessages({
     id: "dict.talents.intellectual.tips.5",
     defaultMessage: `Consider writing or organizing discussion groups. This will both help to polish your thoughts as well as help you come up with new ones.`,
   },
+
+  "dict.external-talents.Achiever.name": {
+    id: "dict.external-talents.Achiever.name",
+    defaultMessage: "Achiever",
+  },
+  "dict.external-talents.Activator.name": {
+    id: "dict.external-talents.Activator.name",
+    defaultMessage: "Activator",
+  },
+  "dict.external-talents.Adaptability.name": {
+    id: "dict.external-talents.Adaptability.name",
+    defaultMessage: "Adaptability",
+  },
+  "dict.external-talents.Analytical.name": {
+    id: "dict.external-talents.Analytical.name",
+    defaultMessage: "Analytical",
+  },
+  "dict.external-talents.Arranger.name": {
+    id: "dict.external-talents.Arranger.name",
+    defaultMessage: "Arranger",
+  },
+  "dict.external-talents.Belief.name": {
+    id: "dict.external-talents.Belief.name",
+    defaultMessage: "Belief",
+  },
+  "dict.external-talents.Command.name": {
+    id: "dict.external-talents.Command.name",
+    defaultMessage: "Command",
+  },
+  "dict.external-talents.Communication.name": {
+    id: "dict.external-talents.Communication.name",
+    defaultMessage: "Communication",
+  },
+  "dict.external-talents.Competition.name": {
+    id: "dict.external-talents.Competition.name",
+    defaultMessage: "Competition",
+  },
+  "dict.external-talents.Connectedness.name": {
+    id: "dict.external-talents.Connectedness.name",
+    defaultMessage: "Connectedness",
+  },
+  "dict.external-talents.Consistency.name": {
+    id: "dict.external-talents.Consistency.name",
+    defaultMessage: "Consistency",
+  },
+  "dict.external-talents.Context.name": {
+    id: "dict.external-talents.Context.name",
+    defaultMessage: "Context",
+  },
+  "dict.external-talents.Deliberative.name": {
+    id: "dict.external-talents.Deliberative.name",
+    defaultMessage: "Deliberative",
+  },
+  "dict.external-talents.Developer.name": {
+    id: "dict.external-talents.Developer.name",
+    defaultMessage: "Developer",
+  },
+  "dict.external-talents.Discipline.name": {
+    id: "dict.external-talents.Discipline.name",
+    defaultMessage: "Discipline",
+  },
+  "dict.external-talents.Empathy.name": {
+    id: "dict.external-talents.Empathy.name",
+    defaultMessage: "Empathy",
+  },
+  "dict.external-talents.Focus.name": {
+    id: "dict.external-talents.Focus.name",
+    defaultMessage: "Focus",
+  },
+  "dict.external-talents.Futuristic.name": {
+    id: "dict.external-talents.Futuristic.name",
+    defaultMessage: "Futuristic",
+  },
+  "dict.external-talents.Harmony.name": {
+    id: "dict.external-talents.Harmony.name",
+    defaultMessage: "Harmony",
+  },
+  "dict.external-talents.Ideation.name": {
+    id: "dict.external-talents.Ideation.name",
+    defaultMessage: "Ideation",
+  },
+  "dict.external-talents.Includer.name": {
+    id: "dict.external-talents.Includer.name",
+    defaultMessage: "Includer",
+  },
+  "dict.external-talents.Individualization.name": {
+    id: "dict.external-talents.Individualization.name",
+    defaultMessage: "Individualization",
+  },
+  "dict.external-talents.Input.name": {
+    id: "dict.external-talents.Input.name",
+    defaultMessage: "Input",
+  },
+  "dict.external-talents.Intellection.name": {
+    id: "dict.external-talents.Intellection.name",
+    defaultMessage: "Intellection",
+  },
+  "dict.external-talents.Learner.name": {
+    id: "dict.external-talents.Learner.name",
+    defaultMessage: "Learner",
+  },
+  "dict.external-talents.Maximizer.name": {
+    id: "dict.external-talents.Maximizer.name",
+    defaultMessage: "Maximizer",
+  },
+  "dict.external-talents.Positivity.name": {
+    id: "dict.external-talents.Positivity.name",
+    defaultMessage: "Positivity",
+  },
+  "dict.external-talents.Relator.name": {
+    id: "dict.external-talents.Relator.name",
+    defaultMessage: "Relator",
+  },
+  "dict.external-talents.Responsibility.name": {
+    id: "dict.external-talents.Responsibility.name",
+    defaultMessage: "Responsibility",
+  },
+  "dict.external-talents.Restorative.name": {
+    id: "dict.external-talents.Restorative.name",
+    defaultMessage: "Restorative",
+  },
+  "dict.external-talents.Self-Assurance.name": {
+    id: "dict.external-talents.Self-Assurance.name",
+    defaultMessage: "Self-Assurance",
+  },
+  "dict.external-talents.Significance.name": {
+    id: "dict.external-talents.Significance.name",
+    defaultMessage: "Significance",
+  },
+  "dict.external-talents.Strategic.name": {
+    id: "dict.external-talents.Strategic.name",
+    defaultMessage: "Strategic",
+  },
+  "dict.external-talents.Woo.name": {
+    id: "dict.external-talents.Woo.name",
+    defaultMessage: "Woo (Winning Others Over)",
+  },
 });
 
 // console.log(
@@ -1036,6 +1173,43 @@ const talentsKeys = [
   "intellectual",
 ];
 
+const externalTalentsKeys = [
+  "Achiever",
+  "Activator",
+  "Adaptability",
+  "Analytical",
+  "Arranger",
+  "Belief",
+  "Command",
+  "Communication",
+  "Competition",
+  "Connectedness",
+  "Consistency",
+  "Context",
+  "Deliberative",
+  "Developer",
+  "Discipline",
+  "Empathy",
+  "Focus",
+  "Futuristic",
+  "Harmony",
+  "Ideation",
+  "Includer",
+  "Individualization",
+  "Input",
+  "Intellection",
+  "Learner",
+  "Maximizer",
+  "Positivity",
+  "Relator",
+  "Responsibility",
+  "Restorative",
+  "Self-Assurance",
+  "Significance",
+  "Strategic",
+  "Woo",
+];
+
 const getPositivesLength = (key) => ({ initiator: 8 }[key] ?? 6);
 
 const translateTalent = (intl, key) => {
@@ -1043,7 +1217,7 @@ const translateTalent = (intl, key) => {
 
   return {
     name: intl.formatMessage({ ...messages[getId("name")] }),
-    emoji: emojis[key],
+    emoji: emojis[key] ?? "👤",
     positives: [...Array(getPositivesLength(key))].map((_, i) =>
       intl.formatMessage({ ...messages[getId(`positives.${i + 1}`)] })
     ),
@@ -1053,7 +1227,7 @@ const translateTalent = (intl, key) => {
   };
 };
 
-export const useTalentsDict = () => {
+const useTalentsDict = () => {
   const intl = useIntl();
   const talents = useMemo(
     () =>
@@ -1065,4 +1239,67 @@ export const useTalentsDict = () => {
   );
 
   return useMemo(() => ({ talents }), [talents]);
+};
+
+const translateExternalTalent = (intl, key) => {
+  const getId = (prop) => `dict.external-talents.${key}.${prop}`;
+
+  return {
+    name: intl.formatMessage({ ...messages[getId("name")] }),
+    emoji: "",
+    positives: [],
+    tips: [],
+    isExternal: true,
+  };
+};
+
+const useExternalTalentsDict = () => {
+  const intl = useIntl();
+  const externalTalents = useMemo(
+    () =>
+      pipe(
+        map((k) => [k, translateExternalTalent(intl, k)]),
+        fromPairs
+      )(externalTalentsKeys),
+    [intl]
+  );
+
+  return useMemo(() => ({ externalTalents }), [externalTalents]);
+};
+
+export const useExternalTalentsOptions = () => {
+  const { externalTalents } = useExternalTalentsDict();
+  return useMemo(
+    () =>
+      externalTalentsKeys.map((key) => ({
+        value: key,
+        label: externalTalents[key]?.name || key,
+      })),
+    [externalTalents]
+  );
+};
+
+export const useAllTalentsDict = () => {
+  const { talents } = useTalentsDict();
+  const { externalTalents } = useExternalTalentsDict();
+
+  return useMemo(
+    () => ({ ...talents, ...externalTalents }),
+    [talents, externalTalents]
+  );
+};
+
+export const useStrengths = ({ keys = [] }) => {
+  const allTalents = useAllTalentsDict();
+  return useMemo(
+    () =>
+      keys.map((key) => ({
+        key,
+        name: allTalents[key]?.name || key,
+        label: [allTalents[key]?.emoji, allTalents[key]?.name || key]
+          .filter(Boolean)
+          .join(" "),
+      })),
+    [keys, allTalents]
+  );
 };

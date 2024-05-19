@@ -54,4 +54,39 @@ export const messages = defineMessages({
     id: "assessment.unfinished.continue",
     defaultMessage: "Continue",
   },
+
+  "assessment.external-info.title": {
+    id: "assessment.external-info.title",
+    defaultMessage: "Do you already have the results?",
+  },
+  "assessment.external-info.desc": {
+    id: "assessment.external-info.desc",
+    defaultMessage:
+      "Add your top strengths in case you already passed such assessment as Gallup before.",
+  },
+  "assessment.external-info.add": {
+    id: "assessment.external-info.add",
+    defaultMessage: "Add results",
+  },
+  "assessment.external-info.continue": {
+    id: "assessment.external-info.continue",
+    defaultMessage: "Go to assesment",
+  },
+
+  "assessment.external.title": {
+    id: "assessment.external.title",
+    defaultMessage: "Add your top strengths",
+  },
+  "assessment.external.strength.placeholder": {
+    id: "assessment.external.strength.placeholder",
+    defaultMessage: "Type your strenght",
+  },
+  "assessment.external.cancel": {
+    id: "assessment.external.cancel",
+    defaultMessage: "Cancel",
+  },
+  "assessment.external.save": {
+    id: "assessment.external.save",
+    defaultMessage: "Save",
+  },
 });
