@@ -45,8 +45,7 @@ function ResetAll({ error, resetErrorBoundary }) {
   );
 }
 
-export default function App({ children = <RouterProvider router={router} /> }) {
-  // TODO: extract contexts to be injectable in storybook stories?
+export const Contexts = ({ children }) => {
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
       {/* <React.Suspense fallback={<div>Loading...</div>}> */}
@@ -89,4 +88,9 @@ export default function App({ children = <RouterProvider router={router} /> }) {
       {/* </React.Suspense> */}
     </ErrorBoundary>
   );
+};
+
+export default function App({ children = <RouterProvider router={router} /> }) {
+  const Wrapper = React.Fragment;
+  return <Wrapper>{children}</Wrapper>;
 }

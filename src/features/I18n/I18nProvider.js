@@ -27,6 +27,9 @@ import { getBrowserTz } from "./utils/date";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { objOf } from "ramda";
+import { useSnackbar } from "../Modal/ConfirmModal";
+import { parametrizedRoutes, routes } from "../../routes/constants";
+import { SETTINGS_TABS } from "../Settings/Settings.page";
 // import messages_de_en from "./translations/de_en.json";
 // import messages_de_cz from "./translations/de_cz.json";
 // import messages_es from "./translations/es.json";
@@ -143,6 +146,7 @@ export const TLIntlProvider = ({ children }) => {
 };
 
 export const I18nProvider = ({ children }) => {
+  const { show } = useSnackbar();
   const { authFetch, userQuery, fetchUser } = useAuth();
   const { language, setLanguage } = useContext(LocaleCtx);
   const browserTz = getBrowserTz();
@@ -204,9 +208,26 @@ export const I18nProvider = ({ children }) => {
     if (userTzWarning && !userTzWarningConfirmedRef.current) {
       userTzWarningConfirmedRef.current = true;
       console.log({ userTz: userDataRef.current?.timeZone, browserTz });
-      alert(
-        `Timezone on your machine (${browserTz}) seems different than in your profile (${userQuery.data?.timeZone}). You can change it in Menu -> Settings`
-      );
+      show({
+        type: "warning",
+        variant: "filled",
+        message: (
+          <>
+            Timezone on your machine ({browserTz}) seems different than in your
+            profile ({userDataRef.current?.timeZone}). You can change it in
+            <Button
+              type="button"
+              variant="text"
+              href={parametrizedRoutes.settings({ tab: SETTINGS_TABS.GENERAL })}
+            >
+              General Settings
+            </Button>
+          </>
+        ),
+      });
+      // alert(
+      //   `Timezone on your machine (${browserTz}) seems different than in your profile (${userQuery.data?.timeZone}). You can change it in Menu -> Settings`
+      // );
     }
   }, [userTzWarning]);
 

@@ -40,6 +40,7 @@ import { routes } from "./constants";
 import ErrorPage from "./ErrorPage";
 import { HelpPage } from "../features/Help/Help.page";
 import { GoogleCalPage } from "../features/Integrations/GoogleCalPage";
+import { Contexts } from "../App";
 
 const GlobalSpinner = () => {
   return (
@@ -49,14 +50,15 @@ const GlobalSpinner = () => {
   );
 };
 
+// TODO: extract contexts here
 const Root = ({ children, ...props }) => {
   const navigation = useNavigation();
 
   return (
-    <>
+    <Contexts>
       {navigation.state === "loading" && <GlobalSpinner />}
       <Outlet />
-    </>
+    </Contexts>
   );
 };
 

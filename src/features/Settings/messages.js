@@ -131,8 +131,8 @@ export const messages = defineMessages({
     id: "settings.user-profile.field.username",
     defaultMessage: "Email",
   },
-  "settings.user-profile.field.companyId": {
-    id: "settings.user-profile.field.companyId",
+  "settings.user-profile.field.company": {
+    id: "settings.user-profile.field.company",
     defaultMessage: "Company",
   },
   "settings.user-profile.field.businessStrategy": {
@@ -168,8 +168,8 @@ export const messages = defineMessages({
     id: "settings.user-profile.field.username.placeholder",
     defaultMessage: " ",
   },
-  "settings.user-profile.field.companyId.placeholder": {
-    id: "settings.user-profile.field.companyId.placeholder",
+  "settings.user-profile.field.company.placeholder": {
+    id: "settings.user-profile.field.company.placeholder",
     defaultMessage: " ",
   },
   "settings.user-profile.field.businessStrategy.placeholder": {

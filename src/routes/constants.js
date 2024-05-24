@@ -46,4 +46,5 @@ export const parametrizedRoutes = {
   checkEmail: ({ email } = {}) => generatePath(routes.checkEmail, { email }),
   forgotPassword: ({ email } = {}) =>
     generatePath(routes.forgotPassword, { email }),
+  settings: ({ tab } = {}) => `${routes.settings}?tab=${tab}`,
 };

@@ -18,7 +18,7 @@ import { useSessionStorage } from "../../hooks/useLocalStorage";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
-const TABS = {
+export const SETTINGS_TABS = {
   PROFILE: "PROFILE",
   USER_PROFILE: "USER_PROFILE",
   GENERAL: "GENERAL",
@@ -32,7 +32,7 @@ export const useDevMode = () => {
 };
 
 function SettingsPageInner() {
-  // const [tab, setTab] = useState(TABS.AVAILABILITY);
+  // const [tab, setTab] = useState(SETTINGS_TABS.AVAILABILITY);
   const msg = useMsg();
   const { isCoach, isAdmin } = useAuth();
   const [isDevMode] = useDevMode();
@@ -40,38 +40,38 @@ function SettingsPageInner() {
   const tabs = useMemo(() => {
     const tabs = [
       {
-        key: TABS.PROFILE,
+        key: SETTINGS_TABS.PROFILE,
         visible: isCoach,
         label: msg("settings.tabs.profile.label"),
         Component: ProfileSettings,
       },
       {
         visible: true,
-        key: TABS.GENERAL,
+        key: SETTINGS_TABS.GENERAL,
         label: msg("settings.tabs.general.label"),
         Component: GeneralSettings,
       },
       {
-        key: TABS.USER_PROFILE,
+        key: SETTINGS_TABS.USER_PROFILE,
         visible: !isCoach && isDevMode,
         label: msg("settings.tabs.profile.label"),
         Component: UserProfileSettings,
       },
       {
         visible: isCoach,
-        key: TABS.AVAILABILITY,
+        key: SETTINGS_TABS.AVAILABILITY,
         label: msg("settings.tabs.availability.label"),
         Component: AvailabilitySettings,
       },
       {
         visible: isAdmin,
-        key: TABS.ADMIN,
+        key: SETTINGS_TABS.ADMIN,
         label: msg("settings.tabs.admin.label"),
         Component: AdminSettings,
       },
       {
         visible: isAdmin,
-        key: TABS.COMPANIES,
+        key: SETTINGS_TABS.COMPANIES,
         // label: msg("settings.tabs.admin.companies"),
         label: "Companies",
         Component: CompaniesSettings,

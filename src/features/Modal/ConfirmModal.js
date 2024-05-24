@@ -121,7 +121,7 @@ export const ConfirmModal = ({
   );
 };
 
-export const TLSnackbar = ({ open, onClose, type, ...rest }) => {
+export const TLSnackbar = ({ open, onClose, type, variant, ...rest }) => {
   const handleClose = (event, reason) => {
     if (reason === "clickaway") return;
     onClose();
@@ -147,7 +147,7 @@ export const TLSnackbar = ({ open, onClose, type, ...rest }) => {
       {...rest}
     >
       {type ? (
-        <Alert severity={type} action={action}>
+        <Alert severity={type} action={action} variant={variant}>
           {rest.message}
         </Alert>
       ) : null}

@@ -29,7 +29,7 @@ const FIELDS = {
   lastName: "lastName",
   username: "username",
 
-  companyId: "companyId",
+  company: "company",
   businessStrategy: "businessStrategy",
   manager: "manager",
 
@@ -41,7 +41,7 @@ const FIELDS = {
   // department: "department",
   // hrManager: "hrManager",
 };
-const READ_ONLY = [FIELDS.username, FIELDS.companyId, FIELDS.businessStrategy];
+const READ_ONLY = [FIELDS.username, FIELDS.company, FIELDS.businessStrategy];
 
 /* PUT
   "firstName": "changed first name",
@@ -77,7 +77,7 @@ const DEFAULT_VALUES = {
   lastName: "",
   username: "jakub.svezi@dummy.com",
 
-  companyId: null,
+  company: "",
   businessStrategy: "",
   manager: "",
 
@@ -195,17 +195,15 @@ export const UserProfileSettings = () => {
         </FormRow>
 
         <FormRow
-          label={msg("settings.user-profile.field.companyId")}
-          name={FIELDS.companyId}
+          label={msg("settings.user-profile.field.company")}
+          name={FIELDS.company}
           dividerTop={false}
         >
           <AutocompleteSelect
-            name={FIELDS.companyId}
+            name={FIELDS.company}
             fullWidth
-            disabled={READ_ONLY.includes(FIELDS.companyId)}
-            placeholder={msg(
-              "settings.user-profile.field.companyId.placeholder"
-            )}
+            disabled={READ_ONLY.includes(FIELDS.company)}
+            placeholder={msg("settings.user-profile.field.company.placeholder")}
             {...companyOptionsProps}
           />
         </FormRow>
