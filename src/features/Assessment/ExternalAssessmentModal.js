@@ -6,6 +6,10 @@ import { useMsg } from "../../components/Msg/Msg";
 import { ConfirmModal } from "../Modal/ConfirmModal";
 import { useExternalTalentsOptions } from "../Strengths/talents";
 import { messages } from "./messages";
+import { includes, omit, pipe, values } from "ramda";
+import { useMemo } from "react";
+
+const names = [0, 1, 2, 3, 4].map((i) => i.toString());
 
 export const ExternalAssessmentModal = ({ visible, onClose, onSubmit }) => {
   const msg = useMsg({ dict: messages });
@@ -18,7 +22,16 @@ export const ExternalAssessmentModal = ({ visible, onClose, onSubmit }) => {
       4: "",
     },
   });
+
+  const valuesRaw = Object.fromEntries(
+    names.map((name) => [name, form.watch(name)])
+  );
+  const valuesStr = JSON.stringify(valuesRaw);
+  const valuesMemoized = useMemo(() => JSON.parse(valuesStr), [valuesStr]);
+
   const options = useExternalTalentsOptions();
+
+  console.log({ valuesMemoized, valuesStr });
 
   return (
     <ConfirmModal
@@ -39,47 +52,29 @@ export const ExternalAssessmentModal = ({ visible, onClose, onSubmit }) => {
             {mutation.error?.message}
           </Alert>
         )} */}
-        <AutocompleteSelect
-          name="0"
-          rules={{ required: true }}
-          placeholder={msg("assessment.external.strength.placeholder")}
-          autoFocus
-          size="small"
-          fullWidth
-          options={options}
-        />
-        <AutocompleteSelect
-          name="1"
-          rules={{ required: true }}
-          placeholder={msg("assessment.external.strength.placeholder")}
-          size="small"
-          fullWidth
-          options={options}
-        />
-        <AutocompleteSelect
-          name="2"
-          rules={{ required: true }}
-          placeholder={msg("assessment.external.strength.placeholder")}
-          size="small"
-          fullWidth
-          options={options}
-        />
-        <AutocompleteSelect
-          name="3"
-          rules={{ required: true }}
-          placeholder={msg("assessment.external.strength.placeholder")}
-          size="small"
-          fullWidth
-          options={options}
-        />
-        <AutocompleteSelect
-          name="4"
-          rules={{ required: true }}
-          placeholder={msg("assessment.external.strength.placeholder")}
-          size="small"
-          fullWidth
-          options={options}
-        />
+        {names.map((name) => (
+          <AutocompleteSelect
+            key={name}
+            name={name}
+            parametrizedValidate={[
+              ["required"],
+              // [
+              //   "forbiddenValues",
+              //   { forbiddenList: pipe(omit([name]), values)(valuesMemoized) },
+              //   // { tsKey: "" },
+              // ],
+            ]}
+            // validationDeps={valuesStr}
+            placeholder={msg("assessment.external.strength.placeholder")}
+            autoFocus
+            size="small"
+            fullWidth
+            options={options.filter(
+              ({ value }) =>
+                !pipe(omit([name]), values, includes(value))(valuesMemoized)
+            )}
+          />
+        ))}
 
         <Box
           sx={{ display: "flex", flexDirection: "row", gap: 3, width: "100%" }}
@@ -87,7 +82,6 @@ export const ExternalAssessmentModal = ({ visible, onClose, onSubmit }) => {
           <Button
             {...{
               variant: "outlined",
-              type: "submit",
               children: msg("assessment.external.cancel"),
               fullWidth: true,
             }}

@@ -141,8 +141,15 @@ export const AreaStep = ({
   const topStrengths = useStrengths({
     keys: user?.data?.strengths?.slice(0, 5),
   });
+  const strengthsCount = user?.data?.strengths?.length || 0;
+  const bottomStrengthKeys =
+    strengthsCount >= 15
+      ? user?.data?.strengths?.slice(-10)
+      : strengthsCount >= 10
+      ? user?.data?.strengths?.slice(-5)
+      : [];
   const bottomStrengths = useStrengths({
-    keys: user?.data?.strengths?.slice(-10),
+    keys: bottomStrengthKeys,
   });
   const areas = useAreas();
   const tilesItems = useMemo(

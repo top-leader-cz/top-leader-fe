@@ -678,7 +678,11 @@ export const getValidateOptionsMaybe = curryN(
     )(parametrizedValidate)
 );
 
-const applyVParams = ({ rules = {}, parametrizedValidate = [] }) => {
+const applyVParams = ({
+  rules = {},
+  parametrizedValidate = [],
+  // validationDeps,
+}) => {
   try {
     // tricky, let's trust to native validation for now
     // also rules.required is used to default clearable and disableClearable
@@ -695,6 +699,7 @@ const applyVParams = ({ rules = {}, parametrizedValidate = [] }) => {
           fromPairs
         )(parametrizedValidate)
       ),
+      // deps: validationDeps, // not working
     };
     // console.log({ rulesResult, rules, parametrizedValidate });
 
@@ -946,6 +951,7 @@ export const AutocompleteSelect = ({
   AutocompleteComponent = Autocomplete,
   TextFieldComponent = TextField,
   disableClearable: disableClearableProp, // needed for language and timezone - saved on change, not on submit, TODO: clearable as on other fields
+  // validationDeps,
   ...props
 }) => {
   const msg = useMsg({ dict: formsMessages });
@@ -964,7 +970,11 @@ export const AutocompleteSelect = ({
         : (data) => data?.value ?? null,
     [multiple]
   );
-  const rules = applyVParams({ rules: rulesProp, parametrizedValidate });
+  const rules = applyVParams({
+    rules: rulesProp,
+    parametrizedValidate,
+    // validationDeps,
+  });
   const disableClearable = disableClearableProp ?? rules?.required;
 
   return (

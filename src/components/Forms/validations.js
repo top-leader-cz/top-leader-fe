@@ -26,6 +26,10 @@ export const validationMessages = defineMessages({
     id: "dict.validation.validDate",
     defaultMessage: "Invalid date",
   },
+  "dict.validation.forbiddenValues": {
+    id: "dict.validation.forbiddenValues",
+    defaultMessage: "Forbidden value",
+  },
   "dict.validation.invalidDate": {
     id: "dict.validation.invalidDate",
     defaultMessage: "Invalid date",
@@ -108,6 +112,18 @@ export const validDate = () => (v) => {
   if (!v) return true; // optional date fields
   return isValid(v);
 };
+
+// TODO: cached fn, not reacting to forbiddenList changes
+const forbiddenValues =
+  ({ forbiddenList = [] } = {}) =>
+  (v) => {
+    if (Array.isArray(v)) {
+      debugger;
+    } else {
+      console.log({ forbiddenList, v });
+      return !forbiddenList.includes(v);
+    }
+  };
 
 // old validations for direct use in rules prop:
 export const invalidDate = (v) => {
