@@ -15,6 +15,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { CompaniesSettings } from "./CompaniesSettings";
 import { UserProfileSettings } from "./UserProfileSettings";
 import { useSessionStorage } from "../../hooks/useLocalStorage";
+import { UserCreditsSettings } from "./UserCreditsSettings";
 
 export const WHITE_BG = { "& .MuiOutlinedInput-root": { bgcolor: "white" } };
 
@@ -22,6 +23,7 @@ export const SETTINGS_TABS = {
   PROFILE: "PROFILE",
   USER_PROFILE: "USER_PROFILE",
   GENERAL: "GENERAL",
+  USER_CREDITS: "USER_CREDITS",
   AVAILABILITY: "AVAILABILITY",
   ADMIN: "ADMIN",
   COMPANIES: "COMPANIES",
@@ -56,6 +58,12 @@ function SettingsPageInner() {
         visible: !isCoach && isDevMode,
         label: msg("settings.tabs.profile.label"),
         Component: UserProfileSettings,
+      },
+      {
+        key: SETTINGS_TABS.USER_CREDITS,
+        visible: isDevMode,
+        label: msg("settings.tabs.credits.label"),
+        Component: UserCreditsSettings,
       },
       {
         visible: isCoach,

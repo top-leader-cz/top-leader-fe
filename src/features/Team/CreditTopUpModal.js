@@ -18,25 +18,22 @@ const TOPUP_FIELDS = {
   credit: "credit",
 };
 
-export const CreditTopUpModal = ({ onClose, selected, open = !!selected }) => {
-  const mutation = useCreditRequestMutation({
-    onSuccess: () => {
-      onClose();
-    },
-  });
-
+export const CreditTopUpModal = ({
+  onClose,
+  extraParams = {},
+  open,
+  mutation,
+}) => {
   const methods = useForm({
     mode: "onSubmit",
-    // mode: "all",¯
     defaultValues: {
       [TOPUP_FIELDS.credit]: "",
     },
   });
-  console.log({ selected });
   const onSubmit = (values, e) =>
     mutation.mutateAsync({
-      username: selected?.username,
       credit: values.credit,
+      ...extraParams,
     });
   const onError = (errors, e) => console.log("[modal.onError]", errors, e);
 

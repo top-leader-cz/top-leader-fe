@@ -1809,6 +1809,9 @@
   "dict.user_status.pending.label": {
     "defaultMessage": "Pending"
   },
+  "dict.validation.forbiddenValues": {
+    "defaultMessage": "Forbidden value"
+  },
   "dict.validation.invalidDate": {
     "defaultMessage": "Invalid date"
   },
@@ -2742,6 +2745,9 @@
   "settings.tabs.availability.label": {
     "defaultMessage": "Availability"
   },
+  "settings.tabs.credits.label": {
+    "defaultMessage": "Credits"
+  },
   "settings.tabs.general.label": {
     "defaultMessage": "General"
   },
@@ -2766,10 +2772,10 @@
   "settings.user-profile.field.businessStrategy.placeholder": {
     "defaultMessage": ""
   },
-  "settings.user-profile.field.companyId": {
+  "settings.user-profile.field.company": {
     "defaultMessage": "Company"
   },
-  "settings.user-profile.field.companyId.placeholder": {
+  "settings.user-profile.field.company.placeholder": {
     "defaultMessage": ""
   },
   "settings.user-profile.field.firstName.placeholder": {

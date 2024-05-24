@@ -18,7 +18,7 @@ import { gray500 } from "../../theme";
 import { useAuth } from "../Authorization";
 import { AddMemberModal } from "./AddMemberModal";
 import { CreditTopUpModal } from "./CreditTopUpModal";
-import { useHrUsersQuery } from "./api";
+import { useCreditRequestMutation, useHrUsersQuery } from "./api";
 import { messages } from "./messages";
 import { formatName } from "../Coaches/CoachCard";
 
@@ -145,6 +145,11 @@ function TeamPageInner() {
       ),
     },
   ];
+  const mutation = useCreditRequestMutation({
+    onSuccess: () => {
+      setTopUpSelected(null);
+    },
+  });
 
   console.log("[Team->Credits.page]", { hrUsersQuery, isHR, isAdmin });
   const manageUsersProps =
@@ -192,8 +197,10 @@ function TeamPageInner() {
         query={hrUsersQuery}
       />
       <CreditTopUpModal
-        selected={topUpSelected}
+        open={!!topUpSelected}
         onClose={() => setTopUpSelected(null)}
+        mutation={mutation}
+        extraParams={{ username: topUpSelected?.username }}
       />
       <AddMemberModal
         open={!!member}

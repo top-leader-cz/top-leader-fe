@@ -10,6 +10,10 @@ export const messages = defineMessages({
     id: "settings.tabs.general.label",
     defaultMessage: "General",
   },
+  "settings.tabs.credits.label": {
+    id: "settings.tabs.credits.label",
+    defaultMessage: "Credits",
+  },
   "settings.tabs.availability.label": {
     id: "settings.tabs.availability.label",
     defaultMessage: "Availability",

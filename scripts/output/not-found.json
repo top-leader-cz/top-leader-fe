@@ -5,6 +5,7 @@
   "assessment.external-info.title": "Do you already have the results?",
   "assessment.external.strength.placeholder": "Type your strenght",
   "assessment.external.title": "Add your top strengths",
+  "dict.validation.forbiddenValues": "Forbidden value",
   "settings.user-profile.field.aspiredCompetency": "Aspired Competency",
   "settings.user-profile.field.aspiredCompetency.placeholder": "Enter your aspired competency",
   "settings.user-profile.field.aspiredPosition": "Aspired Position (2-5 Years)",
