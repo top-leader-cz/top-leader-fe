@@ -15,7 +15,6 @@ import {
 } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { IntlProvider } from "react-intl";
-import { useMutation } from "react-query";
 import { useStaticCallback } from "../../hooks/useStaticCallback.hook";
 import messages_cs from "../../translations/cs.json";
 import messages_de from "../../translations/de.json";
@@ -28,7 +27,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { objOf } from "ramda";
 import { useSnackbar } from "../Modal/ConfirmModal";
-import { parametrizedRoutes, routes } from "../../routes/constants";
+import { parametrizedRoutes } from "../../routes/constants";
 import { SETTINGS_TABS } from "../Settings/Settings.page";
 // import messages_de_en from "./translations/de_en.json";
 // import messages_de_cz from "./translations/de_cz.json";
