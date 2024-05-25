@@ -34,10 +34,8 @@ export const useDevMode = () => {
 };
 
 function SettingsPageInner() {
-  // const [tab, setTab] = useState(SETTINGS_TABS.AVAILABILITY);
   const msg = useMsg();
   const { isCoach, isAdmin } = useAuth();
-  const [isDevMode] = useDevMode();
 
   const tabs = useMemo(() => {
     const tabs = [
@@ -54,7 +52,7 @@ function SettingsPageInner() {
         Component: GeneralSettings,
       },
       {
-        visible: !isCoach && isDevMode,
+        visible: !isCoach,
         key: SETTINGS_TABS.USER_PROFILE,
         label: msg("settings.tabs.profile.label"),
         Component: UserProfileSettings,
@@ -86,7 +84,7 @@ function SettingsPageInner() {
       },
     ].filter(prop("visible"));
     return tabs;
-  }, [isAdmin, isCoach, isDevMode, msg]);
+  }, [isAdmin, isCoach, msg]);
 
   console.log("[SettingsPageInner.rndr]", { tabs });
 

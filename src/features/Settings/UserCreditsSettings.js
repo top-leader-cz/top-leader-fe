@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useMsg } from "../../components/Msg/Msg";
-import { TLCell, TLTableWithHeader } from "../../components/Table";
+import { TLCell, TLTableWithHeader, UserCell } from "../../components/Table";
 import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
 import { ActionsCell } from "../Team/Team.page";
 import { messages as teamMessages } from "../Team/messages";
 import { CreditTopUpModal } from "../Team/CreditTopUpModal";
 import { of, pick } from "ramda";
 import { H2 } from "../../components/Typography";
+import { formatName } from "../Coaches/CoachCard";
 
 const useUserCreditsQuery = (params = {}) => {
   return useMyQuery({
@@ -40,11 +41,11 @@ export const UserCreditsSettings = () => {
   });
 
   const columns = [
-    // {
-    //   label: teamMsg("team.members.table.col.name"),
-    //   key: "name",
-    //   render: (row) => <UserCell email={row.username} name={formatName(row)} />,
-    // },
+    {
+      label: teamMsg("team.members.table.col.name"),
+      key: "name",
+      render: (row) => <UserCell email={row.username} name={formatName(row)} />,
+    },
     // {
     //   label: teamMsg("team.members.table.col.coach"),
     //   key: "coach",

@@ -118,11 +118,6 @@ export const UserProfileSettings = () => {
     },
     invalidate: [{ queryKey: ["user-settings"] }],
   });
-
-  const companyOptionsProps = useLoadableOptions({
-    query: useCompaniesQuery({ retry: false }),
-    map: useCompaniesQuery.toOpts,
-  });
   const managersProps = useLoadableOptions({
     query: useUserManagersQuery(),
     map: map(
@@ -199,12 +194,11 @@ export const UserProfileSettings = () => {
           name={FIELDS.company}
           dividerTop={false}
         >
-          <AutocompleteSelect
+          <BareInputField
             name={FIELDS.company}
             fullWidth
             disabled={READ_ONLY.includes(FIELDS.company)}
             placeholder={msg("settings.user-profile.field.company.placeholder")}
-            {...companyOptionsProps}
           />
         </FormRow>
         <FormRow
