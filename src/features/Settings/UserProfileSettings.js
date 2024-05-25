@@ -1,6 +1,10 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { Msg, useMsg } from "../../components/Msg/Msg";
-import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import {
+  useAuth,
+  useMyMutation,
+  useMyQuery,
+} from "../Authorization/AuthProvider";
 import { H2, P } from "../../components/Typography";
 import { FormRow } from "./FormRow";
 import { Box, Button } from "@mui/material";
@@ -23,6 +27,7 @@ import { formatName } from "../Coaches/CoachCard";
 import { WHITE_BG } from "./Settings.page";
 import { RHForm } from "../../components/Forms/Form";
 import { ControlsContainer } from "../Sessions/steps/Controls";
+import { useMemo } from "react";
 
 const FIELDS = {
   firstName: "firstName",
@@ -41,37 +46,7 @@ const FIELDS = {
   // department: "department",
   // hrManager: "hrManager",
 };
-const READ_ONLY = [FIELDS.username, FIELDS.company, FIELDS.businessStrategy];
 
-/* PUT
-  "firstName": "changed first name",
-  "lastName": "changed last name",
-  
-  "manager": "jakub.manager@dummy.com",
-
-  "position": "new position",
-  "aspiredCompetency": "changed aspired competency",
-  "aspiredPosition": "changed aspired position"
-
-
-
-TASK:
-
-First name: User to edit eidtable
-Last name: User to edit eidtable
-Email: (to be populated)
-
-Company: (to be populated) 
-Company business strategy: (to be populated)
-Manager: (to be populated)  eidtable
-
-Position: (to be populated) eidtable
-Aspired Competency: (to be populated) eidtable
-Aspired Position (2-5 Years): (User to input) eidtable
-  
-*/
-
-// GET
 const DEFAULT_VALUES = {
   firstName: "",
   lastName: "",
@@ -97,8 +72,14 @@ export const useUserManagersQuery = () => {
 
 export const UserProfileSettings = () => {
   const msg = useMsg();
-  //   const { authFetch, user } = useAuth();
-  //   const { language, i18n, userTz } = useContext(I18nContext);
+  const { isHR } = useAuth();
+  const READ_ONLY = useMemo(
+    () =>
+      isHR
+        ? [FIELDS.username, FIELDS.company]
+        : [FIELDS.username, FIELDS.company, FIELDS.businessStrategy],
+    [isHR]
+  );
 
   const initialValuesQuery = useMyQuery({
     queryKey: ["user-settings"],
