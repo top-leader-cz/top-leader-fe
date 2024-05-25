@@ -54,14 +54,14 @@ function SettingsPageInner() {
         Component: GeneralSettings,
       },
       {
-        key: SETTINGS_TABS.USER_PROFILE,
         visible: !isCoach && isDevMode,
+        key: SETTINGS_TABS.USER_PROFILE,
         label: msg("settings.tabs.profile.label"),
         Component: UserProfileSettings,
       },
       {
+        visible: true,
         key: SETTINGS_TABS.USER_CREDITS,
-        visible: isDevMode,
         label: msg("settings.tabs.credits.label"),
         Component: UserCreditsSettings,
       },

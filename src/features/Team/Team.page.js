@@ -189,8 +189,7 @@ function TeamPageInner() {
       : {};
 
   return (
-    <Layout>
-      <Header text={msg("team.heading")} />
+    <Layout header={{ heading: msg("team.heading") }}>
       <TLTableWithHeader
         {...manageUsersProps}
         columns={columns}
@@ -207,6 +206,7 @@ function TeamPageInner() {
         username={member?.username}
         onClose={() => setMember()}
       />
+      <Box sx={{ pb: 3 }} />
     </Layout>
   );
 }

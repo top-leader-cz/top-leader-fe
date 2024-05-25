@@ -1,4 +1,5 @@
 import { generatePath } from "react-router-dom";
+import { Authority } from "../features/Authorization/AuthProvider";
 
 const getResetPassPath = (prefix) => `${prefix}/:email?/:token?/*`;
 
@@ -47,4 +48,9 @@ export const parametrizedRoutes = {
   forgotPassword: ({ email } = {}) =>
     generatePath(routes.forgotPassword, { email }),
   settings: ({ tab } = {}) => `${routes.settings}?tab=${tab}`,
+};
+
+export const rolesDefByRoute = {
+  [routes.team]: { anyOf: [Authority.ADMIN, Authority.HR] },
+  [routes.clients]: { anyOf: [Authority.ADMIN, Authority.COACH] },
 };

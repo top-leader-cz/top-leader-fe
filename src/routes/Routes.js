@@ -16,7 +16,6 @@ import {
   RequireAuth,
   SignInPage,
 } from "../features/Authorization";
-import { Authority } from "../features/Authorization/AuthProvider";
 import { CheckEmailPage } from "../features/Authorization/CheckEmailPage";
 import { ForgotPasswordPage } from "../features/Authorization/ForgotPasswordPage";
 import { PasswordChangedPage } from "../features/Authorization/PasswordChangedPage";
@@ -36,7 +35,7 @@ import { SettingsPage } from "../features/Settings/Settings.page";
 import { StrengthsPage } from "../features/Strengths";
 import { TeamPage } from "../features/Team/Team.page";
 import { MyValuesPage, SetValuesPage } from "../features/Values";
-import { routes } from "./constants";
+import { rolesDefByRoute, routes } from "./constants";
 import ErrorPage from "./ErrorPage";
 import { HelpPage } from "../features/Help/Help.page";
 import { GoogleCalPage } from "../features/Integrations/GoogleCalPage";
@@ -279,16 +278,12 @@ export const router = createHashRouter([
       },
       {
         path: routes.externalFeedbackPage,
-        element: (
-          // <ForbidAuth>
-          <ExternalFeedbackPage />
-          // </ForbidAuth>
-        ),
+        element: <ExternalFeedbackPage />,
       },
       {
         path: routes.team,
         element: (
-          <RequireAuth>
+          <RequireAuth rolesDef={rolesDefByRoute[routes.team]}>
             <TeamPage />
           </RequireAuth>
         ),
@@ -296,7 +291,7 @@ export const router = createHashRouter([
       {
         path: routes.clients,
         element: (
-          <RequireAuth someRequired={[Authority.COACH, Authority.ADMIN]}>
+          <RequireAuth rolesDef={rolesDefByRoute[routes.clients]}>
             <ClientsPage />
           </RequireAuth>
         ),

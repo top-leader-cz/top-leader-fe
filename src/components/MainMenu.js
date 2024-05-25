@@ -13,13 +13,15 @@ import * as React from "react";
 import { defineMessages } from "react-intl";
 import { useMatch } from "react-router-dom";
 import { useAuth } from "../features/Authorization";
+import { useHasRequiredRoles } from "../features/Authorization/Redirects";
+import { useDevMode } from "../features/Settings/Settings.page";
 import { routes } from "../routes";
+import { rolesDefByRoute } from "../routes/constants";
 import theme from "../theme";
 import { Icon } from "./Icon";
 import { LinkBehavior } from "./LinkBehavior";
 import { Msg, MsgProvider } from "./Msg";
 import { P } from "./Typography";
-import { useDevMode } from "../features/Settings/Settings.page";
 
 const messages = defineMessages({
   "main-menu.items.dashboard": {
@@ -116,15 +118,18 @@ const LogoImg = ({ mobile, text }) => {
 };
 
 // TODO: LinkBehavior -> NavLink:
-const ListItemLink = ({ to, text, icon, onClick, mobile }) => {
-  const match = useMatch(to ?? "");
+const ListItemLink = ({ route, text, icon, onClick, mobile }) => {
+  const match = useMatch(route ?? "");
+  const hasRole = useHasRequiredRoles(rolesDefByRoute[route]);
+
+  if (!hasRole) return null;
 
   return (
     <ListItem disablePadding>
       <ListItemButton
         component={LinkBehavior}
-        selected={Boolean(to && match)}
-        href={to}
+        selected={Boolean(route && match)}
+        href={route}
         onClick={onClick}
       >
         {icon && <ListItemIcon>{icon}</ListItemIcon>}
@@ -164,47 +169,43 @@ export const MainMenu = ({ open }) => {
               mobile={mobile}
               text={<Msg id="main-menu.items.dashboard" />}
               icon={<Icon name="HomeOutlined" />}
-              to={routes.dashboard}
+              route={routes.dashboard}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.sessions" />}
               icon={<Icon name="DescriptionOutlined" />}
-              to={routes.sessions}
+              route={routes.sessions}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.coaches" />}
               icon={<Icon name="PersonOutlined" />}
-              to={routes.coaches}
+              route={routes.coaches}
             />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.getFeedback" />}
               icon={<Icon name="ForumOutlined" />}
-              to={routes.getFeedback}
+              route={routes.getFeedback}
             />
-            {/* {isHR ? ( */}
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.team" />}
               icon={<Icon name="People" />}
-              to={routes.team}
+              route={routes.team}
             />
-            {/* ) : null} */}
-            {isCoach ? (
-              <ListItemLink
-                mobile={mobile}
-                text={<Msg id="main-menu.items.clients" />}
-                icon={<Icon name="People" />}
-                to={routes.clients}
-              />
-            ) : null}
+            <ListItemLink
+              mobile={mobile}
+              text={<Msg id="main-menu.items.clients" />}
+              icon={<Icon name="People" />}
+              route={routes.clients}
+            />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.messages" />}
               icon={<Icon name="ChatBubbleOutlineOutlined" />}
-              to={routes.messages}
+              route={routes.messages}
             />
           </List>
         </Box>
@@ -213,13 +214,13 @@ export const MainMenu = ({ open }) => {
             mobile={mobile}
             text={<Msg id="main-menu.items.settings" />}
             icon={<Icon name="SettingsOutlined" />}
-            to={routes.settings}
+            route={routes.settings}
           />
           <ListItemLink
             mobile={mobile}
             text={<Msg id="main-menu.items.help" />}
             icon={<Icon name="HelpOutlined" />}
-            to={routes.help}
+            route={routes.help}
           />
           <Divider sx={{ my: 2 }} />
           <ListItemLink

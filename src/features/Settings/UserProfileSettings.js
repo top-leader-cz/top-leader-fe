@@ -75,7 +75,7 @@ Aspired Position (2-5 Years): (User to input) eidtable
 const DEFAULT_VALUES = {
   firstName: "",
   lastName: "",
-  username: "jakub.svezi@dummy.com",
+  username: "",
 
   company: "",
   businessStrategy: "",

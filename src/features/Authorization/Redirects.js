@@ -37,9 +37,19 @@ export const MyNavigate = ({ to, ...rest }) => {
   return <Navigate to={newTo} {...rest} />;
 };
 
-export const RequireAuth = ({ children, someRequired = [] }) => {
+export const useHasRequiredRoles = ({ anyOf = [] } = {}) => {
+  const auth = useAuth();
+
+  if (!anyOf.length) return true;
+  if (!auth.isLoggedIn) return false;
+
+  return intersection(auth.user?.data?.userRoles, anyOf).length > 0;
+};
+
+export const RequireAuth = ({ children, rolesDef }) => {
   const auth = useAuth();
   const location = useLocation();
+  const hasRole = useHasRequiredRoles(rolesDef);
 
   const [lastUsername, setLastUsername] = useState("");
   const username = auth.user?.data?.username;
@@ -64,15 +74,8 @@ export const RequireAuth = ({ children, someRequired = [] }) => {
     );
   }
 
-  if (someRequired.length) {
-    if (
-      // intersection(auth.user.data?.userRoles, someRequired).length !== someRequired.length
-      intersection(auth.user.data?.userRoles, someRequired).length < 1
-    )
-      return <MyNavigate to={routes.dashboard} replace />;
-  }
-
-  return children;
+  if (hasRole) return children;
+  else return <MyNavigate to={routes.dashboard} replace />;
 };
 
 const getAuthorizedLocationRedirect = ({ locationState, currentUsername }) => {
