@@ -1,3 +1,4 @@
 {
-  "dict.validation.forbiddenValues": "Forbidden value"
+  "dict.validation.forbiddenValues": "Forbidden value",
+  "team.credit.add-member.fields.aspiredCompetency": "Aspired competency"
 }

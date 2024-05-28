@@ -205,6 +205,15 @@ export const AddMemberModal = ({ onClose, open, username }) => {
                           size="small"
                           fullWidth
                         />
+                        <RHFTextField
+                          name="aspiredCompetency"
+                          // rules={{ minLength: 2 }}
+                          label={msg(
+                            "team.credit.add-member.fields.aspiredCompetency"
+                          )}
+                          size="small"
+                          fullWidth
+                        />
                       </>
                     )}
                   </>

@@ -122,6 +122,10 @@ export const messages = defineMessages({
     id: "team.credit.add-member.fields.position",
     defaultMessage: "Position",
   },
+  "team.credit.add-member.fields.aspiredCompetency": {
+    id: "team.credit.add-member.fields.aspiredCompetency",
+    defaultMessage: "Aspired competency",
+  },
   "team.credit.add-member.fields.locale": {
     id: "team.credit.add-member.fields.locale",
     defaultMessage: "Select languages",

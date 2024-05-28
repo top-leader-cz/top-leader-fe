@@ -2850,6 +2850,9 @@
   "strengths.tips.title": {
     "defaultMessage": "💡 Tips for action"
   },
+  "team.credit.add-member.fields.aspiredCompetency": {
+    "defaultMessage": "Aspired competency"
+  },
   "team.credit.add-member.fields.authorities": {
     "defaultMessage": "Authorities"
   },

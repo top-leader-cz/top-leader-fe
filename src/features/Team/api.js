@@ -90,7 +90,7 @@ export const useHRUserMutation = ({ isEdit, ...rest } = {}) => {
         }),
         ifElse(
           always(isHR || isAdmin),
-          pick(["isManager", "manager", "position"]),
+          pick(["isManager", "manager", "position", "aspiredCompetency"]),
           always({})
         ),
       ]),
