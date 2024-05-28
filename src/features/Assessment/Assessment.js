@@ -317,8 +317,7 @@ function Assessment() {
       handleDiscard,
     },
   } = useAssessment();
-  const [isDevMode] = useDevMode();
-  const externalInfoModal = useVisibility(isDevMode);
+  const externalInfoModal = useVisibility(true);
   const externalAssessmentModal = useVisibility(false);
 
   const handleNextRef = useRef(nextWithSave);

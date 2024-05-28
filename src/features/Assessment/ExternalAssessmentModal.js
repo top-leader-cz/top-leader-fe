@@ -84,6 +84,7 @@ export const ExternalAssessmentModal = ({ visible, onClose, onSubmit }) => {
               variant: "outlined",
               children: msg("assessment.external.cancel"),
               fullWidth: true,
+              onClick: onClose,
             }}
           />
           <Button
