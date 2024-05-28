@@ -15,7 +15,7 @@ import { useAuth } from "../Authorization";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { messages } from "./messages";
 import { useValuesDict } from "./values";
-import { identity, map, pipe } from "ramda";
+import { identity, map, pipe, last } from "ramda";
 
 // {
 //     "id": 1,
@@ -46,13 +46,13 @@ export const useMakeSelectable = ({
   idKey = "timestamp",
   map: mapItem,
   sorter = identity,
+  getDefaultSelected = last,
 }) => {
   const staticMap = useStaticCallback(mapItem);
   const stack = useMemo(
     () => pipe(map(staticMap), sorter)(entries),
     [entries, sorter, staticMap]
   );
-  const last = stack[stack.length - 1];
   const [selectedId, setSelectedId] = useState();
   const isSelected = useCallback(
     (entry) => selectedId && entry[idKey] === selectedId,
@@ -61,9 +61,8 @@ export const useMakeSelectable = ({
   const selected = stack.find(isSelected);
 
   return {
-    last,
     all: stack,
-    selected: selected || last,
+    selected: selected || getDefaultSelected(stack),
     setSelected: useCallback((entry) => setSelectedId(entry?.[idKey]), []),
     isSelected,
   };

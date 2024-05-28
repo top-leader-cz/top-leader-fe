@@ -458,6 +458,7 @@ export function AuthProvider({ children }) {
     isCoach: hasRole(Authority.COACH),
     isHR: hasRole(Authority.HR),
     isAdmin: hasRole(Authority.ADMIN),
+    isManager: hasRole(Authority.MANAGER),
   };
 
   // console.log("[AP.rndr]", value);

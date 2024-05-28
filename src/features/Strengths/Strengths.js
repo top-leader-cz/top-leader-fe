@@ -14,7 +14,7 @@ import { SelectedStregth } from "./SelectedStregth";
 import { StrengthsRightMenu } from "./StrengthsRightMenu";
 import { messages } from "./messages";
 import { useAllTalentsDict } from "./talents";
-import { prop, sortBy } from "ramda";
+import { descend, head, prop, sort, sortBy } from "ramda";
 
 const useStrengthsHistoryQuery = () =>
   useMyQuery({
@@ -26,7 +26,8 @@ export function StrengthsPage() {
   const query = useStrengthsHistoryQuery();
   const sel = useMakeSelectable({
     entries: query.data ?? [],
-    sorter: sortBy(prop("date")),
+    sorter: sort(descend(prop("date"))),
+    getDefaultSelected: head,
     map: (el) => ({
       // status
       date: el.createdAt,

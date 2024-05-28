@@ -140,9 +140,15 @@ const ListItemLink = ({ route, text, icon, onClick, mobile }) => {
 };
 
 export const MainMenu = ({ open }) => {
-  const { signout, isHR, isCoach, isAdmin } = useAuth();
+  const { signout, isHR, isCoach, isAdmin, isManager } = useAuth();
   const mobile = !open;
   const [isDevMode, setIsDevMode] = useDevMode();
+  const logoText = [
+    isAdmin ? "Admin" : isHR ? "HR" : isCoach ? "Coach" : "",
+    isManager && "Manager",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <MsgProvider messages={messages}>
@@ -160,10 +166,7 @@ export const MainMenu = ({ open }) => {
         }}
       >
         <Box>
-          <LogoImg
-            mobile={mobile}
-            text={isAdmin ? "Admin" : isHR ? "HR" : isCoach ? "Coach" : ""}
-          />
+          <LogoImg mobile={mobile} text={logoText} />
           <List component="nav">
             <ListItemLink
               mobile={mobile}
