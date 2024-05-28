@@ -33,6 +33,7 @@ export const routes = {
   feedbackResults: "/get-feedback/results/:id",
   externalFeedbackPage: "/feedback/:formId?/:username?/:token?",
   team: "/team",
+  myTeam: "/my-team",
   clients: "/clients",
   messages: "/messages",
   muiDefaultApp: "/mui-default-app",
@@ -52,5 +53,6 @@ export const parametrizedRoutes = {
 
 export const rolesDefByRoute = {
   [routes.team]: { anyOf: [Authority.ADMIN, Authority.HR] },
+  [routes.myTeam]: { anyOf: [Authority.MANAGER] },
   [routes.clients]: { anyOf: [Authority.ADMIN, Authority.COACH] },
 };

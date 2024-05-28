@@ -185,37 +185,33 @@ export const AddMemberModal = ({ onClose, open, username }) => {
                   {...HIDDEN_FIELD}
                 />
 
-                {(isHR || isAdmin) && (
+                <FormControlLabel
+                  control={<CheckboxField name="isManager" />}
+                  label={msg("team.credit.add-member.fields.isManager")}
+                />
+                {isEdit && (
                   <>
-                    <FormControlLabel
-                      control={<CheckboxField name="isManager" />}
-                      label={msg("team.credit.add-member.fields.isManager")}
+                    <AutocompleteSelect
+                      name="manager"
+                      label={msg("team.credit.add-member.fields.manager")}
+                      {...managersProps}
                     />
-                    {isEdit && (
-                      <>
-                        <AutocompleteSelect
-                          name="manager"
-                          label={msg("team.credit.add-member.fields.manager")}
-                          {...managersProps}
-                        />
-                        <RHFTextField
-                          name="position"
-                          rules={{ minLength: 2 }}
-                          label={msg("team.credit.add-member.fields.position")}
-                          size="small"
-                          fullWidth
-                        />
-                        <RHFTextField
-                          name="aspiredCompetency"
-                          // rules={{ minLength: 2 }}
-                          label={msg(
-                            "team.credit.add-member.fields.aspiredCompetency"
-                          )}
-                          size="small"
-                          fullWidth
-                        />
-                      </>
-                    )}
+                    <RHFTextField
+                      name="position"
+                      rules={{ minLength: 2 }}
+                      label={msg("team.credit.add-member.fields.position")}
+                      size="small"
+                      fullWidth
+                    />
+                    <RHFTextField
+                      name="aspiredCompetency"
+                      // rules={{ minLength: 2 }}
+                      label={msg(
+                        "team.credit.add-member.fields.aspiredCompetency"
+                      )}
+                      size="small"
+                      fullWidth
+                    />
                   </>
                 )}
 

@@ -67,8 +67,6 @@ export const creditFrom = (credit) => {
 export const toApiLocale = pipe(prop("locale"), defaultTo("en"), take(2));
 
 export const useHRUserMutation = ({ isEdit, ...rest } = {}) => {
-  const { isHR, isAdmin } = useAuth();
-
   return useMyMutation({
     fetchDef: {
       ...(isEdit
@@ -79,7 +77,16 @@ export const useHRUserMutation = ({ isEdit, ...rest } = {}) => {
         : { method: "POST", url: `/api/latest/hr-users` }),
       from: converge(unapply(mergeAll), [
         pick(isEdit ? [] : ["username"]),
-        pick(["firstName", "lastName", "authorities", "timeZone"]),
+        pick([
+          "firstName",
+          "lastName",
+          "authorities",
+          "timeZone",
+          "isManager",
+          "manager",
+          "position",
+          "aspiredCompetency",
+        ]),
         applySpec({
           locale: toApiLocale, // just create?
           status: ifElse(
@@ -88,11 +95,6 @@ export const useHRUserMutation = ({ isEdit, ...rest } = {}) => {
             ifElse(prop("trialUser"), always("AUTHORIZED"), always("PENDING"))
           ),
         }),
-        ifElse(
-          always(isHR || isAdmin),
-          pick(["isManager", "manager", "position", "aspiredCompetency"]),
-          always({})
-        ),
       ]),
     },
     invalidate: [

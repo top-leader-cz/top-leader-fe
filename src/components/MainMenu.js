@@ -44,6 +44,10 @@ const messages = defineMessages({
     id: "main-menu.items.team",
     defaultMessage: "Team",
   },
+  "main-menu.items.myTeam": {
+    id: "main-menu.items.myTeam",
+    defaultMessage: "My Team",
+  },
   "main-menu.items.clients": {
     id: "main-menu.items.clients",
     defaultMessage: "Clients",
@@ -198,6 +202,14 @@ export const MainMenu = ({ open }) => {
               icon={<Icon name="People" />}
               route={routes.team}
             />
+            {isDevMode ? (
+              <ListItemLink
+                mobile={mobile}
+                text={<Msg id="main-menu.items.myTeam" />}
+                icon={<Icon name="People" />}
+                route={routes.myTeam}
+              />
+            ) : null}
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.clients" />}

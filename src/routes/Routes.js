@@ -40,6 +40,7 @@ import ErrorPage from "./ErrorPage";
 import { HelpPage } from "../features/Help/Help.page";
 import { GoogleCalPage } from "../features/Integrations/GoogleCalPage";
 import { Contexts } from "../App";
+import { MyTeamPage } from "../features/MyTeam/MyTeam";
 
 const GlobalSpinner = () => {
   return (
@@ -285,6 +286,14 @@ export const router = createHashRouter([
         element: (
           <RequireAuth rolesDef={rolesDefByRoute[routes.team]}>
             <TeamPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: routes.myTeam,
+        element: (
+          <RequireAuth rolesDef={rolesDefByRoute[routes.myTeam]}>
+            <MyTeamPage />
           </RequireAuth>
         ),
       },
