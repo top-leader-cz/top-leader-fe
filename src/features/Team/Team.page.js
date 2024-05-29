@@ -20,7 +20,7 @@ import { AddMemberModal } from "./AddMemberModal";
 import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useCreditRequestMutation, useHrUsersQuery } from "./api";
 import { messages } from "./messages";
-import { formatName } from "../Coaches/CoachCard";
+import { ShowMore, formatName } from "../Coaches/CoachCard";
 
 const getKey = (button) =>
   button.key || JSON.stringify(omit(["children"], button));
@@ -113,6 +113,29 @@ function TeamPageInner() {
       label: msg("team.members.table.col.scheduled"),
       key: "scheduled",
       render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
+    },
+    {
+      label: msg("team.members.table.col.longTermGoal"),
+      key: "longTermGoal",
+      render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
+    },
+    {
+      label: msg("team.members.table.col.areaOfDevelopment"),
+      key: "areaOfDevelopment",
+      render: (row) => (
+        <TLCell align="right">
+          <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
+        </TLCell>
+      ),
+    },
+    {
+      label: msg("team.members.table.col.strengths"),
+      key: "strengths",
+      render: (row) => (
+        <TLCell align="right">
+          <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
+        </TLCell>
+      ),
     },
     // {
     //   label: msg("team.members.table.col.all"),

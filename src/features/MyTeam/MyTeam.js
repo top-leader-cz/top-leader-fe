@@ -3,23 +3,63 @@ import { useState } from "react";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { useMsg } from "../../components/Msg/Msg";
-import { TLCell, UserCell } from "../../components/Table/TLLoadableTable";
+import {
+  StyledTableCell,
+  StyledTableRow,
+  TLCell,
+  UserCell,
+} from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
-import { gray500 } from "../../theme";
+import { gray50, gray500 } from "../../theme";
 import { useAuth } from "../Authorization";
-import { formatName } from "../Coaches/CoachCard";
+import { ShowMore, formatName } from "../Coaches/CoachCard";
 import { ActionsCell, SlotChip } from "../Team/Team.page";
 import { messages } from "../Team/messages";
 import { useMyQuery } from "../Authorization/AuthProvider";
-import { always } from "ramda";
+import { always, prop } from "ramda";
 
 export const useManagerTeamQuery = (rest = {}) =>
   useMyQuery({
-    queryKey: ["managerTeam"],
-    fetchDef: { url: ``, to: always([]) },
+    queryKey: ["my-team"],
+    fetchDef: { url: "/api/latest/my-team", to: prop("content") },
     ...rest,
   });
+
+/*
+  String firstName,
+  String lastName,
+  String username,
+
+  String coach,
+  String coachFirstName,
+  String coachLastName,
+
+  Integer credit,
+  Integer requestedCredit,
+  Integer scheduledCredit,
+  Integer paidCredit,
+
+  String longTermGoal,
+  List<String> areaOfDevelopment,
+  List<String> strengths,
+*/
+
+// TODO
+const expandedRowRenderAoDLTG = ({ row, columns }) => {
+  if (!row.areaOfDevelopment && !row.longTermGoal) return null;
+
+  return (
+    <StyledTableRow
+      sx={{ bgcolor: gray50 }}
+      //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+    >
+      <StyledTableCell colSpan={columns.length} variant="default">
+        <H2 sx={{ fontSize: "16px" }}>AoD and LTG</H2>
+      </StyledTableCell>
+    </StyledTableRow>
+  );
+};
 
 export function MyTeamPage() {
   //   const [topUpSelected, setTopUpSelected] = useState(false);
@@ -67,6 +107,29 @@ export function MyTeamPage() {
       label: teamMsg("team.members.table.col.scheduled"),
       key: "scheduled",
       render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
+    },
+    {
+      label: teamMsg("team.members.table.col.longTermGoal"),
+      key: "longTermGoal",
+      render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
+    },
+    {
+      label: teamMsg("team.members.table.col.areaOfDevelopment"),
+      key: "areaOfDevelopment",
+      render: (row) => (
+        <TLCell align="right">
+          <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
+        </TLCell>
+      ),
+    },
+    {
+      label: teamMsg("team.members.table.col.strengths"),
+      key: "strengths",
+      render: (row) => (
+        <TLCell align="right">
+          <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
+        </TLCell>
+      ),
     },
 
     // {
@@ -118,18 +181,18 @@ export function MyTeamPage() {
             </Box>
           ),
           subheader: <P mt={1.5}>{teamMsg("team.members.sub")}</P>,
-          action: (
-            <Button
-              variant="contained"
-              startIcon={<Icon name="Add" />}
-              aria-label="add member"
-              onClick={() => {
-                setMember({});
-              }}
-            >
-              {teamMsg("team.members.add")}
-            </Button>
-          ),
+          // action: (
+          //   <Button
+          //     variant="contained"
+          //     startIcon={<Icon name="Add" />}
+          //     aria-label="add member"
+          //     onClick={() => {
+          //       setMember({});
+          //     }}
+          //   >
+          //     {teamMsg("team.members.add")}
+          //   </Button>
+          // ),
           columns,
           query: usersQuery,
         }}

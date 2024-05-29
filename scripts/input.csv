@@ -667,7 +667,7 @@ dashboard.cards.strengths.title.empty,,Find my strengths,Poznat své silné str�
 error-page.default.message,,"Sorry, an unexpected error has occurred.","Omlouváme se, došlo k neočekávané chybě.","Désolé, une erreur inattendue s'est produite.",Es ist ein unerwarteter Fehler aufgetreten.,error-page.default.message,,,"Sorry, an unexpected error has occurred.",,,,
 error-page.default.title,,Oops!,Jejda!,Oops!,Huch!,error-page.default.title,,,Oops!,,,,
 file-upload.primary,,Click to upload,Kliknutím nahrajete,Cliquez pour télécharger,Zum Hochladen hier klicken,file-upload.primary,,,Click to upload,,,,
-main-menu.items.team,,Credits,Kredity,Crédits,Guthaben,,Performed,Found,Credits,Credit,0.9090909090909091,settings.admin.member.modal.fields.credit,
+main-menu.items.team,,Team,Tým,Équipe,Mannschaft,,Performed,Found,Credits,Credit,0.9090909090909091,settings.admin.member.modal.fields.credit,
 sessions.aside.start-button,,Start new session,Začít novou relaci,Démarrer une nouvelle session,Neue Lerneinheit starten,sessions.aside.start-button,,,Start new session,,,,
 sessions.aside.title,,My sessions,Mé relace,Mes sessions,Meine Seminare,sessions.aside.title,,,My sessions,,,,
 sessions.card.goals.title,,Goals,Cíle,Buts,Ziele,sessions.card.goals.title,,,Goals,,,,

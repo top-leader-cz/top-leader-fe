@@ -202,14 +202,12 @@ export const MainMenu = ({ open }) => {
               icon={<Icon name="People" />}
               route={routes.team}
             />
-            {isDevMode ? (
-              <ListItemLink
-                mobile={mobile}
-                text={<Msg id="main-menu.items.myTeam" />}
-                icon={<Icon name="People" />}
-                route={routes.myTeam}
-              />
-            ) : null}
+            <ListItemLink
+              mobile={mobile}
+              text={<Msg id="main-menu.items.myTeam" />}
+              icon={<Icon name="People" />}
+              route={routes.myTeam}
+            />
             <ListItemLink
               mobile={mobile}
               text={<Msg id="main-menu.items.clients" />}

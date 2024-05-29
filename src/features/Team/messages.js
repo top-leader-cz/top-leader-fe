@@ -45,6 +45,18 @@ export const messages = defineMessages({
     id: "team.members.table.col.scheduled",
     defaultMessage: "Scheduled credits",
   },
+  "team.members.table.col.longTermGoal": {
+    id: "team.members.table.col.longTermGoal",
+    defaultMessage: "Long-term goals",
+  },
+  "team.members.table.col.areaOfDevelopment": {
+    id: "team.members.table.col.areaOfDevelopment",
+    defaultMessage: "Area of Development",
+  },
+  "team.members.table.col.strengths": {
+    id: "team.members.table.col.strengths",
+    defaultMessage: "Top5 talents",
+  },
   // "team.members.table.col.all": {
   //   id: "team.members.table.col.all",
   //   defaultMessage: "All credits",

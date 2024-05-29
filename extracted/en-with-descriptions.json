@@ -2268,6 +2268,9 @@
   "main-menu.items.messages": {
     "defaultMessage": "Messages"
   },
+  "main-menu.items.myTeam": {
+    "defaultMessage": "My Team"
+  },
   "main-menu.items.sessions": {
     "defaultMessage": "Sessions"
   },
@@ -2925,8 +2928,14 @@
   "team.members.table.col.action": {
     "defaultMessage": "Action"
   },
+  "team.members.table.col.areaOfDevelopment": {
+    "defaultMessage": "Area of Development"
+  },
   "team.members.table.col.coach": {
     "defaultMessage": "Coach"
+  },
+  "team.members.table.col.longTermGoal": {
+    "defaultMessage": "Long-term goals"
   },
   "team.members.table.col.name": {
     "defaultMessage": "Name"
@@ -2942,6 +2951,9 @@
   },
   "team.members.table.col.scheduled": {
     "defaultMessage": "Scheduled credits"
+  },
+  "team.members.table.col.strengths": {
+    "defaultMessage": "Top5 talents"
   },
   "team.members.title": {
     "defaultMessage": "Team members"
