@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { prop } from "ramda";
-import { useState } from "react";
 import { Layout } from "../../components/Layout";
+import { MsgProvider } from "../../components/Msg";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import {
   StyledTableCell,
@@ -14,10 +14,9 @@ import { H2, P } from "../../components/Typography";
 import { gray50 } from "../../theme";
 import { useAuth } from "../Authorization";
 import { useMyQuery } from "../Authorization/AuthProvider";
-import { ShowMore, formatName } from "../Coaches/CoachCard";
+import { formatName } from "../Coaches/CoachCard";
 import { SlotChip } from "../Team/Team.page";
 import { messages } from "../Team/messages";
-import { MsgProvider } from "../../components/Msg";
 import { myTeamMessages } from "./messages";
 
 export const useManagerTeamQuery = (rest = {}) =>
@@ -56,27 +55,26 @@ const ExpandedPseudoCell = ({ text, emphasized = false }) => {
         "&:not(:last-child)": { mb: 1 },
       }}
     >
-      {text}
+      {text || <>&nbsp;</>}
     </Box>
   );
 };
 
-// TODO
 export const expandedRowRenderAoDLTG = ({ row, columns }) => {
-  if (
-    !row.areaOfDevelopment?.length &&
-    !row.longTermGoal &&
-    !row.strengths?.length
-  )
-    return null;
   const data = [
     [
       <Msg id="team.members.table.col.areaOfDevelopment" />,
-      row.areaOfDevelopment?.join(", "),
+      row.areaOfDevelopment?.join?.(", "),
     ],
     [<Msg id="team.members.table.col.longTermGoal" />, row.longTermGoal],
-    [<Msg id="team.members.table.col.strengths" />, row.strengths?.join(", ")],
+    [
+      <Msg id="team.members.table.col.strengths" />,
+      row.strengths?.join?.(", "),
+    ],
   ];
+
+  // if (!data.some(([, text]) => text)) return null;
+
   return (
     <StyledTableRow
       sx={{ bgcolor: gray50 }}

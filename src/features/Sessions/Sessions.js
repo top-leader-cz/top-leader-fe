@@ -157,7 +157,14 @@ const SessionCard = ({
                 sx={{}}
               />
             </Box>
-            <P sx={{ my: 3, whiteSpace: "pre-wrap", lineHeight: 2 }}>
+            <P
+              sx={{
+                my: 3,
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+                lineHeight: 2,
+              }}
+            >
               {reflection || lastReflection || motivation}
             </P>
             <ActionStepsReadOnly
