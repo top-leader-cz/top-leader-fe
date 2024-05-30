@@ -766,6 +766,7 @@
   "messages.empty.description": "Messages will appear here once a conversation with a coach begins.",
   "messages.empty.title": "There are no messages yet",
   "messages.heading": "Messages",
+  "my-team.heading": "My Team",
   "score.max": "Totally me",
   "score.min": "Not me at all",
   "session.step-card.step": "Step {current}/{total}",

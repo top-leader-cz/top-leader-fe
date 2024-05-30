@@ -21,6 +21,7 @@ import { CreditTopUpModal } from "./CreditTopUpModal";
 import { useCreditRequestMutation, useHrUsersQuery } from "./api";
 import { messages } from "./messages";
 import { ShowMore, formatName } from "../Coaches/CoachCard";
+import { expandedRowRenderAoDLTG } from "../MyTeam/MyTeam";
 
 const getKey = (button) =>
   button.key || JSON.stringify(omit(["children"], button));
@@ -114,29 +115,29 @@ function TeamPageInner() {
       key: "scheduled",
       render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
     },
-    {
-      label: msg("team.members.table.col.longTermGoal"),
-      key: "longTermGoal",
-      render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
-    },
-    {
-      label: msg("team.members.table.col.areaOfDevelopment"),
-      key: "areaOfDevelopment",
-      render: (row) => (
-        <TLCell align="right">
-          <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
-        </TLCell>
-      ),
-    },
-    {
-      label: msg("team.members.table.col.strengths"),
-      key: "strengths",
-      render: (row) => (
-        <TLCell align="right">
-          <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
-        </TLCell>
-      ),
-    },
+    // {
+    //   label: msg("team.members.table.col.longTermGoal"),
+    //   key: "longTermGoal",
+    //   render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
+    // },
+    // {
+    //   label: msg("team.members.table.col.areaOfDevelopment"),
+    //   key: "areaOfDevelopment",
+    //   render: (row) => (
+    //     <TLCell align="right">
+    //       <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
+    //     </TLCell>
+    //   ),
+    // },
+    // {
+    //   label: msg("team.members.table.col.strengths"),
+    //   key: "strengths",
+    //   render: (row) => (
+    //     <TLCell align="right">
+    //       <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
+    //     </TLCell>
+    //   ),
+    // },
     // {
     //   label: msg("team.members.table.col.all"),
     //   key: "all",
@@ -215,6 +216,7 @@ function TeamPageInner() {
     <Layout header={{ heading: msg("team.heading") }}>
       <TLTableWithHeader
         {...manageUsersProps}
+        {...{ expandedRowRender: expandedRowRenderAoDLTG }}
         columns={columns}
         query={hrUsersQuery}
       />
@@ -234,10 +236,12 @@ function TeamPageInner() {
   );
 }
 
-export function TeamPage() {
+export const withTeamMessages = (Component) => (props) => {
   return (
     <MsgProvider messages={messages}>
-      <TeamPageInner />
+      <Component {...props} />
     </MsgProvider>
   );
-}
+};
+
+export const TeamPage = withTeamMessages(TeamPageInner);

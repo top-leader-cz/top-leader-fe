@@ -1,8 +1,8 @@
-import { Box, Button, IconButton } from "@mui/material";
+import { Box } from "@mui/material";
+import { prop } from "ramda";
 import { useState } from "react";
-import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
-import { useMsg } from "../../components/Msg/Msg";
+import { Msg, useMsg } from "../../components/Msg/Msg";
 import {
   StyledTableCell,
   StyledTableRow,
@@ -11,13 +11,14 @@ import {
 } from "../../components/Table/TLLoadableTable";
 import { TLTableWithHeader } from "../../components/Table/TLTableWithHeader";
 import { H2, P } from "../../components/Typography";
-import { gray50, gray500 } from "../../theme";
+import { gray50 } from "../../theme";
 import { useAuth } from "../Authorization";
-import { ShowMore, formatName } from "../Coaches/CoachCard";
-import { ActionsCell, SlotChip } from "../Team/Team.page";
-import { messages } from "../Team/messages";
 import { useMyQuery } from "../Authorization/AuthProvider";
-import { always, prop } from "ramda";
+import { ShowMore, formatName } from "../Coaches/CoachCard";
+import { SlotChip } from "../Team/Team.page";
+import { messages } from "../Team/messages";
+import { MsgProvider } from "../../components/Msg";
+import { myTeamMessages } from "./messages";
 
 export const useManagerTeamQuery = (rest = {}) =>
   useMyQuery({
@@ -45,27 +46,64 @@ export const useManagerTeamQuery = (rest = {}) =>
   List<String> strengths,
 */
 
-// TODO
-const expandedRowRenderAoDLTG = ({ row, columns }) => {
-  if (!row.areaOfDevelopment && !row.longTermGoal) return null;
+const ExpandedPseudoCell = ({ text, emphasized = false }) => {
+  return (
+    <Box
+      sx={{
+        color: emphasized ? "#101828" : "#344054",
+        fontWeight: emphasized ? 500 : 400,
+        fontSize: 14,
+        "&:not(:last-child)": { mb: 1 },
+      }}
+    >
+      {text}
+    </Box>
+  );
+};
 
+// TODO
+export const expandedRowRenderAoDLTG = ({ row, columns }) => {
+  if (
+    !row.areaOfDevelopment?.length &&
+    !row.longTermGoal &&
+    !row.strengths?.length
+  )
+    return null;
+  const data = [
+    [
+      <Msg id="team.members.table.col.areaOfDevelopment" />,
+      row.areaOfDevelopment?.join(", "),
+    ],
+    [<Msg id="team.members.table.col.longTermGoal" />, row.longTermGoal],
+    [<Msg id="team.members.table.col.strengths" />, row.strengths?.join(", ")],
+  ];
   return (
     <StyledTableRow
       sx={{ bgcolor: gray50 }}
       //   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
     >
       <StyledTableCell colSpan={columns.length} variant="default">
-        <H2 sx={{ fontSize: "16px" }}>AoD and LTG</H2>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <Box sx={{ mr: 3 }}>
+            {data.map(([text]) => (
+              <ExpandedPseudoCell text={text} />
+            ))}
+          </Box>
+          <Box>
+            {data.map(([, text]) => (
+              <ExpandedPseudoCell text={text} emphasized />
+            ))}
+          </Box>
+        </Box>
       </StyledTableCell>
     </StyledTableRow>
   );
 };
 
-export function MyTeamPage() {
-  //   const [topUpSelected, setTopUpSelected] = useState(false);
-  const [member, setMember] = useState();
+function MyTeamInner() {
   const teamMsg = useMsg({ dict: messages });
-  const { isHR, isAdmin, isCoach } = useAuth();
+  const msg = useMsg({ dict: myTeamMessages });
+  const { isHR, isAdmin } = useAuth();
 
   const usersQuery = useManagerTeamQuery();
 
@@ -108,66 +146,35 @@ export function MyTeamPage() {
       key: "scheduled",
       render: (row) => <TLCell align="right">{row.scheduledCredit}</TLCell>,
     },
-    {
-      label: teamMsg("team.members.table.col.longTermGoal"),
-      key: "longTermGoal",
-      render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
-    },
-    {
-      label: teamMsg("team.members.table.col.areaOfDevelopment"),
-      key: "areaOfDevelopment",
-      render: (row) => (
-        <TLCell align="right">
-          <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
-        </TLCell>
-      ),
-    },
-    {
-      label: teamMsg("team.members.table.col.strengths"),
-      key: "strengths",
-      render: (row) => (
-        <TLCell align="right">
-          <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
-        </TLCell>
-      ),
-    },
-
     // {
-    //   label: teamMsg("team.members.table.col.action"),
-    //   key: "action",
+    //   label: teamMsg("team.members.table.col.longTermGoal"),
+    //   key: "longTermGoal",
+    //   render: (row) => <TLCell align="right">{row.longTermGoal}</TLCell>,
+    // },
+    // {
+    //   label: teamMsg("team.members.table.col.areaOfDevelopment"),
+    //   key: "areaOfDevelopment",
     //   render: (row) => (
-    //     <ActionsCell
-    //       buttons={[
-    //         {
-    //           key: 1,
-    //           variant: "outlined",
-    //           onClick: () => setTopUpSelected(row),
-    //           children: teamMsg("team.credit.topup"),
-    //         },
-    //         {
-    //           key: 2,
-    //           tooltip: teamMsg("settings.admin.table.edit.tooltip"),
-    //           Component: IconButton,
-    //           onClick: () => setMember(row),
-    //           children: <Icon name="BorderColorOutlined" />,
-    //           hidden: isCoach,
-    //           sx: { color: gray500 },
-    //         },
-    //       ]}
-    //     />
+    //     <TLCell align="right">
+    //       <ShowMore maxChars={25} text={row.areaOfDevelopment?.join(", ")} />
+    //     </TLCell>
+    //   ),
+    // },
+    // {
+    //   label: teamMsg("team.members.table.col.strengths"),
+    //   key: "strengths",
+    //   render: (row) => (
+    //     <TLCell align="right">
+    //       <ShowMore maxChars={25} text={row.strengths?.join(", ")} />
+    //     </TLCell>
     //   ),
     // },
   ];
-  //   const mutation = useCreditRequestMutation({
-  //     onSuccess: () => {
-  //       setTopUpSelected(null);
-  //     },
-  //   });
 
   console.log("[MyTeam.page]", { usersQuery, isHR, isAdmin });
 
   return (
-    <Layout header={{ heading: teamMsg("team.heading") }}>
+    <Layout header={{ heading: msg("my-team.heading") }}>
       <TLTableWithHeader
         {...{
           title: (
@@ -181,34 +188,22 @@ export function MyTeamPage() {
             </Box>
           ),
           subheader: <P mt={1.5}>{teamMsg("team.members.sub")}</P>,
-          // action: (
-          //   <Button
-          //     variant="contained"
-          //     startIcon={<Icon name="Add" />}
-          //     aria-label="add member"
-          //     onClick={() => {
-          //       setMember({});
-          //     }}
-          //   >
-          //     {teamMsg("team.members.add")}
-          //   </Button>
-          // ),
           columns,
+          expandedRowRender: expandedRowRenderAoDLTG,
           query: usersQuery,
         }}
       />
-      {/* <CreditTopUpModal
-        open={!!topUpSelected}
-        onClose={() => setTopUpSelected(null)}
-        mutation={mutation}
-        extraParams={{ username: topUpSelected?.username }}
-      /> */}
-      {/* <AddMemberModal
-        open={!!member}
-        username={member?.username}
-        onClose={() => setMember()}
-      /> */}
       <Box sx={{ pb: 3 }} />
     </Layout>
   );
 }
+
+const withTeamMessages = (Component) => (props) => {
+  return (
+    <MsgProvider messages={messages}>
+      <Component {...props} />
+    </MsgProvider>
+  );
+};
+
+export const MyTeamPage = withTeamMessages(MyTeamInner);

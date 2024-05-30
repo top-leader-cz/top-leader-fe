@@ -1,5 +1,5 @@
 import { omit, values } from "ramda";
-import App from "../../App";
+import App, { Contexts } from "../../App";
 import { MockForm } from "./AutocompleteSelect.stories";
 import { FreeSoloField, optionEqStrategies } from "./Fields";
 
@@ -23,11 +23,11 @@ export default {
   },
   decorators: [
     (Story) => (
-      <App>
+      <Contexts>
         <MockForm formConf={{ defaultValues: { field1: null } }}>
           <Story />
         </MockForm>
-      </App>
+      </Contexts>
     ),
   ],
 };

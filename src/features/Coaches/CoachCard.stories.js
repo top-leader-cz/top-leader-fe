@@ -1,5 +1,5 @@
 import { AuthMock } from "../../../.storybook/mockUtils";
-import App from "../../App";
+import App, { Contexts } from "../../App";
 import { CoachCard } from "./CoachCard";
 
 // TODO: separate AvailabilityCalendar.stories.js, import mock data from there
@@ -56,12 +56,12 @@ export default {
     //   </div>
     // ),
     (Story) => (
-      <App>
+      <Contexts>
         <AuthMock mockData={MOCK}>
           {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
           <Story />
         </AuthMock>
-      </App>
+      </Contexts>
     ),
   ],
 };

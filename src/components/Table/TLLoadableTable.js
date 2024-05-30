@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   Chip,
   Stack,
   Table,
@@ -10,19 +9,16 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
   styled,
   tableCellClasses,
 } from "@mui/material";
 import { Fragment, useContext } from "react";
-import { QueryRenderer } from "../../features/QM/QueryRenderer";
-import { P } from "../Typography";
-import { Icon } from "../Icon";
-import { gray200 } from "../../theme";
 import { formatName } from "../../features/Coaches/CoachCard";
 import { I18nContext } from "../../features/I18n/I18nProvider";
-import { ErrorBoundary } from "../ErrorBoundary";
-import { omit, pick } from "ramda";
+import { QueryRenderer } from "../../features/QM/QueryRenderer";
+import { gray200 } from "../../theme";
+import { Icon } from "../Icon";
+import { P } from "../Typography";
 
 export const StyledTableCell = styled(TableCell, {
   shouldForwardProp: (prop) => prop !== "variant",

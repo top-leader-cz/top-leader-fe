@@ -90,7 +90,6 @@ export const Contexts = ({ children }) => {
   );
 };
 
-export default function App({ children = <RouterProvider router={router} /> }) {
-  const Wrapper = React.Fragment;
-  return <Wrapper>{children}</Wrapper>;
+export default function App() {
+  return <RouterProvider router={router} />;
 }

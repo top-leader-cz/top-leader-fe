@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
-import App from "../../App";
+import App, { Contexts } from "../../App";
 import { AutocompleteSelect } from "./Fields";
 import { RHForm } from "./Form";
 import { keys, map, mergeAll, pipe } from "ramda";
@@ -55,12 +55,12 @@ export default {
     //   </div>
     // ),
     (Story) => (
-      <App>
+      <Contexts>
         <MockForm watchNames={["field1"]}>
           {/* 👇 Decorators in Storybook also accept a function. Replace <Story/> with Story() to enable it  */}
           <Story />
         </MockForm>
-      </App>
+      </Contexts>
     ),
   ],
   //   render: ({ footer, ...args }) => (

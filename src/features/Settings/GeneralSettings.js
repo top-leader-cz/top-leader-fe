@@ -19,7 +19,11 @@ import {
 import { Msg } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, H3, P } from "../../components/Typography";
-import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import {
+  useAuth,
+  useMyMutation,
+  useMyQuery,
+} from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FL_MAX_WIDTH, FormRow } from "./FormRow";
@@ -108,6 +112,7 @@ const GCalSync = ({ msg }) => {
 };
 
 export const GeneralSettings = () => {
+  const { isCoach } = useAuth();
   const passwordMutation = useMyMutation({
     fetchDef: {
       method: "POST",
@@ -291,32 +296,38 @@ export const GeneralSettings = () => {
           </ControlsContainer>
         </FormRow>
 
-        <H2 sx={{ mb: 3 }}>
-          <Msg id="settings.general.integrations" />
-        </H2>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            maxWidth: FL_MAX_WIDTH,
-          }}
-        >
-          <Avatar
-            sx={{ width: 44, height: 44, mr: 2 }}
-            variant="square"
-            src={"/google-calendar.png"}
-          />
-          <Box sx={{ flexGrow: "2" }}>
-            <H3 sx={{ mb: 1 }}>
-              {msg("settings.general.integrations.google-calendar.title")}
-            </H3>
-            <P>
-              {msg("settings.general.integrations.google-calendar.description")}
-            </P>
-          </Box>
-          <GCalSync msg={msg} />
-        </Box>
+        {isCoach && (
+          <>
+            <H2 sx={{ mb: 3 }}>
+              <Msg id="settings.general.integrations" />
+            </H2>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                maxWidth: FL_MAX_WIDTH,
+              }}
+            >
+              <Avatar
+                sx={{ width: 44, height: 44, mr: 2 }}
+                variant="square"
+                src={"/google-calendar.png"}
+              />
+              <Box sx={{ flexGrow: "2" }}>
+                <H3 sx={{ mb: 1 }}>
+                  {msg("settings.general.integrations.google-calendar.title")}
+                </H3>
+                <P>
+                  {msg(
+                    "settings.general.integrations.google-calendar.description"
+                  )}
+                </P>
+              </Box>
+              <GCalSync msg={msg} />
+            </Box>
+          </>
+        )}
       </FormProvider>
     </form>
   );

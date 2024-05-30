@@ -2301,6 +2301,9 @@
   "messages.heading": {
     "defaultMessage": "Messages"
   },
+  "my-team.heading": {
+    "defaultMessage": "My Team"
+  },
   "score.max": {
     "defaultMessage": "Totally me"
   },
