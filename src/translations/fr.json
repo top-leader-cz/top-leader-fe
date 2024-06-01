@@ -638,6 +638,7 @@
   "team.members.table.col.areaOfDevelopment": "Domaine de développement",
   "team.members.table.col.longTermGoal": "Objectifs à long terme",
   "team.members.table.col.strengths": "Top5 talents",
+  "dict.validation.notUnique": "Doit être unique",
   "auth.unauthorized.title": "Bienvenu chez Topleader",
   "auth.unauthorized.perex": "Veuillez saisir vos identifiants",
   "feedback.external.request-access-modal.desc": "Veuillez saisir vos identifiants",

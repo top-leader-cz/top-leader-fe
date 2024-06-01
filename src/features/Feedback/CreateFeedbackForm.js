@@ -74,7 +74,7 @@ export const CreateFeedbackForm = ({
     <FormProvider {...form}>
       <FormBuilderMeta isExistingTitle={isExistingTitle} />
       <Divider sx={{ my: 3 }} />
-      <FormBuilderFields name="fields" />
+      <FormBuilderFields name={FEEDBACK_FIELDS.fields} />
     </FormProvider>
   );
 };

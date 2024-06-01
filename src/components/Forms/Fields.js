@@ -681,6 +681,7 @@ export const getValidateOptionsMaybe = curryN(
 const applyVParams = ({
   rules = {},
   parametrizedValidate = [],
+  debugMsg = "",
   // validationDeps,
 }) => {
   try {
@@ -701,7 +702,11 @@ const applyVParams = ({
       ),
       // deps: validationDeps, // not working
     };
-    // console.log({ rulesResult, rules, parametrizedValidate });
+    console.log("[applyVParams]", debugMsg, {
+      rulesResult,
+      rules,
+      parametrizedValidate,
+    });
 
     return rulesResult;
   } catch (e) {
@@ -1095,7 +1100,8 @@ const useGroupedOptions = ({ options: optionsProp, groupedOptions }) => {
 export const FreeSoloField = ({
   name,
   id = name,
-  rules,
+  rules: rulesProp,
+  parametrizedValidate,
   label,
   options: optionsProp,
   groupedOptions,
@@ -1106,8 +1112,14 @@ export const FreeSoloField = ({
   clearOnBlur = true,
   debug = true,
   inputProps = {},
+  customError,
   ...props
 }) => {
+  const rules = applyVParams({
+    rules: rulesProp,
+    parametrizedValidate,
+    debugMsg: name,
+  });
   const msg = useMsg({ dict: formsMessages });
   const placeholder = useMemo(
     () => placeholderProp || msg("general.freeSolo.placeholder"),
@@ -1133,7 +1145,7 @@ export const FreeSoloField = ({
     <Controller
       name={name}
       rules={rules}
-      render={({ field, fieldState }) => (
+      render={({ field, fieldState, formState }) => (
         <Autocomplete
           freeSolo
           // https://mui.com/material-ui/react-autocomplete/#creatable
@@ -1157,8 +1169,8 @@ export const FreeSoloField = ({
             console.log(...color("blue", "[FreeSoloField.onChange]"), { name, data, field, action, other });
             if (typeof debug === "string") debugger; // debugger, break, d, b
             const value = from({ data, action });
-            onChange?.(value);
             field.onChange(value); // https://levelup.gitconnected.com/reareact-hook-form-with-mui-examples-a3080b71ec45
+            onChange?.(value);
           }}
           // onBlur={(event, reason, ...rest) => {
           //   // prettier-ignore
@@ -1168,15 +1180,24 @@ export const FreeSoloField = ({
           // }}
           renderInput={(params) => {
             // when initially rendered with value but without options, stays displayed with option key instead of label
-            if (debug) console.log("[FreeSoloField.renderInput]", { name, field, params, optionsProps }); // prettier-ignore
+            if (debug) console.log("[FreeSoloField.renderInput]", { name, field, fieldState, "fieldState.error": fieldState.error, params, optionsProps }); // prettier-ignore
             return (
               <TextField
                 {...params}
                 label={label}
                 placeholder={placeholder}
-                error={!!fieldState.error}
+                error={!!fieldState.error || !!customError}
                 helperText={
-                  <FieldError {...{ field, fieldState, rules, name }} />
+                  <FieldError
+                    {...{
+                      field,
+                      fieldState,
+                      rules,
+                      name,
+                      customError,
+                      parametrizedValidate,
+                    }}
+                  />
                 }
                 InputLabelProps={{ shrink: !!label }}
                 inputProps={{

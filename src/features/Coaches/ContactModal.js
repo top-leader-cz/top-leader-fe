@@ -16,9 +16,7 @@ import { H2, P } from "../../components/Typography";
 import { useSendMessageMutation } from "../Messages/api";
 import { formatName } from "./Coaches.page";
 import React, { useCallback, useState } from "react";
-import { useSnackbar } from "../Modal/ConfirmModal";
 import { messages } from "./messages";
-import { maxLength, notBlank } from "../../components/Forms/validations";
 
 // {
 //     "username": "coach1@gmail.com",

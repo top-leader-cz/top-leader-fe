@@ -53,7 +53,7 @@ export const TextAreaStep = ({
           name={textAreaName}
           rules={{
             required: "Required",
-            validate: { ...(field.validate ?? { notBlank: notBlank(0) }) },
+            validate: { ...(field.validate ?? { notBlank: notBlank() }) },
           }}
           placeholder={msg("sessions.steps.textareastep.placeholder", {
             textAreaName,
@@ -133,7 +133,7 @@ export const GoalStep = ({
           name={textAreaName}
           rules={{
             required: "Required",
-            validate: { ...(field.validate ?? { notBlank: notBlank(0) }) },
+            validate: { ...(field.validate ?? { notBlank: notBlank() }) },
           }}
           placeholder={msg("sessions.steps.goal.placeholder")}
           autoFocus

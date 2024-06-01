@@ -970,3 +970,4 @@ team.credit.add-member.fields.aspiredCompetency,,Aspired competency,Očekávaná
 team.members.table.col.areaOfDevelopment,,Area of Development,Oblast rozvoje,Domaine de développement,Entwicklungsbereich,,,,,,,,
 team.members.table.col.longTermGoal,,Long-term goals,Dlouhodobé cíle,Objectifs à long terme,Langfristige Ziele,,,,,,,,
 team.members.table.col.strengths,,Top5 talents,Top5 talentů,Top5 talents,Top5 Talente,,,,,,,,
+dict.validation.notUnique,,Must be unique,Musí být jedinečné,Doit être unique,Muss einzigartig sein,,,,,,,,

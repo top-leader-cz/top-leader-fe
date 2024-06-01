@@ -37,7 +37,7 @@ export const FeedbackField = ({ index, name, required, inputType, scales }) => {
       <RHFTextField
         name={name}
         placeholder={msg("feedback.external.answer-placeholder")}
-        rules={{ required, validate: { notBlank: notBlank(0) } }}
+        rules={{ required, validate: { notBlank: notBlank() } }}
         variant="standard"
         // fullWidth
         sx={{ mt: 3, width: "50%" }}

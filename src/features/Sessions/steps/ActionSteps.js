@@ -194,7 +194,7 @@ export const ActionStepsInner = ({
                 placeholder={msg("action-steps.label.placeholder")}
                 rules={{
                   required: true,
-                  validate: { notBlank: notBlank(0) },
+                  validate: { notBlank: notBlank() },
                 }}
                 withHelperTextSpace
                 autoFocus

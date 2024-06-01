@@ -15,7 +15,7 @@ export const FormBuilderMeta = ({ isExistingTitle }) => {
           name={FEEDBACK_FIELDS.title}
           rules={{
             required: true,
-            validate: { notBlank: notBlank(0) },
+            validate: { notBlank: notBlank() },
           }}
           render={({ field, fieldState, formState }) => {
             // console.log("[FormBuilderMeta.title]", { field, fieldState });

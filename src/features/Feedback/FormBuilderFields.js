@@ -8,8 +8,8 @@ import {
   FormGroup,
   IconButton,
 } from "@mui/material";
-import { prop } from "ramda";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { prop, remove as ramdaRemove } from "ramda";
+import { useFieldArray, useForm, useFormContext } from "react-hook-form";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import {
   AutocompleteSelect,
@@ -29,6 +29,7 @@ import {
 } from "./constants";
 import { messages } from "./messages";
 import { useFeedbackOptions } from "./useFeedbackQuestionOptionsDict";
+import { validationMessages } from "../../components/Forms/validations";
 
 export const FEEDBACK_INPUT_TYPE_OPTIONS = [
   { value: INPUT_TYPES.TEXT, label: "Paragraph" },
@@ -63,7 +64,7 @@ export const InputPreview = ({ inputType, index }) => {
   //   throw new Error("Missing inputType:" + inputType);
 };
 
-const FormBuilderField = ({ getName, index, remove, sx }) => {
+const FormBuilderField = ({ getName, index, remove, otherValues, sx }) => {
   const form = useFormContext();
 
   const titleName = getName(SUBFIELDS.title);
@@ -76,8 +77,18 @@ const FormBuilderField = ({ getName, index, remove, sx }) => {
   const required = form.watch(requiredName);
 
   const { optionsProps } = useFeedbackOptions();
+  const validationMsg = useMsg({ dict: validationMessages });
+  const uniqueError =
+    !!title && otherValues.includes(title)
+      ? validationMsg("dict.validation.notUnique")
+      : null;
 
-  console.log("FormBuilderField.rndr", { optionsProps, titleName, title });
+  console.log("FormBuilderField.rndr", {
+    index,
+    optionsProps,
+    titleName,
+    title,
+  });
 
   return (
     <Card sx={sx}>
@@ -90,8 +101,9 @@ const FormBuilderField = ({ getName, index, remove, sx }) => {
         <Box display="flex" flexDirection="row" gap={3}>
           <FreeSoloField
             name={titleName}
-            rules={{ required: "Required" }}
+            parametrizedValidate={[["required"], ["notBlank"]]}
             sx={{ maxWidth: "50%", flex: "0 1 auto" }}
+            customError={uniqueError}
             {...optionsProps}
           />
           <AutocompleteSelect
@@ -122,10 +134,13 @@ export const FormBuilderFields = ({ name }) => {
   const msg = useMsg({ dict: messages });
 
   const { fields, append, remove } = useFieldArray({
-    name: FEEDBACK_FIELDS.fields,
+    name,
     rules: { required: true, minLength: 1 },
   });
   const { query, optionsProps } = useFeedbackOptions();
+  const form = useFormContext();
+  const titles = form.watch(name).map(({ title }) => title);
+  console.log({ titles });
 
   const missingTranslations = optionsProps.options
     ?.map(prop("missing"))
@@ -143,14 +158,15 @@ export const FormBuilderFields = ({ name }) => {
   return (
     <>
       {tsMissing}
-      {fields.map((field, i) => (
+      {fields.map((field, index) => (
         <ErrorBoundary key={field.id}>
           <FormBuilderField
             key={field.id}
-            index={i}
+            index={index}
             remove={remove}
-            getName={(fieldName) => `${name}.${i}.${fieldName}`}
+            getName={(fieldName) => `${name}.${index}.${fieldName}`}
             sx={{ mt: 3 }}
+            otherValues={ramdaRemove(index, 1, titles)}
           />
         </ErrorBoundary>
       ))}

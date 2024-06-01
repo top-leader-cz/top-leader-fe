@@ -30,6 +30,10 @@ export const validationMessages = defineMessages({
     id: "dict.validation.forbiddenValues",
     defaultMessage: "Forbidden value",
   },
+  "dict.validation.notUnique": {
+    id: "dict.validation.notUnique",
+    defaultMessage: "Must be unique",
+  },
   "dict.validation.invalidDate": {
     id: "dict.validation.invalidDate",
     defaultMessage: "Invalid date",
@@ -46,9 +50,11 @@ export const validationMessages = defineMessages({
 
 const getError = ({ error, msg, name, rules, parametrizedValidate }) => {
   if (!error?.type) return undefined;
-  const tsKey =
-    getValidateOptionsMaybe(error?.type, parametrizedValidate)?.tsKey ||
-    `dict.validation.${error?.type}`;
+  const optionsMaybe = getValidateOptionsMaybe(
+    error?.type,
+    parametrizedValidate
+  );
+  const tsKey = optionsMaybe?.tsKey || `dict.validation.${error?.type}`;
   const paramsMaybe = getValidateParamsMaybe(error?.type, parametrizedValidate);
   const params = paramsMaybe || {
     gteLength: rules?.[error?.type] || "Unknown", // TODO
@@ -57,7 +63,16 @@ const getError = ({ error, msg, name, rules, parametrizedValidate }) => {
   const errorMsg = translated || error?.type;
 
   if (errorMsg) {
-    console.log("[getError] ", name, { error, tsKey, translated, errorMsg });
+    console.log("[getError] ", name, {
+      error,
+      tsKey,
+      paramsMaybe,
+      translated,
+      errorMsg,
+      rules,
+      parametrizedValidate,
+      optionsMaybe,
+    });
     // debugger;
   }
 
@@ -75,24 +90,33 @@ export const FieldError = ({
   rules,
   name,
   parametrizedValidate,
+  customError,
 }) => {
   const msg = useMsg({ dict: validationMessages });
 
-  if (!error) return undefined;
-  return (
-    <Fade in={true} timeout={500}>
-      <span>{getError({ error, msg, name, rules, parametrizedValidate })}</span>
-    </Fade>
-  );
+  if (error)
+    return (
+      <Fade in={true} timeout={500}>
+        <span>
+          {getError({ error, msg, name, rules, parametrizedValidate })}
+        </span>
+      </Fade>
+    );
+  if (customError) return <span>{customError}</span>;
+  return undefined;
   return getError({ error, msg, name, rules, parametrizedValidate });
 };
 
 // export const required = () => (v) => !!v;
 
 export const notBlank =
-  (gtLen = 0) =>
+  ({ gtLen = 0 } = {}) =>
   (v) =>
-    v?.trim?.()?.length > gtLen;
+    console.log("%cnotBlank", "color:lime;", {
+      v,
+      gtLen,
+      result: v?.trim?.()?.length > gtLen,
+    }) || v?.trim?.()?.length > gtLen;
 export const minLength =
   ({ gteLength = 1 } = {}) =>
   (v) =>
@@ -114,13 +138,13 @@ export const validDate = () => (v) => {
 };
 
 // TODO: cached fn, not reacting to forbiddenList changes
-const forbiddenValues =
+export const forbiddenValues =
   ({ forbiddenList = [] } = {}) =>
   (v) => {
     if (Array.isArray(v)) {
       debugger;
     } else {
-      console.log({ forbiddenList, v });
+      console.log("%c[forbiddenValues]", "color:lime", { forbiddenList, v });
       return !forbiddenList.includes(v);
     }
   };

@@ -1827,6 +1827,9 @@
   "dict.validation.notBlank": {
     "defaultMessage": "Cannot be blank"
   },
+  "dict.validation.notUnique": {
+    "defaultMessage": "Must be unique"
+  },
   "dict.validation.required": {
     "defaultMessage": "Required"
   },

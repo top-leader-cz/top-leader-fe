@@ -48,16 +48,16 @@ const DEFS = {
   },
   [SESSION_FIELDS.LONG_TERM_GOAL]: {
     map: pipe(defaultTo(""), trim),
-    validate: { notBlank: notBlank(0) },
+    validate: { notBlank: notBlank() },
   },
   [SESSION_FIELDS.MOTIVATION]: {
     map: pipe(defaultTo(""), trim),
-    validate: { notBlank: notBlank(0) },
+    validate: { notBlank: notBlank() },
   },
   [SESSION_FIELDS.ACTION_STEPS]: { map: map(evolve({ label: trim })) },
   [SESSION_FIELDS.REFLECTION]: {
     map: trim,
-    validate: { notBlank: notBlank(0) },
+    validate: { notBlank: notBlank() },
   },
   [SESSION_FIELDS.PREV_ACTION_STEPS]: {},
 };

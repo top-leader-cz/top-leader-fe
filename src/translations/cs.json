@@ -638,6 +638,7 @@
   "team.members.table.col.areaOfDevelopment": "Oblast rozvoje",
   "team.members.table.col.longTermGoal": "Dlouhodobé cíle",
   "team.members.table.col.strengths": "Top5 talentů",
+  "dict.validation.notUnique": "Musí být jedinečné",
   "auth.unauthorized.title": "Vítejte v TopLeader",
   "auth.unauthorized.perex": "Zadejte své údaje",
   "feedback.external.request-access-modal.desc": "Zadejte své údaje",

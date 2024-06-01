@@ -608,6 +608,7 @@
   "dict.validation.maxLength": "Too long. Max length is {lteLength}",
   "dict.validation.minLength": "Too short. Min length is {gteLength}",
   "dict.validation.notBlank": "Cannot be blank",
+  "dict.validation.notUnique": "Must be unique",
   "dict.validation.required": "Required",
   "dict.validation.todayOrFuture": "Must be in the future",
   "dict.validation.validDate": "Invalid date",
