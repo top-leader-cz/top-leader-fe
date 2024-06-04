@@ -19,6 +19,7 @@ import {
   startOfDay,
 } from "date-fns/fp";
 import {
+  allPass,
   converge,
   filter,
   identity,
@@ -100,6 +101,8 @@ export const AvailabilityCalendar = ({
   const visibleDaysCount = visibleDaysCountProp || downLg ? 3 : 7;
   const msg = useMsg({ dict: messages });
   const today = useMemo(() => todayProp || new Date(), [todayProp]);
+  const isAvailabilityIntervalVisible = (interval) => interval.start > today;
+
   const [offsetDays, setOffsetDays] = useState(0);
   const calendarInterval = useMemo(
     () => ({
@@ -146,7 +149,7 @@ export const AvailabilityCalendar = ({
     reset();
   }, [reset]);
 
-  // prettier-ignore
+  // prettier-ignore-next-line
   // console.log( "%c[AvailabilityCalendar.rndr]", "color:deeppink", coach.username, { today, calendarInterval, someResultsQuery, queries, onPick, pickedCoach, coach, visibleDaysCount, } );
 
   return (
@@ -172,6 +175,7 @@ export const AvailabilityCalendar = ({
           variant="outlined"
           size="small"
           sx={{ color: "inherit" }}
+          disabled={offsetDays < 1}
           onClick={createAddOffset(-1)}
         >
           <Icon name={"ChevronLeft"} />
@@ -180,6 +184,7 @@ export const AvailabilityCalendar = ({
           variant="outlined"
           size="small"
           sx={{ color: "inherit" }}
+          disabled={offsetDays < visibleDaysCount}
           onClick={createAddOffset(-visibleDaysCount)}
         >
           <Icon name={"KeyboardDoubleArrowLeft"} />
@@ -241,7 +246,7 @@ export const AvailabilityCalendar = ({
                   textAlign: "center",
                   width: cellWidth,
                   border: isToday(date) ? "1px solid #DAD2F1" : "none",
-                  borderRadius: 1
+                  borderRadius: 1,
                 }}
               >
                 {i18n.formatLocal(date, "E")}
@@ -283,11 +288,15 @@ export const AvailabilityCalendar = ({
                       start: startOfDay(date),
                       end: endOfDay(date),
                     };
+
                     const dayAvailabilities = filter(
-                      isIntervalWithin({
-                        parentInterval: dayInterval,
-                        overlapping: "debugger",
-                      }),
+                      allPass([
+                        isAvailabilityIntervalVisible,
+                        isIntervalWithin({
+                          parentInterval: dayInterval,
+                          overlapping: "debugger",
+                        }),
+                      ]),
                       availabilityIntervals
                     );
                     const isLoading = getIsDayLoading({
@@ -331,8 +340,8 @@ export const AvailabilityCalendar = ({
                       })
                       .filter(Boolean);
 
-                    // prettier-ignore
-                    // console.log( "[AvailabilityCalendar.rndr] DAY rndr prop", date, {displayedMs, slotsCount, unavailableSlots}, { date, dayInterval, dayAvailabilities, isLoading }, { anchoredInterval, availabilityIntervals, visibleDaysCount } );
+                    // prettier-ignore-next-line
+                    // console.log( "[AvailabilityCalendar.rndr] DAY rndr prop", date, {displayedMs, slotsCount, unavailableSlots}, { date, dayInterval, dayAvailabilities }, { anchoredInterval, availabilityIntervals, visibleDaysCount } );
 
                     return (
                       <Box
@@ -407,9 +416,9 @@ export const AvailabilityCalendar = ({
                                   // componentsProps={{ popper: { sx: { marginTop: "0px" } }, }}
                                   // slotProps={{
                                   //   popper: {
-                                      // NOT WORKING
-                                      // modifiers: [ { name: "offset", options: { offset: [0, -30] }, }, ],
-                                      // sx: { [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: { marginTop: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]: { marginBottom: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="right"] .${tooltipClasses.tooltip}`]: { marginLeft: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="left"] .${tooltipClasses.tooltip}`]: { marginRight: "0px" }, },
+                                  // NOT WORKING
+                                  // modifiers: [ { name: "offset", options: { offset: [0, -30] }, }, ],
+                                  // sx: { [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: { marginTop: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="top"] .${tooltipClasses.tooltip}`]: { marginBottom: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="right"] .${tooltipClasses.tooltip}`]: { marginLeft: "0px" }, [`&.${tooltipClasses.popper}[data-popper-placement*="left"] .${tooltipClasses.tooltip}`]: { marginRight: "0px" }, },
                                   //   },
                                   // }}
                                   title={

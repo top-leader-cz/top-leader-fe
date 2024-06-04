@@ -5,6 +5,7 @@ import {
   addDays,
   addHours,
   addMilliseconds,
+  addYears,
   eachWeekOfIntervalWithOptions,
   formatISO,
   getDay,
@@ -101,13 +102,6 @@ const parseAvailabilities = ({
       : identity
   );
 
-// const fetchFrameKeyToParams_ = ({ userTz }) => pipe(
-//     parseISO,
-//     applySpec({
-//       from: pipe( startOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz) ),
-//       to: pipe( endOfWeekWithOptions({ weekStartsOn: 1 }), formatInTimeZone(API_DATETIME_LOCAL_FORMAT, userTz) ), }) );
-// const getFetchFrameKeys_ = ({ calendarInterval, userTz }) => { return getWeekStarts({ calendarInterval, userTz, weekStartsOn: 1, UTC: false, ISO: true, }); };
-
 export const API_DATETIME_LOCAL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 const fetchFrameKeyToParams = ({ userTz }) =>
@@ -127,8 +121,11 @@ const fetchFrameKeyToParams = ({ userTz }) =>
     })
   );
 
-const getFetchFrameKeys = ({ calendarInterval, userTz }) => {
+const getFetchFrameKeys = ({ calendarInterval }) => {
   const now = startOfDay(new Date());
+  // dont fetch past weeks?
+  // if (calendarInterval.end < now) return [];
+
   const floatingWeekKeys = pipe(
     eachWeekOfIntervalWithOptions({ weekStartsOn: getDay(now) }),
     map(formatISO)
@@ -136,13 +133,13 @@ const getFetchFrameKeys = ({ calendarInterval, userTz }) => {
   return floatingWeekKeys;
 };
 
-export const fetchAvailabilityWeekIntervals = ({
+const fetchAvailabilityWeekIntervals = ({
   authFetch,
   username,
   fetchFrameKey,
   userTz,
   timeZone,
-  freeBusy,
+  // freeBusy,
 }) => {
   return pipeP(
     fetchFrameKeyToParams({ userTz }),
@@ -155,11 +152,11 @@ export const fetchAvailabilityWeekIntervals = ({
         username: always(username),
         from: prop("from"),
         to: prop("to"),
-        useFreeBusy: always(freeBusy),
+        // useFreeBusy: always(freeBusy),
       },
     }),
     authFetch,
-    parseAvailabilities({ timeZone })
+    parseAvailabilities({ timeZone, parentInterval: undefined })
   )(fetchFrameKey);
 };
 
@@ -190,7 +187,7 @@ export const useAvailabilityQueries = ({
 }) => {
   const { authFetch } = useAuth();
   const { userTz } = useContext(I18nContext);
-  const fetchFrameKeys = getFetchFrameKeys({ calendarInterval, userTz });
+  const fetchFrameKeys = getFetchFrameKeys({ calendarInterval });
   // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
   // console.log(".....", { calendarInterval, fetchFrameKeys });
 
@@ -207,7 +204,6 @@ export const useAvailabilityQueries = ({
         fetchFrameKey,
         userTz,
         timeZone,
-        freeBusy,
       }),
     }),
   }));
@@ -257,12 +253,9 @@ export const getIsDayLoading = ({ queries, dayInterval, userTz }) => {
     calendarInterval: dayInterval,
     userTz,
   });
-  // const dayQueries = queries.filter((query) => {
-  //   // const fetchInterval =
-  // });
   // firstDaysOfTheWeek - one Monday in Europe/Prague can be split in two week starts in UTC
-  const allFetched = fetchFrameKeys.every((dayName) =>
-    queries.find((query) => dayName === query.data?.params?.fetchFrameKey)
+  const allFetched = fetchFrameKeys.every((key) =>
+    queries.find((query) => key === query.data?.params?.fetchFrameKey)
   );
   // if (dayInterval.end.getDay() === 1)
   //   console.log("%cgetIsDayLoading", "color:blue", {
