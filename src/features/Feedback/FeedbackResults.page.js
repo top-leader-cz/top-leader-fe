@@ -168,7 +168,7 @@ function FeedbackResultsPageInner() {
   );
 
   return (
-    <Layout>
+    <Layout initialPrintLeftMenuHidden>
       <Header
         // back={{ href: routes.dashboard }}
         // text={msg("feedback.create.heading")} // TODO: change textation and use this

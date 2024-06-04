@@ -21,6 +21,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -75,15 +76,31 @@ const MyDrawer = styled(Drawer, {
   }),
 }));
 
-const SideMenu = ({ children, width, anchor, toggleMobile, open }) => {
+const SideMenu = ({
+  children,
+  width,
+  anchor,
+  toggleMobile,
+  open,
+  printHidden,
+}) => {
+  const printSx = printHidden
+    ? {
+        "@media print": {
+          display: "none",
+        },
+      }
+    : {};
+
   return (
     <MyDrawer
-      id="side-menu"
+      id="side-menu-left"
       width={width}
       variant="permanent"
       anchor={anchor}
       open={open}
       toggleMobile={toggleMobile}
+      sx={printSx}
     >
       {children}
       {toggleMobile ? (
@@ -194,15 +211,39 @@ const LayoutHeader = ({
 
 export const LayoutCtx = createContext({});
 
+export const usePrintWithoutLeftMenu = ({
+  setPrintLeftMenuHidden: setPrintLeftMenuHiddenProp,
+} = {}) => {
+  const { setPrintLeftMenuHidden = setPrintLeftMenuHiddenProp } =
+    useContext(LayoutCtx);
+
+  // Firefox printing fix: https://mui.com/material-ui/react-use-media-query/
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=774398
+  // const isPrint = useMediaQuery("print");
+
+  useLayoutEffect(() => {
+    // setPrintLeftMenuHidden(isPrint);
+    setPrintLeftMenuHidden(true);
+    return () => {
+      setPrintLeftMenuHidden(false);
+    };
+  }, [setPrintLeftMenuHidden]);
+};
+
 export const Layout = ({
   children,
   header,
   rightMenuContent: rightMenuContentProp,
-  contentWrapperSx,
+  initialPrintLeftMenuHidden = false,
 }) => {
   const theme = useTheme();
   const downLg = useMediaQuery(theme.breakpoints.down("lg"));
   const downMd = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [printLeftMenuHidden, setPrintLeftMenuHidden] = useState(
+    initialPrintLeftMenuHidden
+  );
+  // usePrintWithoutLeftMenu({ setPrintLeftMenuHidden });
 
   const [leftOpen, setLeftOpen] = useState(!downLg);
   useEffect(() => {
@@ -234,7 +275,9 @@ export const Layout = ({
   // console.log("[Layout.rndr]", { stack, rightMenuContent });
 
   return (
-    <LayoutCtx.Provider value={{ downLg, downMd }}>
+    <LayoutCtx.Provider
+      value={{ downLg, downMd, printLeftMenuHidden, setPrintLeftMenuHidden }}
+    >
       <Box
         id="layout"
         sx={{
@@ -248,6 +291,7 @@ export const Layout = ({
           width={leftWidth}
           anchor="left"
           open={leftOpen}
+          printHidden={printLeftMenuHidden}
           toggleMobile={
             !downLg ? null : (
               <IconButton
@@ -274,7 +318,6 @@ export const Layout = ({
             flexGrow: 1,
             position: "relative",
             //   bgcolor: "background.default",
-            ...contentWrapperSx,
           }}
         >
           {header && <LayoutHeader {...header} />}

@@ -163,8 +163,6 @@ export const fetchAvailabilityWeekIntervals = ({
   )(fetchFrameKey);
 };
 
-const joinResults = pipe(flatten);
-
 // const isFetched = (interval, intervals) => {
 //   const startIntervalMaybe = pipe(
 //     find((int) => isWithinInterval(interval.start, int))
@@ -190,14 +188,6 @@ export const useAvailabilityQueries = ({
   calendarInterval,
   disabled,
 }) => {
-  // const [fetchWindows, setFetchWindows] = useState([calendarInterval]);
-  // useEffect(() => {
-  //   if (!isFetched(calendarInterval, fetchWindows)) {
-  //     setFetchWindows(updateWindows(calendarInterval));
-  //   }
-  // }, []);
-  // const query = useQuery();
-
   const { authFetch } = useAuth();
   const { userTz } = useContext(I18nContext);
   const fetchFrameKeys = getFetchFrameKeys({ calendarInterval, userTz });
@@ -238,8 +228,8 @@ export const useAvailabilityQueries = ({
     )(queries);
     const fulfilled = filter(Boolean, mapped);
     const allIntervalsMaybe =
-      fulfilled.length === queries.length ? joinResults(fulfilled) : undefined;
-    const someIntervals = fulfilled.length ? joinResults(fulfilled) : [];
+      fulfilled.length === queries.length ? flatten(fulfilled) : undefined;
+    const someIntervals = fulfilled.length ? flatten(fulfilled) : [];
 
     return {
       queries,
