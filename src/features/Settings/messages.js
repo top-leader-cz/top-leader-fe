@@ -258,6 +258,10 @@ export const messages = defineMessages({
     id: "settings.general.integrations.google-calendar.connect",
     defaultMessage: "Connect",
   },
+  "settings.general.integrations.google-calendar.reconnect": {
+    id: "settings.general.integrations.google-calendar.reconnect",
+    defaultMessage: "Reconnect",
+  },
   "settings.availability.aside.title": {
     id: "settings.availability.aside.title",
     defaultMessage: "Preview",

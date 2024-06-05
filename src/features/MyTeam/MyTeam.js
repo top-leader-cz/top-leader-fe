@@ -189,6 +189,7 @@ function MyTeamInner() {
           columns,
           expandedRowRender: expandedRowRenderAoDLTG,
           query: usersQuery,
+          exportCsv: { filename: "my-team.csv" },
         }}
       />
       <Box sx={{ pb: 3 }} />

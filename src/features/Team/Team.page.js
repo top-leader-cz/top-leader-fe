@@ -22,6 +22,7 @@ import { useCreditRequestMutation, useHrUsersQuery } from "./api";
 import { messages } from "./messages";
 import { ShowMore, formatName } from "../Coaches/CoachCard";
 import { expandedRowRenderAoDLTG } from "../MyTeam/MyTeam";
+import { unparse } from "papaparse";
 
 const getKey = (button) =>
   button.key || JSON.stringify(omit(["children"], button));
@@ -176,41 +177,38 @@ function TeamPageInner() {
   });
 
   console.log("[Team->Credits.page]", { hrUsersQuery, isHR, isAdmin });
-  const manageUsersProps =
-    isHR || isAdmin
-      ? {
-          title: (
-            <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
-              <H2>
-                <Msg id="team.members.title" />
-              </H2>
-              <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
-                <Msg
-                  id="team.members.title.count.badge"
-                  values={{ count: hrUsersQuery.data?.length }}
-                />
-              </SlotChip>
-            </Box>
-          ),
-          subheader: (
-            <P mt={1.5}>
-              <Msg id="team.members.sub" />
-            </P>
-          ),
-          action: (
-            <Button
-              variant="contained"
-              startIcon={<Icon name="Add" />}
-              aria-label="add member"
-              onClick={() => {
-                setMember({});
-              }}
-            >
-              <Msg id="team.members.add" />
-            </Button>
-          ),
-        }
-      : {};
+  const manageUsersProps = {
+    title: (
+      <Box sx={{ display: "inline-flex", alignItems: "baseline" }}>
+        <H2>
+          <Msg id="team.members.title" />
+        </H2>
+        <SlotChip sx={{ display: "inline-flex", p: 0.75, ml: 4 }}>
+          <Msg
+            id="team.members.title.count.badge"
+            values={{ count: hrUsersQuery.data?.length }}
+          />
+        </SlotChip>
+      </Box>
+    ),
+    subheader: (
+      <P mt={1.5}>
+        <Msg id="team.members.sub" />
+      </P>
+    ),
+    action: (
+      <Button
+        variant="contained"
+        startIcon={<Icon name="Add" />}
+        aria-label="add member"
+        onClick={() => {
+          setMember({});
+        }}
+      >
+        <Msg id="team.members.add" />
+      </Button>
+    ),
+  };
 
   return (
     <Layout header={{ heading: msg("team.heading") }}>
@@ -219,6 +217,7 @@ function TeamPageInner() {
         {...{ expandedRowRender: expandedRowRenderAoDLTG }}
         columns={columns}
         query={hrUsersQuery}
+        exportCsv={{ filename: "team.csv" }}
       />
       <CreditTopUpModal
         open={!!topUpSelected}

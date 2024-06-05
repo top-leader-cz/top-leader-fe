@@ -33,4 +33,8 @@ export const generalMessages = defineMessages({
     id: "general.decline",
     defaultMessage: "Decline",
   },
+  "general.export.csv": {
+    id: "general.export.csv",
+    defaultMessage: "Export CSV",
+  },
 });

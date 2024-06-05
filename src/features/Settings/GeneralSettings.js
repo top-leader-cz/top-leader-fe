@@ -90,7 +90,18 @@ const GCalSync = ({ msg }) => {
                 {msg("settings.general.integrations.google-calendar.connect")}
               </Button>
             );
-          else return data?.status;
+          else
+            return (
+              <Button
+                component="a"
+                variant="outlined"
+                href={getAbsoluteHref(`/login/google`)}
+                title={data?.status}
+                // target="_blank"
+              >
+                {msg("settings.general.integrations.google-calendar.reconnect")}
+              </Button>
+            );
         }}
       />
       {/* <Tooltip title={"Enabled useFreeBusy"} placement="top">
