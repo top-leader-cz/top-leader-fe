@@ -4,11 +4,11 @@ import { ThemeProvider } from "@mui/material/styles";
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { RouterProvider } from "react-router-dom";
+// import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./features/Authorization/AuthProvider";
 import { I18nProvider, TLIntlProvider } from "./features/I18n/I18nProvider";
 import "./index.css";
-import { router } from "./routes";
+// import { router } from "./routes";
 import theme from "./theme";
 
 import { RightMenuProvider } from "./components/Layout"; // circular dependency when imported earlier
@@ -48,7 +48,6 @@ function ResetAll({ error, resetErrorBoundary }) {
 export const Contexts = ({ children }) => {
   return (
     <ErrorBoundary FallbackComponent={ResetAll} onReset={RESET}>
-      {/* <React.Suspense fallback={<div>Loading...</div>}> */}
       <ThemeProvider theme={theme}>
         <TLIntlProvider>
           <QueryClientProvider client={queryClient}>
@@ -85,11 +84,10 @@ export const Contexts = ({ children }) => {
           </QueryClientProvider>
         </TLIntlProvider>
       </ThemeProvider>
-      {/* </React.Suspense> */}
     </ErrorBoundary>
   );
 };
 
-export default function App() {
-  return <RouterProvider router={router} />;
-}
+// export default function App() {
+//   return <RouterProvider router={router} />;
+// }

@@ -37,4 +37,8 @@ export const generalMessages = defineMessages({
     id: "general.export.csv",
     defaultMessage: "Export CSV",
   },
+  "general.delimiter": {
+    id: "general.delimiter",
+    defaultMessage: "Delimiter {delimiter}",
+  },
 });

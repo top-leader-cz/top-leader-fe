@@ -144,6 +144,35 @@ export const TLIntlProvider = ({ children }) => {
   );
 };
 
+function getDecimalSeparator(locale) {
+  // Create a number formatter for the given locale
+  const formatter = new Intl.NumberFormat(locale);
+
+  // Use the formatter to format a number with a decimal part
+  const parts = formatter.formatToParts(1.1);
+
+  // Find and return the decimal separator
+  const decimalPart = parts.find((part) => part.type === "decimal");
+  return decimalPart ? decimalPart.value : null;
+}
+
+function guessExcelCsvDelimiter(locale) {
+  // Create a number formatter for the given locale
+  const formatter = new Intl.NumberFormat(locale);
+
+  // Use the formatter to format a number with decimal and group parts
+  const parts = formatter.formatToParts(1234.5);
+
+  // Find the decimal separator
+  const decimalPart = parts.find((part) => part.type === "decimal");
+  const decimalSeparator = decimalPart ? decimalPart.value : ".";
+
+  // Guess the delimiter based on the decimal separator
+  const csvDelimiter = decimalSeparator === "," ? ";" : ",";
+
+  return csvDelimiter;
+}
+
 export const I18nProvider = ({ children }) => {
   const { show } = useSnackbar();
   const { authFetch, userQuery, fetchUser } = useAuth();
@@ -243,7 +272,19 @@ export const I18nProvider = ({ children }) => {
     language,
     locale,
   });
-  console.log("[I18nProvider.rndr]", { language, userTz, i18n });
+  // Not working on my machine, locale is en-GB (js + system), separator is ".", delimiter should be "," but excel uses ";" and it's not possible to change it in preferences
+  // const decimalSeparator = getDecimalSeparator(locale.code);
+  // const decimalSeparatorIsComma = decimalSeparator === ",";
+  const guessedCsvDelimiter = guessExcelCsvDelimiter(locale.code);
+
+  console.log("[I18nProvider.rndr]", {
+    language,
+    userTz,
+    i18n,
+    locale,
+    guessedCsvDelimiter,
+    // decimalSeparatorIsComma,
+  });
 
   return (
     <ErrorBoundary fallbackRender={renderResetLang} onReset={onReset}>
@@ -256,6 +297,7 @@ export const I18nProvider = ({ children }) => {
           userTzMutation,
           locale,
           i18n,
+          guessedCsvDelimiter,
         }}
       >
         <LocalizationProvider
