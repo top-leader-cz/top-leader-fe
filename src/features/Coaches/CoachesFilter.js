@@ -9,6 +9,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
+import { filter, flip, includes, pipe, prop } from "ramda";
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { getCoachLanguagesOptions } from "../../components/Forms";
@@ -16,14 +17,13 @@ import { AutocompleteSelect, SliderField } from "../../components/Forms/Fields";
 import { RHForm } from "../../components/Forms/Form";
 import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
+import { I18nContext } from "../I18n/I18nProvider";
 import { ControlsContainer } from "../Sessions/steps/Controls";
 import { useFieldsDict } from "../Settings/useFieldsDict";
 
-import { I18nContext, defaultLanguage } from "../I18n/I18nProvider";
-
 const color = (color, msg) => ["%c" + msg, `color:${color};`];
 
-export const INITIAL_FILTER = ({ userLang = defaultLanguage } = {}) => ({
+export const INITIAL_FILTER = () => ({
   // languages: [userLang.substring(0, 2)],
   languages: [],
   fields: [],
@@ -69,12 +69,19 @@ const Rates = ({ msg, rates = RATES }) => {
   );
 };
 
-export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
-  const { language } = useContext(I18nContext);
+export const filterOptions = (supportedValues) =>
+  filter(pipe(prop("value"), flip(includes)(supportedValues)));
+
+export const CoachesFilter = ({
+  filter,
+  setFilter,
+  supportedLanguages = [],
+  supportedFields = [],
+  sx = { my: 3 },
+}) => {
   const msg = useMsg();
-  const { fieldsOptions } = useFieldsDict();
+  const { fieldsOptions: unfilteredFieldsOptions } = useFieldsDict();
   const methods = useForm({
-    // mode: "all",
     defaultValues: filter,
   });
 
@@ -88,8 +95,6 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
     () => ({ languages, fields, experience, prices }),
     [languages, fields, experience, prices]
   );
-
-  // console.log(...color("pink", "[CoachesFilter]"), { filter, values, search, });
 
   const setFilterRef = useRef(setFilter);
   setFilterRef.current = setFilter;
@@ -117,9 +122,16 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
 
     onSearch("");
   };
+  const languageOptions = useMemo(
+    () => pipe(getCoachLanguagesOptions, filterOptions(supportedLanguages))(),
+    [supportedLanguages]
+  );
+  const fieldsOptions = useMemo(
+    () => filterOptions(supportedFields)(unfilteredFieldsOptions),
+    [supportedFields, unfilteredFieldsOptions]
+  );
 
   return (
-    // <FormProvider {...methods}>
     <RHForm
       form={methods}
       onSubmit={(values) =>
@@ -136,7 +148,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
             <AutocompleteSelect
               name="languages"
               label={msg("coaches.filter.language.label")}
-              options={getCoachLanguagesOptions()}
+              options={languageOptions}
               // renderOption={renderLanguageOption}
               multiple
             />
@@ -145,6 +157,7 @@ export const CoachesFilter = ({ filter, setFilter, sx = { my: 3 } }) => {
               label={msg("coaches.filter.field.label")}
               options={fieldsOptions}
               multiple
+              disableCloseOnSelect={false}
             />
             <SliderField
               name="experience"

@@ -5,7 +5,6 @@ import {
   addDays,
   addHours,
   addMilliseconds,
-  addYears,
   eachWeekOfIntervalWithOptions,
   formatISO,
   getDay,
@@ -30,10 +29,6 @@ import { useAuth } from "../Authorization";
 import { useMyMutation } from "../Authorization/AuthProvider";
 import { I18nContext } from "../I18n/I18nProvider";
 import { fixEnd } from "../I18n/utils/date";
-import {
-  useLocalStorage,
-  useSessionStorage,
-} from "../../hooks/useLocalStorage";
 
 const handleIntervalOverlapping = ({
   overlapping,
@@ -139,7 +134,6 @@ const fetchAvailabilityWeekIntervals = ({
   fetchFrameKey,
   userTz,
   timeZone,
-  // freeBusy,
 }) => {
   return pipeP(
     fetchFrameKeyToParams({ userTz }),
@@ -152,31 +146,11 @@ const fetchAvailabilityWeekIntervals = ({
         username: always(username),
         from: prop("from"),
         to: prop("to"),
-        // useFreeBusy: always(freeBusy),
       },
     }),
     authFetch,
     parseAvailabilities({ timeZone, parentInterval: undefined })
   )(fetchFrameKey);
-};
-
-// const isFetched = (interval, intervals) => {
-//   const startIntervalMaybe = pipe(
-//     find((int) => isWithinInterval(interval.start, int))
-//   )(intervals);
-//   const endIntervalMaybe = pipe(
-//     find((int) => isWithinInterval(interval.end, int))
-//   )(intervals);
-
-//   if (startIntervalMaybe === endIntervalMaybe) return true;
-//   if (startIntervalMaybe === endIntervalMaybe) return true;
-// };
-
-// const updateWindows = curryN(2, (interval, intervals) => {});
-
-export const useFreeBusy = () => {
-  const [freeBusy, setFreeBusy] = useSessionStorage("__freeBusy", true);
-  return [freeBusy, setFreeBusy];
 };
 
 export const useAvailabilityQueries = ({
@@ -191,11 +165,9 @@ export const useAvailabilityQueries = ({
   // TODO: frame by current "floating" week, not weekstarts. Initial load - 2x fetch -> 1x fetch
   // console.log(".....", { calendarInterval, fetchFrameKeys });
 
-  const [freeBusy] = useFreeBusy();
-
   const queryDefs = fetchFrameKeys.map((fetchFrameKey) => ({
     enabled: !!username && !!timeZone && !disabled,
-    queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey, freeBusy }], // prettier-ignore
+    queryKey: ["coaches", username, "availability", { userTz, fetchFrameKey, timeZone }], // prettier-ignore
     queryFn: async () => ({
       params: { userTz, fetchFrameKey, username, calendarInterval },
       weekData: await fetchAvailabilityWeekIntervals({
@@ -301,12 +273,10 @@ const exampleErr = [
 ];
 export const usePickSlotMutation = ({ username, ...mutationProps }) => {
   const { i18n, userTz } = useContext(I18nContext);
-  const [freeBusy] = useFreeBusy();
   const pickSlotMutation = useMyMutation({
     fetchDef: {
       method: "POST",
       url: `/api/latest/coaches/${username}/schedule`,
-      query: { useFreeBusy: freeBusy },
       from: applySpec({
         time: ({ interval }) =>
           i18n.formatLocal(interval.start, API_DATETIME_LOCAL_FORMAT),

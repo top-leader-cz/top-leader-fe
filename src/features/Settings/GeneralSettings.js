@@ -29,7 +29,6 @@ import { ControlsContainer } from "../Sessions/steps/Controls";
 import { FL_MAX_WIDTH, FormRow } from "./FormRow";
 import { WHITE_BG } from "./Settings.page";
 import pjson from "../../../package.json";
-import { useFreeBusy } from "../Availability/api";
 import { QueryRenderer } from "../QM/QueryRenderer";
 
 const FIELDS_GENERAL = {
@@ -69,9 +68,6 @@ const useGoogleInfoQuery = () => {
 
 const GCalSync = ({ msg }) => {
   const query = useGoogleInfoQuery();
-  const [freeBusy, setFreeBusy] = useFreeBusy();
-
-  console.log({ freeBusy });
 
   return (
     <>
