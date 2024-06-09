@@ -328,6 +328,7 @@ const ExternalFeedbackPageInner = () => {
     params: { formId, username, token },
     externalFeedbackQuery,
     mutation,
+    submitted,
   });
 
   return (

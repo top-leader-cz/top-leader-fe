@@ -4,7 +4,7 @@ import * as df from "date-fns";
 import * as tz from "date-fns-tz";
 import { API_TIME_FORMAT, UTC_DATE_FORMAT, parseUTCZoned } from "./utils/date";
 import { formatDistanceToNow } from "date-fns";
-import { filter, fromPairs, keys, map, pipe } from "ramda";
+import { chain, filter, fromPairs, keys, map, pipe } from "ramda";
 
 // do not use directly, passed down to components thru context
 export const useI18nInternal = ({ userTz, language, locale }) => {
@@ -142,10 +142,16 @@ export const useI18nInternal = ({ userTz, language, locale }) => {
       .filter((k) => k.endsWith("WithOptions"))
       .map((k) => k.replace("WithOptions", ""));
     const fns = pipe(
-      map((fnName) => {
+      chain((fnName) => {
         const fn = dffp[`${fnName}WithOptions`];
         if (typeof fn === "function") {
-          return [fnName, (...args) => fn({ locale }, ...args)];
+          return [
+            [fnName, (...args) => fn({ locale }, ...args)],
+            [
+              `${fnName}WithMergeOptions`,
+              (options, ...args) => fn({ locale, ...options }, ...args),
+            ],
+          ];
         }
       }),
       filter(Boolean),

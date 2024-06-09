@@ -1,7 +1,14 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Divider } from "@mui/material";
+import { Box, Button, Divider, Tooltip } from "@mui/material";
 import { evolve, mergeRight, pipe, prop, slice } from "ramda";
-import { useContext, useMemo, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { RHFTextField } from "../../components/Forms";
@@ -21,6 +28,8 @@ import { getCollectedMaybe } from "./GetFeedback.page";
 import { Results } from "./Results";
 import { useFeedbackResultsQuery, useSaveFeedbackFormMutation } from "./api";
 import { messages } from "./messages";
+import { isBefore } from "date-fns/fp";
+import { intervalToDuration } from "date-fns";
 
 const AddRecipient = ({ feedback, onSuccess }) => {
   const msg = useMsg({ dict: messages });
@@ -76,10 +85,48 @@ const AddRecipient = ({ feedback, onSuccess }) => {
   );
 };
 
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+  savedCallback.current = callback;
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 const SharedWith = ({ feedback }) => {
   const msg = useMsg({ dict: messages });
   const [addVisible, setAddVisible] = useState(false);
   const handleAdd = () => setAddVisible(true);
+
+  const [, rerender] = useReducer((x) => x + 1, 0);
+  useInterval(rerender, 1000);
+  const { i18n } = useContext(I18nContext);
+  const isStillValid = isBefore(
+    i18n.parseUTCLocal(feedback.validTo),
+    Date.now()
+  );
+  const timeToExpire = i18n.dffp.formatDurationWithMergeOptions(
+    {},
+    intervalToDuration({
+      start: Date.now(),
+      end: i18n.parseUTCLocal(feedback.validTo),
+    })
+  );
+  // const timeToExpire = i18n.dffp.formatDistanceWithMergeOptions(
+  //   { addSuffix: false, includeSeconds: true },
+  //   i18n.parseUTCLocal(feedback.validTo),
+  //   Date.now()
+  // );
+
+  console.log("[SharedWith.rndr]", { feedback, isStillValid, timeToExpire });
 
   // if (!feedback?.recipients) return null;
 
@@ -96,18 +143,22 @@ const SharedWith = ({ feedback }) => {
         <P bigger sx={{ color: "black" }}>
           {msg("feedback.results.shared-with")}
         </P>
-        <Button
-          variant="text"
-          startIcon={<Icon name="Add" />}
-          // disabled={addVisible}
-          onClick={handleAdd}
-          sx={{
-            ml: 1,
-            visibility: addVisible ? "hidden" : "visible",
-          }}
-        >
-          {msg("feedback.results.add-email")}
-        </Button>
+        {isStillValid && (
+          <Tooltip title={timeToExpire}>
+            <Button
+              variant="text"
+              startIcon={<Icon name="Add" />}
+              // disabled={addVisible}
+              onClick={handleAdd}
+              sx={{
+                ml: 1,
+                visibility: addVisible ? "hidden" : "visible",
+              }}
+            >
+              {msg("feedback.results.add-email")}
+            </Button>
+          </Tooltip>
+        )}
       </Box>
 
       {addVisible && (
