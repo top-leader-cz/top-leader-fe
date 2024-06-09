@@ -2196,8 +2196,14 @@
   "general.delete": {
     "defaultMessage": "Delete"
   },
+  "general.delimiter": {
+    "defaultMessage": "Delimiter {delimiter}"
+  },
   "general.edit": {
     "defaultMessage": "Edit"
+  },
+  "general.export.csv": {
+    "defaultMessage": "Export CSV"
   },
   "general.freeSolo.placeholder": {
     "defaultMessage": "Type your own and hit enter or select from the list"
@@ -2663,6 +2669,9 @@
   },
   "settings.general.integrations.google-calendar.description": {
     "defaultMessage": "Sync your appointments with Google Calendar"
+  },
+  "settings.general.integrations.google-calendar.reconnect": {
+    "defaultMessage": "Reconnect"
   },
   "settings.general.integrations.google-calendar.title": {
     "defaultMessage": "Google Calendar"
