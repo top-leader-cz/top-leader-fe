@@ -206,7 +206,7 @@ const FinishedModal = ({ visible, onConfirm, onClose, feedback, msg }) =>
     />
   );
 
-const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
+const RequestAccessModal = ({ visible, onClose, params }) => {
   const msg = useMsg();
   const form = useForm({
     defaultValues: {
@@ -217,7 +217,7 @@ const RequestAccessModal = ({ visible, onClose, onSuccess, params }) => {
       hrEmail: "",
     },
   });
-  const mutation = useRequestAccessMutation({ params, onSuccess });
+  const mutation = useRequestAccessMutation({ params, onSuccess: onClose });
 
   return (
     <ConfirmModal
@@ -314,6 +314,7 @@ const ExternalFeedbackPageInner = () => {
   const mutation = useExternalFeedbackMutation({
     params: { formId, username, token },
     onSuccess: () => {
+      setSubmitted(true);
       setFinishedModalVisible(true);
     },
   });
@@ -322,13 +323,6 @@ const ExternalFeedbackPageInner = () => {
     (values) => mutation.mutateAsync(values),
     [mutation]
   );
-
-  const handleFinished = useCallback(() => {
-    setFinishedModalVisible();
-    setRequestAccessModalVisible();
-    setSubmitted(true);
-    // navigate(routes.signIn); // TODO?
-  }, []);
 
   console.log("[ExternalFeedbackPageInner.rndr]", {
     params: { formId, username, token },
@@ -372,7 +366,6 @@ const ExternalFeedbackPageInner = () => {
                   params={{ formId, username, token }}
                   visible={requestAccessModalVisible}
                   onClose={() => setRequestAccessModalVisible()}
-                  onSuccess={handleFinished}
                 />
               </>
             );

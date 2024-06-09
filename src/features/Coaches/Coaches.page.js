@@ -1,6 +1,6 @@
 import { Box, Divider } from "@mui/material";
-import { filter } from "ramda";
-import { useContext, useState } from "react";
+import { chain, filter, pipe, prop, uniq } from "ramda";
+import { useMemo, useState } from "react";
 import { InfoBox } from "../../components/InfoBox";
 import { Layout } from "../../components/Layout";
 import { MsgProvider } from "../../components/Msg";
@@ -9,7 +9,6 @@ import { ScrollableRightMenu } from "../../components/ScrollableRightMenu";
 import { H1, P } from "../../components/Typography";
 import { useAuth } from "../Authorization";
 import { useMyQuery } from "../Authorization/AuthProvider";
-import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { CoachCard } from "./CoachCard";
 import { CoachesFilter, INITIAL_FILTER } from "./CoachesFilter";
@@ -51,7 +50,6 @@ export const useCoachesQuery = ({ filter, ...rest } = {}) => {
       url: "/api/latest/coaches",
       data: getPayload({ filter }),
     },
-    // queryFn: () => authFetch({ method: "POST", url: "/api/latest/coaches", data: getPayload({ filter }), }),
     refetchOnWindowFocus: false,
     ...rest,
   });
@@ -59,11 +57,15 @@ export const useCoachesQuery = ({ filter, ...rest } = {}) => {
   return coachesQuery;
 };
 
+const allCoachesFilter = INITIAL_FILTER();
+
 export function CoachesPageInner() {
   const msg = useMsg();
-  const { language } = useContext(I18nContext);
   const [filter, setFilter] = useState(INITIAL_FILTER());
   const coachesQuery = useCoachesQuery({ filter });
+  const allCoachesQuery = useCoachesQuery({
+    filter: allCoachesFilter,
+  });
 
   const EXPECT_ITEMS = [
     // {
@@ -82,8 +84,13 @@ export function CoachesPageInner() {
       text: msg("coaches.aside.items.3.text"),
     },
   ];
-
-  // console.log("[Coaches.page.rndr]", { filter });
+  const { supportedLanguages, supportedFields } = useMemo(() => {
+    const coaches = allCoachesQuery.data?.content || [];
+    return {
+      supportedLanguages: pipe(chain(prop("languages")), uniq)(coaches),
+      supportedFields: pipe(chain(prop("fields")), uniq)(coaches),
+    };
+  }, [allCoachesQuery.data]);
 
   return (
     <Layout
@@ -116,7 +123,12 @@ export function CoachesPageInner() {
         </Box>
         <Divider variant="fullWidth" sx={{ mt: 2, mb: 3 }} />
       </Box>
-      <CoachesFilter filter={filter} setFilter={setFilter} />
+      <CoachesFilter
+        filter={filter}
+        setFilter={setFilter}
+        supportedLanguages={supportedLanguages}
+        supportedFields={supportedFields}
+      />
 
       <QueryRenderer
         {...coachesQuery}

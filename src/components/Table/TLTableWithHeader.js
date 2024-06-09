@@ -144,7 +144,7 @@ export const TLTableWithHeader = ({
   sx = {},
 }) => {
   const msg = useMsg({ dict: generalMessages });
-  const { guessedCsvDelimiter } = useContext(I18nContext);
+  // const { guessedCsvDelimiter } = useContext(I18nContext);
 
   return (
     <Card sx={sx}>

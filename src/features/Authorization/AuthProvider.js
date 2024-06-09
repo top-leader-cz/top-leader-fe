@@ -476,7 +476,7 @@ const noop = () => {};
 // https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
 // https://github.com/TanStack/query/discussions/5279
 export const useMyQuery = ({
-  fetchDef: { from: fromProp, to = identity, ...restFD } = {},
+  fetchDef: { from = always(undefined), to = identity, ...restFD } = {},
   debug,
   onSuccess,
   onError,
@@ -487,7 +487,7 @@ export const useMyQuery = ({
   const query = useQuery({
     queryFn: performCall({
       debug,
-      fetchDef: { ...restFD, from: fromProp ?? always(undefined), to },
+      fetchDef: { ...restFD, from, to },
       performCallFnMaybe: queryFn,
       authFetch,
     }),
