@@ -123,7 +123,7 @@ const FeedbackMeta = ({ data, sx = {} }) => {
             {msg("feedback.external.deadline", {
               date: i18n.formatLocalMaybe(
                 i18n.parseUTCLocal(data.validTo),
-                "Pp"
+                "P"
               ),
             })}
           </Button>
