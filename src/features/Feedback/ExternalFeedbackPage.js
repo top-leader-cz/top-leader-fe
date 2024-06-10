@@ -195,7 +195,7 @@ const FinishedModal = ({ visible, onConfirm, onClose, feedback, msg }) =>
           children: msg("feedback.external.finished-modal.request-access.no"),
           onClick: onClose,
         },
-        {
+        onConfirm && {
           variant: "contained",
           type: "button",
           children: msg("feedback.external.finished-modal.request-access.yes"),
@@ -355,19 +355,19 @@ const ExternalFeedbackPageInner = () => {
                 />
                 <FinishedModal
                   visible={finishedModalVisible}
-                  onConfirm={() => {
-                    setFinishedModalVisible();
-                    setRequestAccessModalVisible(true);
-                  }}
+                  // onConfirm={() => {
+                  //   setFinishedModalVisible();
+                  //   setRequestAccessModalVisible(true);
+                  // }}
                   msg={msg}
                   onClose={() => setFinishedModalVisible()}
                   feedback={data}
                 />
-                <RequestAccessModal
+                {/* <RequestAccessModal
                   params={{ formId, username, token }}
                   visible={requestAccessModalVisible}
                   onClose={() => setRequestAccessModalVisible()}
-                />
+                /> */}
               </>
             );
           }}

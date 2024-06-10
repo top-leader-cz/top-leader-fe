@@ -31,6 +31,18 @@ import { messages } from "./messages";
 import { isBefore } from "date-fns/fp";
 import { intervalToDuration } from "date-fns";
 
+export const ConditionalWrapper = ({
+  condition,
+  WrapperComponent,
+  wrapperProps = {},
+  renderWrapped = ({ children }) => (
+    <WrapperComponent {...wrapperProps}>{children}</WrapperComponent>
+  ),
+  children,
+}) => {
+  return condition ? renderWrapped({ children }) : children;
+};
+
 const AddRecipient = ({ feedback, onSuccess }) => {
   const msg = useMsg({ dict: messages });
   const form = useForm({
@@ -143,22 +155,25 @@ const SharedWith = ({ feedback }) => {
         <P bigger sx={{ color: "black" }}>
           {msg("feedback.results.shared-with")}
         </P>
-        {isStillValid && (
-          <Tooltip title={timeToExpire}>
-            <Button
-              variant="text"
-              startIcon={<Icon name="Add" />}
-              // disabled={addVisible}
-              onClick={handleAdd}
-              sx={{
-                ml: 1,
-                visibility: addVisible ? "hidden" : "visible",
-              }}
-            >
-              {msg("feedback.results.add-email")}
-            </Button>
-          </Tooltip>
-        )}
+        <ConditionalWrapper
+          condition={isStillValid}
+          WrapperComponent={Tooltip}
+          wrapperProps={{
+            title: timeToExpire,
+          }}
+        >
+          <Button
+            variant="text"
+            startIcon={<Icon name="Add" />}
+            onClick={handleAdd}
+            sx={{
+              ml: 1,
+              visibility: addVisible ? "hidden" : "visible",
+            }}
+          >
+            {msg("feedback.results.add-email")}
+          </Button>
+        </ConditionalWrapper>
       </Box>
 
       {addVisible && (
