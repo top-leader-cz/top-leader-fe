@@ -155,7 +155,7 @@ export const TLTableWithHeader = ({
           subheader={subheader}
           action={
             <Stack direction="row" spacing={2}>
-              {!query.error && exportCsv && (
+              {query && !query.error && exportCsv && (
                 <ButtonMenu
                   button={{
                     variant: "outlined",
