@@ -15,6 +15,7 @@ import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 import { Finished } from "./steps/Finished";
 import { useEditSteps, useSteps } from "./steps/useSessionSteps";
 import { Icon } from "../../components/Icon";
+import { EvaluationModal } from "./EvaluationModal";
 
 const initialAdjust = false;
 const initialStepIndex = 0;
@@ -110,6 +111,7 @@ function EditSessionPageInner() {
           justifyContent: "space-between",
         }}
       />
+      <EvaluationModal open />
       {finished ? (
         <Finished />
       ) : (

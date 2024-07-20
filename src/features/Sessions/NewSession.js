@@ -18,6 +18,7 @@ import { Finished } from "./steps/Finished";
 import { useNewSessionSteps, useSteps } from "./steps/useSessionSteps";
 import { Header } from "../../components/Header";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
+import { EvaluationModal } from "./EvaluationModal";
 
 export const StepperRightMenu = ({
   heading,
@@ -137,6 +138,7 @@ function NewSessionPageInner() {
           justifyContent: "space-between",
         }}
       />
+      <EvaluationModal open />
       {finished ? (
         <Finished />
       ) : (
