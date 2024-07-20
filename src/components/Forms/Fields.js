@@ -7,6 +7,7 @@ import {
   IconButton,
   InputLabel,
   OutlinedInput,
+  Radio,
   Slider,
   Switch,
   TextField,
@@ -556,6 +557,28 @@ export const CheckboxField = ({ name, rules, ...props }) => {
               ...field,
               ...props,
               ...invertedProps,
+            }}
+          />
+        );
+      }}
+    />
+  );
+};
+
+// TODO https://mui.com/material-ui/react-radio-button/
+export const RadioRatingField = ({ name, rules, options, ...props }) => {
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field }) => {
+        return (
+          <Radio
+            {...{
+              name,
+              checked: !!field.value,
+              ...field,
+              ...props,
             }}
           />
         );
