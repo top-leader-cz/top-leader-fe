@@ -16,7 +16,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { ActionStepsReadOnly } from "../Sessions/Sessions";
 import { useUserSessionQuery } from "../Sessions/api";
 import { assoc, curry, evolve, keys, map, pipe, reduce, sort } from "ramda";
-import { messages as sessionMessages } from "../Sessions/messages";
+import { sessionsMessages } from "../Sessions/messages";
 
 const ActionCardHeading = ({ heading, sx = {} }) => {
   return (
@@ -26,7 +26,7 @@ const ActionCardHeading = ({ heading, sx = {} }) => {
   );
 };
 
-const ActionCard = ({ heading, children, button, sx = {} }) => {
+export const ActionCard = ({ heading, children, button, sx = {} }) => {
   return (
     <Box
       sx={{
@@ -48,7 +48,7 @@ const ActionCard = ({ heading, children, button, sx = {} }) => {
   );
 };
 
-const EmptyActionCardContent = ({
+export const EmptyActionCardContent = ({
   iconName = "RocketLaunch",
   title,
   perex,
@@ -87,7 +87,7 @@ const EmptyActionCardContent = ({
 //   { checked: true, date: "2023-09-06", id: 42, label: "Mock Task2: TODO: RM from FE", },
 // ];
 
-const Actions = ({ canFetch = true, ...props }) => {
+export const Actions = ({ canFetch = true, ...props }) => {
   const sessionQuery = useUserSessionQuery({
     enabled: canFetch,
     refetchOnReconnect: true,
@@ -114,7 +114,7 @@ const Actions = ({ canFetch = true, ...props }) => {
 
 const ScheduledDay = ({ time, name, username }) => {
   const { i18n } = useContext(I18nContext);
-  const msg = useMsg({ dict: sessionMessages });
+  const msg = useMsg({ dict: sessionsMessages });
 
   return (
     <Box
@@ -195,7 +195,7 @@ export const renameKeys = curry((keysMap, obj) =>
   reduce((acc, key) => assoc(keysMap[key] || key, obj[key], acc), {}, keys(obj))
 );
 
-const UpcomingSessionsCard = ({}) => {
+export const UpcomingSessionsCard = ({}) => {
   const { isCoach } = useAuth();
   const { i18n } = useContext(I18nContext);
   const msg = useMsg();
@@ -258,7 +258,7 @@ const UpcomingSessionsCard = ({}) => {
   );
 };
 
-const SessionsActionCards = ({ ...rest }) => {
+export const SessionsActionCards = ({ ...rest }) => {
   const { user } = useAuth();
   const areaOfDevelopment = user.data.areaOfDevelopment || [];
 

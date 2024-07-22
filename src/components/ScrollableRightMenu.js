@@ -7,6 +7,7 @@ export const ScrollableRightMenu = ({
   children,
   buttonProps,
   sx = {},
+  wrapperSx = {},
 }) => {
   return (
     <ErrorBoundary>
@@ -32,6 +33,7 @@ export const ScrollableRightMenu = ({
             display: "flex",
             flexDirection: "column",
             flexWrap: "nowrap",
+            ...wrapperSx,
           }}
         >
           {children}

@@ -312,7 +312,9 @@ export const Layout = ({
         <Box
           component="main"
           sx={{
-            px: 4,
+            px: 3,
+            pb: 3, // TODO: check everywhere
+            overflow: "auto",
             // mx: 4,
             width: "100%",
             flexGrow: 1,
