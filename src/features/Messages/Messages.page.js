@@ -90,7 +90,7 @@ const stringToColor = (string) => {
   /* eslint-enable no-bitwise */
 };
 
-const UserAvatar = ({
+export const UserAvatar = ({
   username: usernameProp,
   fullName: fullNameProp,
   sx = {},

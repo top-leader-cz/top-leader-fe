@@ -1,14 +1,55 @@
 import { defineMessages } from "react-intl";
 
-export const messages = defineMessages({
+export const dashboardMessages = defineMessages({
   "dashboard.header": {
     id: "dashboard.header",
     defaultMessage: "Hello, {user}!",
     description: "First text user sees after login",
   },
+  "dashboard.perex": {
+    id: "dashboard.perex",
+    defaultMessage:
+      "Sapiente laboriosam doloribus cumque tempora quibusdam et explicabo facilis.",
+  },
   "dashboard.section-1.heading": {
     id: "dashboard.section-1.heading",
     defaultMessage: "Who I am",
+  },
+  "dashboard.upcoming.heading": {
+    id: "dashboard.upcoming.heading",
+    defaultMessage: "Upcoming sessions",
+  },
+  "dashboard.actions.empty.title": {
+    id: "dashboard.actions.empty.title",
+    defaultMessage: "No actions",
+  },
+  "dashboard.actions.empty.perex": {
+    id: "dashboard.actions.empty.perex",
+    defaultMessage: "Go through a session to set action points for your goal",
+  },
+  "dashboard.actions.empty.action": {
+    id: "dashboard.actions.empty.action",
+    defaultMessage: "Start private session",
+  },
+  "dashboard.upcoming.empty.title": {
+    id: "dashboard.upcoming.empty.title",
+    defaultMessage: "No upcoming sessions",
+  },
+  "dashboard.upcoming.empty.perex": {
+    id: "dashboard.upcoming.empty.perex",
+    defaultMessage: "Sessions with a coach will appear here",
+  },
+  "dashboard.learn.heading": {
+    id: "dashboard.learn.heading",
+    defaultMessage: "Learn",
+  },
+  "dashboard.upcoming.empty.action.select-coach": {
+    id: "dashboard.upcoming.empty.action.select-coach",
+    defaultMessage: "Select coach",
+  },
+  "dashboard.upcoming.empty.action.schedule-session": {
+    id: "dashboard.upcoming.empty.action.schedule-session",
+    defaultMessage: "Schedule session",
   },
   "dashboard.section-1.perex": {
     id: "dashboard.section-1.perex",
@@ -23,6 +64,11 @@ export const messages = defineMessages({
     id: "dashboard.cards.strengths.title.empty",
     defaultMessage: "Find my strengths",
   },
+  "dashboard.cards.strengths.perex": {
+    id: "dashboard.cards.strengths.perex",
+    defaultMessage:
+      "Understand your top talents to focus on what you excel at.",
+  },
   "dashboard.cards.values.title.filled": {
     id: "dashboard.cards.values.title.filled",
     defaultMessage: "My values",
@@ -30,6 +76,10 @@ export const messages = defineMessages({
   "dashboard.cards.values.title.empty": {
     id: "dashboard.cards.values.title.empty",
     defaultMessage: "Set my values",
+  },
+  "dashboard.cards.values.perex": {
+    id: "dashboard.cards.values.perex",
+    defaultMessage: "Your values are a central part of who you are.",
   },
   "dashboard.cards.notes.title": {
     id: "dashboard.cards.notes.title",
@@ -60,9 +110,17 @@ export const messages = defineMessages({
     id: "dashboard.cards.ai.empty.steps.strengths.title",
     defaultMessage: "Assess strengths",
   },
+  "dashboard.cards.ai.empty.steps.strengths.button": {
+    id: "dashboard.cards.ai.empty.steps.strengths.button",
+    defaultMessage: "Find my strengths",
+  },
   "dashboard.cards.ai.empty.steps.values.title": {
     id: "dashboard.cards.ai.empty.steps.values.title",
     defaultMessage: "Define values",
+  },
+  "dashboard.cards.ai.empty.steps.values.button": {
+    id: "dashboard.cards.ai.empty.steps.values.button",
+    defaultMessage: "Set my values",
   },
   "dashboard.cards.ai.empty.steps.explore.title": {
     id: "dashboard.cards.ai.empty.steps.explore.title",
@@ -113,6 +171,15 @@ export const messages = defineMessages({
   "dashboard.section-2.perex": {
     id: "dashboard.section-2.perex",
     defaultMessage: "Become a better leader and here is how you get there.",
+  },
+  "dashboard.my-leader-profile": {
+    id: "dashboard.my-leader-profile",
+    defaultMessage: "My leader profile",
+  },
+  "dashboard.unlock-steps.perex": {
+    id: "dashboard.unlock-steps.perex",
+    defaultMessage:
+      "Once you pass the assessments, your strengths and values  will appear here",
   },
   "dashboard.rightmenu.title": {
     id: "dashboard.rightmenu.title",
