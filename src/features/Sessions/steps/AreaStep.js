@@ -6,16 +6,7 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
-import {
-  any,
-  chain,
-  equals,
-  findIndex,
-  identity,
-  map,
-  omit,
-  prop,
-} from "ramda";
+import { any, chain, equals, findIndex, identity, map, prop } from "ramda";
 import { useMemo, useState } from "react";
 import { Icon } from "../../../components/Icon";
 import { Msg } from "../../../components/Msg";
@@ -212,70 +203,17 @@ export const AreaStep = ({
     // setCustomArea(value);
   };
 
-  const tiles = useMemo(
-    () =>
-      [
-        {
-          title: msg("sessions.new.steps.area.strengths.title"),
-          items: topStrengths,
-          fallback: msg("sessions.new.steps.area.fallback.title"),
-        },
-        {
-          title: msg("sessions.new.steps.area.weaknesses.title"),
-          items: bottomStrengths,
-          fallback: msg("sessions.new.steps.area.fallback.title"),
-        },
-        {
-          title: msg("sessions.new.steps.area.recommended.title"),
-          items: areas,
-          fallback: null,
-        },
-      ]
-        .filter(({ items }) => items.length)
-        .map((items, i) => {
-          return { items };
-        }),
-    [areas, bottomStrengths, msg, topStrengths]
-  );
-
   console.log("[AreaStep.rndr]", {
     data,
     selectedArea,
-    step,
-    stepper,
     // customArea,
     selectedTile,
-    topStrengths,
-    bottomStrengths,
-    areas,
   });
 
-  const gridItemProps =
-    tilesItems?.length === 3
-      ? {
-          xs: 12,
-          md: 6,
-          lg: 4,
-        }
-      : tilesItems?.length === 2
-      ? {
-          xs: 12,
-          md: 6,
-        }
-      : {
-          xs: 12,
-        };
-
   return (
-    <SessionStepCard
-      {...{
-        step: tilesItems?.length === 3 ? step : omit(["perex"], step),
-        stepper,
-      }}
-    >
+    <SessionStepCard {...{ step, stepper }}>
       <Grid container spacing={3} sx={{ my: 3 }}>
-        {/* {tilesItems[0]?.length && ( */}
-        <Grid item {...gridItemProps}>
+        <Grid item xs={12} md={6} lg={4}>
           <AreaTile
             title={msg("sessions.new.steps.area.strengths.title")}
             items={tilesItems[0]}
@@ -286,9 +224,7 @@ export const AreaStep = ({
             onClick={createOnSelect(0)}
           />
         </Grid>
-        {/* )} */}
-        {/* {tilesItems[1]?.length && ( */}
-        <Grid item {...gridItemProps}>
+        <Grid item xs={12} md={6} lg={4}>
           <AreaTile
             title={msg("sessions.new.steps.area.weaknesses.title")}
             items={tilesItems[1]}
@@ -299,9 +235,7 @@ export const AreaStep = ({
             onClick={createOnSelect(1)}
           />
         </Grid>
-        {/* )} */}
-        {/* {tilesItems[2]?.length && ( */}
-        <Grid item {...gridItemProps}>
+        <Grid item xs={12} md={6} lg={4}>
           <AreaTile
             title={msg("sessions.new.steps.area.recommended.title")}
             items={tilesItems[2]}
@@ -312,7 +246,6 @@ export const AreaStep = ({
             onClick={createOnSelect(2)}
           />
         </Grid>
-        {/* )} */}
       </Grid>
       <Box
         sx={{

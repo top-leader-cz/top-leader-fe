@@ -10,7 +10,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { StepperRightMenu } from "./NewSession";
 import { SessionStepCard } from "./SessionStepCard";
 import { useUserReflectionMutation, useUserSessionQuery } from "./api";
-import { sessionsMessages } from "./messages";
+import { messages } from "./messages";
 import { DEFAULT_VALUE_ROW } from "./steps/ActionStepsStep";
 import { Finished } from "./steps/Finished";
 import { useEditSteps, useSteps } from "./steps/useSessionSteps";
@@ -136,7 +136,7 @@ function EditSessionPageInner() {
 
 export function EditSessionPage() {
   return (
-    <MsgProvider messages={sessionsMessages}>
+    <MsgProvider messages={messages}>
       <EditSessionPageInner />
     </MsgProvider>
   );

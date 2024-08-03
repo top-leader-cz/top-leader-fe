@@ -1,15 +1,1 @@
-{
-  "dashboard.actions.empty.action": "Start private session",
-  "dashboard.actions.empty.perex": "Go through a session to set action points for your goal",
-  "dashboard.actions.empty.title": "No actions",
-  "dashboard.cards.strengths.perex": "Understand your top talents to focus on what you excel at.",
-  "dashboard.cards.values.perex": "Your values are a central part of who you are.",
-  "dashboard.learn.heading": "Learn",
-  "dashboard.my-leader-profile": "My leader profile",
-  "dashboard.perex": "Sapiente laboriosam doloribus cumque tempora quibusdam et explicabo facilis.",
-  "dashboard.unlock-steps.perex": "Once you pass the assessments, your strengths and values will appear here",
-  "dashboard.upcoming.empty.action.schedule-session": "Schedule session",
-  "dashboard.upcoming.empty.action.select-coach": "Select coach",
-  "dashboard.upcoming.heading": "Upcoming sessions",
-  "general.today": "Today"
-}
+{}
