@@ -472,6 +472,11 @@ export function useAuth() {
 
 const noop = () => {};
 
+// refetch* apply only to stale query:
+// refetchOnMount: false,
+// refetchOnWindowFocus: false,
+// refetchOnReconnect: false,
+
 // Following code fixes onSuccess and onError removed in react-query 5
 // https://tanstack.com/query/v5/docs/react/guides/migrating-to-v5
 // https://github.com/TanStack/query/discussions/5279

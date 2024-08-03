@@ -36,6 +36,7 @@ import {
   KeyboardDoubleArrowRight,
   Lightbulb,
   Lock,
+  School,
   Login,
   LogoutOutlined,
   Mail,
@@ -57,6 +58,9 @@ import {
   LinkedIn,
   StopCircle,
   Sync,
+  CalendarMonth,
+  PlayCircleOutline,
+  MenuBookOutlined,
 } from "@mui/icons-material";
 import * as React from "react";
 
@@ -97,6 +101,7 @@ const Icons = {
   KeyboardDoubleArrowRight,
   Lightbulb,
   Lock,
+  School,
   Login,
   LogoutOutlined,
   Mail,
@@ -118,6 +123,9 @@ const Icons = {
   LinkedIn,
   StopCircle,
   Sync,
+  CalendarMonth,
+  PlayCircleOutline,
+  MenuBookOutlined,
 };
 
 export const ICON_NAMES = Object.keys(Icons);

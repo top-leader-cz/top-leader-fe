@@ -12,7 +12,7 @@ import { SessionTodosFields } from "./SessionTodos";
 import { useReflectionHints } from "./hints";
 import { SESSION_FIELDS } from "./constants";
 import { useMsg } from "../../../components/Msg/Msg";
-import { messages } from "../messages";
+import { sessionsMessages } from "../messages";
 import { Icon } from "../../../components/Icon";
 
 export const ReflectStep = ({
@@ -29,7 +29,7 @@ export const ReflectStep = ({
   const reflectionField = step.fieldDefMap[SESSION_FIELDS.REFLECTION];
   const hints = useReflectionHints();
   console.log("[ReflectStep.rndr]", { previousActionSteps });
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: sessionsMessages });
 
   return (
     <FormStepCard

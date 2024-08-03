@@ -13,7 +13,7 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { SessionStepCard } from "./SessionStepCard";
 import { VerticalStepper } from "./VerticalStepper";
 import { useUserSessionMutation, useUserSessionQuery } from "./api";
-import { messages } from "./messages";
+import { sessionsMessages } from "./messages";
 import { Finished } from "./steps/Finished";
 import { useNewSessionSteps, useSteps } from "./steps/useSessionSteps";
 import { Header } from "../../components/Header";
@@ -157,7 +157,7 @@ function NewSessionPageInner() {
 
 export function NewSessionPage() {
   return (
-    <MsgProvider messages={messages}>
+    <MsgProvider messages={sessionsMessages}>
       <NewSessionPageInner />
     </MsgProvider>
   );
