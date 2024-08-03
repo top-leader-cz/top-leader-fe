@@ -1,6 +1,6 @@
 import { defineMessages } from "react-intl";
 
-export const messages = defineMessages({
+export const sessionsMessages = defineMessages({
   "sessions.heading": {
     id: "sessions.heading",
     defaultMessage: "Sessions",

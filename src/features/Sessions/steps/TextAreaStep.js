@@ -7,7 +7,7 @@ import { SessionStepCard } from "../SessionStepCard";
 import { Controls } from "./Controls";
 import { SESSION_FIELDS } from "./constants";
 import { useMsg } from "../../../components/Msg/Msg";
-import { messages } from "../messages";
+import { sessionsMessages } from "../messages";
 import { useGoalHints } from "./hints";
 import { primary25, primary500 } from "../../../theme";
 import { useMyQuery } from "../../Authorization/AuthProvider";
@@ -25,7 +25,7 @@ export const TextAreaStep = ({
   step: { fieldDefMap = {}, ...step },
   ...props
 }) => {
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: sessionsMessages });
   const field = fieldDefMap[textAreaName];
   const { control, watch, formState } = useForm({
     mode: "all",
@@ -111,7 +111,7 @@ export const GoalStep = ({
   // const goalHints = useGoalHints();
   // const goalHints = [].concat(goalAIHintsQuery.data || []);
 
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: sessionsMessages });
   const field = fieldDefMap[textAreaName];
   const { control, watch, formState, setValue } = useForm({
     mode: "all",

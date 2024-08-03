@@ -188,7 +188,7 @@ export const MainMenu = ({ open }) => {
               mobile={mobile}
               text={<Msg id="main-menu.items.coaches" />}
               icon={<Icon name="PersonOutlined" />}
-              route={routes.coaches}
+              route={routes.coaches} // TODO: split to coaches and myCoach
             />
             <ListItemLink
               mobile={mobile}

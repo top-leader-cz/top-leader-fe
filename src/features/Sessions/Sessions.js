@@ -5,6 +5,7 @@ import {
   CardActionArea,
   CardContent,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { useContext } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -24,29 +25,50 @@ import { I18nContext } from "../I18n/I18nProvider";
 import { QueryRenderer } from "../QM/QueryRenderer";
 import { useMakeSelectable } from "../Values/MyValues";
 import { useAreasDict } from "./areas";
-import { messages } from "./messages";
+import { sessionsMessages } from "./messages";
+import { gray50, gray500, primary25, primary500 } from "../../theme";
+import { useTheme } from "@emotion/react";
 
-const SessionCardIconTile = ({ iconName, caption, text, sx = {} }) => {
+export const SessionCardIconTile = ({
+  iconName,
+  caption,
+  text,
+  grayOutEmpty,
+  spacious,
+  sx = {},
+}) => {
+  const { color, bgcolor } =
+    !text && grayOutEmpty
+      ? {
+          color: gray500,
+          bgcolor: gray50,
+        }
+      : { color: primary500, bgcolor: primary25 || "#DAD2F1" };
+
+  const { iconSize, outerIconSize, gap, verticalGap } = spacious
+    ? { iconSize: 24, outerIconSize: 44, gap: 2, verticalGap: 0.5 }
+    : { iconSize: 16, outerIconSize: 32, gap: 1, verticalGap: 0 };
+
   return (
     <Box
       display="flex"
       flexDirection="row"
       alignItems="center"
-      width={"100%"}
-      sx={sx}
+      width="100%"
+      sx={{ gap, ...sx }}
     >
       <Avatar
         variant="rounded"
         sx={{
-          width: 32,
-          height: 32,
-          bgcolor: "#DAD2F1",
+          width: outerIconSize,
+          height: outerIconSize,
+          bgcolor,
           // borderRadius: 3,
         }}
       >
-        <Icon name={iconName} sx={{ fontSize: 16, color: "primary.main" }} />
+        <Icon name={iconName} sx={{ fontSize: iconSize, color }} />
       </Avatar>
-      <Box sx={{ display: "flex", flexDirection: "column", px: 1 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: verticalGap }}>
         <Typography>{caption}</Typography>
         <P emphasized>{text}</P>
       </Box>
@@ -110,6 +132,8 @@ const SessionCard = ({
   const { i18n } = useContext(I18nContext);
   const parsed = i18n.parseUTCLocal(date);
   const formattedDate = i18n.formatLocalMaybe(parsed, "P");
+  const theme = useTheme();
+  const upLg = useMediaQuery(theme.breakpoints.up("lg"));
 
   // console.log("[SC.rndr]", {
   //   date,
@@ -127,11 +151,14 @@ const SessionCard = ({
         <CardContent
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "column", lg: "row" },
           }}
         >
           <Box>
-            <P>{formattedDate}&nbsp;-&nbsp;</P>
+            <P>
+              {formattedDate}
+              {upLg && <>&nbsp;-&nbsp;</>}
+            </P>
           </Box>
           <Box sx={{ width: "100%" }}>
             <P>{translateSessionType({ type, msg })}</P>
@@ -147,14 +174,12 @@ const SessionCard = ({
                 iconName={"InsertChart"}
                 caption={msg("sessions.edit.steps.align.area.caption")}
                 text={areas[areaOfDevelopment]?.label || areaOfDevelopment}
-                sx={{}}
               />
               <SessionCardIconTile
-                iconName={"InsertChart"}
+                iconName={"InsertChart"} // TODO x2
                 caption={msg("sessions.edit.steps.align.goal.caption")}
                 text={longTermGoal}
                 // text="Giving speeches to audiences regularly" // TODO: width
-                sx={{}}
               />
             </Box>
             <P
@@ -193,7 +218,7 @@ export const useSessionsQuery = (rest = {}) => {
 };
 
 function Sessions() {
-  const msg = useMsg({ dict: messages });
+  const msg = useMsg({ dict: sessionsMessages });
   const sessionsQuery = useSessionsQuery();
   const sel = useMakeSelectable({
     entries: sessionsQuery.data ?? [],
@@ -226,7 +251,7 @@ function Sessions() {
     return <Navigate to={routes.newSession} replace />;
 
   return (
-    <MsgProvider messages={messages}>
+    <MsgProvider messages={sessionsMessages}>
       <Layout
         rightMenuContent={
           <HistoryRightMenu
