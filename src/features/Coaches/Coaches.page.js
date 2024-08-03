@@ -16,6 +16,9 @@ import { ScheduledSessionsCard } from "./ScheduledSessions";
 import { useUserUpcomingSessionsQuery, useYourCoachQuery } from "./api";
 import { messages } from "./messages";
 
+export const formatName = ({ firstName, lastName }) =>
+  `${firstName} ${lastName}`;
+
 const getPayload = ({
   filter: {
     languages,

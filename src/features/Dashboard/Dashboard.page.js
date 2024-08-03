@@ -1,509 +1,536 @@
-import { Button, Card, CardActionArea, Grid } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  alpha,
+  Card,
+  CardActionArea,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Grid,
+  Step,
+  StepLabel,
+  Stepper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
-import { isToday } from "date-fns";
-import { evolve, map, pipe, sort } from "ramda";
-import React, { useContext } from "react";
-import { ErrorBoundary } from "../../components/ErrorBoundary";
+import { always, anyPass, ifElse, map, path, pick, prop } from "ramda";
+import React, { useMemo, useState } from "react";
+import { useIsFetching } from "react-query";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "../../components/Icon";
 import { Layout } from "../../components/Layout";
 import { Msg, MsgProvider } from "../../components/Msg";
 import { useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
-import { generalMessages } from "../../components/messages";
 import { routes } from "../../routes";
-import { gray500, gray900, primary500 } from "../../theme";
+import { primary25, primary500 } from "../../theme";
 import { useAuth } from "../Authorization";
-import { useUpcomingCoachSessionsQuery } from "../Clients/api";
-import { formatName } from "../Coaches/CoachCard";
-import { useUserUpcomingSessionsQuery } from "../Coaches/api";
-import { I18nContext } from "../I18n/I18nProvider";
-import { UserAvatar } from "../Messages/Messages.page";
+import { useMyMutation, useMyQuery } from "../Authorization/AuthProvider";
+import { ShowMore } from "../Coaches/CoachCard";
 import { QueryRenderer } from "../QM/QueryRenderer";
-import { ActionStepsReadOnly, SessionCardIconTile } from "../Sessions/Sessions";
-import { useUserSessionQuery } from "../Sessions/api";
-import { useAreasDict } from "../Sessions/areas";
-import { sessionsMessages } from "../Sessions/messages";
-import {
-  actionBlueprintKey,
-  anyTruthy,
-  DashboardRightMenu,
-  useUserInsights,
-} from "./DashboardRightMenu";
-import { ExpandableInfoBox } from "./ExpandableInfoBox";
-import { HeadingWithIcon } from "./HeadingWithIcon";
-import { renameKeys } from "./JourneyRightMenu";
-import { ResourceMediaCard } from "./ResourceMediaCard";
-import { dashboardMessages } from "./messages";
+import { useStrengths } from "../Strengths/talents";
+import { useValuesDict } from "../Values/values";
+import { JourneyRightMenu } from "./JourneyRightMenu";
+import { messages } from "./messages";
 
-// from JourneyRightMenu
-const EmptyActionCardContent = ({
-  iconName = "RocketLaunch",
-  title,
-  perex,
-  button,
-  sx = {},
-}) => {
+const DashboardIcon = ({ iconName, color, sx = {} }) => {
   return (
-    <Box
+    <Avatar
+      variant="rounded"
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 3,
-        px: 3,
-        py: 5,
-        height: "100%",
+        width: 100,
+        height: 100,
+        borderRadius: "28px",
+        color,
+        bgcolor: alpha(color, 0.2),
         ...sx,
       }}
     >
-      {iconName && (
-        <Avatar sx={{ bgcolor: "#F9FAFB", width: 100, height: 100 }}>
-          <Avatar sx={{ bgcolor: "#EAECF0", width: 60, height: 60 }}>
-            <Icon name={iconName} sx={{ color: "#667085" }} />
-          </Avatar>
-        </Avatar>
-      )}
-      <Box sx={{ textAlign: "center", flex: 1 }}>
-        {title && (
-          <P emphasized sx={{ mb: 0.5 }}>
-            {title}
-          </P>
-        )}
-        {perex && <P>{perex}</P>}
-      </Box>
-      {button && <Button {...button} />}
-    </Box>
+      <Icon name={iconName} sx={{ width: 50, height: 50 }} />
+    </Avatar>
   );
 };
 
-const ScheduledDay = ({ id, isPrivate, time, name, username }) => {
-  const { i18n } = useContext(I18nContext);
-  const msg = useMsg({ dict: sessionsMessages });
-  const generalMsg = useMsg({ dict: generalMessages });
+const sx = {
+  display: "flex",
+  flexFlow: "column nowrap",
+  justifyContent: "space-between",
+  height: "100%",
+};
+
+const useNoteMutation = () =>
+  useMyMutation({
+    debug: true,
+    // debug: "d",
+    fetchDef: {
+      method: "POST",
+      url: `/api/latest/user-info/notes`,
+      from: pick(["notes"]),
+    },
+    invalidate: { queryKey: ["user-info"] },
+    snackbar: { success: false, error: true },
+  });
+
+const DashboardCardNotes = () => {
+  const msg = useMsg();
+  const { user } = useAuth();
+  const [note, setNote] = useState(user.data.notes || "");
+  const noteMutation = useNoteMutation();
+  const isFetchingUser = useIsFetching({ queryKey: ["user-info"] });
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <P
-        sx={{
-          fontSize: 14,
-          color: isToday(time) ? primary500 : gray500,
-          fontWeight: isToday(time) ? 600 : 400,
-        }}
-      >
-        {i18n
-          .formatLocal(
-            time,
-            isToday(time)
-              ? `'${generalMsg("general.today")}, 'PPP`
-              : "cccc', 'PPP"
-          )
-          ?.replace(i18n.formatLocal(time, "y"), "")}
-      </P>
-      <Box
-        sx={{
-          // pl: 4,
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 2,
-        }}
-      >
-        <Box
+    <Card>
+      <CardContent sx={{ position: "relative", ...sx }}>
+        <H2 sx={{ mb: 2 }}>{msg("dashboard.cards.notes.title")}</H2>
+        <TextField
+          multiline
+          minRows={18}
+          placeholder={msg("dashboard.cards.notes.placeholder.empty")}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          onBlur={(e) => {
+            if (note !== user.data.notes) {
+              // TODO: race condition: Cmd+Z + Blur during user loading after save?
+              noteMutation.mutate({
+                notes: note,
+                previousNotes: user.data.notes,
+              });
+            }
+          }}
+        />
+        <CircularProgress
+          color="inherit"
+          size={20}
+          // thickness={2}
           sx={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            opacity: noteMutation.isLoading ? 1 : isFetchingUser ? 0.1 : 0,
+          }}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+const minCardHeight = 215;
+const DashboardCard = ({ title, href, items, fallbackIcon = {} }) => {
+  return (
+    <Card sx={{ minHeight: minCardHeight }}>
+      <CardActionArea sx={{ height: "100%" }} href={href}>
+        <CardContent
+          sx={{
+            position: "relative",
             height: "100%",
-            flexBasis: "24px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            flexShrink: 100,
+            minHeight: minCardHeight, // just for Grid
           }}
         >
-          <Box
-            sx={{
-              borderRight: `4px solid ${isPrivate ? "#EAAA08" : primary500}`,
-              borderRadius: "4px",
-              height: "100%",
-            }}
-          />
-        </Box>
-        {!isPrivate && (
-          <UserAvatar
-            username={username}
-            fullName={name}
-            sx={{ width: 38, height: 38 }}
-          />
-        )}
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <P sx={{ fontSize: 14, color: gray900, fontWeight: 600 }}>
-            {name || username || msg("sessions.type.USER_SESSION")}
-          </P>
-          <P sx={{ fontSize: 14, color: gray500, fontWeight: 400 }}>
-            {i18n.formatLocal(time, "p")}
-          </P>
-        </Box>
-      </Box>
-    </Box>
+          <H2 sx={{ mb: 2 }}>{title}</H2>
+          {!items?.length ? (
+            <DashboardIcon
+              iconName={fallbackIcon.name ?? "FitnessCenterOutlined"}
+              color={fallbackIcon.color ?? "#0BA5EC"}
+              sx={{ position: "absolute", bottom: 24, right: 24 }}
+            />
+          ) : (
+            items.map((item) => (
+              <Chip
+                sx={{
+                  borderRadius: 1,
+                  justifyContent: "flex-start",
+                  m: 1,
+                  pointerEvents: "none",
+                  bgcolor: "#F9F8FF",
+                  height: "auto",
+                  p: 1,
+                  "& .MuiChip-label": {
+                    textWrap: "wrap",
+                  },
+                }}
+                key={item.label}
+                {...item}
+              />
+            ))
+          )}
+        </CardContent>
+      </CardActionArea>
+    </Card>
   );
 };
 
-const CoachUpcomingSessions = ({ data }) => {
+const DashboardCardAssessment = ({ selectedKeys = [] }) => {
+  const items = useStrengths({ keys: selectedKeys?.slice(0, 5) });
+  const msg = useMsg();
+
   return (
-    <Box
+    <DashboardCard
+      title={
+        items.length
+          ? msg("dashboard.cards.strengths.title.filled")
+          : msg("dashboard.cards.strengths.title.empty")
+      }
+      href={items.length ? routes.strengths : routes.assessment}
+      items={items}
+      fallbackIcon={{ name: "FitnessCenterOutlined", color: "#0BA5EC" }}
+    />
+  );
+};
+
+const DashboardCardValues = ({ selectedKeys = [] }) => {
+  const valuesDict = useValuesDict();
+  const items = useMemo(
+    () =>
+      selectedKeys.map((key) => ({
+        label: [valuesDict[key]?.emoji ?? "⚓️", valuesDict[key]?.name || key]
+          .filter(Boolean)
+          .join(" "),
+      })),
+    [selectedKeys, valuesDict]
+  );
+  const msg = useMsg();
+
+  return (
+    <DashboardCard
+      title={
+        items.length
+          ? msg("dashboard.cards.values.title.filled")
+          : msg("dashboard.cards.values.title.empty")
+      }
+      href={items.length ? routes.myValues : routes.setValues}
+      items={items}
+      fallbackIcon={{ name: "JoinRight", color: "#2E90FA" }}
+    />
+  );
+};
+
+const DashboardCardFeedback = () => {
+  const msg = useMsg();
+
+  return (
+    <DashboardCard
+      title={msg("dashboard.cards.feedback.title")}
+      href={routes.getFeedback}
+      items={undefined}
+      fallbackIcon={{ name: "Forum", color: "#6172F3" }}
+    />
+  );
+};
+
+const ExpandableInfoBox = ({ heading, text }) => {
+  const showMoreMaxChars = 1500;
+
+  return (
+    <Accordion
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        // alignItems: "center",
-        gap: 3,
-        px: 3,
-        py: 3,
-        height: "100%",
+        bgcolor: primary25,
+        mb: 1,
+        boxShadow: "none",
+        borderRadius: "6px",
+        "&:before": {
+          display: "none",
+        },
       }}
     >
-      {data.map(({ username, firstName, lastName, time, id, isPrivate }) => (
-        <ErrorBoundary>
-          <ScheduledDay
-            id={id}
-            key={time + username}
-            name={formatName({ firstName, lastName })}
-            username={username}
-            time={time}
-            isPrivate={isPrivate}
+      <AccordionSummary
+        expandIcon={<Icon name="ExpandMore" />}
+        aria-controls="panel1-content"
+        id="panel1-header"
+        sx={{
+          // p: 3,
+          // borderRadius: 0.5,
+          color: primary500,
+          fontSize: 16,
+          fontWeight: 500,
+          py: 1,
+        }}
+      >
+        {heading}
+      </AccordionSummary>
+      <AccordionDetails>
+        {showMoreMaxChars ? (
+          <ShowMore maxChars={showMoreMaxChars} text={text} />
+        ) : (
+          text
+        )}
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+const InsightsTipsHeader = ({ title, perex, isLoading = false }) => {
+  const size = 14;
+  return (
+    <>
+      <Typography sx={{ mb: 2, color: primary500, fontSize: size }}>
+        {isLoading ? (
+          <CircularProgress
+            color="inherit"
+            size={size}
+            // thickness={2}
+            sx={{ opacity: 0.25, mr: 1 }}
           />
-        </ErrorBoundary>
+        ) : (
+          <Icon name={"AutoAwesome"} sx={{ fontSize: "inherit", mr: 1 }} />
+        )}
+        {title}
+      </Typography>
+      {perex && <Typography sx={{ mb: 2 }}>{perex}</Typography>}
+    </>
+  );
+};
+
+const AIPromptsCategory = ({ title, perex, items = [], isLoading = false }) => {
+  const visibleItems = items.filter(prop("text"));
+  if (!visibleItems.length) return null;
+
+  return (
+    <Box>
+      <InsightsTipsHeader title={title} perex={perex} isLoading={isLoading} />
+      {visibleItems.map(({ heading, text }) => (
+        <ExpandableInfoBox
+          key={heading}
+          elevation={0}
+          heading={heading}
+          text={text}
+        />
       ))}
     </Box>
   );
 };
 
-const UpcomingSessionsContent = ({}) => {
-  const { isCoach, user } = useAuth();
-  const { i18n } = useContext(I18nContext);
+const UnlockAI = () => {
   const msg = useMsg();
-  const coachUpcomingSessionsQuery = useUpcomingCoachSessionsQuery({
-    enabled: isCoach,
-  });
-  const userUpcomingSessionsQuery = useUserUpcomingSessionsQuery({
-    enabled: !isCoach,
-  });
-  const query = isCoach
-    ? coachUpcomingSessionsQuery
-    : userUpcomingSessionsQuery;
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  // const assessed = false;
+  // const evaluated = false;
+  const assessed = !!user.data.strengths?.length;
+  const evaluated = !!user.data.values?.length;
+  const switchOrder = evaluated && !assessed;
+  const activeStepIndex = +evaluated + assessed;
 
-  const empty = (
-    <EmptyActionCardContent
-      iconName="CalendarMonth"
-      title={<Msg id="dashboard.upcoming.empty.title" />}
-      perex={<Msg id="dashboard.upcoming.empty.perex" />}
-      // perex={ "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit." }
-      button={{
-        variant: "outlined",
-        href: routes.coaches,
-        children: user.data.coach ? (
-          <Msg id="dashboard.upcoming.empty.action.schedule-session" />
-        ) : (
-          <Msg id="dashboard.upcoming.empty.action.select-coach" />
-        ),
-      }}
-    />
-  );
+  const VALUES_STEP = {
+    label: msg("dashboard.cards.ai.empty.steps.values.title"),
+    onClick: () => navigate(routes.setValues),
+  };
+  const STRENGTHS_STEP = {
+    label: msg("dashboard.cards.ai.empty.steps.strengths.title"),
+    onClick: () => navigate(routes.assessment),
+  };
+  const steps = [
+    ...(switchOrder
+      ? [VALUES_STEP, STRENGTHS_STEP]
+      : [STRENGTHS_STEP, VALUES_STEP]),
+    { label: msg("dashboard.cards.ai.empty.steps.explore.title") },
+  ];
 
   return (
-    <QueryRenderer
-      query={query}
-      loaderProps={{ sx: { m: 2 } }}
-      loaderName="Skeleton"
-      errored={() => empty}
-      success={({ data }) => {
-        if (!data?.length) return empty;
-
-        const parseTime = evolve({ time: i18n.parseUTCLocal });
-        const mappedData = pipe(
-          map(
-            isCoach
-              ? parseTime
-              : pipe(renameKeys({ coach: "username" }), parseTime)
-          ),
-          sort((a, b) => +a.time - b.time)
-        )(data);
-
-        return <CoachUpcomingSessions data={mappedData} />;
-      }}
-    />
+    <Box>
+      <InsightsTipsHeader
+        title={msg("dashboard.cards.ai.empty.title")}
+        perex={msg("dashboard.cards.ai.empty.perex")}
+      />
+      <Stepper activeStep={activeStepIndex} orientation="vertical">
+        {steps.map(({ label, onClick }, index) => {
+          const stepLabelProps =
+            index === activeStepIndex
+              ? {
+                  sx: {
+                    padding: 0,
+                    cursor: onClick ? "pointer" : "default",
+                  },
+                  onClick: () => onClick?.({ index, activeStepIndex }),
+                }
+              : { sx: { padding: 0 } };
+          return (
+            <Step key={label}>
+              <StepLabel {...stepLabelProps}>{label}</StepLabel>
+            </Step>
+          );
+        })}
+      </Stepper>
+    </Box>
   );
 };
 
-// const MOCK = [
-//   { checked: false, date: "2023-09-06", id: 52, label: "Mock Task1: TODO: RM from FE", },
-//   { checked: true, date: "2023-09-06", id: 42, label: "Mock Task2: TODO: RM from FE", },
-// ];
+const anyTruthy = (subProp, propNames, obj) =>
+  anyPass(map((propName) => path([propName, subProp]), propNames))(obj);
 
-const ActionsContent = ({ insightsQuery }) => {
-  const msg = useMsg({ dict: dashboardMessages });
-  const sessionQuery = useUserSessionQuery({
-    enabled: true,
-    refetchOnReconnect: true,
+const insightsKeys = ["leaderShipStyle", "leaderPersona", "animalSpirit"];
+const tipsKeys = ["leadershipTip", "personalGrowthTip"];
+const allKeys = [...insightsKeys, ...tipsKeys];
+
+const isGenerating = (data, query) => {
+  if (!data) return false;
+  const isGeneratingResults = anyTruthy("isPending", allKeys, data);
+  // console.log("[isGenerating]", { isGeneratingResults, data, query });
+  return isGeneratingResults;
+};
+
+const POLL_INTERVAL = 7 * 1000;
+// const POLL_INTERVAL = 3 * 1000;
+
+const DashboardCardAI = () => {
+  const msg = useMsg();
+  // Does not return anything, BE side effect to trigger generation
+  const generateQuery = useMyQuery({
+    queryKey: ["user-insight", "generate-tips"],
+    fetchDef: {
+      url: `/api/latest/user-insight/generate-tips`,
+      to: always({ TODO: "@JK" }),
+    },
+    // refetch* apply only to stale query:
+    // refetchOnMount: false,
+    // refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
+
+    staleTime: 8 * 60 * 60 * 1000,
+    cacheTime: Infinity, // never garbage collect inactive query
+  });
+  const insightsQuery = useMyQuery({
+    enabled: !generateQuery.isLoading,
+    queryKey: ["user-insight"],
+    fetchDef: { url: `/api/latest/user-insight` },
+    refetchInterval: ifElse(isGenerating, always(POLL_INTERVAL), always(false)),
+    // refetchOnWindowFocus: false,
   });
 
-  const empty = (
-    <EmptyActionCardContent
-      iconName="RocketLaunch"
-      title={<Msg id="dashboard.actions.empty.title" />}
-      perex={<Msg id="dashboard.actions.empty.perex" />}
-      button={{
-        variant: "outlined",
-        href: routes.startSession,
-        children: <Msg id="dashboard.actions.empty.action" />,
-      }}
-    />
-  );
+  // prettier-ignore
+  // useEffect( () => () => { console.log("%c[DashboardCardAI.eff.unmounting] in React.StrictMode mode executes nested tree queries twice, but user-info query once", "color:pink;");  }, [] );
+  // prettier-ignore
+  // if (process.env.NODE_ENV === "development") console.log("[DashboardCardAI.rndr]", { insights: insightsQuery.status, generate: generateQuery.status, insightsQuery, generateQuery, });
 
   return (
-    <QueryRenderer
-      query={sessionQuery}
-      loaderProps={{ sx: { m: 2 } }}
-      loaderName="Skeleton"
-      // errored={() => empty}
-      success={({ data: { actionSteps = [] } }) => {
-        if (!actionSteps?.length) return empty;
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-              justifyContent: "space-between",
-              gap: 3,
-              p: 3,
-            }}
-          >
-            {/* <ActionStepsReadOnly steps={MOCK} /> */}
-            <ActionStepsReadOnly steps={actionSteps} />
-            <QueryRenderer
-              query={insightsQuery}
-              loaderName="Skeleton"
-              loaderProps={{ rows: 3, sx: { mb: 4 } }}
-              loading={null}
-              errored={null}
-              success={({ data }) => {
-                return (
-                  <ExpandableInfoBox
-                    headingElement={
-                      <HeadingWithIcon
-                        title={
-                          msg(
-                            "dashboard.cards.ai.tips.personal-growth.title"
-                          ) || "Actions blueprint"
-                        }
-                        isLoading={anyTruthy(
-                          "isPending",
-                          [actionBlueprintKey],
-                          data
-                        )}
-                      />
-                    }
-                    text={data[actionBlueprintKey]?.text}
-                    hideEmpty
-                  />
-                );
-              }}
-            />
-          </Box>
-        );
-      }}
-    />
+    <Card sx={{ minHeight: minCardHeight, mb: 3 }}>
+      <CardContent
+        sx={{
+          position: "relative",
+          height: "100%",
+          minHeight: minCardHeight, // just for Grid
+        }}
+      >
+        <QueryRenderer
+          query={insightsQuery}
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mb: 4 } }}
+          success={({ data }) =>
+            !anyTruthy("text", allKeys, data) ? (
+              <UnlockAI /> // All empty
+            ) : (
+              // Some data available
+              <Box sx={{ display: "flex", flexFlow: "column nowrap", gap: 1 }}>
+                <AIPromptsCategory
+                  title={msg("dashboard.cards.ai.insights.title")}
+                  perex={msg("dashboard.cards.ai.insights.perex")}
+                  items={[
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.leadership-style.title"
+                      ),
+                      text: data[insightsKeys[0]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.leader-persona.title"
+                      ),
+                      text: data[insightsKeys[1]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.insights.animal-spirit.title"
+                      ),
+                      text: data[insightsKeys[2]]?.text,
+                    },
+                  ]}
+                  isLoading={anyTruthy("isPending", insightsKeys, data)}
+                />
+                <AIPromptsCategory
+                  title={msg("dashboard.cards.ai.tips.title")}
+                  // perex={msg("dashboard.cards.ai.tips.perex")}
+                  items={[
+                    {
+                      heading: msg("dashboard.cards.ai.tips.leadership.title"),
+                      text: data[tipsKeys[0]]?.text,
+                    },
+                    {
+                      heading: msg(
+                        "dashboard.cards.ai.tips.personal-growth.title"
+                      ),
+                      text: data[tipsKeys[1]]?.text,
+                    },
+                  ]}
+                  isLoading={anyTruthy("isPending", tipsKeys, data)}
+                />
+              </Box>
+            )
+          }
+        />
+        {/* <SuspenseRenderer
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mb: 4 } }}
+        >
+          <InsightsInner />
+        </SuspenseRenderer>
+        <SuspenseRenderer
+          loaderName="Skeleton"
+          loaderProps={{ rows: 3, sx: { mt: 4 } }}
+        >
+          <TipsInner />
+        </SuspenseRenderer> */}
+      </CardContent>
+    </Card>
   );
-  // return !areaOfDevelopment.length ? (
-  //   <EmptyActionCardContent
-  //     iconName="RocketLaunch"
-  //     title={<Msg id="dashboard.rightmenu.actions.title.empty" />}
-  //     perex={<Msg id="dashboard.rightmenu.actions.perex.empty" />}
-  //     button={{
-  //       variant: "outlined",
-  //       href: routes.startSession,
-  //       children: <Msg id="dashboard.rightmenu.actions.set-area" />,
-  //     }}
-  //   />
-  // ) : (
-  //   <Actions canFetch={!!areaOfDevelopment?.length} sx={{ py: 0.5 }} />
-  // );
 };
-
-const sessionCardSx = { display: "flex", gap: 3, flexDirection: "column" };
-const SessionCardTitle = ({ iconName, children }) => (
-  <P sx={{ fontWeight: 500 }}>
-    <Icon name={iconName} sx={{ fontSize: "inherit", mr: 0.5 }} />
-    {children}
-  </P>
-);
-
-const RESOURCE_TYPE = {
-  VIDEO: "Video",
-  ARTICLE: "Article",
-  TUTORIAL: "Tutorial",
-};
-
-export const RESOURCE_COLORS = {
-  [RESOURCE_TYPE.VIDEO]: { color: "#056AD6", bgcolor: "#EFF9FF" },
-  [RESOURCE_TYPE.ARTICLE]: {
-    color: primary500,
-    bgcolor: "#F9F8FF",
-    iconName: "MenuBookOutlined",
-    actionName: "read",
-  },
-  [RESOURCE_TYPE.TUTORIAL]: { color: "#876205", bgcolor: "#FFFBE1" },
-  default: { color: "#056AD6", bgcolor: "#EFF9FF" },
-};
-
-const resources = [
-  {
-    title: "10 Surprising Things Successful Leaders Do Differently",
-    previewSrc: "https://placehold.co/400x400?text=Preview",
-    type: RESOURCE_TYPE.ARTICLE,
-    estimatedTime: "10min",
-  },
-  {
-    title: "Thought leadership benefits",
-    previewSrc: "https://placehold.co/400x400?text=Preview",
-    type: RESOURCE_TYPE.TUTORIAL,
-    estimatedTime: "26min",
-  },
-  {
-    title: "Great Leadership Begins with Three Commitments | Pete Rogers",
-    previewSrc: "https://placehold.co/400x400?text=Preview",
-    type: RESOURCE_TYPE.VIDEO,
-    estimatedTime: "14min",
-  },
-  {
-    title: "The Key to Effective Leadership",
-    previewSrc: "https://placehold.co/400x400?text=Preview",
-    type: RESOURCE_TYPE.VIDEO,
-    estimatedTime: "5min",
-  },
-  {
-    title: "What Makes a Great Leader?",
-    previewSrc: "https://placehold.co/400x400?text=Preview",
-    type: RESOURCE_TYPE.VIDEO,
-    estimatedTime: "27min",
-  },
-];
 
 export function DashboardPage() {
   const { user, isCoach } = useAuth();
   const { username, firstName } = user.data;
   const displayName = firstName || username;
   // console.log("[Dashboard.rndr]", { user });
-  const sessionsMsg = useMsg({ dict: sessionsMessages });
-  const dashboardMsg = useMsg({ dict: dashboardMessages });
-  const { areas } = useAreasDict();
-  const areaOfDevelopment = user.data.areaOfDevelopment[0];
-  const longTermGoal = user.data.longTermGoal; // TODO: BE / call
 
-  const insightsQuery = useUserInsights();
-
+  // prettier-ignore
   // useEffect( () => () => { console.log("%c[DashboardPage.unmounting]", "color:pink;");  }, [] );
 
   return (
-    <MsgProvider messages={dashboardMessages}>
+    <MsgProvider messages={messages}>
       <Layout
-        rightMenuContent={
-          <DashboardRightMenu user={user} insightsQuery={insightsQuery} />
-        }
+        rightMenuContent={<JourneyRightMenu user={user} />}
         header={{
           withNotifications: true,
           avatarSrc: isCoach && `/api/latest/coaches/${username}/photo`,
           heading: <Msg id="dashboard.header" values={{ user: displayName }} />,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <Box>
-            <H2 sx={{ mb: 0.5 }}>
-              {dashboardMsg("dashboard.rightmenu.title")}
-            </H2>
-            <P>{dashboardMsg("dashboard.perex")}</P>
-          </Box>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6} alignItems="stretch">
-              <Card sx={{ height: "100%" }}>
-                <CardActionArea
-                  href={routes.startSession}
-                  sx={{ minHeight: 92 - 50, p: 3, height: "100%" }}
-                >
-                  {/* <CardContent sx={{ p: 3 }}> */}
-                  <SessionCardIconTile
-                    grayOutEmpty
-                    spacious
-                    iconName={"InsertChart"}
-                    caption={sessionsMsg(
-                      "sessions.edit.steps.align.area.caption"
-                    )}
-                    text={areas[areaOfDevelopment]?.label || areaOfDevelopment}
-                  />
-                </CardActionArea>
-              </Card>
+        <Box>
+          <H2>
+            <Msg id="dashboard.section-1.heading" />
+          </H2>
+          <P>
+            <Msg id="dashboard.section-1.perex" />
+          </P>
+          <Grid
+            container
+            // columns={{ xs: 4, md: 8, lg: 12 }}
+            spacing={2}
+            sx={{ my: 3 }}
+          >
+            <Grid item xs={12} md={6} lg={4}>
+              <DashboardCardAssessment selectedKeys={user.data.strengths} />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <Card sx={{ height: "100%" }}>
-                <CardActionArea
-                  href={routes.startSession}
-                  sx={{ minHeight: 92 - 50, p: 3, height: "100%" }}
-                >
-                  {/* <CardContent sx={{ p: 3 }}> */}
-                  <SessionCardIconTile
-                    grayOutEmpty
-                    spacious
-                    iconName={"Adjust"} // TODO x2
-                    caption={sessionsMsg(
-                      "sessions.edit.steps.align.goal.caption"
-                    )}
-                    text={longTermGoal}
-                  />
-                </CardActionArea>
-              </Card>
+            <Grid item xs={12} md={6} lg={4}>
+              <DashboardCardValues selectedKeys={user.data.values} />
             </Grid>
-          </Grid>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} lg={5} xl={4} sx={sessionCardSx}>
-              <SessionCardTitle iconName={"CalendarMonth"}>
-                {dashboardMsg("dashboard.upcoming.heading")}
-              </SessionCardTitle>
-              <Card sx={{ height: "100%" }}>
-                <UpcomingSessionsContent />
-              </Card>
+            <Grid item xs={12} md={6} lg={4}>
+              <DashboardCardFeedback />
             </Grid>
-            <Grid item xs={12} sm={6} lg={7} xl={8} sx={sessionCardSx}>
-              <SessionCardTitle iconName={"RocketLaunch"}>
-                {dashboardMsg("dashboard.rightmenu.actions.heading")}
-              </SessionCardTitle>
-              <Card sx={{ height: "100%" }}>
-                <ActionsContent insightsQuery={insightsQuery} />
-              </Card>
+            <Grid item xs={12}>
+              <DashboardCardAI />
             </Grid>
-          </Grid>
-
-          <SessionCardTitle iconName={"School"}>
-            {dashboardMsg("dashboard.learn.heading")}
-          </SessionCardTitle>
-          <Grid container spacing={2}>
-            {resources.map(
-              ({
-                title = "",
-                previewSrc = "https://placehold.co/400x400?text=Preview",
-                type = RESOURCE_TYPE.VIDEO,
-                estimatedTime = "",
-              }) => (
-                <Grid item xs={12} sm={6} lg={3} xl={2} sx={{}}>
-                  <ResourceMediaCard
-                    title={title}
-                    previewSrc={previewSrc}
-                    type={type}
-                    estimatedTime={estimatedTime}
-                    sx={{ height: "100%" }}
-                  />
-                </Grid>
-              )
-            )}
           </Grid>
         </Box>
       </Layout>

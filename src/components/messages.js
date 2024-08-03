@@ -41,8 +41,4 @@ export const generalMessages = defineMessages({
     id: "general.delimiter",
     defaultMessage: "Delimiter {delimiter}",
   },
-  "general.today": {
-    id: "general.today",
-    defaultMessage: "Today",
-  },
 });

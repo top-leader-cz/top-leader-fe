@@ -14,9 +14,9 @@ import { Icon } from "../../components/Icon";
 import { Msg, useMsg } from "../../components/Msg/Msg";
 import { H2, P } from "../../components/Typography";
 import { useSendMessageMutation } from "../Messages/api";
+import { formatName } from "./Coaches.page";
 import React, { useCallback, useState } from "react";
 import { messages } from "./messages";
-import { formatName } from "./CoachCard";
 
 // {
 //     "username": "coach1@gmail.com",
