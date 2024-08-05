@@ -11,5 +11,8 @@
   "dashboard.upcoming.empty.action.schedule-session": "Schedule session",
   "dashboard.upcoming.empty.action.select-coach": "Select coach",
   "dashboard.upcoming.heading": "Upcoming sessions",
+  "feedback.results.summary": "Summary",
+  "feedback.results.summary.areas-of-improvement": "Areas for improvement",
+  "feedback.results.summary.strong-areas": "Strong areas",
   "general.today": "Today"
 }

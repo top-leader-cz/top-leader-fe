@@ -95,7 +95,7 @@ const FieldResults = ({ question }) => {
   return null;
 };
 
-const FieldResultsCard = ({ index, question, feedback, sx }) => {
+export const FieldResultsCard = ({ index, question, feedback, sx }) => {
   const msg = useMsg({ dict: messages });
   const { optionsProps } = useFeedbackOptions();
   const answersCount =
@@ -120,21 +120,5 @@ const FieldResultsCard = ({ index, question, feedback, sx }) => {
         </CardContent>
       </Card>
     </ErrorBoundary>
-  );
-};
-
-export const Results = ({ feedback }) => {
-  return (
-    <>
-      {feedback?.questions?.map((question, i) => (
-        <FieldResultsCard
-          key={question.id ?? i}
-          index={i}
-          question={question}
-          feedback={feedback}
-          sx={{ mt: 3 }}
-        />
-      ))}
-    </>
   );
 };
