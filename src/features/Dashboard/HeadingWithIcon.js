@@ -6,13 +6,22 @@ export const HeadingWithIcon = ({
   title,
   perex,
   isLoading = false,
+  emphasized = false,
+  size = emphasized ? 16 : 14,
+  withoutIcon,
   sx = {},
 }) => {
-  const size = 14;
   return (
     <>
-      <Typography sx={{ color: primary500, fontSize: size, ...sx }}>
-        {isLoading ? (
+      <Typography
+        sx={{
+          color: primary500,
+          fontSize: size,
+          fontWeight: emphasized ? 500 : 400,
+          ...sx,
+        }}
+      >
+        {withoutIcon ? null : isLoading ? (
           <CircularProgress
             color="inherit"
             size={size}

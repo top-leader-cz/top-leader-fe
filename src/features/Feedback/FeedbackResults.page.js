@@ -1,5 +1,14 @@
 import { LoadingButton } from "@mui/lab";
-import { Box, Button, Divider, Tooltip } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Card,
+  Divider,
+  Tooltip,
+} from "@mui/material";
 import { evolve, mergeRight, pipe, prop, slice } from "ramda";
 import {
   useContext,
@@ -25,11 +34,13 @@ import { QueryRenderer } from "../QM/QueryRenderer";
 import { controlsMessages } from "../Sessions/steps/Controls";
 import { FeedbackRightMenu } from "./FeedbackRightMenu";
 import { getCollectedMaybe } from "./GetFeedback.page";
-import { Results } from "./Results";
+import { FieldResultsCard } from "./Results";
 import { useFeedbackResultsQuery, useSaveFeedbackFormMutation } from "./api";
 import { messages } from "./messages";
 import { isBefore } from "date-fns/fp";
 import { intervalToDuration } from "date-fns";
+import { HeadingWithIcon } from "../Dashboard/HeadingWithIcon";
+import { gray900, primary25 } from "../../theme";
 
 export const ConditionalWrapper = ({
   condition,
@@ -192,6 +203,90 @@ const SharedWith = ({ feedback }) => {
   );
 };
 
+const SUMMARY_MOCK = {
+  strongAreas:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  areasOfImprovement: "areasOfImprovement",
+};
+
+const InfoBox = ({ title, text, sx = {} }) => {
+  return (
+    <Box
+      sx={{
+        bgcolor: primary25,
+        mb: 1,
+        borderRadius: "6px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        p: 2,
+        ...sx,
+      }}
+    >
+      <HeadingWithIcon emphasized withoutIcon title={title} />
+      <P bigger sx={{ color: gray900 }}>
+        {text}
+      </P>
+    </Box>
+  );
+};
+
+const FeedbackResultsSummaryCard = ({ summary, sx }) => {
+  const msg = useMsg({ dict: messages });
+  const { strongAreas, areasOfImprovement } = summary || {};
+
+  if (!strongAreas && !areasOfImprovement) return null;
+
+  return (
+    <Card sx={sx}>
+      <Accordion
+        defaultExpanded
+        sx={{
+          // bgcolor: gray50,
+          borderRadius: "8px",
+          "&:before": {
+            display: "none", // remove border
+          },
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<Icon name="ExpandMore" />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+        >
+          <HeadingWithIcon emphasized title={msg("feedback.results.summary")} />
+        </AccordionSummary>
+        {/* <CardActionArea sx={{}} href={href}> */}
+        <AccordionDetails
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "stretch",
+            gap: 3,
+            pt: 0,
+          }}
+        >
+          {!!strongAreas && (
+            <InfoBox
+              sx={{ flex: 1 }}
+              title={msg("feedback.results.summary.strong-areas")}
+              text={strongAreas}
+            />
+          )}
+          {!!areasOfImprovement && (
+            <InfoBox
+              sx={{ flex: 1 }}
+              title={msg("feedback.results.summary.areas-of-improvement")}
+              text={areasOfImprovement}
+            />
+          )}
+        </AccordionDetails>
+        {/* </CardActionArea> */}
+      </Accordion>
+    </Card>
+  );
+};
+
 function FeedbackResultsPageInner() {
   const { id } = useParams();
   const msg = useMsg();
@@ -245,7 +340,23 @@ function FeedbackResultsPageInner() {
       <QueryRenderer
         query={query}
         success={({ data: feedback }) => {
-          return <Results feedback={feedback} />;
+          return (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <FeedbackResultsSummaryCard
+                summary={feedback?.summary}
+                // summary={SUMMARY_MOCK}
+              />
+              {feedback?.questions?.map((question, i) => (
+                <FieldResultsCard
+                  key={question.id ?? i}
+                  index={i}
+                  question={question}
+                  feedback={feedback}
+                  // sx={{ mt: 3 }}
+                />
+              ))}
+            </Box>
+          );
         }}
       />
     </Layout>

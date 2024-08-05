@@ -57,6 +57,18 @@ export const messages = defineMessages({
     id: "feedback.results.add",
     defaultMessage: "Add",
   },
+  "feedback.results.summary": {
+    id: "feedback.results.summary",
+    defaultMessage: "Summary",
+  },
+  "feedback.results.summary.strong-areas": {
+    id: "feedback.results.summary.strong-areas",
+    defaultMessage: "Strong areas",
+  },
+  "feedback.results.summary.areas-of-improvement": {
+    id: "feedback.results.summary.areas-of-improvement",
+    defaultMessage: "Areas for improvement",
+  },
   "feedback.create.stats.questions": {
     id: "feedback.create.stats.questions",
     defaultMessage: "Questions",
